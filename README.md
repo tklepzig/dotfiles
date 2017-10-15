@@ -1,3 +1,7 @@
 # dotfiles
 
-My Dotfiles -- TODO
+My Dotfiles
+
+## TODO
+
+- Symlinks unter WIndows (msysgit)
