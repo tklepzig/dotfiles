@@ -1,9 +1,7 @@
 # dotfiles
 
-My Dotfiles
+My Dotfiles.
 
-## TODO
+## Installation
 
-- Move from basic-setup to here
-- Symlinks unter Windows (msysgit): `cmd <<< "mklink \"$link\" \"${target//\//\\}\"" > /dev/null` (needs admin rights)
-- Linux: `ln -s "$target" "$link"`
+    curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh|bash
