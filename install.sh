@@ -1,8 +1,5 @@
 #!/bin/bash
 
-accent='\033[1;33m'
-normal='\033[0m'
-
 isOS()
 {
     shopt -s nocasematch
@@ -20,37 +17,47 @@ isProgramInstalled()
     return 0
 }
 
-if ! isProgramInstalled git
-then
-    echo "No Git found!"
-    exit
-fi
-
-pushd ~
-rm -rf .dotfiles
-git clone --depth=1 https://github.com/tklepzig/dotfiles.git .dotfiles
-popd
-
-# Add entry to .bashrc
+accent='\033[1;33m'
+normal='\033[0m'
 profileFile='.bashrc'
 if isOS darwin
 then
     profileFile='.bash_profile'
 fi
 
+echo -e "${accent}Searching for Git...${normal}"
+if ! isProgramInstalled git
+then
+    echo -e "${accent}No Git found!${normal}"
+    exit
+fi
+echo -e "${accent}Git found: $(which git).${normal}"
+
+
+echo -e "${accent}Cloning Repo...${normal}"
+pushd ~
+rm -rf .dotfiles
+git clone --depth=1 https://github.com/tklepzig/dotfiles.git .dotfiles
+popd
+echo -e "${accent}Done.${normal}"
+
+
+echo -e "${accent}Configuring $profileFile...${normal}"
 if [ ! -f ~/$profileFile ]
 then
     touch ~/$profileFile
 fi
-
 if ! grep -q "~/.dotfiles/bashrc.sh" ~/$profileFile
 then
     echo "if [ -f ~/.dotfiles/bashrc.sh ]; then . ~/.dotfiles/bashrc.sh; fi" >> ~/$profileFile;
 fi
+echo -e "${accent}Done.${normal}"
 
 
-# create symlinks
+echo -e "${accent}Creating Symlinks...${normal}"
 ln -sf ~/.dotfiles/vimrc ~/.vimrc
+echo -e "${accent}Done.${normal}"
 
-# git config
+echo -e "${accent}Configuring Git${normal}"
 ~/.dotfiles/git-config.sh
+echo -e "${accent}Done.${normal}"
