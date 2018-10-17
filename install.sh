@@ -28,7 +28,8 @@ fi
 
 dotfilesDir='~/.dotfiles'
 if [ ! -d $dotfilesDir ]; then
-    git clone https://github.com/tklepzig/dotfiles.git $dotfilesDir
+    cd ~
+    git clone https://github.com/tklepzig/dotfiles.git .dotfiles
     cd $dotfilesDir
 else
     cd $dotfilesDir
