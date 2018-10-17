@@ -64,8 +64,14 @@ export PS1='\u@\h:\[\033[0;33m\]\w\[\033[01;32m\]`__git_ps1`\[\033[00m\]\n\$ '
 
 if isOS linux
 then
-	. /usr/share/bash-completion/completions/git
+	[ -f /usr/share/bash-completion/completions/git ] && . /usr/share/bash-completion/completions/git
 fi
+
+if isOS darwin
+then
+    [ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
+fi
+
 __git_complete "g s" _git_status
 __git_complete "g si" _git_status
 __git_complete "g sa" _git_status
