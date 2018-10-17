@@ -26,18 +26,10 @@ then
     exit
 fi
 
-dotfilesDir='~/.dotfiles'
-if [ ! -d $dotfilesDir ]; then
-    cd ~
-    git clone https://github.com/tklepzig/dotfiles.git .dotfiles
-    cd $dotfilesDir
-else
-    cd $dotfilesDir
-    git fetch && git merge --ff-only
-fi
-
-# now we are in ~/.dotfiles
-
+pushd ~
+rm -rf .dotfiles
+git clone --depth=1 https://github.com/tklepzig/dotfiles.git .dotfiles
+popd
 
 # Add entry to .bashrc
 profileFile='.bashrc'
@@ -61,4 +53,4 @@ fi
 ln -sf ~/.dotfiles/vimrc ~/.vimrc
 
 # git config
-./git-config.sh
+~/.dotfiles/git-config.sh
