@@ -1,0 +1,78 @@
+[
+    {
+        "key": "alt+backspace",
+        "command": "extension.deleteCamelLeftCommand",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "cmd+shift+[Period]",
+        "command": "tslint.fixAllProblems"
+    },
+    {
+        "key": "cmd+shift+[Period]",
+        "command": "-extension.refactorix.Semicolons.Remove",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "cmd+shift+s",
+        "command": "-workbench.action.files.saveAs"
+    },
+    {
+        "key": "cmd+shift+s",
+        "command": "workbench.action.files.saveAll"
+    },
+    {
+        "key": "cmd+shift+[Period]",
+        "command": "eslint.executeAutofix"
+    },
+    {
+        "key": "alt+delete",
+        "command": "extension.deleteCamelRightCommand",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+delete",
+        "command": "-extension.deleteCamelRightCommand",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "shift+alt+left",
+        "command": "extension.extendCamelLeftCommand",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+shift+left",
+        "command": "-extension.extendCamelLeftCommand",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "shift+alt+right",
+        "command": "extension.extendCamelRightCommand",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+shift+right",
+        "command": "-extension.extendCamelRightCommand",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "alt+left",
+        "command": "extension.moveCamelLeftCommand",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+left",
+        "command": "-extension.moveCamelLeftCommand",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "alt+right",
+        "command": "extension.moveCamelRightCommand",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+right",
+        "command": "-extension.moveCamelRightCommand",
+        "when": "editorTextFocus"
+    }
+]

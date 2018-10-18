@@ -61,3 +61,25 @@ echo -e "${accent}Done.${normal}"
 echo -e "${accent}Configuring Git${normal}"
 ~/.dotfiles/git-config.sh
 echo -e "${accent}Done.${normal}"
+
+if isProgramInstalled code-insiders
+then
+    echo -e "${accent}Installing VS Code extensions${normal}"
+    ~/.dotfiles/vscode-extensions.sh
+    echo -e "${accent}Done.${normal}"
+
+    echo -e "${accent}Creating Symlinks for VS Code config...${normal}"
+    vscodeConfigPath=""
+    if isOS linux
+    then
+        vscodeConfigPath="~/.config/Code/User"
+        ln -sf ~/.dotfiles/vscode-keybindings.json $vscodeConfigPath/settings.json
+    fi
+    if isOS darwin
+    then
+        vscodeConfigPath="~/Library/Application Support/Code/User"
+        ln -sf ~/.dotfiles/vscode-keybindings-macos.json $vscodeConfigPath/settings.json
+    fi
+    ln -sf ~/.dotfiles/vscode-settings.json $vscodeConfigPath/keybindings.json
+    echo -e "${accent}Done.${normal}"
+fi

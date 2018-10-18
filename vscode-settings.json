@@ -1,0 +1,46 @@
+{
+    "window.zoomLevel": 1,
+    "editor.fontSize": 14,
+    "editor.tabCompletion": "onlySnippets",
+    "editor.quickSuggestions": {
+        "other": true,
+        "comments": true,
+        "strings": true
+    },
+    "git.autofetch": false,
+    "workbench.iconTheme": "seti",
+    "editor.minimap.enabled": false,
+    "files.associations": {
+        "*.jsx": "javascriptreact"
+    },
+    "emmet.showExpandedAbbreviation": "always",
+    "openSpecFile.suffixMap": {
+        ".js": ".spec.js",
+        ".spec.js": ".js",
+        ".ts": ".spec.ts",
+        ".spec.ts": ".ts"
+    },
+    "typelens.skiplanguages": [
+        "csharp",
+        "dockerfile"
+    ],
+    "debug.toolBarLocation": "docked",
+    "zenMode.centerLayout": false,
+    "gitlens.historyExplorer.enabled": true,
+    "bracketPairColorizer.consecutivePairColors": [
+        "()",
+        "[]",
+        "{}",
+        [
+            "Gold",
+            "LightSkyBlue",
+            "orange"
+        ],
+        "Red"
+    ],
+    "flow.useNPMPackagedFlow": true,
+    "breadcrumbs.enabled": true,
+    "eslint.autoFixOnSave": true,
+    "editor.matchBrackets": false,
+    "flow.pathToFlow": "${workspaceRoot}/node_modules/.bin/flow"
+}
