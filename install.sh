@@ -19,11 +19,22 @@ isProgramInstalled()
 
 accent='\033[1;33m'
 normal='\033[0m'
+
 profileFile='.bashrc'
 if isOS darwin
 then
     profileFile='.bash_profile'
 fi
+
+skipVsCodeConfig=0
+for var in "$@"
+do
+    case "$var" in
+        "--skip-vsc")
+            skipVsCodeConfig=1
+            ;;
+    esac
+done
 
 echo -e "${accent}Searching for Git...${normal}"
 if ! isProgramInstalled git
@@ -60,7 +71,7 @@ echo -e "${accent}Configuring Git${normal}"
 $dotfilesDir/git-config.sh
 echo -e "${accent}Done.${normal}"
 
-if isProgramInstalled code-insiders
+if isProgramInstalled code-insiders && [ "$skipVsCodeConfig" = "0" ]
 then
     echo -e "${accent}Installing VS Code extensions${normal}"
     $dotfilesDir/vscode-extensions.sh
