@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 isOS()
 {
     shopt -s nocasematch
@@ -17,8 +19,25 @@ isProgramInstalled()
     return 0
 }
 
-accent='\033[1;33m'
-normal='\033[0m'
+accent='\033[0;33m'
+success='\033[0;92m'
+error='\033[0;91m'
+reset='\033[0m'
+
+info()
+{
+    echo -e "${accent}$1${reset}"
+}
+
+success()
+{
+    echo -e "${success}$1${reset}"
+}
+
+error()
+{
+    echo -e "${error}$1${reset}"
+}
 
 profileFile='.bashrc'
 if isOS darwin
@@ -36,22 +55,22 @@ do
     esac
 done
 
-echo -e "${accent}Searching for Git...${normal}"
+info "Searching for Git..."
 if ! isProgramInstalled git
 then
-    echo -e "${accent}No Git found!${normal}"
+    error "No Git found!"
     exit
 fi
-echo -e "${accent}Git found: $(which git).${normal}"
+success "Git found: $(which git)."
 
 dotfilesDir=$HOME/.dotfiles
-echo -e "${accent}Cloning Repo...${normal}"
+info "Cloning Repo..."
 rm -rf $dotfilesDir
-git clone --depth=1 https://github.com/tklepzig/dotfiles.git $dotfilesDir
-echo -e "${accent}Done.${normal}"
+git clone --depth=1 https://github.com/tklepzig/dotfiles.git $dotfilesDir > /dev/null 2>&1
+success "Done."
 
 
-echo -e "${accent}Configuring $profileFile...${normal}"
+info "Configuring $profileFile..."
 if [ ! -f $HOME/$profileFile ]
 then
     touch $HOME/$profileFile
@@ -60,24 +79,24 @@ if ! grep -q "$dotfilesDir/bashrc.sh" $HOME/$profileFile
 then
     echo "if [ -f $dotfilesDir/bashrc.sh ]; then . $dotfilesDir/bashrc.sh; fi" >> $HOME/$profileFile;
 fi
-echo -e "${accent}Done.${normal}"
+success "Done."
 
 
-echo -e "${accent}Creating Symlinks...${normal}"
+info "Creating Symlinks..."
 ln -sf $dotfilesDir/vimrc $HOME/.vimrc
-echo -e "${accent}Done.${normal}"
+success "Done."
 
-echo -e "${accent}Configuring Git${normal}"
+info "Configuring Git..."
 $dotfilesDir/git-config.sh
-echo -e "${accent}Done.${normal}"
+success "Done."
 
 if isProgramInstalled code-insiders && [ "$skipVsCodeConfig" = "0" ]
 then
-    echo -e "${accent}Installing VS Code extensions${normal}"
+    info "Installing VS Code extensions..."
     $dotfilesDir/vscode-extensions.sh
-    echo -e "${accent}Done.${normal}"
+    success "Done."
 
-    echo -e "${accent}Creating Symlinks for VS Code config...${normal}"
+    info "Creating Symlinks for VS Code config..."
     vscodeConfigPath=""
     if isOS linux
     then
@@ -90,5 +109,5 @@ then
         ln -sf $dotfilesDir/vscode-keybindings-macos.json "$vscodeConfigPath/keybindings.json"
     fi
     ln -sf $dotfilesDir/vscode-settings.json "$vscodeConfigPath/settings.json"
-    echo -e "${accent}Done.${normal}"
+    success "Done."
 fi
