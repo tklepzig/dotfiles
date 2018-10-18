@@ -52,6 +52,11 @@ then
     alias n='nautilus .'
 fi
 
+if isOS darwin
+then
+    alias o='open .'
+fi
+
 alias git='LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 git'
 alias g='git'
 alias gk='LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 gitk --all &'
