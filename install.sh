@@ -33,53 +33,51 @@ then
 fi
 echo -e "${accent}Git found: $(which git).${normal}"
 
-
+dotfilesDir=$HOME/.dotfiles
 echo -e "${accent}Cloning Repo...${normal}"
-pushd ~
-rm -rf .dotfiles
-git clone --depth=1 https://github.com/tklepzig/dotfiles.git .dotfiles
-popd
+rm -rf $dotfilesDir
+git clone --depth=1 https://github.com/tklepzig/dotfiles.git $dotfilesDir
 echo -e "${accent}Done.${normal}"
 
 
 echo -e "${accent}Configuring $profileFile...${normal}"
-if [ ! -f ~/$profileFile ]
+if [ ! -f $HOME/$profileFile ]
 then
-    touch ~/$profileFile
+    touch $HOME/$profileFile
 fi
-if ! grep -q "~/.dotfiles/bashrc.sh" ~/$profileFile
+if ! grep -q "$dotfilesDir/bashrc.sh" $HOME/$profileFile
 then
-    echo "if [ -f ~/.dotfiles/bashrc.sh ]; then . ~/.dotfiles/bashrc.sh; fi" >> ~/$profileFile;
+    echo "if [ -f $dotfilesDir/bashrc.sh ]; then . $dotfilesDir/bashrc.sh; fi" >> $HOME/$profileFile;
 fi
 echo -e "${accent}Done.${normal}"
 
 
 echo -e "${accent}Creating Symlinks...${normal}"
-ln -sf ~/.dotfiles/vimrc ~/.vimrc
+ln -sf $dotfilesDir/vimrc $HOME/.vimrc
 echo -e "${accent}Done.${normal}"
 
 echo -e "${accent}Configuring Git${normal}"
-~/.dotfiles/git-config.sh
+$dotfilesDir/git-config.sh
 echo -e "${accent}Done.${normal}"
 
 if isProgramInstalled code-insiders
 then
     echo -e "${accent}Installing VS Code extensions${normal}"
-    ~/.dotfiles/vscode-extensions.sh
+    $dotfilesDir/vscode-extensions.sh
     echo -e "${accent}Done.${normal}"
 
     echo -e "${accent}Creating Symlinks for VS Code config...${normal}"
     vscodeConfigPath=""
     if isOS linux
     then
-        vscodeConfigPath="~/.config/Code/User"
-        ln -sf ~/.dotfiles/vscode-keybindings.json $vscodeConfigPath/settings.json
+        vscodeConfigPath="$HOME/.config/Code - Insiders/User"
+        ln -sf $dotfilesDir/vscode-keybindings.json "$vscodeConfigPath/keybindings.json"
     fi
     if isOS darwin
     then
-        vscodeConfigPath="~/Library/Application Support/Code/User"
-        ln -sf ~/.dotfiles/vscode-keybindings-macos.json $vscodeConfigPath/settings.json
+        vscodeConfigPath="$HOME/Library/Application Support/Code - Insiders/User"
+        ln -sf $dotfilesDir/vscode-keybindings-macos.json "$vscodeConfigPath/keybindings.json"
     fi
-    ln -sf ~/.dotfiles/vscode-settings.json $vscodeConfigPath/keybindings.json
+    ln -sf $dotfilesDir/vscode-settings.json "$vscodeConfigPath/settings.json"
     echo -e "${accent}Done.${normal}"
 fi
