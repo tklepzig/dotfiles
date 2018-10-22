@@ -1,5 +1,5 @@
 set nocompatible
-set softtabstop=2 expandtab shiftwidth=2 smarttab
+set tabstop=2 softtabstop=2 expandtab shiftwidth=2 smarttab
 
 " Enable syntax highlighting.
 syntax on
