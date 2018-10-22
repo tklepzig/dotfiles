@@ -54,6 +54,7 @@ fi
 alias sif="$dotfilesDir/search-in-files.sh"
 alias hgrep="$dotfilesDir/hgrep.sh"
 alias update-my-config='curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh|bash'
+alias update-my-config-skip-vsc='curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh | bash -s -- --skip-vsc'
 
 _complete_ssh_hosts ()
 {
