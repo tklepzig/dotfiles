@@ -69,14 +69,10 @@ complete -F _complete_ssh_hosts ssh
 
 _complete_rake_tasks ()
 {
-    tasks=$(rake -T -A)
-    taskCompletion=""
-    while read -r task; do
-        taskCompletion+=$(echo "$task" | sed -e 's/ #.*$//g' -e 's/rake //g')
-    done <<< "$tasks"
     local cur
 	COMPREPLY=()
 	cur="${COMP_WORDS[COMP_CWORD]}"
+    taskCompletion=`rake -T -A | awk '{print $2}'`
 	COMPREPLY=( $(compgen -W "${taskCompletion}" -- $cur))
 	return 0
 }
