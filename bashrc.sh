@@ -66,6 +66,14 @@ _complete_ssh_hosts ()
 }
 complete -F _complete_ssh_hosts ssh
 
+# bash completion for rake tasks
+tasks=$(rake -T -A)
+taskCompletion=""
+while read -r task; do
+  taskCompletion+=$(echo "$task" | sed -e 's/ #.*$//g' -e 's/rake //g')
+done <<< "$tasks"
+complete -W "$taskCompletion" rake
+
 if isOS linux
 then
     alias n='nautilus .'
