@@ -58,6 +58,7 @@ alias update-my-config-skip-vsc='curl -Ls https://raw.githubusercontent.com/tkle
 
 _complete_ssh_hosts ()
 {
+    local cur
 	COMPREPLY=()
 	cur="${COMP_WORDS[COMP_CWORD]}"
 	comp_ssh_hosts=`awk '{split($1,aliases,","); if (aliases[1] !~ /^\[/) print aliases[1]}' ~/.ssh/known_hosts ; cat ~/.ssh/config | grep ^Host  | awk '{print $2}'`
@@ -66,13 +67,20 @@ _complete_ssh_hosts ()
 }
 complete -F _complete_ssh_hosts ssh
 
-# bash completion for rake tasks
-tasks=$(rake -T -A)
-taskCompletion=""
-while read -r task; do
-  taskCompletion+=$(echo "$task" | sed -e 's/ #.*$//g' -e 's/rake //g')
-done <<< "$tasks"
-complete -W "$taskCompletion" rake
+_complete_rake_tasks ()
+{
+    tasks=$(rake -T -A)
+    taskCompletion=""
+    while read -r task; do
+        taskCompletion+=$(echo "$task" | sed -e 's/ #.*$//g' -e 's/rake //g')
+    done <<< "$tasks"
+    local cur
+	COMPREPLY=()
+	cur="${COMP_WORDS[COMP_CWORD]}"
+	COMPREPLY=( $(compgen -W "${taskCompletion}" -- $cur))
+	return 0
+}
+complete -F _complete_rake_tasks rake
 
 if isOS linux
 then
