@@ -117,3 +117,28 @@ then
     ln -sf $dotfilesDir/vscode-settings.json "$vscodeConfigPath/settings.json"
     success "Done."
 fi
+
+
+if isProgramInstalled docker && isOS darwin
+then
+    echo "Installing docker bash completion"
+    pushd /usr/local/etc/bash_completion.d
+    ln -s /Applications/Docker.app/Contents/Resources/etc/docker.bash-completion
+    popd
+fi
+
+if isProgramInstalled docker-machine && isOS darwin
+then
+    echo "Installing docker-machine bash completion"
+    pushd /usr/local/etc/bash_completion.d
+    ln -s /Applications/Docker.app/Contents/Resources/etc/docker-machine.bash-completion
+    popd
+fi
+
+if isProgramInstalled docker-compose && isOS darwin
+then
+    echo "Installing docker-compose bash completion"
+    pushd /usr/local/etc/bash_completion.d
+    ln -s /Applications/Docker.app/Contents/Resources/etc/docker-compose.bash-completion
+    popd
+fi
