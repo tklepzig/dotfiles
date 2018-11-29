@@ -22,10 +22,6 @@
         "command": "workbench.action.files.saveAll"
     },
     {
-        "key": "cmd+shift+[Period]",
-        "command": "eslint.executeAutofix"
-    },
-    {
         "key": "alt+delete",
         "command": "extension.deleteCamelRightCommand",
         "when": "editorTextFocus"
