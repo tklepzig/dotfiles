@@ -123,7 +123,7 @@ if isProgramInstalled docker && isOS darwin
 then
     info "Installing docker bash completion..."
     pushd /usr/local/etc/bash_completion.d > /dev/null
-    ln -s /Applications/Docker.app/Contents/Resources/etc/docker.bash-completion
+    ln -sf /Applications/Docker.app/Contents/Resources/etc/docker.bash-completion
     popd > /dev/null
     success "Done."
 fi
@@ -132,7 +132,7 @@ if isProgramInstalled docker-machine && isOS darwin
 then
     info "Installing docker-machine bash completion..."
     pushd /usr/local/etc/bash_completion.d > /dev/null
-    ln -s /Applications/Docker.app/Contents/Resources/etc/docker-machine.bash-completion
+    ln -sf /Applications/Docker.app/Contents/Resources/etc/docker-machine.bash-completion
     popd > /dev/null
     success "Done."
 fi
@@ -141,7 +141,7 @@ if isProgramInstalled docker-compose && isOS darwin
 then
     info "Installing docker-compose bash completion..."
     pushd /usr/local/etc/bash_completion.d > /dev/null
-    ln -s /Applications/Docker.app/Contents/Resources/etc/docker-compose.bash-completion
+    ln -sf /Applications/Docker.app/Contents/Resources/etc/docker-compose.bash-completion
     popd > /dev/null
     success "Done."
 fi
