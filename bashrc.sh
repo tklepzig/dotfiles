@@ -136,6 +136,7 @@ __git_complete "g cma" _git_commit
 __git_complete "g p" _git_push
 __git_complete "g pn" _git_push
 __git_complete "g c" _git_checkout
+__git_complete "g cb" _git_checkout
 __git_complete "g b" _git_branch
 __git_complete "g bd" _git_branch
 __git_complete "g ba" _git_branch

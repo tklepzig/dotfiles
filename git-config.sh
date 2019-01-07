@@ -58,6 +58,7 @@ git config --global alias.pn "!f() { currentBranch=\$(git rev-parse --abbrev-ref
 #git config --global alias.pt "push --tags"
 
 git config --global alias.c "checkout"
+git config --global alias.cb "checkout -b"
 
 git config --global alias.b "branch"
 git config --global alias.bd "branch -d"
