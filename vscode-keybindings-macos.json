@@ -5,8 +5,8 @@
         "when": "editorTextFocus"
     },
     {
-        "key": "cmd+shift+[Period]",
-        "command": "tslint.fixAllProblems"
+        "key": "alt+shift+[Period]",
+        "command": "eslint.executeAutofix"
     },
     {
         "key": "cmd+shift+[Period]",

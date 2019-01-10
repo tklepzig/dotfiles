@@ -33,18 +33,18 @@ $codeBin --install-extension thekarel.open-spec-file --force
 $codeBin --install-extension legfrey.javascript-test-runner --force
 
 # ES 2015, Babel
-$codeBin --install-extension dzannotti.vscode-babel-coloring --force
+# $codeBin --install-extension dzannotti.vscode-babel-coloring --force
 $codeBin --install-extension dbaeumer.vscode-eslint --force
 # $codeBin --install-extension cmstead.jsrefactor --force
-$codeBin --install-extension jeremyrajan.react-component --force
-$codeBin --install-extension wangtao0101.vscode-js-import --force
+# $codeBin --install-extension jeremyrajan.react-component --force
+# $codeBin --install-extension wangtao0101.vscode-js-import --force
 
 # Prettier
 $codeBin --install-extension esbenp.prettier-vscode --force
 
 # Flow
-$codeBin --install-extension flowtype.flow-for-vscode --force
-$codeBin --install-extension lsadam0.ReactFlowSnippets --force
+# $codeBin --install-extension flowtype.flow-for-vscode --force
+# $codeBin --install-extension lsadam0.ReactFlowSnippets --force
 
 # Styled Components
 $codeBin --install-extension jpoissonnier.vscode-styled-components --force
@@ -82,3 +82,7 @@ $codeBin --install-extension dunstontc.viml --force
 
 # Open in GitHub
 $codeBin --install-extension fabiospampinato.vscode-open-in-github
+
+# Python
+$codeBin --install-extension brainfit.vscode-importmagic
+$codeBin --install-extension ms-python.python
