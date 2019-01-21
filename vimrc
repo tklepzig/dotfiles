@@ -66,3 +66,4 @@ set directory=$TEMP,.
 set backspace=2   " Backspace deletes like most programs in insert mode
 
 set magic
+inoremap jj <ESC>
