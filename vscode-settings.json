@@ -1,5 +1,6 @@
 {
     "window.zoomLevel": 1,
+    "editor.mouseWheelZoom": true,
     "editor.fontSize": 14,
     "editor.tabCompletion": "onlySnippets",
     "editor.quickSuggestions": {
