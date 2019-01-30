@@ -66,6 +66,7 @@ git config --global alias.ba "branch -a"
 git config --global alias.bnm "branch --no-merged"
 git config --global alias.bv "branch -vv"
 git config --global alias.bc "!f() { git remote prune origin; git branch -vv | grep 'origin/.*: gone]' | awk '{print \$1}' | xargs git branch -d; }; f"
+git config --global alias.bcD "!f() { git remote prune origin; git branch -vv | grep 'origin/.*: gone]' | awk '{print \$1}' | xargs git branch -D; }; f"
 
 git config --global alias.f "fetch"
 git config --global alias.fm "!f() { . ~/.dotfiles/git-fetch-merge.sh; }; f"
