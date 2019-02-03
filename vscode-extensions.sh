@@ -16,7 +16,7 @@ $codeBin --install-extension christian-kohler.path-intellisense --force
 #$codeBin --install-extension huizhou.githd --force
 $codeBin --install-extension eamodio.gitlens --force
 $codeBin --install-extension kisstkondoros.typelens --force
-$codeBin --install-extension michelemelluso.code-beautifier --force
+# $codeBin --install-extension michelemelluso.code-beautifier --force
 $codeBin --install-extension minhthai.vscode-todo-parser --force
 $codeBin --install-extension mrmlnc.vscode-scss --force
 $codeBin --install-extension pflannery.vscode-versionlens --force
@@ -31,6 +31,7 @@ $codeBin --install-extension Orta.vscode-jest --force
 $codeBin --install-extension andys8.jest-snippets --force
 $codeBin --install-extension thekarel.open-spec-file --force
 $codeBin --install-extension legfrey.javascript-test-runner --force
+$codeBin --install-extension rtbenfield.vscode-jest-test-adapter --force
 
 # ES 2015, Babel
 # $codeBin --install-extension dzannotti.vscode-babel-coloring --force
