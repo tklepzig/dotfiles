@@ -47,5 +47,5 @@
     "typescript.updateImportsOnFileMove.enabled": "never",
     "javascript.updateImportsOnFileMove.enabled": "never",
     "prettier.disableLanguages": ["vue", "typescript", "typescriptreact"],
-    "prettier.tabWidth": 4
+    "prettier.tabWidth": 2
 }
