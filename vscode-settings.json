@@ -40,9 +40,12 @@
         "Red"
     ],
     "breadcrumbs.enabled": true,
-    "eslint.autoFixOnSave": false,
+    "eslint.autoFixOnSave": true,
+    "tslint.autoFixOnSave": true,
     "editor.matchBrackets": false,
     "editor.formatOnSave": true,
     "typescript.updateImportsOnFileMove.enabled": "never",
-    "javascript.updateImportsOnFileMove.enabled": "never"
+    "javascript.updateImportsOnFileMove.enabled": "never",
+    "prettier.disableLanguages": ["vue", "typescript", "typescriptreact"],
+    "prettier.tabWidth": 4
 }
