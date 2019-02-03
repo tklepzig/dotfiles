@@ -46,6 +46,5 @@
     "editor.formatOnSave": true,
     "typescript.updateImportsOnFileMove.enabled": "never",
     "javascript.updateImportsOnFileMove.enabled": "never",
-    "prettier.disableLanguages": ["vue", "typescript", "typescriptreact"],
-    "prettier.tabWidth": 2
+    "prettier.tslintIntegration": true
 }
