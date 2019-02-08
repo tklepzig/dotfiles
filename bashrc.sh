@@ -95,6 +95,7 @@ alias gg='LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 git gui &'
 alias gsa="$dotfilesDir/git-status-all.sh"
 alias c='code-insiders .'
 alias d='docker'
+alias dc='docker-compose'
 
 export GIT_PS1_SHOWDIRTYSTATE=1
 export PS1='\u@\h:\[\033[0;33m\]\w\[\033[01;32m\]`__git_ps1`\[\033[00m\]\n\$ '
