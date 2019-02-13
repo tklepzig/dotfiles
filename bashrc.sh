@@ -94,11 +94,8 @@ alias gk='LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 gitk --all &'
 alias gg='LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 git gui &'
 alias gsa="$dotfilesDir/git-status-all.sh"
 alias c='code-insiders .'
-
 alias d='docker'
-complete -F _docker d
 alias dc='docker-compose'
-complete -F _docker-compose dc
 
 export GIT_PS1_SHOWDIRTYSTATE=1
 export PS1='\u@\h:\[\033[0;33m\]\w\[\033[01;32m\]`__git_ps1`\[\033[00m\]\n\$ '
@@ -175,3 +172,8 @@ __git_complete "g cpn" _git_cherry_pick
 __git_complete "g rv" _git_revert
 __git_complete "g rvn" _git_revert
 __git_complete g __git_main
+
+complete -r d > /dev/null 2>&1
+complete -F _docker d
+complete -r dc > /dev/null 2>&1
+complete -F _docker_compose dc
