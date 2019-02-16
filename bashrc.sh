@@ -175,5 +175,8 @@ __git_complete g __git_main
 
 complete -r d > /dev/null 2>&1
 complete -F _docker d
+_completion_loader docker
+
 complete -r dc > /dev/null 2>&1
 complete -F _docker_compose dc
+_completion_loader docker-compose
