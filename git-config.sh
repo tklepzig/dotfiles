@@ -1,8 +1,8 @@
 #!/bin/bash
 
-logCommon="-c core.pager='less -SRF' log --graph --all --format='%C(yellow)%h%C(reset) %C(cyan)%><(15)%ar%C(reset) %s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%Creset'"
-reflogCommon="-c core.pager='less -SRF' reflog --format='%C(yellow)%h%C(reset) %C(dim yellow)%<(10)%gd%C(reset) %C(cyan)%><(15)%ar%C(reset) %gs%C(reset)%C(auto)%d%Creset'"
-stashCommon="-c core.pager='less -SRF' stash list --format='%C(yellow)%h%C(reset) %C(dim yellow)%<(10)%gd%C(reset) %C(cyan)%><(15)%ar%C(reset) %gs%C(reset)'"
+logCommon="-c core.pager='less -SRF' log --graph --all --date=human --format='%C(yellow)%h%C(reset) %C(cyan)%><(15)%ad%C(reset) %s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%Creset'"
+reflogCommon="-c core.pager='less -SRF' reflog --date=human --format='%C(yellow)%h%C(reset) %C(dim yellow)%<(10)%gd%C(reset) %C(cyan)%><(15)%ad%C(reset) %gs%C(reset)%C(auto)%d%Creset'"
+stashCommon="-c core.pager='less -SRF' stash list --date=human --format='%C(yellow)%h%C(reset) %C(dim yellow)%<(10)%gd%C(reset) %C(cyan)%><(15)%ad%C(reset) %gs%C(reset)'"
 
 # general config
 git config --global credential.helper store
