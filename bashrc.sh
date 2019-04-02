@@ -38,9 +38,9 @@ HISTCONTROL=ignoredups:ignorespace
 # append to the history file, don't overwrite it
 shopt -s histappend
 
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
+HISTSIZE=10000
+SAVEHIST=40000
+HISTFILESIZE=40000
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -98,7 +98,11 @@ alias d='docker'
 alias dc='docker-compose'
 
 export GIT_PS1_SHOWDIRTYSTATE=1
-export PS1='\u@\h:\[\033[0;33m\]\w\[\033[01;32m\]`__git_ps1`\[\033[00m\]\n\$ '
+export GIT_PS1_SHOWSTASHSTATE=1
+export GIT_PS1_SHOWUNTRACKEDFILES=1
+export GIT_PS1_SHOWUPSTREAM="auto"
+export GIT_PS1_SHOWCOLORHINTS=1
+export PROMPT_COMMAND='__git_ps1 "\u@\h:\[\033[0;33m\]\w\[\033[01;32m\]" "\[\033[00m\]\n\$ "'
 
 if isOS linux
 then
