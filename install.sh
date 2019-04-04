@@ -51,6 +51,8 @@ then
     profileFile='.bash_profile'
 fi
 
+zshProfileFile='.zshrc'
+
 skipVsCodeConfig=0
 for var in "$@"
 do
@@ -84,6 +86,18 @@ fi
 if ! grep -q "$dotfilesDir/bashrc.sh" $HOME/$profileFile
 then
     echo "if [ -f $dotfilesDir/bashrc.sh ]; then . $dotfilesDir/bashrc.sh; fi" >> $HOME/$profileFile;
+fi
+success "Done."
+
+
+info "Configuring $zshProfileFile..."
+if [ ! -f $HOME/$zshProfileFile ]
+then
+    touch $HOME/$zshProfileFile
+fi
+if ! grep -q "$dotfilesDir/zshrc.sh" $HOME/$zshProfileFile
+then
+    echo "if [ -f $dotfilesDir/zshrc.sh ]; then . $dotfilesDir/zshrc.sh; fi" >> $HOME/$zshProfileFile;
 fi
 success "Done."
 
