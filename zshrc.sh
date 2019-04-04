@@ -94,9 +94,9 @@ precmd() {
         # STATUS line taken from https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/git.zsh
         STATUS=$(command git status --porcelain 2> /dev/null | tail -n1)
         if [[ -n $STATUS ]]; then
-            RPROMPT='%{$fg_bold[red]%}${vcs_info_msg_0_} %f'
+            RPROMPT='%{$fg_bold[red]%}${vcs_info_msg_0_}%{$reset_color%}'
         else
-            RPROMPT='%{$fg_bold[green]%}${vcs_info_msg_0_} %f'
+            RPROMPT='%{$fg_bold[green]%}${vcs_info_msg_0_}%{$reset_color%}'
         fi
     else
         # nothing from vcs_info
