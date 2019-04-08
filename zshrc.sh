@@ -90,19 +90,25 @@ setopt prompt_subst
 precmd() {
     vcs_info
     if [[ -n ${vcs_info_msg_0_} ]]; then
-        upstream_info=$(git rev-list --left-right --count $(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2> /dev/null)...HEAD 2> /dev/null)
-        case "$upstream_info" in
-            "") # no upstream
-                upstream_prompt="" ;;
-            "0	0") # equal to upstream
-                upstream_prompt="=" ;;
-            "0	"*) # ahead of upstream
-                upstream_prompt=">" ;;
-            *"	0") # behind upstream
-                upstream_prompt="<" ;;
-            *)	    # diverged from upstream
-                upstream_prompt="<>" ;;
-		esac
+        upstream=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2> /dev/null)
+
+        if [[ -z $upstream ]] then
+            upstream_prompt="#";
+        else
+            upstream_info=$(git rev-list --left-right --count $upstream...HEAD 2> /dev/null)
+            case "$upstream_info" in
+                "") # no upstream
+                    upstream_prompt="" ;;
+                "0	0") # equal to upstream
+                    upstream_prompt="=" ;;
+                "0	"*) # ahead of upstream
+                    upstream_prompt=">" ;;
+                *"	0") # behind upstream
+                    upstream_prompt="<" ;;
+                *)	    # diverged from upstream
+                    upstream_prompt="<>" ;;
+            esac
+        fi
 
         # vcs_info found something (the documentation got that backwards
         # STATUS line taken from https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/git.zsh
