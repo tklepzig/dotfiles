@@ -90,13 +90,27 @@ setopt prompt_subst
 precmd() {
     vcs_info
     if [[ -n ${vcs_info_msg_0_} ]]; then
+        upstream_info=$(git rev-list --left-right --count $(git rev-parse --abbrev-ref --symbolic-full-name @{u})...HEAD 2> /dev/null)
+        case "$upstream_info" in
+            "") # no upstream
+                upstream_prompt="" ;;
+            "0	0") # equal to upstream
+                upstream_prompt="=" ;;
+            "0	"*) # ahead of upstream
+                upstream_prompt=">" ;;
+            *"	0") # behind upstream
+                upstream_prompt="<" ;;
+            *)	    # diverged from upstream
+                upstream_prompt="<>" ;;
+		esac
+
         # vcs_info found something (the documentation got that backwards
         # STATUS line taken from https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/git.zsh
         STATUS=$(command git status --porcelain 2> /dev/null | tail -n1)
         if [[ -n $STATUS ]]; then
-            RPROMPT='%{$fg_bold[red]%}${vcs_info_msg_0_}%{$reset_color%}'
+            RPROMPT='%{$fg_bold[red]%}${vcs_info_msg_0_} %{$fg_bold[cyan]%}$upstream_prompt%{$reset_color%}'
         else
-            RPROMPT='%{$fg_bold[green]%}${vcs_info_msg_0_}%{$reset_color%}'
+            RPROMPT='%{$fg_bold[green]%}${vcs_info_msg_0_} %{$fg_bold[cyan]%}$upstream_prompt%{$reset_color%}'
         fi
     else
         # nothing from vcs_info
