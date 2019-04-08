@@ -114,6 +114,14 @@ precmd() {
         fi
     else
         # nothing from vcs_info
+
+        # sample for github infos
+        # token=$(cat .gh-token)
+        # response=$(curl -s "https://api.github.com/search/issues?q=repo:user/repo+type:issue+state:open&access_token=$token" 2>/dev/null)
+        # issueCount=$(echo $response | sed -En "s/^.*\"total_count\": ([0-9]+),.*$/\1/p")
+        # response=$(curl -s "https://api.github.com/search/issues?q=repo:user/repo+type:pr+state:open&access_token=$token" 2>/dev/null)
+        # prCount=$(echo $response | sed -En "s/^.*\"total_count\": ([0-9]+),.*$/\1/p")
+
         RPROMPT='%T'
     fi
 }
