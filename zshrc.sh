@@ -90,7 +90,7 @@ setopt prompt_subst
 precmd() {
     vcs_info
     if [[ -n ${vcs_info_msg_0_} ]]; then
-        upstream_info=$(git rev-list --left-right --count $(git rev-parse --abbrev-ref --symbolic-full-name @{u})...HEAD 2> /dev/null)
+        upstream_info=$(git rev-list --left-right --count $(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2> /dev/null)...HEAD 2> /dev/null)
         case "$upstream_info" in
             "") # no upstream
                 upstream_prompt="" ;;
