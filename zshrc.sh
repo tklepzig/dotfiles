@@ -128,7 +128,8 @@ precmd() {
         # response=$(curl -s "https://api.github.com/search/issues?q=repo:user/repo+type:pr+state:open&access_token=$token" 2>/dev/null)
         # prCount=$(echo $response | sed -En "s/^.*\"total_count\": ([0-9]+),.*$/\1/p")
 
-        RPROMPT='%T'
+        battery=$(cat /sys/class/power_supply/BAT1/uevent | sed -En "s/^.*POWER_SUPPLY_CAPACITY=([0-9]+).*$/\1/p")
+        RPROMPT='%T | $battery%%'
     fi
 }
 
