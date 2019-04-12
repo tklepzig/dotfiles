@@ -59,13 +59,12 @@ set printoptions=paper:letter
 " Make backspace delete lots of things
 set backspace=indent,eol,start
 
-" Auto-backup files and .swp files don't go to pwd
-set backupdir=$TEMP,.
-set directory=$TEMP,.
+set backupdir=/tmp//,.
+set directory=/tmp//,.
+set undodir=/tmp//,.
 
 set backspace=2   " Backspace deletes like most programs in insert mode
 
-set magic
 inoremap jj <ESC>
 
 
@@ -85,6 +84,7 @@ Plugin 'kien/ctrlp.vim'
 Plugin 'tomasiser/vim-code-dark'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'sheerun/vim-polyglot'
+Plugin 'tpope/vim-fugitive'
 
 call vundle#end()
 
@@ -110,6 +110,9 @@ call NERDTreeHighlightFile('js', 'Red', 'none', '#ffa500', '#151515')
 
 colorscheme codedark
 let g:airline_theme = 'codedark'
+
+let NERDTreeMinimalUI = 1
+let NERDTreeDirArrows = 1
 
 " How can I open NERDTree automatically when vim starts up on opening a directory?
 " This window is tab-specific, meaning it's used by all windows in the tab. This trick also prevents NERDTree from hiding when first selecting a file.
