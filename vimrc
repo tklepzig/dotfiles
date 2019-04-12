@@ -85,8 +85,12 @@ Plugin 'tomasiser/vim-code-dark'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'sheerun/vim-polyglot'
 Plugin 'tpope/vim-fugitive'
+Plugin 'christoomey/vim-system-copy'
 
 call vundle#end()
+
+let g:system_copy#copy_command='xclip -sel clipboard'
+let g:system_copy#paste_command='xclip -sel clipboard -o'
 
 " Enable TOC window auto-fit
 let g:vim_markdown_toc_autofit = 1
