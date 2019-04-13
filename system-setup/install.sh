@@ -64,7 +64,7 @@ then
     sudo add-apt-repository -y ppa:git-core/ppa
     
     # install seafile client
-    sudo add-apt-repository ppa:seafile/seafile-client
+    sudo add-apt-repository -y ppa:seafile/seafile-client
     
     sudo apt-get -y update
     sudo apt-get -y install git seafile-gui
@@ -91,13 +91,12 @@ info "Installing Vundle..."
 git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
 success "Done."
 
-set +e
 info "Installing vim plugins..."
-vim +PluginInstall +qall > /dev/null 2>&1
+# "echo" to suppress the "Please press ENTER to continue...
+echo | vim +PluginInstall +qall > /dev/null 2>&1
 success "Done."
-set -e
 
 info "Setting default shell to zsh..."
 chsh -s $(which zsh)
-success "Done."
+success "Done. Please notice: In order to use the new shell, you have to logout and back in."
 
