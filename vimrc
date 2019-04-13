@@ -88,7 +88,9 @@ Plugin 'tomasiser/vim-code-dark'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'sheerun/vim-polyglot'
 Plugin 'tpope/vim-fugitive'
+Plugin 'junegunn/gv.vim'
 Plugin 'christoomey/vim-system-copy'
+Plugin 'rickhowe/diffchar.vim'
 
 call vundle#end()
 
