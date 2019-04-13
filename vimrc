@@ -65,7 +65,7 @@ set undodir=/tmp//,.
 
 set backspace=2   " Backspace deletes like most programs in insert mode
 
-inoremap jj <ESC>
+inoremap qq <ESC>
 
 
 " new
