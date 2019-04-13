@@ -84,6 +84,7 @@ alias c='code-insiders .'
 alias d='docker'
 alias dc='docker-compose'
 alias ccp='xclip -selection clipboard'
+alias v='vi .'
 
 autoload -Uz vcs_info
 setopt prompt_subst
