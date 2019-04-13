@@ -140,4 +140,3 @@ autocmd BufWinEnter * NERDTreeMirror
 " Preven Ctrlp from searching node modules and git
 let g:ctrlp_custom_ignore = '\v[\/](node_modules|dist)|(\.(swp|git))$'
 
-
