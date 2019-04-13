@@ -3,6 +3,22 @@
 set -e
 . ../common.sh
 
+info "Searching for Git..."
+if ! isProgramInstalled git
+then
+    error "No Git found!"
+    exit
+fi
+success "Git found: $(which git)."
+
+dotfilesDir=$HOME/.dotfiles
+info "Cloning Repo..."
+rm -rf $dotfilesDir
+git clone --depth=1 https://github.com/tklepzig/dotfiles.git $dotfilesDir > /dev/null 2>&1
+success "Done."
+
+cd $dotfilesDir
+
 if isUbuntu
 then
     info "Adding universe repository..."
@@ -60,7 +76,7 @@ gsettings set org.gnome.shell.app-switcher current-workspace-only true
 success "Done."
 
 info "Running dotfiles setup..."
-. ../install.sh
+. ../install.sh --skip-clone
 success "Done."
 
 info "Installing vim plugins..."

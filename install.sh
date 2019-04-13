@@ -12,11 +12,15 @@ fi
 zshProfileFile='.zshrc'
 
 skipVsCodeConfig=0
+skipClone=0
 for var in "$@"
 do
     case "$var" in
         "--skip-vsc")
             skipVsCodeConfig=1
+            ;;
+        "--skip-clone")
+            skipClone=1
             ;;
     esac
 done
@@ -30,10 +34,13 @@ fi
 success "Git found: $(which git)."
 
 dotfilesDir=$HOME/.dotfiles
-info "Cloning Repo..."
-rm -rf $dotfilesDir
-git clone --depth=1 https://github.com/tklepzig/dotfiles.git $dotfilesDir > /dev/null 2>&1
-success "Done."
+if [ "$skipClone" = "0" ]
+then
+  info "Cloning Repo..."
+  rm -rf $dotfilesDir
+  git clone --depth=1 https://github.com/tklepzig/dotfiles.git $dotfilesDir > /dev/null 2>&1
+  success "Done."
+fi
 
 
 info "Configuring $profileFile..."
