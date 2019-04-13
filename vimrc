@@ -65,8 +65,11 @@ set undodir=/tmp//,.
 
 set backspace=2   " Backspace deletes like most programs in insert mode
 
+" Remap Escape key to qq
 inoremap qq <ESC>
 
+" Remap autocompletion trigger to Ctrl+Space
+inoremap <Nul> <C-n>
 
 " new
 
