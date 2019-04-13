@@ -34,7 +34,7 @@ then
 fi
 
 info "Installing some basic tools..."
-sudo apt-get -y install curl gnome-tweak-tool vim xdotool gparted sshfs tmux pwgen xclip
+sudo apt-get -y install curl gnome-tweak-tool vim xdotool gparted sshfs tmux pwgen xclip zsh
 success "Done."
 
 info "Installing Google Chrome..."
@@ -89,5 +89,9 @@ success "Done."
 
 info "Installing vim plugins..."
 vim +PluginInstall +qall
+success "Done."
+
+info "Setting default shell to zsh..."
+chsh -s $(which zsh)
 success "Done."
 

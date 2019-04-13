@@ -135,7 +135,8 @@ autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 map <C-n> :NERDTreeToggle<CR>
 
 " Close NERD Tree when everything else is closed.
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+" disabled for convenience, if closing all is desired, enter :qa
+" autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 " Keep NERD Tree open in new tabs
 autocmd BufWinEnter * NERDTreeMirror
