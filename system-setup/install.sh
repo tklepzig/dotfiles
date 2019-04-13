@@ -1,7 +1,14 @@
 #!/bin/bash
 
 set -e
-. ../common.sh
+dotfilesDir=$HOME/.dotfiles
+
+if [ ! -f $dotfilesDir/common.sh ]
+then
+  source <(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/common.sh)
+else
+  source $dotfilesDir/common.sh
+fi
 
 info "Searching for Git..."
 if ! isProgramInstalled git
@@ -11,7 +18,6 @@ then
 fi
 success "Git found: $(which git)."
 
-dotfilesDir=$HOME/.dotfiles
 info "Cloning Repo..."
 rm -rf $dotfilesDir
 git clone --depth=1 https://github.com/tklepzig/dotfiles.git $dotfilesDir > /dev/null 2>&1

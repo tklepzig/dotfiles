@@ -1,7 +1,14 @@
 #!/bin/bash
 
 set -e
-. ./common.sh 
+dotfilesDir=$HOME/.dotfiles
+
+if [ ! -f $dotfilesDir/common.sh ]
+then
+  source <(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/common.sh)
+else
+  source $dotfilesDir/common.sh
+fi
 
 profileFile='.bashrc'
 if isOS darwin
@@ -33,7 +40,6 @@ then
 fi
 success "Git found: $(which git)."
 
-dotfilesDir=$HOME/.dotfiles
 if [ "$skipClone" = "0" ]
 then
   info "Cloning Repo..."
