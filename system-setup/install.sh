@@ -87,6 +87,10 @@ info "Running dotfiles setup..."
 . ../install.sh --skip-clone
 success "Done."
 
+info "Installing Vundle..."
+git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
+success "Done."
+
 info "Installing vim plugins..."
 vim +PluginInstall +qall
 success "Done."
