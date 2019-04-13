@@ -96,6 +96,7 @@ alias gsa="$dotfilesDir/git-status-all.sh"
 alias c='code-insiders .'
 alias d='docker'
 alias dc='docker-compose'
+alias v='vi .'
 
 export GIT_PS1_SHOWDIRTYSTATE=1
 export GIT_PS1_SHOWSTASHSTATE=1
