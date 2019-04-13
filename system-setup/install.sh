@@ -91,9 +91,11 @@ info "Installing Vundle..."
 git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
 success "Done."
 
+set +e
 info "Installing vim plugins..."
 vim +PluginInstall +qall
 success "Done."
+set -e
 
 info "Setting default shell to zsh..."
 chsh -s $(which zsh)
