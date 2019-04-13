@@ -93,7 +93,7 @@ success "Done."
 
 set +e
 info "Installing vim plugins..."
-vim +PluginInstall +qall
+vim +PluginInstall +qall > /dev/null 2>&1
 success "Done."
 set -e
 
