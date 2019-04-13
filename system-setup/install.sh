@@ -23,7 +23,7 @@ rm -rf $dotfilesDir
 git clone --depth=1 https://github.com/tklepzig/dotfiles.git $dotfilesDir > /dev/null 2>&1
 success "Done."
 
-cd $dotfilesDir
+cd $dotfilesDir/system-setup
 
 if isUbuntu
 then
