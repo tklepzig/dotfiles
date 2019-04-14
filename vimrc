@@ -84,7 +84,6 @@ Plugin 'scrooloose/nerdtree.git'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'kien/ctrlp.vim'
 Plugin 'tomasiser/vim-code-dark'
-Plugin 'vim-airline/vim-airline-themes'
 Plugin 'sheerun/vim-polyglot'
 Plugin 'tpope/vim-fugitive'
 Plugin 'junegunn/gv.vim'
@@ -92,6 +91,7 @@ Plugin 'christoomey/vim-system-copy'
 Plugin 'rickhowe/diffchar.vim'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
 
 call vundle#end()
 
@@ -152,7 +152,4 @@ let g:ctrlp_show_hidden = 1
 highlight GitGutterAdd    ctermfg=2
 highlight GitGutterChange ctermfg=3
 highlight GitGutterDelete ctermfg=1
-
-
-let g:airline#extensions#tabline#enabled = 1
 
