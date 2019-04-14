@@ -91,6 +91,7 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'junegunn/gv.vim'
 Plugin 'christoomey/vim-system-copy'
 Plugin 'rickhowe/diffchar.vim'
+Plugin 'airblade/vim-gitgutter'
 
 call vundle#end()
 
