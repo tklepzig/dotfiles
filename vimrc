@@ -139,8 +139,7 @@ map <C-n> :NERDTreeToggle<CR>
 
 " Close NERD Tree when everything else is closed.
 " disabled for convenience, if closing all is desired, enter :qa
-" re-enabled, better when having multiple tabs open...
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+" autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 " Keep NERD Tree open in new tabs
 autocmd BufWinEnter * NERDTreeMirror
