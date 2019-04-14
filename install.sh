@@ -130,3 +130,10 @@ then
     popd > /dev/null
     success "Done."
 fi
+
+info "Installing vim plugins..."
+# "echo" to suppress the "Please press ENTER to continue...
+echo | vim +PluginInstall +qall > /dev/null 2>&1
+success "Done."
+
+

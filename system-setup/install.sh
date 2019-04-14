@@ -75,25 +75,23 @@ info "Installing some media tools..."
 sudo apt-get -y install winff easytag audacity gimp vlc
 success "Done."
 
-info "Modifing gnome settings..."
-set +e
-gsettings set org.gnome.desktop.interface show-battery-percentage true
-gsettings set org.gnome.shell enable-hot-corners false
-gsettings set org.gnome.shell.app-switcher current-workspace-only true
-set -e
-success "Done."
-
-info "Running dotfiles setup..."
-. ../install.sh --skip-clone
-success "Done."
+if isUbuntu
+then
+  info "Modifing gnome settings..."
+  set +e
+  gsettings set org.gnome.desktop.interface show-battery-percentage true
+  gsettings set org.gnome.shell enable-hot-corners false
+  gsettings set org.gnome.shell.app-switcher current-workspace-only true
+  set -e
+  success "Done."
+fi
 
 info "Installing Vundle..."
 git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
 success "Done."
 
-info "Installing vim plugins..."
-# "echo" to suppress the "Please press ENTER to continue...
-echo | vim +PluginInstall +qall > /dev/null 2>&1
+info "Running dotfiles setup..."
+. ../install.sh --skip-clone
 success "Done."
 
 info "Setting default shell to zsh..."
