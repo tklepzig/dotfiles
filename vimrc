@@ -90,6 +90,9 @@ Plugin 'junegunn/gv.vim'
 Plugin 'christoomey/vim-system-copy'
 Plugin 'rickhowe/diffchar.vim'
 Plugin 'airblade/vim-gitgutter'
+Plugin 'leafgarland/typescript-vim'
+" Plugin 'peitalin/vim-jsx-typescript'
+" Plugin 'Quramy/tsuquyomi'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 
@@ -144,11 +147,16 @@ map <C-n> :NERDTreeToggle<CR>
 " Keep NERD Tree open in new tabs
 autocmd BufWinEnter * NERDTreeMirror
 
-" Preven Ctrlp from searching node modules and git
+" Prevent Ctrlp from searching node modules and git
 let g:ctrlp_custom_ignore = '\v[\/](node_modules|dist)|(\.(swp|git))$'
 let g:ctrlp_show_hidden = 1
 
 highlight GitGutterAdd    ctermfg=2
 highlight GitGutterChange ctermfg=3
 highlight GitGutterDelete ctermfg=1
+
+autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
+
+" set filetypes as typescript.tsx
+" autocmd BufNewFile,BufRead *.tsx,*.jsx set filetype=typescript.tsx
 
