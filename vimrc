@@ -145,7 +145,7 @@ map <C-n> :NERDTreeToggle<CR>
 " autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 " Keep NERD Tree open in new tabs
-autocmd BufWinEnter * NERDTreeMirror
+" autocmd BufWinEnter * NERDTreeMirror
 
 " Prevent Ctrlp from searching node modules and git
 let g:ctrlp_custom_ignore = '\v[\/](node_modules|dist)|(\.(swp|git))$'
