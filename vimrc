@@ -91,7 +91,7 @@ Plugin 'christoomey/vim-system-copy'
 Plugin 'rickhowe/diffchar.vim'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'leafgarland/typescript-vim'
-" Plugin 'peitalin/vim-jsx-typescript'
+Plugin 'ianks/vim-tsx'
 " Plugin 'Quramy/tsuquyomi'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
@@ -158,5 +158,5 @@ highlight GitGutterDelete ctermfg=1
 autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
 
 " set filetypes as typescript.tsx
-" autocmd BufNewFile,BufRead *.tsx,*.jsx set filetype=typescript.tsx
+autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx
 
