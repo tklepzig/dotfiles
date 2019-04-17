@@ -151,3 +151,6 @@ PROMPT="%n@%m:%{$fg[yellow]%}%~%{$reset_color%}${NEWLINE}\$ "
 zstyle ':vcs_info:git:*' formats "%b"
 zstyle ':vcs_info:git:*' actionformats "%b %{$reset_color%}%{$fg_bold[blue]%}(%a)%{$reset_color%}"
 zstyle ':vcs_info:*' enable git
+
+source $dotfilesDir/yarn-completion.plugin.zsh
+
