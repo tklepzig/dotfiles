@@ -92,7 +92,7 @@ Plugin 'rickhowe/diffchar.vim'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'leafgarland/typescript-vim'
 Plugin 'ianks/vim-tsx'
-" Plugin 'Quramy/tsuquyomi'
+Plugin 'Quramy/tsuquyomi'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 
