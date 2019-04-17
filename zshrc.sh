@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-dotfilesDir='~/.dotfiles'
+dotfilesDir="$HOME/.dotfiles"
 
 isOS()
 {
