@@ -98,8 +98,10 @@ Plugin 'vim-airline/vim-airline-themes'
 
 call vundle#end()
 
-let g:system_copy#copy_command='xclip -sel clipboard'
-let g:system_copy#paste_command='xclip -sel clipboard -o'
+if substitute(system('uname'), '\n', '', '') == "Linux"
+  let g:system_copy#copy_command='xclip -sel clipboard'
+  let g:system_copy#paste_command='xclip -sel clipboard -o'
+endif
 
 " Enable TOC window auto-fit
 let g:vim_markdown_toc_autofit = 1
@@ -160,3 +162,6 @@ autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
 " set filetypes as typescript.tsx
 autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx
 
+let mapleader = "^"
+
+nnoremap <Leader>w <C-w>
