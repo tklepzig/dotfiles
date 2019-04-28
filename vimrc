@@ -162,6 +162,6 @@ autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
 " set filetypes as typescript.tsx
 autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx
 
-let mapleader = "^"
+let mapleader = "\<space>"
 
 nnoremap <Leader>w <C-w>
