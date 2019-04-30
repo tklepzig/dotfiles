@@ -65,6 +65,8 @@ set undodir=/tmp//,.
 
 set backspace=2   " Backspace deletes like most programs in insert mode
 
+let mapleader = "\<space>"
+
 " Remap Escape key to qq
 inoremap qq <ESC>
 
@@ -140,7 +142,7 @@ autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
 " map Ctrl+n to toggling the NERD Tree
-map <C-n> :NERDTreeToggle<CR>
+map <Leader>n :NERDTreeToggle<CR>
 
 " Close NERD Tree when everything else is closed.
 " disabled for convenience, if closing all is desired, enter :qa
@@ -162,6 +164,5 @@ autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
 " set filetypes as typescript.tsx
 autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx
 
-let mapleader = "\<space>"
 
 nnoremap <Leader>w <C-w>
