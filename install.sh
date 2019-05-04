@@ -131,6 +131,14 @@ then
     success "Done."
 fi
 
+# Docker completion for zsh on linux
+
+if isProgramInstalled docker && isOS linux
+then
+  mkdir -p $HOME/.zsh/completion
+  curl -L https://raw.githubusercontent.com/docker/compose/1.24.0/contrib/completion/zsh/_docker-compose > $HOME/.zsh/completion/_docker-compose
+fi
+
 info "Installing vim plugins..."
 # "echo" to suppress the "Please press ENTER to continue...
 echo | vim +PluginInstall +qall > /dev/null 2>&1
