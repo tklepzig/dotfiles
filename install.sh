@@ -136,7 +136,7 @@ fi
 if isProgramInstalled docker && isOS linux
 then
   mkdir -p $HOME/.zsh/completion
-  curl -L https://raw.githubusercontent.com/docker/compose/1.24.0/contrib/completion/zsh/_docker-compose > $HOME/.zsh/completion/_docker-compose
+  curl -L https://raw.githubusercontent.com/docker/compose/1.24.0/contrib/completion/zsh/_docker-compose > $HOME/.zsh/completion/_docker-compose 2>/dev/null
 fi
 
 info "Installing vim plugins..."
