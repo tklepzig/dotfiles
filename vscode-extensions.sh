@@ -87,3 +87,8 @@ $codeBin --install-extension fabiospampinato.vscode-open-in-github
 # Python
 $codeBin --install-extension brainfit.vscode-importmagic
 $codeBin --install-extension ms-python.python
+
+# Ruby
+$codeBin --install-extension rebornix.ruby
+$codeBin --install-extension castwide.solargraph
+$codeBin --install-extension misogi.ruby-rubocop

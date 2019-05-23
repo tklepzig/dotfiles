@@ -1,50 +1,49 @@
 {
-    "window.zoomLevel": 1,
-    "editor.mouseWheelZoom": true,
-    "editor.fontSize": 14,
-    "editor.tabCompletion": "onlySnippets",
-    "editor.quickSuggestions": {
-        "other": true,
-        "comments": true,
-        "strings": true
-    },
-    "git.autofetch": false,
-    "workbench.iconTheme": "seti",
-    "editor.minimap.enabled": false,
-    "files.associations": {
-        "*.jsx": "javascriptreact"
-    },
-    "emmet.showExpandedAbbreviation": "always",
-    "openSpecFile.suffixMap": {
-        ".js": ".spec.js",
-        ".spec.js": ".js",
-        ".ts": ".spec.ts",
-        ".spec.ts": ".ts"
-    },
-    "typelens.skiplanguages": [
-        "csharp",
-        "dockerfile"
-    ],
-    "debug.toolBarLocation": "docked",
-    "zenMode.centerLayout": false,
-    "gitlens.historyExplorer.enabled": true,
-    "bracketPairColorizer.consecutivePairColors": [
-        "()",
-        "[]",
-        "{}",
-        [
-            "Gold",
-            "LightSkyBlue",
-            "orange"
-        ],
-        "Red"
-    ],
-    "breadcrumbs.enabled": true,
-    "eslint.autoFixOnSave": true,
-    "tslint.autoFixOnSave": true,
-    "editor.matchBrackets": false,
-    "editor.formatOnSave": true,
-    "typescript.updateImportsOnFileMove.enabled": "never",
-    "javascript.updateImportsOnFileMove.enabled": "never",
-    "prettier.tslintIntegration": true
+  "window.zoomLevel": 1,
+  "editor.mouseWheelZoom": true,
+  "editor.fontSize": 14,
+  "editor.tabCompletion": "onlySnippets",
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": true,
+    "strings": true
+  },
+  "git.autofetch": false,
+  "workbench.iconTheme": "seti",
+  "editor.minimap.enabled": false,
+  "files.associations": {
+    "*.jsx": "javascriptreact"
+  },
+  "emmet.showExpandedAbbreviation": "always",
+  "openSpecFile.suffixMap": {
+    ".js": ".spec.js",
+    ".spec.js": ".js",
+    ".ts": ".spec.ts",
+    ".spec.ts": ".ts"
+  },
+  "typelens.skiplanguages": ["csharp", "dockerfile"],
+  "debug.toolBarLocation": "docked",
+  "zenMode.centerLayout": false,
+  "gitlens.historyExplorer.enabled": true,
+  "bracketPairColorizer.consecutivePairColors": [
+    "()",
+    "[]",
+    "{}",
+    ["Gold", "LightSkyBlue", "orange"],
+    "Red"
+  ],
+  "breadcrumbs.enabled": true,
+  "eslint.autoFixOnSave": true,
+  "tslint.autoFixOnSave": true,
+  "editor.matchBrackets": false,
+  "editor.formatOnSave": true,
+  "typescript.updateImportsOnFileMove.enabled": "never",
+  "javascript.updateImportsOnFileMove.enabled": "never",
+  "prettier.tslintIntegration": true,
+  "editor.formatOnSaveTimeout": 3000,
+  "ruby.intellisense": false,
+  "solargraph.useBundler": true,
+  "[ruby]": {
+    "editor.defaultFormatter": "misogi.ruby-rubocop"
+  }
 }
