@@ -40,10 +40,12 @@
   "typescript.updateImportsOnFileMove.enabled": "never",
   "javascript.updateImportsOnFileMove.enabled": "never",
   "prettier.tslintIntegration": true,
-  "editor.formatOnSaveTimeout": 3000,
   "ruby.intellisense": false,
+  "ruby.format": false,
+  "ruby.codeCompletion": false,
   "solargraph.useBundler": true,
   "[ruby]": {
-    "editor.defaultFormatter": "misogi.ruby-rubocop"
+    "editor.defaultFormatter": "misogi.ruby-rubocop",
+    "editor.formatOnSaveTimeout": 3000
   }
 }

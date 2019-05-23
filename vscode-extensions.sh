@@ -92,3 +92,4 @@ $codeBin --install-extension ms-python.python
 $codeBin --install-extension rebornix.ruby
 $codeBin --install-extension castwide.solargraph
 $codeBin --install-extension misogi.ruby-rubocop
+$codeBin --install-extension kaiwood.endwise
