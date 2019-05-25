@@ -83,6 +83,8 @@ alias gsa="$dotfilesDir/git-status-all.sh"
 alias c='code-insiders .'
 alias d='docker'
 alias dc='docker-compose'
+alias dce='docker-compose exec'
+alias dcl='docker-compose logs -f'
 alias ccp='xclip -selection clipboard'
 alias v='vi .'
 
