@@ -53,7 +53,7 @@ $codeBin --install-extension jpoissonnier.vscode-styled-components --force
 # Typescript
 #$codeBin --install-extension rbbit.typescript-hero --force # Ein Typescript Import Assistant, der alle Imports einer Datei auf einmal auflösen kann
 #$codeBin --install-extension pmneo.tsimporter --force # Ebenfalls ein Typescript Import Assistant, aber der unterstützt die tsconfig.json
-$codeBin --install-extension ms-vscode.vscode-typescript-tslint-plugin --force
+# $codeBin --install-extension ms-vscode.vscode-typescript-tslint-plugin --force
 $codeBin --install-extension christianoetterli.refactorix --force
 $codeBin --install-extension infeng.vscode-react-typescript --force
 

@@ -136,7 +136,7 @@ precmd() {
         then
             battery=$(pmset -g batt | egrep "([0-9]+)\%.*" -o --colour=auto | cut -f1 -d'%')
         else
-            battery=$(cat /sys/class/power_supply/BAT1/uevent | sed -En "s/^.*POWER_SUPPLY_CAPACITY=([0-9]+).*$/\1/p")
+            battery=$(cat /sys/class/power_supply/BAT0/uevent | sed -En "s/^.*POWER_SUPPLY_CAPACITY=([0-9]+).*$/\1/p")
         fi
 
         batteryColor=""
