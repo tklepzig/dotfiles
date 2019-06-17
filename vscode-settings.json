@@ -37,8 +37,8 @@
   "eslint.validate": [
     "javascript",
     "javascriptreact",
-    "typescript",
-    "typescriptreact"
+    { "language": "typescript", "autoFix": true },
+    { "language": "typescriptreact", "autoFix": true }
   ],
   "editor.matchBrackets": false,
   "editor.formatOnSave": true,
