@@ -58,7 +58,11 @@ setopt inc_append_history
 
 cdpath=(~ ~/development)
 
+# Use vi as the default editor
 export EDITOR=vi
+
+# But still use emacs-style zsh bindings (see https://superuser.com/a/457401)
+bindkey -e
 
 alias sif="$dotfilesDir/search-in-files.sh"
 alias hgrep="$dotfilesDir/hgrep.sh"
