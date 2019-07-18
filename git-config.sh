@@ -17,6 +17,7 @@ git config --global pull.rebase true
 #git config --global merge.kdiff3.keepTemporaries false
 git config --global core.editor "vim"
 git config --global color.status always
+git config --global grep.extendedRegexp true
 
 # aliases
 git config --global alias.s  "status -sb"
