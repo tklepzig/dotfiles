@@ -75,6 +75,7 @@ success "Done."
 
 info "Creating Symlinks..."
 ln -sf $dotfilesDir/vimrc $HOME/.vimrc
+ln -sf $dotfilesDir/tmux.conf $HOME/.tmux.conf
 success "Done."
 
 info "Configuring Git..."
