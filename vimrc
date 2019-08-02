@@ -71,7 +71,7 @@ let mapleader = "\<space>"
 inoremap qq <ESC>
 
 " Remap autocompletion trigger to Ctrl+Space
-inoremap <Nul> <C-n>
+" inoremap <Nul> <C-n>
 
 " new
 
@@ -97,6 +97,7 @@ Plugin 'ianks/vim-tsx'
 Plugin 'Quramy/tsuquyomi'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
+" Plugin 'christoomey/vim-tmux-navigator'
 
 call vundle#end()
 
@@ -169,3 +170,13 @@ nnoremap <Leader>w <C-w>
 nnoremap <Enter> O<Esc>j
 
 map <Leader>p :CtrlP<CR>
+
+
+" let g:tmux_navigator_no_mappings = 1
+" 
+" nnoremap <silent> <Leader><Left> :TmuxNavigateLeft<cr>
+" nnoremap <silent> <Leader><Down> :TmuxNavigateDown<cr>
+" nnoremap <silent> <Leader><Up> :TmuxNavigateUp<cr>
+" nnoremap <silent> <Leader><Right> :TmuxNavigateRight<cr>
+" nnoremap <silent> <Leader>- :TmuxNavigatePrevious<cr>
+
