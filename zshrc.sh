@@ -136,13 +136,7 @@ precmd() {
         # response=$(curl -s "https://api.github.com/search/issues?q=repo:user/repo+type:pr+state:open&access_token=$token" 2>/dev/null)
         # prCount=$(echo $response | sed -En "s/^.*\"total_count\": ([0-9]+),.*$/\1/p")
 
-        if isOS darwin
-        then
-            battery=$(pmset -g batt | egrep "([0-9]+)\%.*" -o --colour=auto | cut -f1 -d'%')
-        else
-            battery=$(cat /sys/class/power_supply/BAT0/uevent | sed -En "s/^.*POWER_SUPPLY_CAPACITY=([0-9]+).*$/\1/p")
-        fi
-
+        battery=$(source $dotfilesDir/battery.sh)
         batteryColor=""
         if [[ $battery -lt 16 ]]
         then
