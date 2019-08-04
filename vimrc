@@ -98,6 +98,7 @@ Plugin 'Quramy/tsuquyomi'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 " Plugin 'christoomey/vim-tmux-navigator'
+Plugin 'scrooloose/nerdcommenter'
 
 call vundle#end()
 
