@@ -86,14 +86,6 @@ then
   success "Done."
 fi
 
-info "Installing Vundle..."
-git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
-success "Done."
-
-info "Installing TPM..."
-git clone https://github.com/tmux-plugins/tpm $HOME/.tmux/plugins/tpm
-success "Done."
-
 info "Running dotfiles setup..."
 . ../install.sh --skip-clone
 success "Done."

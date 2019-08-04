@@ -78,6 +78,25 @@ ln -sf $dotfilesDir/vimrc $HOME/.vimrc
 ln -sf $dotfilesDir/tmux.conf $HOME/.tmux.conf
 success "Done."
 
+if [ ! -d "$HOME/.vim/bundle/Vundle.vim" ]
+then
+    info "Installing Vundle..."
+    git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
+    success "Done."
+fi
+
+info "Installing vim plugins..."
+# "echo" to suppress the "Please press ENTER to continue...
+echo | vim +PluginInstall +qall > /dev/null 2>&1
+success "Done."
+
+# if [ ! -d "$HOME/.tmux/plugins/tpm" ]
+# then
+#     info "Installing TPM..."
+#     git clone https://github.com/tmux-plugins/tpm $HOME/.tmux/plugins/tpm
+#     success "Done."
+# fi
+
 info "Configuring Git..."
 $dotfilesDir/git-config.sh
 success "Done."
@@ -139,10 +158,3 @@ then
   mkdir -p $HOME/.zsh/completion
   curl -L https://raw.githubusercontent.com/docker/compose/1.24.0/contrib/completion/zsh/_docker-compose > $HOME/.zsh/completion/_docker-compose 2>/dev/null
 fi
-
-info "Installing vim plugins..."
-# "echo" to suppress the "Please press ENTER to continue...
-echo | vim +PluginInstall +qall > /dev/null 2>&1
-success "Done."
-
-
