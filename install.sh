@@ -81,7 +81,7 @@ success "Done."
 if [ ! -d "$HOME/.vim/bundle/Vundle.vim" ]
 then
     info "Installing Vundle..."
-    git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
+    git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim > /dev/null 2>&1
     success "Done."
 fi
 
@@ -93,7 +93,7 @@ success "Done."
 # if [ ! -d "$HOME/.tmux/plugins/tpm" ]
 # then
 #     info "Installing TPM..."
-#     git clone https://github.com/tmux-plugins/tpm $HOME/.tmux/plugins/tpm
+#     git clone https://github.com/tmux-plugins/tpm $HOME/.tmux/plugins/tpm > /dev/null 2>&1
 #     success "Done."
 # fi
 
