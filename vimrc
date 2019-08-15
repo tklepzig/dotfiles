@@ -68,7 +68,7 @@ set backspace=2   " Backspace deletes like most programs in insert mode
 let mapleader = "\<space>"
 
 " Remap Escape key to qq
-inoremap qq <ESC>
+"inoremap qq <ESC>
 
 " Remap autocompletion trigger to Ctrl+Space
 " inoremap <Nul> <C-n>
@@ -145,6 +145,7 @@ autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
 " map Ctrl+n to toggling the NERD Tree
 map <Leader>n :NERDTreeToggle<CR>
+map <Leader>f :NERDTreeFind<CR>
 
 " Close NERD Tree when everything else is closed.
 " disabled for convenience, if closing all is desired, enter :qa
@@ -174,10 +175,16 @@ map <Leader>p :CtrlP<CR>
 
 
 " let g:tmux_navigator_no_mappings = 1
-" 
+"
 " nnoremap <silent> <Leader><Left> :TmuxNavigateLeft<cr>
 " nnoremap <silent> <Leader><Down> :TmuxNavigateDown<cr>
 " nnoremap <silent> <Leader><Up> :TmuxNavigateUp<cr>
 " nnoremap <silent> <Leader><Right> :TmuxNavigateRight<cr>
 " nnoremap <silent> <Leader>- :TmuxNavigatePrevious<cr>
+
+" no arrow keys in edit mode
+inoremap <Left> <nop>
+inoremap <Right> <nop>
+inoremap <Up> <nop>
+inoremap <Down> <nop>
 
