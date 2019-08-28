@@ -86,19 +86,20 @@ Plugin 'scrooloose/nerdtree.git'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'kien/ctrlp.vim'
 Plugin 'tomasiser/vim-code-dark'
-Plugin 'sheerun/vim-polyglot'
 Plugin 'tpope/vim-fugitive'
 Plugin 'junegunn/gv.vim'
 Plugin 'christoomey/vim-system-copy'
-Plugin 'rickhowe/diffchar.vim'
+"Plugin 'rickhowe/diffchar.vim'
 Plugin 'airblade/vim-gitgutter'
-Plugin 'leafgarland/typescript-vim'
 Plugin 'ianks/vim-tsx'
 Plugin 'Quramy/tsuquyomi'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
-" Plugin 'christoomey/vim-tmux-navigator'
+"Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'scrooloose/nerdcommenter'
+Plugin 'sheerun/vim-polyglot'
+Plugin 'leafgarland/typescript-vim'
+Plugin 'tpope/vim-surround'
 
 call vundle#end()
 
@@ -188,3 +189,14 @@ inoremap <Right> <nop>
 inoremap <Up> <nop>
 inoremap <Down> <nop>
 
+autocmd FileType typescript nmap <buffer> <Leader>t : <C-u>echo tsuquyomi#hint()<CR>
+
+"set omnifunc=syntaxcomplete#Complete
+"
+"inoremap <expr> . MayComplete()
+"func MayComplete()
+  "if (can complete)
+    "return ".\<C-X>\<C-O>"
+  "endif
+  "return '.'
+"endfunc
