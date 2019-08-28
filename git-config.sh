@@ -40,6 +40,9 @@ git config --global alias.ls "$logCommon --simplify-by-decoration"
 git config --global alias.lf "$logCommon --follow"
 git config --global alias.lfp "$logCommon --follow -p"
 
+git config --global alias.lb "!f() { currentBranch=\$(git rev-parse --abbrev-ref HEAD); git log --oneline --graph --date=human --format='%C(yellow)%h%C(reset) %C(cyan)%><(15)%ad%C(reset) %s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%Creset' --no-merges \${1:-\$currentBranch} --not \$(git for-each-ref --format=\"%(refname)\" refs/heads | grep -Fv refs/heads/\${1:-\$currentBranch}); }; f"
+git config --global alias.lbp "!f() { currentBranch=\$(git rev-parse --abbrev-ref HEAD); git log --oneline --graph --date=human --format='%C(yellow)%h%C(reset) %C(cyan)%><(15)%ad%C(reset) %s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%Creset' --no-merges -p \${1:-\$currentBranch} --not \$(git for-each-ref --format=\"%(refname)\" refs/heads | grep -Fv refs/heads/\${1:-\$currentBranch}); }; f"
+
 git config --global alias.rl "$reflogCommon -10"
 git config --global alias.rll "$reflogCommon"
 
