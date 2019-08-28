@@ -3,3 +3,6 @@
 [count]<leader>ci |NERDCommenterInvert|
 [count]<leader>cy |NERDCommenterYank|
 [count]<leader>cu |NERDCommenterUncomment|
+
+https://vim.fandom.com/wiki/All_the_right_moves
+
