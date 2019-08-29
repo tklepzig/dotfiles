@@ -100,6 +100,8 @@ Plugin 'scrooloose/nerdcommenter'
 Plugin 'sheerun/vim-polyglot'
 Plugin 'leafgarland/typescript-vim'
 Plugin 'tpope/vim-surround'
+Plugin 'maralla/completor.vim'
+Plugin 'BrandonRoehl/auto-omni'
 
 call vundle#end()
 
@@ -144,7 +146,6 @@ autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
-" map Ctrl+n to toggling the NERD Tree
 map <Leader>n :NERDTreeToggle<CR>
 map <Leader>f :NERDTreeFind<CR>
 
@@ -173,30 +174,23 @@ nnoremap <Leader>w <C-w>
 nnoremap <Enter> O<Esc>j
 
 map <Leader>p :CtrlP<CR>
-
-
-" let g:tmux_navigator_no_mappings = 1
-"
-" nnoremap <silent> <Leader><Left> :TmuxNavigateLeft<cr>
-" nnoremap <silent> <Leader><Down> :TmuxNavigateDown<cr>
-" nnoremap <silent> <Leader><Up> :TmuxNavigateUp<cr>
-" nnoremap <silent> <Leader><Right> :TmuxNavigateRight<cr>
-" nnoremap <silent> <Leader>- :TmuxNavigatePrevious<cr>
+map <Leader>i :TsuImport<CR>
 
 " no arrow keys in edit mode
 inoremap <Left> <nop>
 inoremap <Right> <nop>
-inoremap <Up> <nop>
-inoremap <Down> <nop>
+" do not disable them here to allow them for autocompletion navigation
+"inoremap <Up> <nop>
+"inoremap <Down> <nop>
 
-autocmd FileType typescript nmap <buffer> <Leader>t : <C-u>echo tsuquyomi#hint()<CR>
+autocmd FileType typescript,typescript.tsx nmap <buffer> <Leader>t : <C-u>echo tsuquyomi#hint()<CR>
 
-"set omnifunc=syntaxcomplete#Complete
-"
-"inoremap <expr> . MayComplete()
-"func MayComplete()
-  "if (can complete)
-    "return ".\<C-X>\<C-O>"
-  "endif
-  "return '.'
-"endfunc
+set omnifunc=syntaxcomplete#Complete
+set completeopt=noinsert,menuone,menu
+
+inoremap <expr> <CR>       pumvisible()    ? "\<C-y>"                  : "\<CR>"
+inoremap <expr> <Down>     pumvisible()    ? "\<C-n>"                  : ""
+inoremap <expr> <Up>       pumvisible()    ? "\<C-p>"                  : ""
+inoremap <expr> <PageDown> pumvisible()    ? "\<PageDown>\<C-p>\<C-n>" : "\<PageDown>"
+inoremap <expr> <PageUp>   pumvisible()    ? "\<PageUp>\<C-p>\<C-n>"   : "\<PageUp>"
+
