@@ -102,6 +102,8 @@ Plugin 'leafgarland/typescript-vim'
 Plugin 'tpope/vim-surround'
 Plugin 'maralla/completor.vim'
 Plugin 'BrandonRoehl/auto-omni'
+Plugin 'josudoey/vim-eslint-fix'
+Plugin 'w0rp/ale'
 
 call vundle#end()
 
@@ -243,3 +245,21 @@ autocmd VimLeave * silent !stty ixon
 nmap <C-s> :w<CR>
 imap <C-s> <C-o>:w<CR>
 
+
+let g:ale_linters = {
+      \   'javascript': ['eslint'],
+      \   'typescript': ['tsserver', 'eslint']
+      \}
+
+let g:ale_fixers = {
+      \   '*': ['remove_trailing_lines', 'trim_whitespace'], 
+      \    'javascript': ['eslint'],
+      \    'typescript': ['eslint', 'prettier'],
+      \    'scss': ['prettier'],
+      \    'html': ['prettier']
+      \}
+
+let g:ale_fix_on_save = 1
+nmap <C-f> :ALEFix<CR>
+imap <C-f> <C-o>:ALEFix<CR>
+let NERDTreeQuitOnOpen=1
