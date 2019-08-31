@@ -80,6 +80,7 @@ call vundle#begin()
 
 Plugin 'VundleVim/Vundle.vim'
 
+Plugin 'HerringtonDarkholme/yats.vim'
 Plugin 'godlygeek/tabular'
 Plugin 'plasticboy/vim-markdown'
 Plugin 'scrooloose/nerdtree.git'
@@ -262,4 +263,5 @@ let g:ale_fixers = {
 let g:ale_fix_on_save = 1
 nmap <C-f> :ALEFix<CR>
 imap <C-f> <C-o>:ALEFix<CR>
-let NERDTreeQuitOnOpen=1
+let NERDTreeQuitOnOpen = 1
+let NERDTreeShowHidden = 1
