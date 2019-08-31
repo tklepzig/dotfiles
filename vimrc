@@ -270,3 +270,4 @@ nnoremap <leader>d :TsuDefinition<CR>
 "todo: ale or tsu
 " rename
 " search in files
+nnoremap <leader>gs :Gstatus<CR>
