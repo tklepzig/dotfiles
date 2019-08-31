@@ -265,9 +265,8 @@ nnoremap <leader><Right> <C-i><CR>
 
 set clipboard=unnamedplus
 
+nnoremap <leader>r :ALEFindReferences<CR>
+nnoremap <leader>d :TsuDefinition<CR>
 "todo: ale or tsu
-" go to defintion
-" show all references
-" quick fix
 " rename
 " search in files
