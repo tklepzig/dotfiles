@@ -264,3 +264,10 @@ nnoremap <leader><Left> <C-o><CR>
 nnoremap <leader><Right> <C-i><CR>
 
 set clipboard=unnamedplus
+
+"todo: ale or tsu
+" go to defintion
+" show all references
+" quick fix
+" rename
+" search in files
