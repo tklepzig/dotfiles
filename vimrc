@@ -273,3 +273,4 @@ nnoremap <leader>d :TsuDefinition<CR>
 nnoremap <leader>gs :Gstatus<CR>
 " todo: add mapping for g lb
 nnoremap <leader>gl :GV<CR>
+nnoremap <leader>glf :GV!<CR>
