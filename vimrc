@@ -89,7 +89,6 @@ Plugin 'kien/ctrlp.vim'
 Plugin 'tomasiser/vim-code-dark'
 Plugin 'tpope/vim-fugitive'
 Plugin 'junegunn/gv.vim'
-Plugin 'christoomey/vim-system-copy'
 "Plugin 'rickhowe/diffchar.vim'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'ianks/vim-tsx'
@@ -107,11 +106,6 @@ Plugin 'josudoey/vim-eslint-fix'
 Plugin 'w0rp/ale'
 
 call vundle#end()
-
-if substitute(system('uname'), '\n', '', '') == "Linux"
-  let g:system_copy#copy_command='xclip -sel clipboard'
-  let g:system_copy#paste_command='xclip -sel clipboard -o'
-endif
 
 " Enable TOC window auto-fit
 let g:vim_markdown_toc_autofit = 1
@@ -268,3 +262,5 @@ let NERDTreeShowHidden = 1
 
 nnoremap <leader><Left> <C-o><CR>
 nnoremap <leader><Right> <C-i><CR>
+
+set clipboard=unnamedplus
