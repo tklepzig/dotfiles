@@ -80,7 +80,7 @@ call vundle#begin()
 
 Plugin 'VundleVim/Vundle.vim'
 
-Plugin 'HerringtonDarkholme/yats.vim'
+"Plugin 'HerringtonDarkholme/yats.vim'
 Plugin 'godlygeek/tabular'
 Plugin 'plasticboy/vim-markdown'
 Plugin 'scrooloose/nerdtree.git'
@@ -253,7 +253,7 @@ let g:ale_linters = {
       \}
 
 let g:ale_fixers = {
-      \   '*': ['remove_trailing_lines', 'trim_whitespace'], 
+      \   '*': ['remove_trailing_lines', 'trim_whitespace'],
       \    'javascript': ['eslint'],
       \    'typescript': ['eslint', 'prettier'],
       \    'scss': ['prettier'],
@@ -265,3 +265,6 @@ nmap <C-f> :ALEFix<CR>
 imap <C-f> <C-o>:ALEFix<CR>
 let NERDTreeQuitOnOpen = 1
 let NERDTreeShowHidden = 1
+
+nnoremap <leader><Left> <C-o><CR>
+nnoremap <leader><Right> <C-i><CR>
