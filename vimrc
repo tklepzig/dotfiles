@@ -271,3 +271,5 @@ nnoremap <leader>d :TsuDefinition<CR>
 " rename
 " search in files
 nnoremap <leader>gs :Gstatus<CR>
+" todo: add mapping for g lb
+nnoremap <leader>gl :GV<CR>
