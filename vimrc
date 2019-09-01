@@ -106,6 +106,7 @@ Plugin 'josudoey/vim-eslint-fix'
 Plugin 'w0rp/ale'
 Plugin 'alvan/vim-closetag'
 Plugin 'jiangmiao/auto-pairs'
+Plugin 'dyng/ctrlsf.vim'
 
 call vundle#end()
 
@@ -145,8 +146,8 @@ autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
-map <Leader>n :NERDTreeToggle<CR>
-map <Leader>f :NERDTreeFind<CR>
+map <Leader>nt :NERDTreeToggle<CR>
+map <Leader>nf :NERDTreeFind<CR>
 
 " Close NERD Tree when everything else is closed.
 " disabled for convenience, if closing all is desired, enter :qa
@@ -277,3 +278,5 @@ nnoremap <leader>gs :Gstatus<CR>
 nnoremap <leader>gl :GV<CR>
 nnoremap <leader>glf :GV!<CR>
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.tsx, *.jsx'
+" todo create ctrlsf mappings and config settings
+" map to <leader>f*
