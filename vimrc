@@ -104,6 +104,8 @@ Plugin 'maralla/completor.vim'
 Plugin 'BrandonRoehl/auto-omni'
 Plugin 'josudoey/vim-eslint-fix'
 Plugin 'w0rp/ale'
+Plugin 'alvan/vim-closetag'
+Plugin 'jiangmiao/auto-pairs'
 
 call vundle#end()
 
@@ -274,3 +276,4 @@ nnoremap <leader>gs :Gstatus<CR>
 " todo: add mapping for g lb
 nnoremap <leader>gl :GV<CR>
 nnoremap <leader>glf :GV!<CR>
+let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.tsx, *.jsx'
