@@ -280,3 +280,11 @@ nnoremap <leader>glf :GV!<CR>
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.tsx, *.jsx'
 " todo create ctrlsf mappings and config settings
 " map to <leader>f*
+nmap     <leader>f <Plug>CtrlSFPrompt
+nmap     <leader>s :CtrlSFToggle<CR>
+vmap     <leader>f <Plug>CtrlSFVwordExec
+let g:ctrlsf_auto_close = {
+      \ "normal" : 0,
+      \ "compact": 0
+      \}
+let g:ctrlsf_default_view_mode = 'compact'
