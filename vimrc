@@ -255,8 +255,8 @@ let g:ale_fixers = {
       \}
 
 let g:ale_fix_on_save = 1
-nmap <C-f> :ALEFix<CR>
-imap <C-f> <C-o>:ALEFix<CR>
+nmap <C-f> :ALEFix<CR>:TsuQuickFix<CR>
+imap <C-f> <C-o>:ALEFix<CR>:TsuQuickFix<CR>
 let NERDTreeQuitOnOpen = 1
 let NERDTreeShowHidden = 1
 
