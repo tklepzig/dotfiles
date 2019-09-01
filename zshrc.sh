@@ -29,6 +29,7 @@ alias rmr='rm -rf'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
+alias t='tmux'
 
 autoload -U colors compinit promptinit
 colors
