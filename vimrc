@@ -107,6 +107,7 @@ Plugin 'w0rp/ale'
 Plugin 'alvan/vim-closetag'
 Plugin 'jiangmiao/auto-pairs'
 Plugin 'dyng/ctrlsf.vim'
+Plugin '1995parham/vim-zimpl'
 
 call vundle#end()
 
@@ -266,7 +267,11 @@ let NERDTreeShowHidden = 1
 nnoremap <leader><Left> <C-o><CR>
 nnoremap <leader><Right> <C-i><CR>
 
-set clipboard=unnamedplus
+if has('macunix')
+  set clipboard=unnamed
+else
+  set clipboard=unnamedplus
+endif
 
 nnoremap <leader>r :ALEFindReferences<CR>
 nnoremap <leader>d :TsuDefinition<CR>
@@ -288,3 +293,36 @@ let g:ctrlsf_auto_close = {
       \ "compact": 0
       \}
 let g:ctrlsf_default_view_mode = 'compact'
+
+" open file with CtrlP in new tab
+let g:ctrlp_prompt_mappings = {
+    \ 'AcceptSelection("e")': ['<C-e>'],
+    \ 'AcceptSelection("t")': ['<Cr>'],
+    \ }
+
+" from https://stackoverflow.com/a/54961319
+function AleIgnore()
+  let codes = []
+  for d in getloclist(0)
+    if (d.lnum==line('.'))
+      let code = split(d.text,':')[0]
+      call add(codes, code)
+    endif
+  endfor
+  if len(codes)
+    exe 'normal O/* eslint-disable-next-line ' . join(codes, ', ') . ' */'
+  endif
+endfunction
+
+
+autocmd BufRead,BufNewFile *.zpl set filetype=zimpl
+
+" see https://unix.stackexchange.com/a/383044
+" Triger `autoread` when files changes on disk
+" https://unix.stackexchange.com/questions/149209/refresh-changed-content-of-file-opened-in-vim/383044#383044
+" https://vi.stackexchange.com/questions/13692/prevent-focusgained-autocmd-running-in-command-line-editing-mode
+autocmd FocusGained,BufEnter,CursorHold,CursorHoldI * if mode() != 'c' | checktime | endif
+" Notification after file change
+" https://vi.stackexchange.com/questions/13091/autocmd-event-for-autoread
+autocmd FileChangedShellPost *
+  \ echohl WarningMsg | echo "File changed on disk. Buffer reloaded." | echohl None
