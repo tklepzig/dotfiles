@@ -147,7 +147,7 @@ autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
-map <Leader>nt :NERDTreeToggle<CR>
+map <Leader>n :NERDTreeToggle<CR>
 map <Leader>nf :NERDTreeFind<CR>
 
 " Close NERD Tree when everything else is closed.
@@ -279,7 +279,7 @@ nnoremap <leader>d :TsuDefinition<CR>
 " rename
 " search in files
 nnoremap <leader>gs :Gstatus<CR>
-" todo: add mapping for g lb
+nnoremap <leader>gd :Gvdiffsplit<CR>
 nnoremap <leader>gl :GV<CR>
 nnoremap <leader>glf :GV!<CR>
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.tsx, *.jsx'

@@ -68,8 +68,8 @@ bindkey -e
 alias sif="$dotfilesDir/search-in-files.sh"
 alias hgrep="$dotfilesDir/hgrep.sh"
 alias b="$dotfilesDir/bookmark.sh"
-alias update-my-config='curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh|bash'
-alias update-my-config-skip-vsc='curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh | bash -s -- --skip-vsc'
+alias dotfiles-update='curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh|bash'
+alias dotfiles-update-skip-vsc='curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh | bash -s -- --skip-vsc'
 
 if isOS linux
 then
