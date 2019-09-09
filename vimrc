@@ -108,6 +108,8 @@ Plugin 'alvan/vim-closetag'
 Plugin 'jiangmiao/auto-pairs'
 Plugin 'dyng/ctrlsf.vim'
 Plugin '1995parham/vim-zimpl'
+Plugin 'Yggdroot/indentLine'
+Plugin 'gcmt/wildfire.vim'
 
 call vundle#end()
 
