@@ -174,7 +174,6 @@ autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx
 
 
 nnoremap <Leader>w <C-w>
-nnoremap <Enter> O<Esc>j
 
 map <Leader>p :CtrlP<CR>
 map <Leader>i :TsuImport<CR>
