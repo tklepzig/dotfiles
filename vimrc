@@ -110,6 +110,7 @@ Plugin 'dyng/ctrlsf.vim'
 Plugin '1995parham/vim-zimpl'
 Plugin 'Yggdroot/indentLine'
 Plugin 'gcmt/wildfire.vim'
+Plugin 'janko/vim-test'
 
 call vundle#end()
 
