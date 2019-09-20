@@ -111,6 +111,7 @@ Plugin '1995parham/vim-zimpl'
 Plugin 'Yggdroot/indentLine'
 Plugin 'gcmt/wildfire.vim'
 Plugin 'janko/vim-test'
+Plugin 'benmills/vimux'
 
 call vundle#end()
 
@@ -283,7 +284,7 @@ nnoremap <leader>d :TsuDefinition<CR>
 nnoremap <leader>gs :Gstatus<CR>
 nnoremap <leader>gd :Gvdiffsplit<CR>
 nnoremap <leader>gl :GV<CR>
-nnoremap <leader>glf :GV!<CR>
+nnoremap <leader>gf :GV!<CR>
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.tsx, *.jsx'
 " todo create ctrlsf mappings and config settings
 " map to <leader>f*
@@ -328,3 +329,13 @@ autocmd FocusGained,BufEnter,CursorHold,CursorHoldI * if mode() != 'c' | checkti
 " https://vi.stackexchange.com/questions/13091/autocmd-event-for-autoread
 autocmd FileChangedShellPost *
   \ echohl WarningMsg | echo "File changed on disk. Buffer reloaded." | echohl None
+
+nnoremap <leader>tn :TestNearest<CR>
+nnoremap <leader>tf :TestFile<CR>
+nnoremap <leader>tl :TestLast<CR>
+nnoremap <leader>tv :TestVisit<CR>
+let test#strategy = "vimux"
+
+" "Zoom" a split window into a tab and/or close it
+nmap <Leader>zo :tabnew %<CR>
+nmap <Leader>zc :tabclose<CR>
