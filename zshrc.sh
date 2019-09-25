@@ -91,8 +91,10 @@ alias d='docker'
 alias dc='docker-compose'
 alias dce='docker-compose exec'
 alias dcl='docker-compose logs -f'
+alias dp='docker system prune -f && docker rmi -f $(docker images -q)'
 alias ccp='xclip -selection clipboard'
 alias v='vi .'
+alias r='ranger'
 
 autoload -Uz vcs_info
 setopt prompt_subst

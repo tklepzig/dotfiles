@@ -112,6 +112,7 @@ Plugin 'Yggdroot/indentLine'
 Plugin 'gcmt/wildfire.vim'
 Plugin 'janko/vim-test'
 Plugin 'benmills/vimux'
+Plugin 'francoiscabrol/ranger.vim'
 
 call vundle#end()
 
@@ -178,7 +179,6 @@ autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx
 nnoremap <Leader>w <C-w>
 
 map <Leader>p :CtrlP<CR>
-map <Leader>i :TsuImport<CR>
 
 
 " Go to tab by number
@@ -227,7 +227,6 @@ inoremap <Right> <nop>
 "inoremap <Up> <nop>
 "inoremap <Down> <nop>
 
-autocmd FileType typescript,typescript.tsx nmap <buffer> <Leader>t : <C-u>echo tsuquyomi#hint()<CR>
 
 set omnifunc=syntaxcomplete#Complete
 set completeopt=noinsert,menuone,menu
@@ -277,7 +276,9 @@ else
 endif
 
 nnoremap <leader>r :ALEFindReferences<CR>
-nnoremap <leader>d :TsuDefinition<CR>
+nnoremap <leader>d :ALEGoToDefinition<CR>
+nnoremap <Leader>i :TsuImport<CR>
+autocmd FileType typescript,typescript.tsx nmap <buffer> <Leader>t : <C-u>echo tsuquyomi#hint()<CR>
 "todo: ale or tsu
 " rename
 " search in files
@@ -339,3 +340,16 @@ let test#strategy = "vimux"
 " "Zoom" a split window into a tab and/or close it
 nmap <Leader>zo :tabnew %<CR>
 nmap <Leader>zc :tabclose<CR>
+
+nmap <Leader>rr :TsuRenameSymbol<CR>
+
+nmap <leader><Up> [c
+nmap <leader><Down> ]c
+"todo
+"To jump to the beginning of a C code block (while, switch, if etc), use the [{ command.
+"To jump to the end of a C code block (while, switch, if etc), use the ]} command.
+"The above two commands will work from anywhere inside the code block.
+"To jump to the beginning of a parenthesis use the [( command.
+"To jump to the end of a parenthesis use the ]) command.
+let g:ranger_map_keys = 0
+nmap <leader>e :Ranger <CR>
