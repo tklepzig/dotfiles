@@ -298,12 +298,6 @@ let g:ctrlsf_auto_close = {
       \}
 let g:ctrlsf_default_view_mode = 'compact'
 
-" open file with CtrlP in new tab
-let g:ctrlp_prompt_mappings = {
-    \ 'AcceptSelection("e")': ['<C-e>'],
-    \ 'AcceptSelection("t")': ['<Cr>'],
-    \ }
-
 " from https://stackoverflow.com/a/54961319
 function AleIgnore()
   let codes = []
