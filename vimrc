@@ -175,7 +175,7 @@ nnoremap <Leader>w <C-w>
 
 let g:fzf_action = {
   \ 'return': 'tab split',
-  \ 'ctrl-x': 'split',
+  \ 'ctrl-h': 'split',
   \ 'ctrl-v': 'vsplit' }
 
 nmap <Leader>p :GFiles<CR>
