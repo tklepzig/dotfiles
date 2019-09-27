@@ -112,6 +112,7 @@ Plug 'janko/vim-test'
 Plug 'benmills/vimux'
 Plug 'francoiscabrol/ranger.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
 
 call plug#end()
 
@@ -160,10 +161,6 @@ nmap <Leader>n :NERDTreeFind<CR>
 " Keep NERD Tree open in new tabs
 " autocmd BufWinEnter * NERDTreeMirror
 
-" Prevent Ctrlp from searching node modules and git
-let g:ctrlp_custom_ignore = '\v[\/](node_modules|dist)|(\.(swp|git))$'
-let g:ctrlp_show_hidden = 1
-
 highlight GitGutterAdd    ctermfg=2
 highlight GitGutterChange ctermfg=3
 highlight GitGutterDelete ctermfg=1
@@ -176,7 +173,12 @@ autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx
 
 nnoremap <Leader>w <C-w>
 
-map <Leader>p :CtrlP<CR>
+let g:fzf_action = {
+  \ 'return': 'tab split',
+  \ 'ctrl-x': 'split',
+  \ 'ctrl-v': 'vsplit' }
+
+nmap <Leader>p :GFiles<CR>
 
 
 " Go to tab by number
