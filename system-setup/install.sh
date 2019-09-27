@@ -34,7 +34,7 @@ then
 fi
 
 info "Installing some basic tools..."
-sudo apt-get -y install curl gnome-tweak-tool vim-gnome xdotool gparted sshfs tmux pwgen xclip zsh silversearcher-ag ranger
+sudo apt-get -y install curl gnome-tweak-tool vim-gnome xdotool gparted sshfs tmux pwgen xclip zsh silversearcher-ag ranger peco tig fzf
 success "Done."
 
 info "Installing Google Chrome..."
@@ -62,10 +62,10 @@ then
     info "Installing latest version of git and seafile client..."
     #install latest version of git
     sudo add-apt-repository -y ppa:git-core/ppa
-    
+
     # install seafile client
     sudo add-apt-repository -y ppa:seafile/seafile-client
-    
+
     sudo apt-get -y update
     sudo apt-get -y install git seafile-gui
     success "Done."
@@ -93,4 +93,3 @@ success "Done."
 info "Setting default shell to zsh..."
 chsh -s $(which zsh)
 success "Done. Please notice: In order to use the new shell, you have to logout and back in."
-

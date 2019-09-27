@@ -244,7 +244,7 @@ silent !stty -ixon
 autocmd VimLeave * silent !stty ixon
 
 nmap <C-s> :w<CR>
-imap <C-s> <C-o>:w<CR>
+imap <C-s> <C-c>:w<CR>
 
 
 let g:ale_linters = {
