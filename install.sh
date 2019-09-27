@@ -78,16 +78,16 @@ ln -sf $dotfilesDir/vimrc $HOME/.vimrc
 ln -sf $dotfilesDir/tmux.conf $HOME/.tmux.conf
 success "Done."
 
-if [ ! -d "$HOME/.vim/bundle/Vundle.vim" ]
+if [ ! -d "$HOME/.vim/autoload/plug.vim" ]
 then
-    info "Installing Vundle..."
-    git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim > /dev/null 2>&1
+    info "Installing vim-plug..."
+    curl -fLo $HOME/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim>/dev/null 2>&1
     success "Done."
 fi
 
 info "Installing vim plugins..."
 # "echo" to suppress the "Please press ENTER to continue...
-echo | vim +PluginInstall +qall > /dev/null 2>&1
+echo | vim +PlugInstall +qall > /dev/null 2>&1
 success "Done."
 
 # if [ ! -d "$HOME/.tmux/plugins/tpm" ]

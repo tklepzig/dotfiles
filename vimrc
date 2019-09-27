@@ -75,46 +75,45 @@ let mapleader = "\<space>"
 
 " new
 
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
 
-Plugin 'VundleVim/Vundle.vim'
+call plug#begin('~/.vim/vim-plug')
 
-"Plugin 'HerringtonDarkholme/yats.vim'
-Plugin 'godlygeek/tabular'
-Plugin 'plasticboy/vim-markdown'
-Plugin 'scrooloose/nerdtree.git'
-Plugin 'Xuyuanp/nerdtree-git-plugin'
-Plugin 'kien/ctrlp.vim'
-Plugin 'tomasiser/vim-code-dark'
-Plugin 'tpope/vim-fugitive'
-Plugin 'junegunn/gv.vim'
-"Plugin 'rickhowe/diffchar.vim'
-Plugin 'airblade/vim-gitgutter'
-Plugin 'ianks/vim-tsx'
-Plugin 'Quramy/tsuquyomi'
-Plugin 'vim-airline/vim-airline'
-Plugin 'vim-airline/vim-airline-themes'
-"Plugin 'christoomey/vim-tmux-navigator'
-Plugin 'scrooloose/nerdcommenter'
-Plugin 'sheerun/vim-polyglot'
-Plugin 'leafgarland/typescript-vim'
-Plugin 'tpope/vim-surround'
-Plugin 'maralla/completor.vim'
-Plugin 'BrandonRoehl/auto-omni'
-Plugin 'josudoey/vim-eslint-fix'
-Plugin 'w0rp/ale'
-Plugin 'alvan/vim-closetag'
-Plugin 'jiangmiao/auto-pairs'
-Plugin 'dyng/ctrlsf.vim'
-Plugin '1995parham/vim-zimpl'
-Plugin 'Yggdroot/indentLine'
-Plugin 'gcmt/wildfire.vim'
-Plugin 'janko/vim-test'
-Plugin 'benmills/vimux'
-Plugin 'francoiscabrol/ranger.vim'
+"Plug 'HerringtonDarkholme/yats.vim'
+Plug 'godlygeek/tabular'
+Plug 'plasticboy/vim-markdown'
+Plug 'scrooloose/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
+"Plug 'kien/ctrlp.vim'
+Plug 'tomasiser/vim-code-dark'
+Plug 'tpope/vim-fugitive'
+Plug 'junegunn/gv.vim'
+"Plug 'rickhowe/diffchar.vim'
+Plug 'airblade/vim-gitgutter'
+Plug 'ianks/vim-tsx'
+Plug 'Quramy/tsuquyomi'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+"Plug 'christoomey/vim-tmux-navigator'
+Plug 'scrooloose/nerdcommenter'
+Plug 'sheerun/vim-polyglot'
+Plug 'leafgarland/typescript-vim'
+Plug 'tpope/vim-surround'
+Plug 'maralla/completor.vim'
+Plug 'BrandonRoehl/auto-omni'
+Plug 'josudoey/vim-eslint-fix'
+Plug 'w0rp/ale'
+Plug 'alvan/vim-closetag'
+Plug 'jiangmiao/auto-pairs'
+Plug 'dyng/ctrlsf.vim'
+Plug '1995parham/vim-zimpl'
+Plug 'Yggdroot/indentLine'
+Plug 'gcmt/wildfire.vim'
+Plug 'janko/vim-test'
+Plug 'benmills/vimux'
+Plug 'francoiscabrol/ranger.vim'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 
-call vundle#end()
+call plug#end()
 
 " Enable TOC window auto-fit
 let g:vim_markdown_toc_autofit = 1
@@ -152,8 +151,7 @@ autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
-map <Leader>n :NERDTreeToggle<CR>
-map <Leader>nf :NERDTreeFind<CR>
+nmap <Leader>n :NERDTreeFind<CR>
 
 " Close NERD Tree when everything else is closed.
 " disabled for convenience, if closing all is desired, enter :qa
