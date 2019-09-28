@@ -65,20 +65,10 @@ set undodir=/tmp//,.
 
 set backspace=2   " Backspace deletes like most programs in insert mode
 
-let mapleader = "\<space>"
-
-" Remap Escape key to qq
-"inoremap qq <ESC>
-
-" Remap autocompletion trigger to Ctrl+Space
-" inoremap <Nul> <C-n>
-
-" new
-
-
 call plug#begin('~/.vim/vim-plug')
 
-"Plug 'HerringtonDarkholme/yats.vim'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'HerringtonDarkholme/yats.vim'
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
 Plug 'scrooloose/nerdtree'
@@ -89,17 +79,17 @@ Plug 'tpope/vim-fugitive'
 Plug 'junegunn/gv.vim'
 "Plug 'rickhowe/diffchar.vim'
 Plug 'airblade/vim-gitgutter'
-Plug 'ianks/vim-tsx'
-Plug 'Quramy/tsuquyomi'
+"Plug 'ianks/vim-tsx'
+"Plug 'Quramy/tsuquyomi'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 "Plug 'christoomey/vim-tmux-navigator'
 Plug 'scrooloose/nerdcommenter'
 Plug 'sheerun/vim-polyglot'
-Plug 'leafgarland/typescript-vim'
+"Plug 'leafgarland/typescript-vim'
 Plug 'tpope/vim-surround'
-Plug 'maralla/completor.vim'
-Plug 'BrandonRoehl/auto-omni'
+"Plug 'maralla/completor.vim'
+"Plug 'BrandonRoehl/auto-omni'
 Plug 'josudoey/vim-eslint-fix'
 Plug 'w0rp/ale'
 Plug 'alvan/vim-closetag'
@@ -136,11 +126,13 @@ call NERDTreeHighlightFile('html', 'yellow', 'none', 'yellow', '#151515')
 call NERDTreeHighlightFile('css', 'cyan', 'none', 'cyan', '#151515')
 call NERDTreeHighlightFile('js', 'Red', 'none', '#ffa500', '#151515')
 
-colorscheme codedark
-let g:airline_theme = 'codedark'
-
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
+let NERDTreeQuitOnOpen = 1
+let NERDTreeShowHidden = 1
+
+colorscheme codedark
+let g:airline_theme = 'codedark'
 
 " How can I open NERDTree automatically when vim starts up on opening a directory?
 " This window is tab-specific, meaning it's used by all windows in the tab. This trick also prevents NERDTree from hiding when first selecting a file.
@@ -152,7 +144,6 @@ autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
-nmap <Leader>n :NERDTreeFind<CR>
 
 " Close NERD Tree when everything else is closed.
 " disabled for convenience, if closing all is desired, enter :qa
@@ -171,31 +162,10 @@ autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
 autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx
 
 
-nnoremap <Leader>w <C-w>
-
 let g:fzf_action = {
   \ 'return': 'tab split',
   \ 'ctrl-h': 'split',
   \ 'ctrl-v': 'vsplit' }
-
-nmap <Leader>p :GFiles<CR>
-
-
-" Go to tab by number
-noremap <leader>1 1gt
-noremap <leader>2 2gt
-noremap <leader>3 3gt
-noremap <leader>4 4gt
-noremap <leader>5 5gt
-noremap <leader>6 6gt
-noremap <leader>7 7gt
-noremap <leader>8 8gt
-noremap <leader>9 :tablast<cr>
-
-" Go to last active tab
-au TabLeave * let g:lasttab = tabpagenr()
-nnoremap <silent> <leader><Tab> :exe "tabn ".g:lasttab<cr>
-vnoremap <silent> <leader><Tab> :exe "tabn ".g:lasttab<cr>
 
 
 " TODO: Use only buffers, not tabs
@@ -220,32 +190,14 @@ let g:airline#extensions#tabline#show_tab_type = 0
 let g:airline#extensions#tabline#close_symbol = '×'
 let g:airline#extensions#tabline#show_close_button = 0
 
-" no arrow keys in edit mode
-inoremap <Left> <nop>
-inoremap <Right> <nop>
-" do not disable them here to allow them for autocompletion navigation
-"inoremap <Up> <nop>
-"inoremap <Down> <nop>
-
-
 set omnifunc=syntaxcomplete#Complete
 set completeopt=noinsert,menuone,menu
-
-inoremap <expr> <CR>       pumvisible()    ? "\<C-y>"                  : "\<CR>"
-inoremap <expr> <Down>     pumvisible()    ? "\<C-n>"                  : ""
-inoremap <expr> <Up>       pumvisible()    ? "\<C-p>"                  : ""
-inoremap <expr> <PageDown> pumvisible()    ? "\<PageDown>\<C-p>\<C-n>" : "\<PageDown>"
-inoremap <expr> <PageUp>   pumvisible()    ? "\<PageUp>\<C-p>\<C-n>"   : "\<PageUp>"
 
 " Allow us to use Ctrl-s and Ctrl-q as keybinds
 silent !stty -ixon
 
 " Restore default behaviour when leaving Vim.
 autocmd VimLeave * silent !stty ixon
-
-nmap <C-s> :w<CR>
-imap <C-s> <C-c>:w<CR>
-
 
 let g:ale_linters = {
       \   'javascript': ['eslint'],
@@ -261,13 +213,6 @@ let g:ale_fixers = {
       \}
 
 let g:ale_fix_on_save = 1
-nmap <C-f> :ALEFix<CR>:TsuQuickFix<CR>
-imap <C-f> <C-o>:ALEFix<CR>:TsuQuickFix<CR>
-let NERDTreeQuitOnOpen = 1
-let NERDTreeShowHidden = 1
-
-nnoremap <leader><Left> <C-o><CR>
-nnoremap <leader><Right> <C-i><CR>
 
 if has('macunix')
   set clipboard=unnamed
@@ -275,23 +220,7 @@ else
   set clipboard=unnamedplus
 endif
 
-nnoremap <leader>r :ALEFindReferences<CR>
-nnoremap <leader>d :ALEGoToDefinition<CR>
-nnoremap <Leader>i :TsuImport<CR>
-autocmd FileType typescript,typescript.tsx nmap <buffer> <Leader>t : <C-u>echo tsuquyomi#hint()<CR>
-"todo: ale or tsu
-" rename
-" search in files
-nnoremap <leader>gs :Gstatus<CR>
-nnoremap <leader>gd :Gvdiffsplit<CR>
-nnoremap <leader>gl :GV<CR>
-nnoremap <leader>gf :GV!<CR>
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.tsx, *.jsx'
-" todo create ctrlsf mappings and config settings
-" map to <leader>f*
-nmap     <leader>f <Plug>CtrlSFPrompt
-nmap     <leader>s :CtrlSFToggle<CR>
-vmap     <leader>f <Plug>CtrlSFVwordExec
 let g:ctrlsf_auto_close = {
       \ "normal" : 0,
       \ "compact": 0
@@ -299,7 +228,7 @@ let g:ctrlsf_auto_close = {
 let g:ctrlsf_default_view_mode = 'compact'
 
 " from https://stackoverflow.com/a/54961319
-function AleIgnore()
+function! AleIgnore()
   let codes = []
   for d in getloclist(0)
     if (d.lnum==line('.'))
@@ -311,7 +240,6 @@ function AleIgnore()
     exe 'normal O/* eslint-disable-next-line ' . join(codes, ', ') . ' */'
   endif
 endfunction
-
 
 autocmd BufRead,BufNewFile *.zpl set filetype=zimpl
 
@@ -325,11 +253,76 @@ autocmd FocusGained,BufEnter,CursorHold,CursorHoldI * if mode() != 'c' | checkti
 autocmd FileChangedShellPost *
   \ echohl WarningMsg | echo "File changed on disk. Buffer reloaded." | echohl None
 
+let test#strategy = "vimux"
+
+let g:ranger_map_keys = 0
+
+
+"--------------Mappings--------------------
+let mapleader = "\<space>"
+
+" Remap Ctrl+C to Escape to ensure triggering InsertLeave
+inoremap <C-c> <ESC>
+
+nnoremap <Leader>w <C-w>
+nmap <Leader>p :GFiles<CR>
+
+" Go to tab by number
+noremap <leader>1 1gt
+noremap <leader>2 2gt
+noremap <leader>3 3gt
+noremap <leader>4 4gt
+noremap <leader>5 5gt
+noremap <leader>6 6gt
+noremap <leader>7 7gt
+noremap <leader>8 8gt
+noremap <leader>9 :tablast<cr>
+
+" Go to last active tab
+au TabLeave * let g:lasttab = tabpagenr()
+nnoremap <silent> <leader><Tab> :exe "tabn ".g:lasttab<cr>
+vnoremap <silent> <leader><Tab> :exe "tabn ".g:lasttab<cr>
+
+" no arrow keys in edit mode
+inoremap <Left> <nop>
+inoremap <Right> <nop>
+" do not disable them here to allow them for autocompletion navigation
+"inoremap <Up> <nop>
+"inoremap <Down> <nop>
+
+inoremap <expr> <CR>       pumvisible()    ? "\<C-y>"                  : "\<CR>"
+inoremap <expr> <Down>     pumvisible()    ? "\<C-n>"                  : ""
+inoremap <expr> <Up>       pumvisible()    ? "\<C-p>"                  : ""
+inoremap <expr> <PageDown> pumvisible()    ? "\<PageDown>\<C-p>\<C-n>" : "\<PageDown>"
+inoremap <expr> <PageUp>   pumvisible()    ? "\<PageUp>\<C-p>\<C-n>"   : "\<PageUp>"
+
+nmap <C-s> :w<CR>
+imap <C-s> <C-c>:w<CR>
+
+nmap <C-f> :ALEFix<CR>:TsuQuickFix<CR>
+imap <C-f> <C-o>:ALEFix<CR>:TsuQuickFix<CR>
+
+nnoremap <leader><Left> <C-o><CR>
+nnoremap <leader><Right> <C-i><CR>
+
+nnoremap <leader>r :ALEFindReferences<CR>
+nnoremap <leader>d :ALEGoToDefinition<CR>
+nnoremap <Leader>i :TsuImport<CR>
+autocmd FileType typescript,typescript.tsx nmap <buffer> <Leader>t : <C-u>echo tsuquyomi#hint()<CR>
+
+nnoremap <leader>gs :Gstatus<CR>
+nnoremap <leader>gd :Gvdiffsplit<CR>
+nnoremap <leader>gl :GV<CR>
+nnoremap <leader>gf :GV!<CR>
+
+nmap     <leader>f <Plug>CtrlSFPrompt
+nmap     <leader>s :CtrlSFToggle<CR>
+vmap     <leader>f <Plug>CtrlSFVwordExec
+
 nnoremap <leader>tn :TestNearest<CR>
 nnoremap <leader>tf :TestFile<CR>
 nnoremap <leader>tl :TestLast<CR>
 nnoremap <leader>tv :TestVisit<CR>
-let test#strategy = "vimux"
 
 " "Zoom" a split window into a tab and/or close it
 nmap <Leader>zo :tabnew %<CR>
@@ -345,5 +338,5 @@ nmap <leader><Down> ]c
 "The above two commands will work from anywhere inside the code block.
 "To jump to the beginning of a parenthesis use the [( command.
 "To jump to the end of a parenthesis use the ]) command.
-let g:ranger_map_keys = 0
+
 nmap <leader>e :Ranger <CR>
