@@ -265,18 +265,18 @@ let mapleader = "\<space>"
 inoremap <C-c> <ESC>
 
 nnoremap <Leader>w <C-w>
-nmap <Leader>p :GFiles<CR>
+nnoremap <Leader>p :GFiles<CR>
 
 " Go to tab by number
-noremap <leader>1 1gt
-noremap <leader>2 2gt
-noremap <leader>3 3gt
-noremap <leader>4 4gt
-noremap <leader>5 5gt
-noremap <leader>6 6gt
-noremap <leader>7 7gt
-noremap <leader>8 8gt
-noremap <leader>9 :tablast<cr>
+nnoremap <leader>1 1gt
+nnoremap <leader>2 2gt
+nnoremap <leader>3 3gt
+nnoremap <leader>4 4gt
+nnoremap <leader>5 5gt
+nnoremap <leader>6 6gt
+nnoremap <leader>7 7gt
+nnoremap <leader>8 8gt
+nnoremap <leader>9 :tablast<cr>
 
 " Go to last active tab
 au TabLeave * let g:lasttab = tabpagenr()
@@ -296,11 +296,11 @@ inoremap <expr> <Up>       pumvisible()    ? "\<C-p>"                  : ""
 inoremap <expr> <PageDown> pumvisible()    ? "\<PageDown>\<C-p>\<C-n>" : "\<PageDown>"
 inoremap <expr> <PageUp>   pumvisible()    ? "\<PageUp>\<C-p>\<C-n>"   : "\<PageUp>"
 
-nmap <C-s> :w<CR>
-imap <C-s> <C-c>:w<CR>
+nnoremap <C-s> :w<CR>
+inoremap <C-s> <C-c>:w<CR>
 
-nmap <C-f> :ALEFix<CR>:TsuQuickFix<CR>
-imap <C-f> <C-o>:ALEFix<CR>:TsuQuickFix<CR>
+nnoremap <C-f> :ALEFix<CR>:TsuQuickFix<CR>
+inoremap <C-f> <C-o>:ALEFix<CR>:TsuQuickFix<CR>
 
 nnoremap <leader><Left> <C-o><CR>
 nnoremap <leader><Right> <C-i><CR>
@@ -308,16 +308,16 @@ nnoremap <leader><Right> <C-i><CR>
 nnoremap <leader>r :ALEFindReferences<CR>
 nnoremap <leader>d :ALEGoToDefinition<CR>
 nnoremap <Leader>i :TsuImport<CR>
-autocmd FileType typescript,typescript.tsx nmap <buffer> <Leader>t : <C-u>echo tsuquyomi#hint()<CR>
+autocmd FileType typescript,typescript.tsx nnoremap <buffer> <Leader>t : <C-u>echo tsuquyomi#hint()<CR>
 
 nnoremap <leader>gs :Gstatus<CR>
 nnoremap <leader>gd :Gvdiffsplit<CR>
 nnoremap <leader>gl :GV<CR>
 nnoremap <leader>gf :GV!<CR>
 
-nmap     <leader>f <Plug>CtrlSFPrompt
-nmap     <leader>s :CtrlSFToggle<CR>
-vmap     <leader>f <Plug>CtrlSFVwordExec
+nnoremap <leader>f <Plug>CtrlSFPrompt
+nnoremap <leader>s :CtrlSFToggle<CR>
+vnoremap <leader>f <Plug>CtrlSFVwordExec
 
 nnoremap <leader>tn :TestNearest<CR>
 nnoremap <leader>tf :TestFile<CR>
@@ -325,13 +325,13 @@ nnoremap <leader>tl :TestLast<CR>
 nnoremap <leader>tv :TestVisit<CR>
 
 " "Zoom" a split window into a tab and/or close it
-nmap <Leader>zo :tabnew %<CR>
-nmap <Leader>zc :tabclose<CR>
+nnoremap <Leader>zo :tabnew %<CR>
+nnoremap <Leader>zc :tabclose<CR>
 
-nmap <Leader>rr :TsuRenameSymbol<CR>
+nnoremap <Leader>rr :TsuRenameSymbol<CR>
 
-nmap <leader><Up> [c
-nmap <leader><Down> ]c
+nnoremap <leader><Up> [c
+nnoremap <leader><Down> ]c
 "todo
 "To jump to the beginning of a C code block (while, switch, if etc), use the [{ command.
 "To jump to the end of a C code block (while, switch, if etc), use the ]} command.
@@ -339,4 +339,4 @@ nmap <leader><Down> ]c
 "To jump to the beginning of a parenthesis use the [( command.
 "To jump to the end of a parenthesis use the ]) command.
 
-nmap <leader>e :Ranger <CR>
+nnoremap <leader>e :Ranger <CR>
