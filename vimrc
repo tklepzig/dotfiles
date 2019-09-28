@@ -106,6 +106,19 @@ Plug 'junegunn/fzf.vim'
 
 call plug#end()
 
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? coc#_select_confirm() :
+      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+let g:coc_snippet_next = '<tab>'
+
 " Enable TOC window auto-fit
 let g:vim_markdown_toc_autofit = 1
 let g:vim_markdown_folding_disabled = 1
@@ -258,6 +271,7 @@ let test#strategy = "vimux"
 let g:ranger_map_keys = 0
 
 let g:coc_global_extensions = [
+      \'coc-json',
       \'coc-tsserver',
       \'coc-snippets',
       \'https://github.com/andys8/vscode-jest-snippets',

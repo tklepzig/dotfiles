@@ -75,6 +75,8 @@ success "Done."
 
 info "Creating Symlinks..."
 ln -sf $dotfilesDir/vimrc $HOME/.vimrc
+mkdir -p $HOME/.vim
+ln -sf $dotfilesDir/coc-settings.json $HOME/.vim/coc-settings.json
 ln -sf $dotfilesDir/tmux.conf $HOME/.tmux.conf
 success "Done."
 
