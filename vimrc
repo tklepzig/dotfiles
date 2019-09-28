@@ -257,6 +257,12 @@ let test#strategy = "vimux"
 
 let g:ranger_map_keys = 0
 
+let g:coc_global_extensions = [
+      \'coc-tsserver',
+      \'coc-snippets',
+      \'https://github.com/andys8/vscode-jest-snippets',
+      \'https://github.com/akamud/vscode-javascript-snippet-pack'
+      \]
 
 "--------------Mappings--------------------
 let mapleader = "\<space>"
