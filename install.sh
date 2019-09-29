@@ -18,13 +18,13 @@ fi
 
 zshProfileFile='.zshrc'
 
-skipVsCodeConfig=0
+skipVsCodeConfig=1
 skipClone=0
 for var in "$@"
 do
     case "$var" in
-        "--skip-vsc")
-            skipVsCodeConfig=1
+        "--include-vsc")
+            skipVsCodeConfig=0
             ;;
         "--skip-clone")
             skipClone=1

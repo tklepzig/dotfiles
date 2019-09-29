@@ -87,7 +87,7 @@ then
 fi
 
 info "Running dotfiles setup..."
-. ../install.sh --skip-clone
+. ../install.sh --skip-clone --include-vsc
 success "Done."
 
 info "Setting default shell to zsh..."
