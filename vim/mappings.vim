@@ -1,7 +1,7 @@
 let mapleader = "\<space>"
 
 " Remap Ctrl+C to Escape to ensure triggering InsertLeave
-inoremap <C-c> <ESC>
+inoremap <C-c> <Esc>
 
 nnoremap <Leader>n :NERDTreeFind<CR>
 nnoremap <Leader>w <C-w>
@@ -49,7 +49,7 @@ nnoremap <Leader>zc :tabclose<CR>
 " Plugins---------------------------------------------------------------------
 
 " ALE
-nnoremap <leader>. :ALEFix<CR>
+"nnoremap <C-f> :ALEFix<CR>
 nnoremap <leader>r :ALEFindReferences<CR>
 nnoremap <leader>d :ALEGoToDefinition<CR>
 
@@ -154,7 +154,7 @@ nmap <leader>a  <Plug>(coc-codeaction-selected)
 " Remap for do codeAction of current line
 nmap <silent> <leader>ac  <Plug>(coc-codeaction)
 " Fix autofix problem of current line
-nmap <silent> <leader>qf  <Plug>(coc-fix-current)
+nmap <silent> <leader>.  <Plug>(coc-fix-current)
 
 " Create mappings for function text object, requires document symbols feature of languageserver.
 "xmap if <Plug>(coc-funcobj-i)
