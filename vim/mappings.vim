@@ -64,8 +64,8 @@ nnoremap <leader>gd :Gvdiffsplit<CR>
 nnoremap <leader>gl :GV<CR>
 nnoremap <leader>gf :GV!<CR>
 " Navigate between hunks
-nmap <leader><Up> <Plug>GitGutterNextHunk
-nmap <leader><Down> <Plug>GitGutterPrevHunk
+nmap <leader><Up> <Plug>(GitGutterPrevHunk)
+nmap <leader><Down> <Plug>(GitGutterNextHunk)
 
 " CtrlSF
 nmap <leader>f <Plug>CtrlSFPrompt
