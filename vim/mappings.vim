@@ -59,7 +59,7 @@ nnoremap <Leader>zc :tabclose<CR>
 "nnoremap <Leader>rr :TsuRenameSymbol<CR>
 
 " vim-fugitive & gv
-nnoremap <leader>gs :Gstatus<CR>
+nnoremap <leader>gs :G<CR>
 nnoremap <leader>gd :Gvdiffsplit<CR>
 nnoremap <leader>gl :GV<CR>
 nnoremap <leader>gf :GV!<CR>
