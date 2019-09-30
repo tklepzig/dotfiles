@@ -50,8 +50,8 @@ nnoremap <Leader>zc :tabclose<CR>
 
 " ALE
 "nnoremap <C-f> :ALEFix<CR>
-nnoremap <leader>r :ALEFindReferences<CR>
-nnoremap <leader>d :ALEGoToDefinition<CR>
+"nnoremap <leader>r :ALEFindReferences<CR>
+"nnoremap <leader>d :ALEGoToDefinition<CR>
 
 " Tsu
 "nnoremap <Leader>i :TsuImport<CR>
@@ -68,9 +68,9 @@ nnoremap <leader><Up> <Plug>GitGutterNextHunk
 nnoremap <leader><Down> <Plug>GitGutterPrevHunk
 
 " CtrlSF
-nnoremap <leader>f <Plug>CtrlSFPrompt
+nmap <leader>f <Plug>CtrlSFPrompt
 "nnoremap <leader>s :CtrlSFToggle<CR>
-vnoremap <leader>f <Plug>CtrlSFVwordExec
+vmap <leader>f <Plug>CtrlSFVwordExec
 
 " vim-test
 nnoremap <leader>tn :TestNearest<CR>
