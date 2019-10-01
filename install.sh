@@ -18,6 +18,21 @@ fi
 
 zshProfileFile='.zshrc'
 
+addLinkToFile() {
+  src=$1
+  target=$2
+  info "Configuring $target..."
+  if [ ! -f $HOME/$target ]
+  then
+    touch $HOME/$target
+  fi
+  if ! grep -q "$dotfilesDir/$src" $HOME/$target
+  then
+    echo "source $dotfilesDir/$src" >> $HOME/$target;
+  fi
+  success "Done."
+}
+
 skipVsCodeConfig=1
 skipClone=0
 for var in "$@"
@@ -48,36 +63,21 @@ then
   success "Done."
 fi
 
+addLinkToFile "bashrc.sh" $profileFile
+addLinkToFile "zshrc.sh" ".zshrc"
+addLinkToFile "vim/vimrc" ".vimrc"
+addLinkToFile "tmux.conf" ".tmux.conf"
 
-info "Configuring $profileFile..."
-if [ ! -f $HOME/$profileFile ]
+info "Creating Backup..."
+if [ -f $HOME/.vim/coc-settings.json ]
 then
-    touch $HOME/$profileFile
-fi
-if ! grep -q "$dotfilesDir/bashrc.sh" $HOME/$profileFile
-then
-    echo "if [ -f $dotfilesDir/bashrc.sh ]; then . $dotfilesDir/bashrc.sh; fi" >> $HOME/$profileFile;
-fi
-success "Done."
-
-
-info "Configuring $zshProfileFile..."
-if [ ! -f $HOME/$zshProfileFile ]
-then
-    touch $HOME/$zshProfileFile
-fi
-if ! grep -q "$dotfilesDir/zshrc.sh" $HOME/$zshProfileFile
-then
-    echo "if [ -f $dotfilesDir/zshrc.sh ]; then . $dotfilesDir/zshrc.sh; fi" >> $HOME/$zshProfileFile;
+  cp $HOME/.vim/coc-settings.json $HOME/.vim/coc-settings.json.bak
 fi
 success "Done."
-
 
 info "Creating Symlinks..."
-ln -sf $dotfilesDir/vim/vimrc $HOME/.vimrc
 mkdir -p $HOME/.vim
 ln -sf $dotfilesDir/vim/coc-settings.json $HOME/.vim/coc-settings.json
-ln -sf $dotfilesDir/tmux.conf $HOME/.tmux.conf
 success "Done."
 
 if [ ! -d "$HOME/.vim/autoload/plug.vim" ]
