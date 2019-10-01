@@ -39,8 +39,8 @@ inoremap <expr> <PageUp>   pumvisible()    ? "\<PageUp>\<C-p>\<C-n>"   : "\<Page
 nnoremap <C-s> :w<CR>
 inoremap <C-s> <C-c>:w<CR>
 
-nnoremap <leader><Left> <C-o><CR>
-nnoremap <leader><Right> <C-i><CR>
+nnoremap <leader>h <C-o><CR>
+nnoremap <leader>l <C-i><CR>
 
 " "Zoom" a split window into a tab and/or close it
 nnoremap <Leader>zo :tabnew %<CR>
@@ -63,9 +63,11 @@ nnoremap <leader>gs :G<CR>
 nnoremap <leader>gd :Gvdiffsplit<CR>
 nnoremap <leader>gl :GV<CR>
 nnoremap <leader>gf :GV!<CR>
-" Navigate between hunks
 nmap <leader>k <Plug>(GitGutterPrevHunk)
 nmap <leader>j <Plug>(GitGutterNextHunk)
+nmap <leader>ghp <Plug>(GitGutterPreviewHunk)
+nmap <leader>ghs <Plug>(GitGutterStageHunk)
+vmap <leader>ghs <Plug>(GitGutterStageHunk)
 
 " CtrlSF
 nmap <leader>f <Plug>CtrlSFPrompt
@@ -118,7 +120,7 @@ inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 " Or use `complete_info` if your vim support it, like:
 " inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
 
-" Use `[g` and `]g` to navigate diagnostics
+" Navigate diagnostics
 nmap <silent> <leader><S-k> <Plug>(coc-diagnostic-prev)
 nmap <silent> <leader><S-j> <Plug>(coc-diagnostic-next)
 

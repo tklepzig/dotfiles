@@ -118,6 +118,8 @@ highlight GitGutterAdd    ctermfg=2
 highlight GitGutterChange ctermfg=3
 highlight GitGutterDelete ctermfg=1
 
+let g:gitgutter_map_keys = 0
+
 autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
 
 " set filetypes as typescript.tsx
