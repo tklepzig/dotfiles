@@ -65,10 +65,6 @@ set undodir=/tmp//,.
 
 set backspace=2   " Backspace deletes like most programs in insert mode
 
-" Use nicer highlight colors
-hi Search ctermfg=black ctermbg=228
-" todo: map :noh (clear highlighting)
-
 call plug#begin('~/.vim/vim-plug')
 
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
@@ -226,3 +222,7 @@ let g:ranger_map_keys = 0
 source $HOME/.dotfiles/vim/nerd-tree.vim
 source $HOME/.dotfiles/vim/coc.vim
 source $HOME/.dotfiles/vim/mappings.vim
+
+" Use nicer highlight colors
+hi Search cterm=NONE ctermfg=black ctermbg=228
+" todo: map :noh (clear highlighting)
