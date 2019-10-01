@@ -64,8 +64,8 @@ nnoremap <leader>gd :Gvdiffsplit<CR>
 nnoremap <leader>gl :GV<CR>
 nnoremap <leader>gf :GV!<CR>
 " Navigate between hunks
-nmap <leader><Up> <Plug>(GitGutterPrevHunk)
-nmap <leader><Down> <Plug>(GitGutterNextHunk)
+nmap <leader><k> <Plug>(GitGutterPrevHunk)
+nmap <leader><j> <Plug>(GitGutterNextHunk)
 
 " CtrlSF
 nmap <leader>f <Plug>CtrlSFPrompt
@@ -119,8 +119,8 @@ inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 " inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
 
 " Use `[g` and `]g` to navigate diagnostics
-nmap <silent> [g <Plug>(coc-diagnostic-prev)
-nmap <silent> ]g <Plug>(coc-diagnostic-next)
+nmap <silent> <leader><S-k> <Plug>(coc-diagnostic-prev)
+nmap <silent> <leader><S-j> <Plug>(coc-diagnostic-next)
 
 " Remap keys for gotos
 nmap <silent> gd <Plug>(coc-definition)
