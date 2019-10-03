@@ -10,6 +10,7 @@ else
   source $dotfilesDir/common.sh
 fi
 
+updateOnly=0
 skipVsCodeConfig=1
 skipClone=0
 for var in "$@"
@@ -20,6 +21,9 @@ do
             ;;
         "--skip-clone")
             skipClone=1
+            ;;
+        "-u")
+            updateOnly=1
             ;;
     esac
 done
@@ -45,16 +49,19 @@ addLinkToFile "zshrc.sh" ".zshrc"
 addLinkToFile "vim/vimrc" ".vimrc"
 addLinkToFile "tmux.conf" ".tmux.conf"
 
-info "Creating Backup..."
-if [ -d $HOME/.vim ]
+if [ "$updateOnly" = "0" ]
 then
-  cp -r $HOME/.vim $HOME/.vim-backup
+  info "Creating Backup..."
+  if [ -d $HOME/.vim ]
+  then
+    cp -r $HOME/.vim $HOME/.vim-backup
+  fi
+  if [ -d $HOME/.zsh ]
+  then
+    cp -r $HOME/.zsh $HOME/.zsh-backup
+  fi
+  success "Done."
 fi
-if [ -d $HOME/.zsh ]
-then
-  cp -r $HOME/.zsh $HOME/.zsh-backup
-fi
-success "Done."
 
 info "Creating Symlinks..."
 mkdir -p $HOME/.vim
@@ -72,13 +79,6 @@ info "Installing vim plugins..."
 # "echo" to suppress the "Please press ENTER to continue...
 echo | vim +PlugInstall +qall > /dev/null 2>&1
 success "Done."
-
-# if [ ! -d "$HOME/.tmux/plugins/tpm" ]
-# then
-#     info "Installing TPM..."
-#     git clone https://github.com/tmux-plugins/tpm $HOME/.tmux/plugins/tpm > /dev/null 2>&1
-#     success "Done."
-# fi
 
 info "Configuring Git..."
 $dotfilesDir/git-config.sh
@@ -135,9 +135,10 @@ then
 fi
 
 # Docker completion for zsh on linux
-
 if isProgramInstalled docker && isOS linux
 then
+  info "Installing docker completion..."
   mkdir -p $HOME/.zsh/completion
   curl -L https://raw.githubusercontent.com/docker/compose/1.24.0/contrib/completion/zsh/_docker-compose > $HOME/.zsh/completion/_docker-compose 2>/dev/null
+  success "Done."
 fi

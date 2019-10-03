@@ -57,8 +57,8 @@ bindkey -e
 
 alias hgrep="$dotfilesDir/hgrep.sh"
 alias b="$dotfilesDir/bookmark.sh"
-alias dotfiles-update='curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh|bash'
-alias dotfiles-update-include-vsc='curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh | bash -s -- --include-vsc'
+alias dotfiles-update='curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh | bash -s -- -u'
+alias dotfiles-update-include-vsc='curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh | bash -s -- -u --include-vsc'
 alias dotfiles-tabula-rasa="$dotfilesDir/tabula-rasa.sh"
 if isOS linux
 then
