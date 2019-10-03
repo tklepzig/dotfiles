@@ -36,15 +36,13 @@ inoremap <expr> <Up>       pumvisible()    ? "\<C-p>"                  : ""
 inoremap <expr> <PageDown> pumvisible()    ? "\<PageDown>\<C-p>\<C-n>" : "\<PageDown>"
 inoremap <expr> <PageUp>   pumvisible()    ? "\<PageUp>\<C-p>\<C-n>"   : "\<PageUp>"
 
-nnoremap <C-s> :w<CR>
-inoremap <C-s> <C-c>:w<CR>
+nnoremap <leader>s :w<CR>
 
 nnoremap <leader>h <C-o><CR>
 nnoremap <leader>l <C-i><CR>
 
-" "Zoom" a split window into a tab and/or close it
-nnoremap <Leader>zo :tabnew %<CR>
-nnoremap <Leader>zc :tabclose<CR>
+" Copy a split window into a tab
+nnoremap <Leader>wt :tabnew %<CR>
 
 " Plugins---------------------------------------------------------------------
 
@@ -71,7 +69,6 @@ vmap <leader>ghs <Plug>(GitGutterStageHunk)
 
 " CtrlSF
 nmap <leader>f <Plug>CtrlSFPrompt
-"nnoremap <leader>s :CtrlSFToggle<CR>
 vmap <leader>f <Plug>CtrlSFVwordExec
 
 " vim-test

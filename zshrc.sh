@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env zsh
 
 dotfilesDir="$HOME/.dotfiles"
 
@@ -47,16 +47,6 @@ SAVEHIST=20000
 setopt hist_ignore_all_dups
 setopt inc_append_history
 
-# source /usr/lib/git-core/git-sh-prompt
-# GIT_PS1_SHOWDIRTYSTATE=1
-# GIT_PS1_SHOWSTASHSTATE=1
-# GIT_PS1_SHOWUNTRACKEDFILES=1
-# GIT_PS1_SHOWUPSTREAM="auto"
-# GIT_PS1_SHOWCOLORHINTS=1
-# NEWLINE=$'\n'
-# precmd () { __git_ps1 "%n@%m:%~" "${NEWLINE}\$ " " (%s)" }
-# export RPROMPT="%T"
-
 cdpath=(~ ~/development)
 
 # Use vi as the default editor
@@ -65,12 +55,11 @@ export EDITOR=vi
 # But still use emacs-style zsh bindings (see https://superuser.com/a/457401)
 bindkey -e
 
-alias sif="$dotfilesDir/search-in-files.sh"
 alias hgrep="$dotfilesDir/hgrep.sh"
 alias b="$dotfilesDir/bookmark.sh"
 alias dotfiles-update='curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh|bash'
 alias dotfiles-update-include-vsc='curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh | bash -s -- --include-vsc'
-
+alias dotfiles-tabula-rasa="$dotfilesDir/tabula-rasa.sh"
 if isOS linux
 then
     alias n='nautilus .'

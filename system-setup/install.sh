@@ -46,8 +46,8 @@ info "Installing Visual Studio Code Insiders..."
 success "Done."
 
 info "Installing Git, npm, node and yarn..."
-# npm & nodejs, for version 10.x
-curl -sL https://deb.nodesource.com/setup_10.x | sudo bash -
+# npm & nodejs, for version 12.x
+curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
 
 # yarn
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -

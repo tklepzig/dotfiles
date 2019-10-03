@@ -10,29 +10,6 @@ else
   source $dotfilesDir/common.sh
 fi
 
-profileFile='.bashrc'
-if isOS darwin
-then
-    profileFile='.bash_profile'
-fi
-
-zshProfileFile='.zshrc'
-
-addLinkToFile() {
-  src=$1
-  target=$2
-  info "Configuring $target..."
-  if [ ! -f $HOME/$target ]
-  then
-    touch $HOME/$target
-  fi
-  if ! grep -q "$dotfilesDir/$src" $HOME/$target
-  then
-    echo "source $dotfilesDir/$src" >> $HOME/$target;
-  fi
-  success "Done."
-}
-
 skipVsCodeConfig=1
 skipClone=0
 for var in "$@"
@@ -69,9 +46,13 @@ addLinkToFile "vim/vimrc" ".vimrc"
 addLinkToFile "tmux.conf" ".tmux.conf"
 
 info "Creating Backup..."
-if [ -f $HOME/.vim/coc-settings.json ]
+if [ -d $HOME/.vim ]
 then
-  cp $HOME/.vim/coc-settings.json $HOME/.vim/coc-settings.json.bak
+  cp -r $HOME/.vim $HOME/.vim-backup
+fi
+if [ -d $HOME/.zsh ]
+then
+  cp -r $HOME/.zsh $HOME/.zsh-backup
 fi
 success "Done."
 

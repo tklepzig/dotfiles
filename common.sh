@@ -51,3 +51,34 @@ error()
 {
     echo -e "${error}$1${reset}"
 }
+
+profileFile='.bashrc'
+if isOS darwin
+then
+    profileFile='.bash_profile'
+fi
+
+addLinkToFile() {
+  src=$1
+  target=$2
+  info "Adding link to $target..."
+  if [ ! -f $HOME/$target ]
+  then
+    touch $HOME/$target
+  fi
+  if ! grep -q "$dotfilesDir/$src" $HOME/$target
+  then
+    echo "source $dotfilesDir/$src" >> $HOME/$target;
+  fi
+  success "Done."
+}
+
+removeLinkFromFile() {
+  target=$1
+  info "Remove link from $target..."
+  if [ -f $HOME/$target ]
+  then
+    sed /.dotfiles/d $HOME/$target > $HOME/$target.tmp && mv $HOME/$target.tmp $HOME/$target
+  fi
+  success "Done."
+}
