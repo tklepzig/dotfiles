@@ -84,6 +84,7 @@ alias dp='docker system prune -f && docker rmi -f $(docker images -q)'
 alias ccp='xclip -selection clipboard'
 alias v='vi .'
 alias r='ranger'
+alias q='exit'
 
 autoload -Uz vcs_info
 setopt prompt_subst
