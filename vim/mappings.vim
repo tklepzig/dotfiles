@@ -6,6 +6,9 @@ inoremap <C-c> <Esc>
 nnoremap <Leader>n :NERDTreeFind<CR>
 nnoremap <Leader>w <C-w>
 nnoremap <Leader>p :GFiles<CR>
+nnoremap <Leader>b :Buffers<CR>
+nnoremap <Leader>q :bd<CR>
+nnoremap <leader><Tab> :b#<cr>
 
 " Go to tab by number
 nnoremap <leader>1 1gt
@@ -18,10 +21,10 @@ nnoremap <leader>7 7gt
 nnoremap <leader>8 8gt
 nnoremap <leader>9 :tablast<cr>
 
-" Go to last active tab
-au TabLeave * let g:lasttab = tabpagenr()
-nnoremap <silent> <leader><Tab> :exe "tabn ".g:lasttab<cr>
-vnoremap <silent> <leader><Tab> :exe "tabn ".g:lasttab<cr>
+"" Go to last active tab
+"au TabLeave * let g:lasttab = tabpagenr()
+"nnoremap <silent> <leader><Tab> :exe "tabn ".g:lasttab<cr>
+"vnoremap <silent> <leader><Tab> :exe "tabn ".g:lasttab<cr>
 
 " no arrow keys in edit mode
 inoremap <Left> <nop>

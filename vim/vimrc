@@ -126,10 +126,10 @@ autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
 autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx
 
 
-let g:fzf_action = {
-  \ 'return': 'tab split',
-  \ 'ctrl-h': 'split',
-  \ 'ctrl-v': 'vsplit' }
+"let g:fzf_action = {
+  "\ 'return': 'tab split',
+  "\ 'ctrl-h': 'split',
+  "\ 'ctrl-v': 'vsplit' }
 
 
 " TODO: Use only buffers, not tabs
@@ -143,16 +143,17 @@ let g:airline#extensions#tabline#left_sep = '|'
 let g:airline#extensions#tabline#left_alt_sep = '|'
 let airline#extensions#tabline#tabs_label = ''
 let airline#extensions#tabline#show_splits = 0
+let g:airline#extensions#tabline#show_close_button = 0
 
 " only show tabs, no buffers
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#show_buffers = 0
-let g:airline#extensions#tabline#show_splits = 0
-let g:airline#extensions#tabline#show_tabs = 1
-let g:airline#extensions#tabline#show_tab_nr = 0
-let g:airline#extensions#tabline#show_tab_type = 0
-let g:airline#extensions#tabline#close_symbol = '×'
-let g:airline#extensions#tabline#show_close_button = 0
+"let g:airline#extensions#tabline#enabled = 1
+"let g:airline#extensions#tabline#show_buffers = 0
+"let g:airline#extensions#tabline#show_splits = 0
+"let g:airline#extensions#tabline#show_tabs = 1
+"let g:airline#extensions#tabline#show_tab_nr = 0
+"let g:airline#extensions#tabline#show_tab_type = 0
+"let g:airline#extensions#tabline#close_symbol = '×'
+"let g:airline#extensions#tabline#show_close_button = 0
 
 set omnifunc=syntaxcomplete#Complete
 set completeopt=noinsert,menuone,menu
