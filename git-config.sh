@@ -112,3 +112,6 @@ git config --global alias.cpn "cherry-pick -n"
 
 git config --global alias.rv "revert"
 git config --global alias.rvn "revert -n"
+
+git config --global alias.prn "!f() { . ~/.dotfiles/git-github-pr.sh new; }; f"
+git config --global alias.pro "!f() { . ~/.dotfiles/git-github-pr.sh; }; f"
