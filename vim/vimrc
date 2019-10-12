@@ -227,5 +227,8 @@ source $HOME/.dotfiles/vim/coc.vim
 source $HOME/.dotfiles/vim/mappings.vim
 
 " Use nicer highlight colors
-hi Search cterm=NONE ctermfg=black ctermbg=228
+hi Search ctermfg=black ctermbg=228
+set cursorline
+hi CursorLineNR ctermfg=39
+hi CursorColumn ctermbg=238
 " todo: map :noh (clear highlighting)
