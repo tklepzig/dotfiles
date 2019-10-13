@@ -1,7 +1,8 @@
 let mapleader = "\<space>"
 
 " Remap Ctrl+C to Escape to ensure triggering InsertLeave
-inoremap <C-c> <Esc>
+map <C-c> <esc>
+imap <C-c> <esc><esc>
 
 nnoremap <Leader>n :NERDTreeFind<CR>
 nnoremap <Leader>w <C-w>
