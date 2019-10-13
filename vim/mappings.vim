@@ -187,3 +187,6 @@ nmap <silent> <leader>.  <Plug>(coc-fix-current)
 "nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
 "" Resume latest coc list
 "nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+
+" Enter // to search for currently visually selected block
+vnoremap // y/\V<C-r>=escape(@",'/\')<CR><CR>
