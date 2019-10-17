@@ -3,24 +3,34 @@ let mapleader = "\<space>"
 " Remap Ctrl+C to Escape to ensure triggering InsertLeave
 map <C-c> <esc>
 imap <C-c> <esc><esc>
+imap jj <esc><esc>
 
 nnoremap <Leader>n :NERDTreeFind<CR>
-nnoremap <Leader>w <C-w>
+nnoremap <Leader>N :NERDTreeToggle<CR>
+nmap <Leader>w <C-w>
 nnoremap <Leader>p :GFiles<CR>
+nnoremap <Leader>P :History<CR>
+nnoremap <Leader>, :Commands<CR>
 nnoremap <Leader>b :Buffers<CR>
 nnoremap <Leader>q :bd<CR>
+nnoremap <Leader>Q :bufdo! bd<CR>
 nnoremap <leader><Tab> :b#<cr>
+nnoremap <leader>; :VimuxPromptCommand<cr>
 
-" Go to tab by number
-nnoremap <leader>1 1gt
-nnoremap <leader>2 2gt
-nnoremap <leader>3 3gt
-nnoremap <leader>4 4gt
-nnoremap <leader>5 5gt
-nnoremap <leader>6 6gt
-nnoremap <leader>7 7gt
-nnoremap <leader>8 8gt
-nnoremap <leader>9 :tablast<cr>
+let g:airline#extensions#tabline#buffer_idx_mode = 1
+nmap <leader>1 <Plug>AirlineSelectTab1
+nmap <leader>2 <Plug>AirlineSelectTab2
+nmap <leader>3 <Plug>AirlineSelectTab3
+nmap <leader>4 <Plug>AirlineSelectTab4
+nmap <leader>5 <Plug>AirlineSelectTab5
+nmap <leader>6 <Plug>AirlineSelectTab6
+nmap <leader>7 <Plug>AirlineSelectTab7
+nmap <leader>8 <Plug>AirlineSelectTab8
+nmap <leader>9 <Plug>AirlineSelectTab9
+nmap <leader>h <Plug>AirlineSelectPrevTab
+nmap <leader>l <Plug>AirlineSelectNextTab
+nmap <leader><Left> <Plug>AirlineSelectPrevTab
+nmap <leader><Right> <Plug>AirlineSelectNextTab
 
 "" Go to last active tab
 "au TabLeave * let g:lasttab = tabpagenr()
@@ -42,8 +52,8 @@ inoremap <expr> <PageUp>   pumvisible()    ? "\<PageUp>\<C-p>\<C-n>"   : "\<Page
 
 nnoremap <leader>s :w<CR>
 
-nnoremap <leader>h <C-o><CR>
-nnoremap <leader>l <C-i><CR>
+nnoremap <leader>- <C-o><CR>
+nnoremap <leader>+ <C-i><CR>
 
 " Copy a split window into a tab
 nnoremap <Leader>wt :tabnew %<CR>
@@ -122,8 +132,8 @@ inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 " inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
 
 " Navigate diagnostics
-nmap <silent> <leader><S-k> <Plug>(coc-diagnostic-prev)
-nmap <silent> <leader><S-j> <Plug>(coc-diagnostic-next)
+nmap <silent> <leader>K <Plug>(coc-diagnostic-prev)
+nmap <silent> <leader>J <Plug>(coc-diagnostic-next)
 
 " Remap keys for gotos
 nmap <silent> gd <Plug>(coc-definition)

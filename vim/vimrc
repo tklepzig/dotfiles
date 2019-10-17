@@ -103,6 +103,14 @@ Plug 'benmills/vimux'
 Plug 'francoiscabrol/ranger.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
+Plug 'easymotion/vim-easymotion'
+Plug 'junegunn/goyo.vim'
+Plug 'junegunn/seoul256.vim'
+Plug 'junegunn/limelight.vim'
+
+if filereadable("$HOME/.plugins.vim")
+  source $HOME/.plugins.vim
+endif
 
 call plug#end()
 
@@ -125,35 +133,16 @@ autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
 " set filetypes as typescript.tsx
 autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx
 
+let g:NERDCustomDelimiters = { 'javascript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' } }
+let g:NERDCustomDelimiters = { 'typescript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' } }
 
-"let g:fzf_action = {
-  "\ 'return': 'tab split',
-  "\ 'ctrl-h': 'split',
-  "\ 'ctrl-v': 'vsplit' }
-
-
-" TODO: Use only buffers, not tabs
-
-" Enable the list of buffers
 let g:airline#extensions#tabline#enabled = 1
-"
-" " Show just the filename
 let g:airline#extensions#tabline#fnamemod = ':t'
 let g:airline#extensions#tabline#left_sep = '|'
 let g:airline#extensions#tabline#left_alt_sep = '|'
 let airline#extensions#tabline#tabs_label = ''
 let airline#extensions#tabline#show_splits = 0
 let g:airline#extensions#tabline#show_close_button = 0
-
-" only show tabs, no buffers
-"let g:airline#extensions#tabline#enabled = 1
-"let g:airline#extensions#tabline#show_buffers = 0
-"let g:airline#extensions#tabline#show_splits = 0
-"let g:airline#extensions#tabline#show_tabs = 1
-"let g:airline#extensions#tabline#show_tab_nr = 0
-"let g:airline#extensions#tabline#show_tab_type = 0
-"let g:airline#extensions#tabline#close_symbol = '×'
-"let g:airline#extensions#tabline#show_close_button = 0
 
 set omnifunc=syntaxcomplete#Complete
 set completeopt=noinsert,menuone,menu
