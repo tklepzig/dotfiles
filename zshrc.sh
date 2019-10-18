@@ -85,6 +85,7 @@ alias ccp='xclip -selection clipboard'
 alias v='vi .'
 alias r='ranger'
 alias q='exit'
+alias ..='cd ..'
 
 autoload -Uz vcs_info
 setopt prompt_subst

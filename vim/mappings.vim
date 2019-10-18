@@ -16,6 +16,7 @@ nnoremap <Leader>q :bd<CR>
 nnoremap <Leader>Q :bufdo! bd<CR>
 nnoremap <leader><Tab> :b#<cr>
 nnoremap <leader>; :VimuxPromptCommand<cr>
+" ToDo: Add CocList diagnostics
 
 let g:airline#extensions#tabline#buffer_idx_mode = 1
 nmap <leader>1 <Plug>AirlineSelectTab1
@@ -200,3 +201,10 @@ nmap <silent> <leader>.  <Plug>(coc-fix-current)
 
 " Enter // to search for currently visually selected block
 vnoremap // y/\V<C-r>=escape(@",'/\')<CR><CR>
+
+" TODO
+" https://github.com/junegunn/limelight.vim
+" https://github.com/junegunn/seoul256.vim
+" https://github.com/junegunn/goyo.vim
+"https://www.bugsnag.com/blog/tmux-and-vim
+"http://vimcasts.org/episodes/fugitive-vim-resolving-merge-conflicts-with-vimdiff/
