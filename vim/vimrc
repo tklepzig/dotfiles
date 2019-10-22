@@ -65,6 +65,9 @@ set undodir=/tmp//,.
 
 set backspace=2   " Backspace deletes like most programs in insert mode
 
+" Decrease maximum column length in which to search for syntax items
+set synmaxcol=200
+
 call plug#begin('~/.vim/vim-plug')
 
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
@@ -200,6 +203,7 @@ autocmd BufRead,BufNewFile *.zpl set filetype=zimpl
 " Triger `autoread` when files changes on disk
 " https://unix.stackexchange.com/questions/149209/refresh-changed-content-of-file-opened-in-vim/383044#383044
 " https://vi.stackexchange.com/questions/13692/prevent-focusgained-autocmd-running-in-command-line-editing-mode
+set autoread
 autocmd FocusGained,BufEnter,CursorHold,CursorHoldI * if mode() != 'c' | checktime | endif
 " Notification after file change
 " https://vi.stackexchange.com/questions/13091/autocmd-event-for-autoread
@@ -220,3 +224,6 @@ set cursorline
 hi CursorLineNR ctermfg=39
 hi CursorColumn ctermbg=238
 " todo: map :noh (clear highlighting)
+
+" Optimize performance, use when necessary
+"https://vi.stackexchange.com/questions/10495/most-annoying-slow-down-of-a-plain-text-editor
