@@ -33,6 +33,15 @@ nmap <leader>l <Plug>AirlineSelectNextTab
 nmap <leader><Left> <Plug>AirlineSelectPrevTab
 nmap <leader><Right> <Plug>AirlineSelectNextTab
 
+nmap <leader>w1 :1wincmd w<cr>
+nmap <leader>w2 :2wincmd w<cr>
+nmap <leader>w3 :3wincmd w<cr>
+nmap <leader>w4 :4wincmd w<cr>
+nmap <leader>w5 :5wincmd w<cr>
+nmap <leader>w6 :6wincmd w<cr>
+nmap <leader>w7 :7wincmd w<cr>
+nmap <leader>w8 :8wincmd w<cr>
+nmap <leader>w9 :9wincmd w<cr>
 "" Go to last active tab
 "au TabLeave * let g:lasttab = tabpagenr()
 "nnoremap <silent> <leader><Tab> :exe "tabn ".g:lasttab<cr>
@@ -208,3 +217,4 @@ vnoremap // y/\V<C-r>=escape(@",'/\')<CR><CR>
 " https://github.com/junegunn/goyo.vim
 "https://www.bugsnag.com/blog/tmux-and-vim
 "http://vimcasts.org/episodes/fugitive-vim-resolving-merge-conflicts-with-vimdiff/
+" pgvy --> this will reselect and re-yank any text that is pasted in visual mode.
