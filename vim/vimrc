@@ -227,3 +227,11 @@ hi CursorColumn ctermbg=238
 
 " Optimize performance, use when necessary
 "https://vi.stackexchange.com/questions/10495/most-annoying-slow-down-of-a-plain-text-editor
+
+hi diffAdded ctermfg=41
+hi diffRemoved ctermfg=Red
+
+hi diffFile cterm=NONE ctermfg=39
+hi gitcommitDiff cterm=NONE ctermfg=39
+hi diffIndexLine cterm=NONE ctermfg=39
+hi diffLine cterm=NONE ctermfg=39
