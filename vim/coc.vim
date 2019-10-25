@@ -47,5 +47,6 @@ let g:coc_global_extensions = [
       \'coc-tsserver',
       \'coc-snippets',
       \'https://github.com/andys8/vscode-jest-snippets',
-      \'https://github.com/akamud/vscode-javascript-snippet-pack'
+      \'https://github.com/akamud/vscode-javascript-snippet-pack',
+      \'coc-python'
       \]
