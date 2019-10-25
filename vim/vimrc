@@ -110,6 +110,7 @@ Plug 'easymotion/vim-easymotion'
 Plug 'junegunn/goyo.vim'
 Plug 'junegunn/seoul256.vim'
 Plug 'junegunn/limelight.vim'
+Plug 'christoomey/vim-tmux-navigator'
 
 if !empty(globpath("$HOME", "/.plugins.vim"))
   source $HOME/.plugins.vim

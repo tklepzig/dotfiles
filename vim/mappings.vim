@@ -8,6 +8,7 @@ imap jj <esc><esc>
 nnoremap <Leader>n :NERDTreeFind<CR>
 nnoremap <Leader>N :NERDTreeToggle<CR>
 nmap <Leader>w <C-w>
+nmap <Leader>wh <C-w>s
 nnoremap <Leader>p :GFiles<CR>
 nnoremap <Leader>P :History<CR>
 nnoremap <Leader>, :Commands<CR>
@@ -15,7 +16,10 @@ nnoremap <Leader>b :Buffers<CR>
 nnoremap <Leader>q :bd<CR>
 nnoremap <Leader>Q :bufdo! bd<CR>
 nnoremap <leader><Tab> :b#<cr>
-nnoremap <leader>; :VimuxPromptCommand<cr>
+nnoremap <leader>vp :VimuxPromptCommand<cr>
+nnoremap <leader>vl :VimuxRunLastCommand<cr>
+nnoremap <leader>vi :VimuxInspectRunner<cr>
+nnoremap <leader>vz :VimuxZoomRunner<cr>
 " ToDo: Add CocList diagnostics
 
 let g:airline#extensions#tabline#buffer_idx_mode = 1
@@ -64,9 +68,6 @@ nnoremap <leader>s :w<CR>
 
 nnoremap <leader>- <C-o><CR>
 nnoremap <leader>+ <C-i><CR>
-
-" Copy a split window into a tab
-nnoremap <Leader>wt :tabnew %<CR>
 
 " Plugins---------------------------------------------------------------------
 
