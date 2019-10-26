@@ -4,6 +4,7 @@ let mapleader = "\<space>"
 map <C-c> <esc>
 imap <C-c> <esc><esc>
 imap jj <esc><esc>
+nmap <leader>jj <esc>
 
 nnoremap <Leader>n :NERDTreeFind<CR>
 nnoremap <Leader>N :NERDTreeToggle<CR>
