@@ -12,11 +12,12 @@ nmap <Leader>w <C-w>
 nmap <Leader>wh <C-w>s
 nnoremap <Leader>p :GFiles<CR>
 nnoremap <Leader>P :History<CR>
-nnoremap <Leader>, :Commands<CR>
+nnoremap <Leader>; :Commands<CR>
 nnoremap <Leader>b :Buffers<CR>
 nnoremap <Leader>q :bd<CR>
 nnoremap <Leader>Q :bufdo! bd<CR>
 nnoremap <leader><Tab> :b#<cr>
+nnoremap <leader>, :VimuxPromptCommand<cr>
 nnoremap <leader>vp :VimuxPromptCommand<cr>
 nnoremap <leader>vl :VimuxRunLastCommand<cr>
 nnoremap <leader>vi :VimuxInspectRunner<cr>
