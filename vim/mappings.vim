@@ -223,3 +223,5 @@ vnoremap // y/\V<C-r>=escape(@",'/\')<CR><CR>
 " https://github.com/junegunn/goyo.vim
 "http://vimcasts.org/episodes/fugitive-vim-resolving-merge-conflicts-with-vimdiff/
 " pgvy --> this will reselect and re-yank any text that is pasted in visual mode.
+"https://github.com/psf/black
+"http://blog.jamesnewton.com/setting-up-coc-nvim-for-ruby-development
