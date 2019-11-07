@@ -241,3 +241,6 @@ hi diffLine cterm=NONE ctermfg=39
 " Move focus to newly created splits
 set splitbelow
 set splitright
+
+" Allow matching ruby blocks with '%'
+runtime macros/matchit.vim
