@@ -6,5 +6,6 @@
   "list.insertMappings": {
     "<C-c>": "do:exit"
   },
-  "python.jediEnabled": false
+  "python.jediEnabled": false,
+  "codeLens.enable": true
 }
