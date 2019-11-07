@@ -236,3 +236,7 @@ hi diffFile cterm=NONE ctermfg=39
 hi gitcommitDiff cterm=NONE ctermfg=39
 hi diffIndexLine cterm=NONE ctermfg=39
 hi diffLine cterm=NONE ctermfg=39
+
+" Move focus to newly created splits
+set splitbelow
+set splitright

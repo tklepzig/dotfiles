@@ -9,7 +9,7 @@ nmap <leader>jj <esc>
 nnoremap <Leader>n :NERDTreeFind<CR>
 nnoremap <Leader>N :NERDTreeToggle<CR>
 nmap <Leader>w <C-w>
-nmap <Leader>wh <C-w>s
+nmap <Leader>w<Tab> <C-w><C-p>
 nnoremap <Leader>p :GFiles<CR>
 nnoremap <Leader>P :History<CR>
 nnoremap <Leader>; :Commands<CR>
@@ -22,6 +22,10 @@ nnoremap <leader>vp :VimuxPromptCommand<cr>
 nnoremap <leader>vl :VimuxRunLastCommand<cr>
 nnoremap <leader>vi :VimuxInspectRunner<cr>
 nnoremap <leader>vz :VimuxZoomRunner<cr>
+nmap H ^
+vmap H ^
+nmap L $
+vmap L $
 " ToDo: Add CocList diagnostics
 
 let g:airline#extensions#tabline#buffer_idx_mode = 1
@@ -57,14 +61,14 @@ nmap <leader>w9 :9wincmd w<cr>
 inoremap <Left> <nop>
 inoremap <Right> <nop>
 " do not disable them here to allow them for autocompletion navigation
-"inoremap <Up> <nop>
-"inoremap <Down> <nop>
+inoremap <Up> <nop>
+inoremap <Down> <nop>
 
 inoremap <expr> <CR>       pumvisible()    ? "\<C-y>"                  : "\<CR>"
-inoremap <expr> <Down>     pumvisible()    ? "\<C-n>"                  : ""
-inoremap <expr> <Up>       pumvisible()    ? "\<C-p>"                  : ""
-inoremap <expr> <PageDown> pumvisible()    ? "\<PageDown>\<C-p>\<C-n>" : "\<PageDown>"
-inoremap <expr> <PageUp>   pumvisible()    ? "\<PageUp>\<C-p>\<C-n>"   : "\<PageUp>"
+inoremap <expr> J          pumvisible()    ? "\<C-n>"                  : "J"
+inoremap <expr> K          pumvisible()    ? "\<C-p>"                  : "K"
+inoremap <expr> L          pumvisible()    ? "\<PageDown>\<C-p>\<C-n>" : "L"
+inoremap <expr> H          pumvisible()    ? "\<PageUp>\<C-p>\<C-n>"   : "H"
 
 nnoremap <leader>s :w<CR>
 
@@ -170,7 +174,8 @@ endfunction
 
 
 " Remap for rename current word
-nmap <leader>rn <Plug>(coc-rename)
+nmap <leader>rr <Plug>(coc-rename)
+nnoremap <silent> <leader>ri :call AleIgnore()<CR>
 
 " Remap for format selected region
 "xmap <leader>f  <Plug>(coc-format-selected)
