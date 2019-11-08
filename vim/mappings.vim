@@ -16,7 +16,7 @@ nnoremap <Leader>; :Commands<CR>
 nnoremap <Leader>b :Buffers<CR>
 nnoremap <Leader>q :bd<CR>
 nnoremap <Leader>Q :bufdo! bd<CR>
-nnoremap <Leader>Qe :%bd|e#|bd#<CR>
+nnoremap <Leader>Qe :%bd\|e#\|bd#<CR>
 nnoremap <leader><Tab> :b#<cr>
 nnoremap <leader>, :VimuxPromptCommand<cr>
 nnoremap <leader>vp :VimuxPromptCommand<cr>
