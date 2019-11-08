@@ -62,14 +62,20 @@ nmap <leader>w9 :9wincmd w<cr>
 inoremap <Left> <nop>
 inoremap <Right> <nop>
 " do not disable them here to allow them for autocompletion navigation
-inoremap <Up> <nop>
-inoremap <Down> <nop>
+"inoremap <Up> <nop>
+"inoremap <Down> <nop>
 
 inoremap <expr> <CR>       pumvisible()    ? "\<C-y>"                  : "\<CR>"
 inoremap <expr> J          pumvisible()    ? "\<C-n>"                  : "J"
 inoremap <expr> K          pumvisible()    ? "\<C-p>"                  : "K"
 inoremap <expr> L          pumvisible()    ? "\<PageDown>\<C-p>\<C-n>" : "L"
 inoremap <expr> H          pumvisible()    ? "\<PageUp>\<C-p>\<C-n>"   : "H"
+
+" allow arrow keys as well...
+inoremap <expr> <Down>     pumvisible()    ? "\<C-n>"                  : ""
+inoremap <expr> <Up>       pumvisible()    ? "\<C-p>"                  : ""
+inoremap <expr> <PageDown> pumvisible()    ? "\<PageDown>\<C-p>\<C-n>" : "\<PageDown>"
+inoremap <expr> <PageUp>   pumvisible()    ? "\<PageUp>\<C-p>\<C-n>"   : "\<PageUp>"
 
 nnoremap <leader>s :w<CR>
 
