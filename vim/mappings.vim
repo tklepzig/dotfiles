@@ -16,8 +16,9 @@ nnoremap <Leader>; :Commands<CR>
 nnoremap <Leader>b :Buffers<CR>
 nnoremap <Leader>q :bd<CR>
 nnoremap <Leader>Q :bufdo! bd<CR>
-nnoremap <Leader>Qe :%bd\|e#\|bd#<CR>
+nnoremap <Leader>Qc :%bd\|e#\|bd#<CR>
 nnoremap <leader><Tab> :b#<cr>
+nnoremap <leader><BS> :noh<cr>
 nnoremap <leader>, :VimuxPromptCommand<cr>
 nnoremap <leader>vp :VimuxPromptCommand<cr>
 nnoremap <leader>vl :VimuxRunLastCommand<cr>
@@ -66,12 +67,6 @@ inoremap <Right> <nop>
 "inoremap <Down> <nop>
 
 inoremap <expr> <CR>       pumvisible()    ? "\<C-y>"                  : "\<CR>"
-inoremap <expr> J          pumvisible()    ? "\<C-n>"                  : "J"
-inoremap <expr> K          pumvisible()    ? "\<C-p>"                  : "K"
-inoremap <expr> L          pumvisible()    ? "\<PageDown>\<C-p>\<C-n>" : "L"
-inoremap <expr> H          pumvisible()    ? "\<PageUp>\<C-p>\<C-n>"   : "H"
-
-" allow arrow keys as well...
 inoremap <expr> <Down>     pumvisible()    ? "\<C-n>"                  : ""
 inoremap <expr> <Up>       pumvisible()    ? "\<C-p>"                  : ""
 inoremap <expr> <PageDown> pumvisible()    ? "\<PageDown>\<C-p>\<C-n>" : "\<PageDown>"
@@ -237,3 +232,4 @@ vnoremap // y/\V<C-r>=escape(@",'/\')<CR><CR>
 " pgvy --> this will reselect and re-yank any text that is pasted in visual mode.
 "https://github.com/psf/black
 "http://blog.jamesnewton.com/setting-up-coc-nvim-for-ruby-development
+" https://blog.carbonfive.com/2011/10/17/vim-text-objects-the-definitive-guide/
