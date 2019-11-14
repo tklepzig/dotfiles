@@ -108,9 +108,9 @@ nmap <leader>f <Plug>CtrlSFPrompt
 vmap <leader>f <Plug>CtrlSFVwordExec
 
 " vim-test
-nnoremap <leader>tn :TestNearest<CR>
-nnoremap <leader>tf :TestFile<CR>
-nnoremap <leader>tl :TestLast<CR>
+nnoremap <leader>tn :w \| TestNearest<CR>
+nnoremap <leader>tf :w \| TestFile<CR>
+nnoremap <leader>tl :w \| TestLast<CR>
 nnoremap <leader>tv :TestVisit<CR>
 
 "todo
@@ -224,6 +224,8 @@ nmap <silent> <leader>.  <Plug>(coc-fix-current)
 " Enter // to search for currently visually selected block
 vnoremap // y/\V<C-r>=escape(@",'/\')<CR><CR>
 
+nnoremap <S-j> :m +1<cr>
+nnoremap <S-k> :m -2<cr>
 " TODO
 " https://github.com/junegunn/limelight.vim
 " https://github.com/junegunn/seoul256.vim
