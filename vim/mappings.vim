@@ -227,6 +227,8 @@ vnoremap // y/\V<C-r>=escape(@",'/\')<CR><CR>
 
 nnoremap <S-j> :m +1<cr>
 nnoremap <S-k> :m -2<cr>
+vnoremap <S-j> :m '>+1<CR>gv
+vnoremap <S-k> :m '<-2<CR>gv
 " TODO
 " https://github.com/junegunn/limelight.vim
 " https://github.com/junegunn/seoul256.vim
