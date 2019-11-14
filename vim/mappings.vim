@@ -104,6 +104,7 @@ vmap <leader>ghs <Plug>(GitGutterStageHunk)
 nmap <leader>yr :w \| call VimuxRunCommandInDir("python", 1)<cr>
 
 " CtrlSF
+nmap <leader>F :CtrlSF<CR>
 nmap <leader>f <Plug>CtrlSFPrompt
 vmap <leader>f <Plug>CtrlSFVwordExec
 
