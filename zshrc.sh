@@ -148,4 +148,4 @@ zstyle ':vcs_info:git:*' actionformats "%b %{$reset_color%}%{$fg_bold[blue]%}(%a
 zstyle ':vcs_info:*' enable git
 
 source $dotfilesDir/yarn-completion.plugin.zsh
-fpath=(~/.zsh/completion $fpath)
+fpath=($HOME/.zsh/completion $fpath)
