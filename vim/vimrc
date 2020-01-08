@@ -225,7 +225,6 @@ hi Search ctermfg=black ctermbg=228
 set cursorline
 hi CursorLineNR ctermfg=39
 hi CursorColumn ctermbg=238
-" todo: map :noh (clear highlighting)
 
 " Optimize performance, use when necessary
 "https://vi.stackexchange.com/questions/10495/most-annoying-slow-down-of-a-plain-text-editor
