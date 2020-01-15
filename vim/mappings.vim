@@ -225,10 +225,9 @@ nmap <silent> <leader>.  <Plug>(coc-fix-current)
 " Enter // to search for currently visually selected block
 vnoremap // y/\V<C-r>=escape(@",'/\')<CR><CR>
 
-"nnoremap <S-j> :m +1<cr>
-"nnoremap <S-k> :m -2<cr>
-vnoremap <S-j> :m '>+1<CR>gv
-vnoremap <S-k> :m '<-2<CR>gv
+vmap <S-k> <Plug>SchleppIndentUp
+vmap <S-j> <Plug>SchleppIndentDown
+
 nmap <S-j> 3<C-e>
 nmap <S-k> 3<C-y>
 " TODO

@@ -112,6 +112,7 @@ Plug 'junegunn/seoul256.vim'
 Plug 'junegunn/limelight.vim'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'vim-ruby/vim-ruby'
+Plug 'zirrostig/vim-schlepp'
 
 if !empty(globpath("$HOME", "/.plugins.vim"))
   source $HOME/.plugins.vim
@@ -223,9 +224,15 @@ source $HOME/.dotfiles/vim/mappings.vim
 " Use nicer highlight colors
 hi Search ctermfg=black ctermbg=228
 set cursorline
+hi CursorLine ctermbg=237
 hi CursorLineNR ctermfg=39
 hi CursorColumn ctermbg=238
 
+augroup BgHighlight
+    autocmd!
+    autocmd WinEnter * set cursorline
+    autocmd WinLeave * set nocursorline
+augroup END
 " Optimize performance, use when necessary
 "https://vi.stackexchange.com/questions/10495/most-annoying-slow-down-of-a-plain-text-editor
 
