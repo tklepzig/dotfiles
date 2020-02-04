@@ -59,7 +59,7 @@ git config --global alias.acmp "!f() { git add --all && git commit -m \"\$1\" &&
 
 git config --global alias.p "push --follow-tags"
 git config --global alias.pn "!f() { currentBranch=\$(git rev-parse --abbrev-ref HEAD); git push -u \${1:-origin} \$currentBranch; }; f"
-#git config --global alias.pt "push --tags"
+git config --global alias.pforce "push --force-with-lease"
 
 git config --global alias.c "checkout"
 git config --global alias.cb "checkout -b"
