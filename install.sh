@@ -135,7 +135,7 @@ fi
 #fi
 
 # Docker completion for zsh on linux
-if isProgramInstalled docker && isOS linux
+if isProgramInstalled docker
 then
   info "Installing docker completion..."
   mkdir -p $HOME/.zsh/completion
