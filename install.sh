@@ -107,38 +107,39 @@ then
 fi
 
 
-if isProgramInstalled docker && isOS darwin
-then
-    info "Installing docker bash completion..."
-    pushd /usr/local/etc/bash_completion.d > /dev/null
-    ln -sf /Applications/Docker.app/Contents/Resources/etc/docker.bash-completion
-    popd > /dev/null
-    success "Done."
-fi
+#if isProgramInstalled docker && isOS darwin
+#then
+    #info "Installing docker bash completion..."
+    #pushd /usr/local/etc/bash_completion.d > /dev/null
+    #ln -sf /Applications/Docker.app/Contents/Resources/etc/docker.bash-completion
+    #popd > /dev/null
+    #success "Done."
+#fi
 
-if isProgramInstalled docker-machine && isOS darwin
-then
-    info "Installing docker-machine bash completion..."
-    pushd /usr/local/etc/bash_completion.d > /dev/null
-    ln -sf /Applications/Docker.app/Contents/Resources/etc/docker-machine.bash-completion
-    popd > /dev/null
-    success "Done."
-fi
+#if isProgramInstalled docker-machine && isOS darwin
+#then
+    #info "Installing docker-machine bash completion..."
+    #pushd /usr/local/etc/bash_completion.d > /dev/null
+    #ln -sf /Applications/Docker.app/Contents/Resources/etc/docker-machine.bash-completion
+    #popd > /dev/null
+    #success "Done."
+#fi
 
-if isProgramInstalled docker-compose && isOS darwin
-then
-    info "Installing docker-compose bash completion..."
-    pushd /usr/local/etc/bash_completion.d > /dev/null
-    ln -sf /Applications/Docker.app/Contents/Resources/etc/docker-compose.bash-completion
-    popd > /dev/null
-    success "Done."
-fi
+#if isProgramInstalled docker-compose && isOS darwin
+#then
+    #info "Installing docker-compose bash completion..."
+    #pushd /usr/local/etc/bash_completion.d > /dev/null
+    #ln -sf /Applications/Docker.app/Contents/Resources/etc/docker-compose.bash-completion
+    #popd > /dev/null
+    #success "Done."
+#fi
 
 # Docker completion for zsh on linux
 if isProgramInstalled docker && isOS linux
 then
   info "Installing docker completion..."
   mkdir -p $HOME/.zsh/completion
-  curl -L https://raw.githubusercontent.com/docker/compose/1.24.0/contrib/completion/zsh/_docker-compose > $HOME/.zsh/completion/_docker-compose 2>/dev/null
+  curl -L https://raw.githubusercontent.com/docker/cli/master/contrib/completion/zsh/_docker > $HOME/.zsh/completion/_docker 2>/dev/null
+  curl -L https://raw.githubusercontent.com/docker/compose/master/contrib/completion/zsh/_docker-compose > $HOME/.zsh/completion/_docker-compose 2>/dev/null
   success "Done."
 fi
