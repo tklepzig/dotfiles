@@ -223,6 +223,7 @@ nmap <silent> <leader>.  <Plug>(coc-fix-current)
 "nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
 " Enter // to search for currently visually selected block
+" Hint: enter :g/ (short for :g//p) to list all  occurences in the current file
 vnoremap // y/\V<C-r>=escape(@",'/\')<CR><CR>
 
 vmap <S-k> <Plug>SchleppIndentUp
