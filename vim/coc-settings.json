@@ -7,5 +7,6 @@
     "<C-c>": "do:exit"
   },
   "python.jediEnabled": false,
-  "codeLens.enable": true
+  "codeLens.enable": true,
+  "coc.preferences.formatOnSaveFiletypes": ["javascript"]
 }
