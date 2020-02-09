@@ -45,16 +45,16 @@ info "Installing Visual Studio Code Insiders..."
 . ./vscode.sh
 success "Done."
 
-info "Installing Git, npm, node and yarn..."
-# npm & nodejs, for version 12.x
-curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
+info "Installing Git, npm, node..."
+# npm & nodejs, for version 13.x
+curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
 
 # yarn
-curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+#curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+#echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 
 sudo apt-get -y update
-sudo apt-get -y install git nodejs yarn
+sudo apt-get -y install git nodejs #yarn
 success "Done."
 
 if isUbuntu
