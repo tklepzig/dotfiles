@@ -113,6 +113,7 @@ Plug 'junegunn/limelight.vim'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'vim-ruby/vim-ruby'
 Plug 'zirrostig/vim-schlepp'
+Plug 'junegunn/vim-peekaboo'
 
 if !empty(globpath("$HOME", "/.plugins.vim"))
   source $HOME/.plugins.vim
@@ -250,3 +251,5 @@ set splitright
 
 " Allow matching ruby blocks with '%'
 runtime macros/matchit.vim
+
+let g:peekaboo_window = "vert bo 60new"
