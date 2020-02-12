@@ -71,6 +71,8 @@ git config --global alias.bnm "branch --no-merged"
 git config --global alias.bv "branch -vv"
 git config --global alias.bc "!f() { git remote prune origin; git branch -vv | grep 'origin/.*: gone]' | awk '{print \$1}' | xargs git branch -d; }; f"
 git config --global alias.bcD "!f() { git remote prune origin; git branch -vv | grep 'origin/.*: gone]' | awk '{print \$1}' | xargs git branch -D; }; f"
+git config --global alias.bfc "!f() { currentBranch=\$(git rev-parse --abbrev-ref HEAD); echo \$(git log master..\${1:-\$currentBranch}  --oneline --pretty=format:'%h' | tail -1); }; f"
+git config --global alias.rbib "!f() { currentBranch=\$(git rev-parse --abbrev-ref HEAD); git rebase -i \$(git log master..\${1:-\$currentBranch}  --oneline --pretty=format:'%h' | tail -1)^; }; f"
 
 git config --global alias.f "fetch"
 git config --global alias.fm "!f() { . ~/.dotfiles/git-fetch-merge.sh; }; f"
