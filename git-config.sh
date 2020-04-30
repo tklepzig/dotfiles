@@ -117,3 +117,4 @@ git config --global alias.rvn "revert -n"
 
 git config --global alias.prn "!f() { . ~/.dotfiles/git-github-pr.sh new; }; f"
 git config --global alias.pro "!f() { . ~/.dotfiles/git-github-pr.sh; }; f"
+git config --global alias.prf "diff --name-only master..HEAD"

@@ -94,7 +94,7 @@ Plug 'tpope/vim-surround'
 "Plug 'maralla/completor.vim'
 "Plug 'BrandonRoehl/auto-omni'
 Plug 'josudoey/vim-eslint-fix'
-Plug 'w0rp/ale'
+Plug 'dense-analysis/ale'
 Plug 'alvan/vim-closetag'
 Plug 'jiangmiao/auto-pairs'
 Plug 'dyng/ctrlsf.vim'
@@ -149,6 +149,7 @@ let g:airline#extensions#tabline#left_alt_sep = '|'
 let airline#extensions#tabline#tabs_label = ''
 let airline#extensions#tabline#show_splits = 0
 let g:airline#extensions#tabline#show_close_button = 0
+let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
 
 set omnifunc=syntaxcomplete#Complete
 set completeopt=noinsert,menuone,menu
