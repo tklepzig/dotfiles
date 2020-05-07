@@ -86,6 +86,7 @@ alias v='vi .'
 alias r='ranger'
 alias q='exit'
 alias ..='cd ..'
+alias ly="lynx -cfg $dotfilesDir/lynx.cfg"
 
 autoload -Uz vcs_info
 setopt prompt_subst

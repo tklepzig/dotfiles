@@ -34,7 +34,7 @@ then
 fi
 
 info "Installing some basic tools..."
-sudo apt-get -y install curl gnome-tweak-tool vim-gnome xdotool gparted sshfs tmux pwgen xclip zsh silversearcher-ag ranger peco tig fzf
+sudo apt-get -y install curl gnome-tweak-tool vim-gnome xdotool gparted sshfs tmux pwgen xclip zsh silversearcher-ag ranger peco tig fzf lynx
 success "Done."
 
 info "Installing Google Chrome..."
