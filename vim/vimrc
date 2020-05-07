@@ -254,3 +254,6 @@ set splitright
 runtime macros/matchit.vim
 
 let g:peekaboo_window = "vert bo 60new"
+
+" Transparent background (so use terminal background)
+hi Normal ctermbg=NONE
