@@ -143,3 +143,29 @@ then
   curl -L https://raw.githubusercontent.com/docker/compose/master/contrib/completion/zsh/_docker-compose > $HOME/.zsh/completion/_docker-compose 2>/dev/null
   success "Done."
 fi
+
+checkInstallation()
+{
+  [[ -n $2 ]] && installName=$2 || installName=$1
+
+  if ! isProgramInstalled $1
+  then
+    error "Warning: $1 is not installed (Try \"apt install $installName\")"
+  fi
+}
+
+info "Check for necessary tools..."
+checkInstallation tmux
+checkInstallation zsh
+checkInstallation ag silversearcher-ag
+checkInstallation ranger
+checkInstallation fzf
+checkInstallation lynx
+info "Done."
+
+if isProgramInstalled zsh
+then
+  info "Setting default shell to zsh..."
+  chsh -s $(which zsh)
+  success "Done."
+fi
