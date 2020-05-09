@@ -154,18 +154,16 @@ checkInstallation()
   fi
 }
 
-info "Check for necessary tools..."
+if isProgramInstalled zsh && [ "$SHELL" != "$(which zsh)" ]
+then
+  info "Setting default shell to zsh..."
+  chsh -s $(which zsh)
+  success "Done."
+fi
+
 checkInstallation tmux
 checkInstallation zsh
 checkInstallation ag silversearcher-ag
 checkInstallation ranger
 checkInstallation fzf
 checkInstallation lynx
-info "Done."
-
-if isProgramInstalled zsh
-then
-  info "Setting default shell to zsh..."
-  chsh -s $(which zsh)
-  success "Done."
-fi
