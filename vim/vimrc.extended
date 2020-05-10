@@ -7,7 +7,6 @@ Plug 'plasticboy/vim-markdown'
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 "Plug 'kien/ctrlp.vim'
-Plug 'tomasiser/vim-code-dark'
 Plug 'tpope/vim-fugitive'
 Plug 'junegunn/gv.vim'
 "Plug 'rickhowe/diffchar.vim'
@@ -54,7 +53,6 @@ call plug#end()
 let g:vim_markdown_toc_autofit = 1
 let g:vim_markdown_folding_disabled = 1
 
-colorscheme codedark
 let g:airline_theme = 'codedark'
 
 highlight GitGutterAdd    ctermfg=2
