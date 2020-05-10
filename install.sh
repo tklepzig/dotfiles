@@ -181,7 +181,11 @@ fi
 
 checkInstallation tmux
 checkInstallation zsh
-checkInstallation ag silversearcher-ag
-checkInstallation ranger
-checkInstallation fzf
 checkInstallation lynx
+
+if [ "$extended" = "1" ]
+then
+  checkInstallation ag silversearcher-ag
+  checkInstallation ranger
+  checkInstallation fzf
+fi
