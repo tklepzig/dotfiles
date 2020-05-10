@@ -51,6 +51,13 @@ fi
 addLinkToFile "bashrc.sh" $profileFile
 addLinkToFile "zshrc.sh" ".zshrc"
 
+if [ "$extended" = "0" ]
+then
+  addLinkToFile "vim/plugins.basic.vim" ".vimrc"
+else
+  addLinkToFile "vim/plugins.extended.vim" ".vimrc"
+fi
+
 addLinkToFile "vim/vimrc.basic" ".vimrc"
 addLinkToFile "tmux.basic.conf" ".tmux.conf"
 

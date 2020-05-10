@@ -1,0 +1,51 @@
+call plug#begin('~/.vim/vim-plug')
+
+Plug 'tomasiser/vim-code-dark'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'HerringtonDarkholme/yats.vim'
+Plug 'godlygeek/tabular'
+Plug 'plasticboy/vim-markdown'
+Plug 'scrooloose/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
+"Plug 'kien/ctrlp.vim'
+Plug 'tpope/vim-fugitive'
+Plug 'junegunn/gv.vim'
+"Plug 'rickhowe/diffchar.vim'
+Plug 'airblade/vim-gitgutter'
+"Plug 'ianks/vim-tsx'
+"Plug 'Quramy/tsuquyomi'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+"Plug 'christoomey/vim-tmux-navigator'
+Plug 'scrooloose/nerdcommenter'
+Plug 'sheerun/vim-polyglot'
+"Plug 'leafgarland/typescript-vim'
+Plug 'tpope/vim-surround'
+"Plug 'maralla/completor.vim'
+"Plug 'BrandonRoehl/auto-omni'
+Plug 'josudoey/vim-eslint-fix'
+Plug 'dense-analysis/ale'
+Plug 'alvan/vim-closetag'
+Plug 'jiangmiao/auto-pairs'
+Plug 'dyng/ctrlsf.vim'
+Plug '1995parham/vim-zimpl'
+Plug 'Yggdroot/indentLine'
+Plug 'gcmt/wildfire.vim'
+Plug 'janko/vim-test'
+Plug 'benmills/vimux'
+Plug 'francoiscabrol/ranger.vim'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+Plug 'easymotion/vim-easymotion'
+Plug 'junegunn/goyo.vim'
+Plug 'junegunn/seoul256.vim'
+Plug 'junegunn/limelight.vim'
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'vim-ruby/vim-ruby'
+Plug 'zirrostig/vim-schlepp'
+Plug 'junegunn/vim-peekaboo'
+
+if !empty(globpath("$HOME", "/.plugins.vim"))
+  source $HOME/.plugins.vim
+endif
+call plug#end()

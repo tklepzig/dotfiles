@@ -138,8 +138,4 @@ hi EndOfBuffer ctermbg=NONE
 hi LineNr ctermbg=NONE
 hi SignColumn ctermbg=NONE
 
-call plug#begin('~/.vim/vim-plug')
-Plug 'tomasiser/vim-code-dark'
-call plug#end()
-
 colorscheme codedark
