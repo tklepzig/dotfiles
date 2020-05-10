@@ -13,6 +13,7 @@ fi
 updateOnly=0
 skipVsCodeConfig=1
 skipClone=0
+extended=1
 for var in "$@"
 do
     case "$var" in
@@ -24,6 +25,9 @@ do
             ;;
         "-u")
             updateOnly=1
+            ;;
+        "-b")
+            extended=0
             ;;
     esac
 done
@@ -46,8 +50,15 @@ fi
 
 addLinkToFile "bashrc.sh" $profileFile
 addLinkToFile "zshrc.sh" ".zshrc"
-addLinkToFile "vim/vimrc" ".vimrc"
-addLinkToFile "tmux.conf" ".tmux.conf"
+
+addLinkToFile "vim/vimrc.basic" ".vimrc"
+addLinkToFile "tmux.basic.conf" ".tmux.conf"
+
+if [ "$extended" = "1" ]
+then
+  addLinkToFile "vim/vimrc.extended" ".vimrc"
+  addLinkToFile "tmux.extended.conf" ".tmux.conf"
+fi
 
 if [ "$updateOnly" = "0" ]
 then

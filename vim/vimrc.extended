@@ -1,0 +1,125 @@
+call plug#begin('~/.vim/vim-plug')
+
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'HerringtonDarkholme/yats.vim'
+Plug 'godlygeek/tabular'
+Plug 'plasticboy/vim-markdown'
+Plug 'scrooloose/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
+"Plug 'kien/ctrlp.vim'
+Plug 'tomasiser/vim-code-dark'
+Plug 'tpope/vim-fugitive'
+Plug 'junegunn/gv.vim'
+"Plug 'rickhowe/diffchar.vim'
+Plug 'airblade/vim-gitgutter'
+"Plug 'ianks/vim-tsx'
+"Plug 'Quramy/tsuquyomi'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+"Plug 'christoomey/vim-tmux-navigator'
+Plug 'scrooloose/nerdcommenter'
+Plug 'sheerun/vim-polyglot'
+"Plug 'leafgarland/typescript-vim'
+Plug 'tpope/vim-surround'
+"Plug 'maralla/completor.vim'
+"Plug 'BrandonRoehl/auto-omni'
+Plug 'josudoey/vim-eslint-fix'
+Plug 'dense-analysis/ale'
+Plug 'alvan/vim-closetag'
+Plug 'jiangmiao/auto-pairs'
+Plug 'dyng/ctrlsf.vim'
+Plug '1995parham/vim-zimpl'
+Plug 'Yggdroot/indentLine'
+Plug 'gcmt/wildfire.vim'
+Plug 'janko/vim-test'
+Plug 'benmills/vimux'
+Plug 'francoiscabrol/ranger.vim'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+Plug 'easymotion/vim-easymotion'
+Plug 'junegunn/goyo.vim'
+Plug 'junegunn/seoul256.vim'
+Plug 'junegunn/limelight.vim'
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'vim-ruby/vim-ruby'
+Plug 'zirrostig/vim-schlepp'
+Plug 'junegunn/vim-peekaboo'
+
+if !empty(globpath("$HOME", "/.plugins.vim"))
+  source $HOME/.plugins.vim
+endif
+call plug#end()
+
+" Enable TOC window auto-fit
+let g:vim_markdown_toc_autofit = 1
+let g:vim_markdown_folding_disabled = 1
+
+colorscheme codedark
+let g:airline_theme = 'codedark'
+
+highlight GitGutterAdd    ctermfg=2
+highlight GitGutterChange ctermfg=3
+highlight GitGutterDelete ctermfg=1
+
+let g:gitgutter_map_keys = 0
+
+let g:NERDCustomDelimiters = { 'javascript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' } }
+let g:NERDCustomDelimiters = { 'typescript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' } }
+
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#fnamemod = ':t'
+let g:airline#extensions#tabline#left_sep = '|'
+let g:airline#extensions#tabline#left_alt_sep = '|'
+let airline#extensions#tabline#tabs_label = ''
+let airline#extensions#tabline#show_splits = 0
+let g:airline#extensions#tabline#show_close_button = 0
+let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+
+let g:ale_linters = {
+      \   'javascript': ['eslint'],
+      \   'typescript': ['tsserver', 'eslint']
+      \}
+
+let g:ale_fixers = {
+      \   '*': ['remove_trailing_lines', 'trim_whitespace'],
+      \    'javascript': ['eslint'],
+      \    'typescript': ['eslint', 'prettier'],
+      \    'scss': ['prettier'],
+      \    'html': ['prettier']
+      \}
+
+let g:ale_fix_on_save = 1
+
+let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.tsx, *.jsx'
+let g:ctrlsf_auto_close = {
+      \ "normal" : 0,
+      \ "compact": 0
+      \}
+let g:ctrlsf_default_view_mode = 'compact'
+
+" from https://stackoverflow.com/a/54961319
+function! AleIgnore()
+  let codes = []
+  for d in getloclist(0)
+    if (d.lnum==line('.'))
+      let code = split(d.text,':')[0]
+      call add(codes, code)
+    endif
+  endfor
+  if len(codes)
+    exe 'normal O/* eslint-disable-next-line ' . join(codes, ', ') . ' */'
+  endif
+endfunction
+
+let test#strategy = "vimux"
+
+let g:ranger_map_keys = 0
+
+source $HOME/.dotfiles/vim/nerd-tree.vim
+source $HOME/.dotfiles/vim/coc.vim
+source $HOME/.dotfiles/vim/mappings.extended.vim
+
+" Allow matching ruby blocks with '%'
+runtime macros/matchit.vim
+
+let g:peekaboo_window = "vert bo 60new"

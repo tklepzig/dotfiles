@@ -1,34 +1,13 @@
-let mapleader = "\<space>"
-
-" Remap Ctrl+C to Escape to ensure triggering InsertLeave
-map <C-c> <esc>
-imap <C-c> <esc><esc>
-imap jj <esc><esc>
-nmap <leader>jj <esc>
-
 nnoremap <Leader>n :NERDTreeFind<CR>
 nnoremap <Leader>N :NERDTreeToggle<CR>
-nmap <Leader>w <C-w>
-nmap <Leader>w<Tab> <C-w><C-p>
 nnoremap <Leader>p :GFiles<CR>
 nnoremap <Leader>P :History<CR>
 nnoremap <Leader>; :Commands<CR>
-nnoremap <Leader>b :Buffers<CR>
-nnoremap <Leader>q :bd<CR>
-nnoremap <Leader>Q :bufdo! bd<CR>
-nnoremap <Leader>Qc :%bd\|e#\|bd#<CR>
-nnoremap <leader><Tab> :b#<cr>
-nnoremap <leader><BS> :noh<cr>
 nnoremap <leader>, :VimuxPromptCommand<cr>
 nnoremap <leader>vp :VimuxPromptCommand<cr>
 nnoremap <leader>vl :VimuxRunLastCommand<cr>
 nnoremap <leader>vi :VimuxInspectRunner<cr>
 nnoremap <leader>vz :VimuxZoomRunner<cr>
-nmap H ^
-vmap H ^
-nmap L $
-vmap L $
-" ToDo: Add CocList diagnostics
 
 let g:airline#extensions#tabline#buffer_idx_mode = 1
 nmap <leader>1 <Plug>AirlineSelectTab1
@@ -45,49 +24,13 @@ nmap <leader>l <Plug>AirlineSelectNextTab
 nmap <leader><Left> <Plug>AirlineSelectPrevTab
 nmap <leader><Right> <Plug>AirlineSelectNextTab
 
-nmap <leader>w1 :1wincmd w<cr>
-nmap <leader>w2 :2wincmd w<cr>
-nmap <leader>w3 :3wincmd w<cr>
-nmap <leader>w4 :4wincmd w<cr>
-nmap <leader>w5 :5wincmd w<cr>
-nmap <leader>w6 :6wincmd w<cr>
-nmap <leader>w7 :7wincmd w<cr>
-nmap <leader>w8 :8wincmd w<cr>
-nmap <leader>w9 :9wincmd w<cr>
 "" Go to last active tab
 "au TabLeave * let g:lasttab = tabpagenr()
 "nnoremap <silent> <leader><Tab> :exe "tabn ".g:lasttab<cr>
 "vnoremap <silent> <leader><Tab> :exe "tabn ".g:lasttab<cr>
 
-" no arrow keys in edit mode
-inoremap <Left> <nop>
-inoremap <Right> <nop>
-" do not disable them here to allow them for autocompletion navigation
-"inoremap <Up> <nop>
-"inoremap <Down> <nop>
-
-inoremap <expr> <CR>       pumvisible()    ? "\<C-y>"                  : "\<CR>"
-inoremap <expr> <Down>     pumvisible()    ? "\<C-n>"                  : ""
-inoremap <expr> <Up>       pumvisible()    ? "\<C-p>"                  : ""
-inoremap <expr> <PageDown> pumvisible()    ? "\<PageDown>\<C-p>\<C-n>" : "\<PageDown>"
-inoremap <expr> <PageUp>   pumvisible()    ? "\<PageUp>\<C-p>\<C-n>"   : "\<PageUp>"
-
-nnoremap <leader>s :w<CR>
-
-nnoremap <leader>- <C-o><CR>
-nnoremap <leader>+ <C-i><CR>
 
 " Plugins---------------------------------------------------------------------
-
-" ALE
-"nnoremap <C-f> :ALEFix<CR>
-"nnoremap <leader>r :ALEFindReferences<CR>
-"nnoremap <leader>d :ALEGoToDefinition<CR>
-
-" Tsu
-"nnoremap <Leader>i :TsuImport<CR>
-"autocmd FileType typescript,typescript.tsx nnoremap <buffer> <Leader>t : <C-u>echo tsuquyomi#hint()<CR>
-"nnoremap <Leader>rr :TsuRenameSymbol<CR>
 
 " vim-fugitive & gv
 nnoremap <leader>gs :G<CR>
@@ -222,15 +165,9 @@ nmap <silent> <leader>.  <Plug>(coc-fix-current)
 "" Resume latest coc list
 "nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
-" Enter // to search for currently visually selected block
-" Hint: enter :g/ (short for :g//p) to list all  occurences in the current file
-vnoremap // y/\V<C-r>=escape(@",'/\')<CR><CR>
-
 vmap <S-k> <Plug>SchleppIndentUp
 vmap <S-j> <Plug>SchleppIndentDown
 
-nmap <S-j> 3<C-e>
-nmap <S-k> 3<C-y>
 " TODO
 " https://github.com/junegunn/limelight.vim
 " https://github.com/junegunn/seoul256.vim

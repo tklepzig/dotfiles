@@ -83,12 +83,17 @@ precmd() {
         # prCount=$(echo $response | sed -En "s/^.*\"total_count\": ([0-9]+),.*$/\1/p")
 
         battery=$(source $dotfilesDir/battery.sh)
-        batteryColor=""
-        if [[ $battery -lt 16 ]]
+        if [[ -z $battery ]]
         then
+          RPROMPT='%T'
+        else
+          batteryColor=""
+          if [[ $battery -lt 16 ]]
+          then
             batteryColor="%{$fg_bold[red]%}"
+          fi
+          RPROMPT='%T | $batteryColor$battery%%%{$reset_color%}'
         fi
-        RPROMPT='%T | $batteryColor$battery%%%{$reset_color%}'
     fi
 }
 

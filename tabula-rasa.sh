@@ -12,14 +12,16 @@ fi
 
 removeLinkFromFile $profileFile
 removeLinkFromFile ".zshrc"
-removeLinkFromFile ".vimrc"
-removeLinkFromFile ".tmux.conf"
+removeLinkFromFile ".vimrc.basic"
+removeLinkFromFile ".vimrc.extended"
+removeLinkFromFile ".tmux.basic.conf"
+removeLinkFromFile ".tmux.extended.conf"
 
 info "Removing ~/.vim..."
 rm -rf $HOME/.vim
 success "Done."
 
-info "Removing ~/.vim..."
+info "Removing ~/.zsh..."
 rm -rf $HOME/.zsh
 success "Done."
 
