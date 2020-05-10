@@ -258,3 +258,5 @@ let g:peekaboo_window = "vert bo 60new"
 " Transparent background (so use terminal background)
 hi Normal ctermbg=NONE
 hi EndOfBuffer ctermbg=NONE
+hi LineNr ctermbg=NONE
+hi SignColumn ctermbg=NONE
