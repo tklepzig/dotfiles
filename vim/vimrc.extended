@@ -1,5 +1,6 @@
 call plug#begin('~/.vim/vim-plug')
 
+Plug 'tomasiser/vim-code-dark'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'HerringtonDarkholme/yats.vim'
 Plug 'godlygeek/tabular'
