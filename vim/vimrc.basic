@@ -105,6 +105,8 @@ autocmd FileChangedShellPost *
 
 source $HOME/.dotfiles/vim/mappings.basic.vim
 
+colorscheme codedark
+
 " Use nicer highlight colors
 hi Search ctermfg=black ctermbg=228
 set cursorline
@@ -137,5 +139,3 @@ hi Normal ctermbg=NONE
 hi EndOfBuffer ctermbg=NONE
 hi LineNr ctermbg=NONE
 hi SignColumn ctermbg=NONE
-
-colorscheme codedark

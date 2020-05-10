@@ -1,3 +1,5 @@
+let mapleader = "\<space>"
+
 nnoremap <Leader>n :NERDTreeFind<CR>
 nnoremap <Leader>N :NERDTreeToggle<CR>
 nnoremap <Leader>p :GFiles<CR>
