@@ -48,3 +48,4 @@ alias r='ranger'
 alias q='exit'
 alias ..='cd ..'
 alias ly="lynx -cfg $dotfilesDir/lynx.cfg"
+alias niwt="f(){ npm i \$1 && npm i -D @types/\$1; unset -f f }; f"
