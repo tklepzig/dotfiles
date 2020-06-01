@@ -8,5 +8,11 @@
   },
   "python.jediEnabled": false,
   "codeLens.enable": true,
-  "coc.preferences.formatOnSaveFiletypes": ["javascript"]
+  "coc.preferences.formatOnSaveFiletypes": [
+    "json",
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ]
 }
