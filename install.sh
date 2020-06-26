@@ -59,12 +59,11 @@ else
 fi
 
 addLinkToFile "vim/vimrc.basic" ".vimrc"
-addLinkToFile "tmux.basic.conf" ".tmux.conf"
+addLinkToFile "tmux.conf" ".tmux.conf"
 
 if [ "$extended" = "1" ]
 then
   addLinkToFile "vim/vimrc.extended" ".vimrc"
-  addLinkToFile "tmux.extended.conf" ".tmux.conf"
 fi
 
 if [ "$updateOnly" = "0" ]
