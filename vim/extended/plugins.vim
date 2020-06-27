@@ -1,5 +1,3 @@
-call plug#begin('~/.vim/vim-plug')
-
 Plug 'tomasiser/vim-code-dark'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'HerringtonDarkholme/yats.vim'
@@ -42,8 +40,3 @@ Plug 'junegunn/seoul256.vim'
 Plug 'junegunn/limelight.vim'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'vim-ruby/vim-ruby'
-
-if !empty(globpath("$HOME", "/.plugins.vim"))
-  source $HOME/.plugins.vim
-endif
-call plug#end()

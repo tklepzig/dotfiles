@@ -52,18 +52,18 @@ addLinkToFile "bashrc.sh" $profileFile
 addLinkToFile "zshrc.sh" ".zshrc"
 addLinkToFile "tmux.conf" ".tmux.conf"
 
-if [ "$extended" = "0" ]
+sed -i s/\"pluginfile/"source \$HOME\/.dotfiles\/vim\/basic\/plugins.vim\n\"pluginfile"/g $dotfilesDir/vim/plugins.vim
+if [ "$extended" = "1" ]
 then
-  addLinkToFile "vim/plugins.basic.vim" ".vimrc"
-else
-  addLinkToFile "vim/plugins.extended.vim" ".vimrc"
+  sed -i s/\"pluginfile/"source \$HOME\/.dotfiles\/vim\/extended\/plugins.vim\n\"pluginfile"/g $dotfilesDir/vim/plugins.vim
 fi
 
-addLinkToFile "vim/vimrc.basic" ".vimrc"
+addLinkToFile "vim/plugins.vim" ".vimrc"
+addLinkToFile "vim/basic/vimrc" ".vimrc"
 
 if [ "$extended" = "1" ]
 then
-  addLinkToFile "vim/vimrc.extended" ".vimrc"
+  addLinkToFile "vim/extended/vimrc" ".vimrc"
 fi
 
 if [ "$updateOnly" = "0" ]
@@ -82,7 +82,7 @@ fi
 
 info "Creating Symlinks..."
 mkdir -p $HOME/.vim
-ln -sf $dotfilesDir/vim/coc-settings.json $HOME/.vim/coc-settings.json
+ln -sf $dotfilesDir/vim/extended/coc-settings.json $HOME/.vim/coc-settings.json
 success "Done."
 
 if [ ! -d "$HOME/.vim/autoload/plug.vim" ]

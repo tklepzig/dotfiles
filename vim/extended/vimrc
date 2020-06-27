@@ -62,9 +62,9 @@ let test#strategy = "vimux"
 
 let g:ranger_map_keys = 0
 
-source $HOME/.dotfiles/vim/nerd-tree.vim
-source $HOME/.dotfiles/vim/coc.vim
-source $HOME/.dotfiles/vim/mappings.extended.vim
+source ./nerd-tree.vim
+source ./coc.vim
+source ./mappings.vim
 
 " Allow matching ruby blocks with '%'
 runtime macros/matchit.vim
