@@ -32,7 +32,7 @@ hasProfile() {
   IFS=','
   for i in $profiles
   do
-    if [ "$i" == "$1" ]
+    if [ "$i" = "$1" ]
     then
       return 0
     fi
