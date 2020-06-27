@@ -78,7 +78,7 @@ git config --global alias.bf "!f() { git diff --name-only  \$(git merge-base \${
 git config --global alias.rbib "!f() { currentBranch=\$(git rev-parse --abbrev-ref HEAD); git rebase -i \$(git log master..\${1:-\$currentBranch}  --oneline --pretty=format:'%h' | tail -1)^; }; f"
 
 git config --global alias.f "fetch"
-git config --global alias.fm "!f() { . ~/.dotfiles/git-fetch-merge.sh; }; f"
+git config --global alias.fm "!f() { . ~/.dotfiles/git/git-fetch-merge.sh; }; f"
 
 git config --global alias.m "merge"
 git config --global alias.ma "merge --abort"
@@ -118,5 +118,5 @@ git config --global alias.cpn "cherry-pick -n"
 git config --global alias.rv "revert"
 git config --global alias.rvn "revert -n"
 
-git config --global alias.prn "!f() { . ~/.dotfiles/git-github-pr.sh new; }; f"
-git config --global alias.pro "!f() { . ~/.dotfiles/git-github-pr.sh; }; f"
+git config --global alias.prn "!f() { . ~/.dotfiles/git/git-github-pr.sh new; }; f"
+git config --global alias.pro "!f() { . ~/.dotfiles/git/git-github-pr.sh; }; f"

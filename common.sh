@@ -26,6 +26,16 @@ isProgramInstalled()
     return 0
 }
 
+checkInstallation()
+{
+  [[ -n $2 ]] && installName=$2 || installName=$1
+
+  if ! isProgramInstalled $1
+  then
+    error "Warning: $1 is not installed (Try \"apt install $installName\")"
+  fi
+}
+
 accent='\033[0;33m'
 note='\033[2;33m'
 success='\033[0;92m'
@@ -51,12 +61,6 @@ error()
 {
     echo -e "${error}$1${reset}"
 }
-
-profileFile='.bashrc'
-if isOS darwin
-then
-    profileFile='.bash_profile'
-fi
 
 addLinkToFile() {
   src=$1

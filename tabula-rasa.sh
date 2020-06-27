@@ -10,7 +10,6 @@ else
   source $dotfilesDir/common.sh
 fi
 
-removeLinkFromFile $profileFile
 removeLinkFromFile ".zshrc"
 removeLinkFromFile ".vimrc"
 removeLinkFromFile ".tmux.conf"

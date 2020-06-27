@@ -87,9 +87,5 @@ then
 fi
 
 info "Running dotfiles setup..."
-. ../install.sh --skip-clone --include-vsc
+. ../install.sh --skip-clone
 success "Done."
-
-info "Setting default shell to zsh..."
-chsh -s $(which zsh)
-success "Done. Please notice: In order to use the new shell, you have to logout and back in."

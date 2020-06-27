@@ -16,10 +16,7 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias t='tmux'
 
-alias hgrep="$dotfilesDir/hgrep.sh"
-alias b="$dotfilesDir/bookmark.sh"
 alias dotfiles-update='curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh | bash -s -- -u'
-alias dotfiles-update-include-vsc='curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh | bash -s -- -u --include-vsc'
 alias dotfiles-tabula-rasa="$dotfilesDir/tabula-rasa.sh"
 if isOS linux
 then
@@ -35,7 +32,7 @@ alias git='LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 git'
 alias g='git'
 alias gk='LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 gitk --all &'
 alias gg='LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 git gui &'
-alias gsa="$dotfilesDir/git-status-all.sh"
+alias gsa="$dotfilesDir/git/git-status-all.sh"
 alias c='code-insiders .'
 alias d='docker'
 alias dc='docker-compose'

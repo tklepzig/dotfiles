@@ -11,15 +11,11 @@ else
 fi
 
 updateOnly=0
-skipVsCodeConfig=1
 skipClone=0
 extended=1
 for var in "$@"
 do
     case "$var" in
-        "--include-vsc")
-            skipVsCodeConfig=0
-            ;;
         "--skip-clone")
             skipClone=1
             ;;
@@ -48,7 +44,6 @@ then
   success "Done."
 fi
 
-addLinkToFile "bashrc.sh" $profileFile
 addLinkToFile "zshrc.sh" ".zshrc"
 addLinkToFile "tmux.conf" ".tmux.conf"
 
@@ -98,60 +93,10 @@ echo | vim +PlugInstall +qall > /dev/null 2>&1
 success "Done."
 
 info "Configuring Git..."
-$dotfilesDir/git-config.sh
+$dotfilesDir/git/git-config.sh
 success "Done."
 
-if isProgramInstalled code-insiders && [ "$skipVsCodeConfig" = "0" ]
-then
-    info "Installing VS Code extensions..."
-    $dotfilesDir/vscode-extensions.sh
-    success "Done."
-
-    info "Creating Symlinks for VS Code config..."
-    vscodeConfigPath=""
-    if isOS linux
-    then
-        vscodeConfigPath="$HOME/.config/Code - Insiders/User"
-        ln -sf $dotfilesDir/vscode-keybindings.json "$vscodeConfigPath/keybindings.json"
-    fi
-    if isOS darwin
-    then
-        vscodeConfigPath="$HOME/Library/Application Support/Code - Insiders/User"
-        ln -sf $dotfilesDir/vscode-keybindings-macos.json "$vscodeConfigPath/keybindings.json"
-    fi
-    ln -sf $dotfilesDir/vscode-settings.json "$vscodeConfigPath/settings.json"
-    success "Done."
-fi
-
-
-#if isProgramInstalled docker && isOS darwin
-#then
-    #info "Installing docker bash completion..."
-    #pushd /usr/local/etc/bash_completion.d > /dev/null
-    #ln -sf /Applications/Docker.app/Contents/Resources/etc/docker.bash-completion
-    #popd > /dev/null
-    #success "Done."
-#fi
-
-#if isProgramInstalled docker-machine && isOS darwin
-#then
-    #info "Installing docker-machine bash completion..."
-    #pushd /usr/local/etc/bash_completion.d > /dev/null
-    #ln -sf /Applications/Docker.app/Contents/Resources/etc/docker-machine.bash-completion
-    #popd > /dev/null
-    #success "Done."
-#fi
-
-#if isProgramInstalled docker-compose && isOS darwin
-#then
-    #info "Installing docker-compose bash completion..."
-    #pushd /usr/local/etc/bash_completion.d > /dev/null
-    #ln -sf /Applications/Docker.app/Contents/Resources/etc/docker-compose.bash-completion
-    #popd > /dev/null
-    #success "Done."
-#fi
-
-# Docker completion for zsh on linux
+# Docker completion for zsh
 if isProgramInstalled docker
 then
   info "Installing docker completion..."
@@ -161,21 +106,11 @@ then
   success "Done."
 fi
 
-checkInstallation()
-{
-  [[ -n $2 ]] && installName=$2 || installName=$1
-
-  if ! isProgramInstalled $1
-  then
-    error "Warning: $1 is not installed (Try \"apt install $installName\")"
-  fi
-}
-
 if isProgramInstalled zsh && [ "$SHELL" != "$(which zsh)" ]
 then
   info "Setting default shell to zsh..."
   chsh -s $(which zsh)
-  success "Done."
+  success "Done. Please notice: In order to use the new shell, you have to logout and back in."
 fi
 
 checkInstallation tmux
