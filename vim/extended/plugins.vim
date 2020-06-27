@@ -1,4 +1,3 @@
-Plug 'tomasiser/vim-code-dark'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'HerringtonDarkholme/yats.vim'
 Plug 'godlygeek/tabular'
@@ -38,5 +37,4 @@ Plug 'easymotion/vim-easymotion'
 Plug 'junegunn/goyo.vim'
 Plug 'junegunn/seoul256.vim'
 Plug 'junegunn/limelight.vim'
-Plug 'christoomey/vim-tmux-navigator'
 Plug 'vim-ruby/vim-ruby'
