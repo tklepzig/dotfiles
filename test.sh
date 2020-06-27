@@ -1,9 +1,9 @@
-profiles="basic,extended"
+#!/bin/bash
 
+profiles="basic,extended"
 hasProfile() {
-  IFS=','
   echo $profiles
-  for i in $profiles
+  for i in ${profiles/,/ }
   do
     echo $i
     echo $1
@@ -15,7 +15,12 @@ hasProfile() {
   return 1
 }
 
+if hasProfile basic
+then
+  echo "has basic"
+fi
+
 if hasProfile extended
 then
-  echo "extended"
+  echo "has extended"
 fi
