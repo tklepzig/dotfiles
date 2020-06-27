@@ -62,10 +62,9 @@ let test#strategy = "vimux"
 
 let g:ranger_map_keys = 0
 
-let path = expand('%:p:h')
-exec 'source' path . '/nerd-tree.vim'
-exec 'source' path . '/coc.vim'
-exec 'source' path . '/mappings.vim'
+source $HOME/.dotfiles/vim/extended/nerd-tree.vim
+source $HOME/.dotfiles/vim/extended/coc.vim
+source $HOME/.dotfiles/vim/extended/mappings.vim
 
 " Allow matching ruby blocks with '%'
 runtime macros/matchit.vim

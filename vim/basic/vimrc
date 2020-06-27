@@ -103,8 +103,7 @@ autocmd FocusGained,BufEnter,CursorHold,CursorHoldI * if mode() != 'c' | checkti
 autocmd FileChangedShellPost *
   \ echohl WarningMsg | echo "File changed on disk. Buffer reloaded." | echohl None
 
-let path = expand('%:p:h')
-exec 'source' path . '/mappings.vim'
+source $HOME/.dotfiles/vim/basic/mappings.vim
 
 colorscheme codedark
 
