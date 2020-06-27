@@ -29,6 +29,7 @@ do
 done
 
 hasProfile() {
+  return 0
   IFS=','
   for i in $profiles
   do
