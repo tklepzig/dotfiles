@@ -50,6 +50,7 @@ fi
 
 addLinkToFile "bashrc.sh" $profileFile
 addLinkToFile "zshrc.sh" ".zshrc"
+addLinkToFile "tmux.conf" ".tmux.conf"
 
 if [ "$extended" = "0" ]
 then
@@ -59,7 +60,6 @@ else
 fi
 
 addLinkToFile "vim/vimrc.basic" ".vimrc"
-addLinkToFile "tmux.conf" ".tmux.conf"
 
 if [ "$extended" = "1" ]
 then
