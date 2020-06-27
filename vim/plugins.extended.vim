@@ -42,8 +42,6 @@ Plug 'junegunn/seoul256.vim'
 Plug 'junegunn/limelight.vim'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'vim-ruby/vim-ruby'
-Plug 'zirrostig/vim-schlepp'
-Plug 'junegunn/vim-peekaboo'
 
 if !empty(globpath("$HOME", "/.plugins.vim"))
   source $HOME/.plugins.vim

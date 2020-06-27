@@ -68,5 +68,3 @@ source $HOME/.dotfiles/vim/mappings.extended.vim
 
 " Allow matching ruby blocks with '%'
 runtime macros/matchit.vim
-
-let g:peekaboo_window = "vert bo 60new"

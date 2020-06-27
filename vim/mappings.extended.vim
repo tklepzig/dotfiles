@@ -167,9 +167,6 @@ nmap <silent> <leader>.  <Plug>(coc-fix-current)
 "" Resume latest coc list
 "nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
-vmap <S-k> <Plug>SchleppIndentUp
-vmap <S-j> <Plug>SchleppIndentDown
-
 " TODO
 " https://github.com/junegunn/limelight.vim
 " https://github.com/junegunn/seoul256.vim
