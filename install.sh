@@ -12,7 +12,7 @@ fi
 
 updateOnly=0
 skipClone=0
-extended=1
+profiles="basic,extended"
 for var in "$@"
 do
     case "$var" in
@@ -22,11 +22,23 @@ do
         "-u")
             updateOnly=1
             ;;
-        "-b")
-            extended=0
+          --profiles=*)
+            profiles="${profiles},${var#*=}"
             ;;
     esac
 done
+
+hasProfile() {
+  IFS=','
+  for i in $profiles
+  do
+    if [ "$i" == "$1" ]
+    then
+      return 0
+    fi
+  done
+  return 1
+}
 
 info "Searching for Git..."
 if ! isProgramInstalled git
@@ -48,7 +60,8 @@ addLinkToFile "zshrc.sh" ".zshrc"
 addLinkToFile "tmux.conf" ".tmux.conf"
 
 sed -i s/\"pluginfile/"source \$HOME\/.dotfiles\/vim\/basic\/plugins.vim\n\"pluginfile"/g $dotfilesDir/vim/plugins.vim
-if [ "$extended" = "1" ]
+
+if hasProfile extended
 then
   sed -i s/\"pluginfile/"source \$HOME\/.dotfiles\/vim\/extended\/plugins.vim\n\"pluginfile"/g $dotfilesDir/vim/plugins.vim
 fi
@@ -56,7 +69,7 @@ fi
 addLinkToFile "vim/plugins.vim" ".vimrc"
 addLinkToFile "vim/basic/vimrc" ".vimrc"
 
-if [ "$extended" = "1" ]
+if hasProfile extended
 then
   addLinkToFile "vim/extended/vimrc" ".vimrc"
 fi
@@ -75,10 +88,13 @@ then
   success "Done."
 fi
 
-info "Creating Symlinks..."
-mkdir -p $HOME/.vim
-ln -sf $dotfilesDir/vim/extended/coc-settings.json $HOME/.vim/coc-settings.json
-success "Done."
+if hasProfile extended
+then
+  info "Creating Symlinks..."
+  mkdir -p $HOME/.vim
+  ln -sf $dotfilesDir/vim/extended/coc-settings.json $HOME/.vim/coc-settings.json
+  success "Done."
+fi
 
 if [ ! -d "$HOME/.vim/autoload/plug.vim" ]
 then
@@ -117,7 +133,7 @@ checkInstallation tmux
 checkInstallation zsh
 checkInstallation lynx
 
-if [ "$extended" = "1" ]
+if hasProfile extended
 then
   checkInstallation ag silversearcher-ag
   checkInstallation ranger
