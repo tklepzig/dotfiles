@@ -29,11 +29,10 @@ do
 done
 
 hasProfile() {
-  return 0
-  IFS=','
-  for i in $profiles
+  local IFS=','
+  for profile in $profiles
   do
-    if [ "$i" = "$1" ]
+    if [ "$profile" = "$1" ]
     then
       return 0
     fi
