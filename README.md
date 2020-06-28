@@ -9,7 +9,7 @@ My dotfiles for zsh, tmux and vim.
 
 ## Profiles
 
-Add these via `--profiles=`, e.g. `--profiles="basic,extended"`
+Add these via `--profiles=`, e.g. `--profiles=web,python`
 
 Name|Details
 -|-
