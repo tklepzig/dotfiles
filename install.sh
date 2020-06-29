@@ -40,6 +40,13 @@ hasProfile() {
   return 1
 }
 
+addPlugin() {
+  sed 's/\"pluginfile/source \$HOME\/.dotfiles\/vim\/'"$1"'\/plugins.vim\
+\"pluginfile/g' $dotfilesDir/vim/plugins.vim > $dotfilesDir/vim/plugins.vim.tmp && mv $dotfilesDir/vim/plugins.vim.tmp $dotfilesDir/vim/plugins.vim
+}
+
+
+
 info "Searching for Git..."
 if ! isProgramInstalled git
 then
@@ -59,11 +66,11 @@ fi
 addLinkToFile "zshrc.sh" ".zshrc"
 addLinkToFile "tmux.conf" ".tmux.conf"
 
-sed -i s/\"pluginfile/"source \$HOME\/.dotfiles\/vim\/basic\/plugins.vim\n\"pluginfile"/g $dotfilesDir/vim/plugins.vim
+addPlugin basic
 
 if hasProfile extended
 then
-  sed -i s/\"pluginfile/"source \$HOME\/.dotfiles\/vim\/extended\/plugins.vim\n\"pluginfile"/g $dotfilesDir/vim/plugins.vim
+  addPlugin extended
 fi
 
 addLinkToFile "vim/plugins.vim" ".vimrc"
