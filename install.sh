@@ -63,8 +63,8 @@ then
   success "Done."
 fi
 
-addLinkToFile "zshrc.sh" ".zshrc"
-addLinkToFile "tmux.conf" ".tmux.conf"
+addLinkToFile "$dotfilesDir/zshrc.sh" "$HOME/.zshrc"
+addLinkToFile "$dotfilesDir/tmux.conf" "$HOME/.tmux.conf"
 
 
 if [ -f $HOME/.plugins.vim ]
@@ -81,12 +81,12 @@ then
   addPlugin extended
 fi
 
-addLinkToFile "$HOME/.plugins.vim" ".vimrc"
-addLinkToFile "vim/basic/vimrc" ".vimrc"
+addLinkToFile "$HOME/.plugins.vim" "$HOME/.vimrc"
+addLinkToFile "$dotfilesDir/vim/basic/vimrc" "$HOME/.vimrc"
 
 if hasProfile extended
 then
-  addLinkToFile "vim/extended/vimrc" ".vimrc"
+  addLinkToFile "$dotfilesDir/vim/extended/vimrc" "$HOME/.vimrc"
 fi
 
 if [ "$updateOnly" = "0" ]

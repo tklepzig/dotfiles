@@ -66,13 +66,13 @@ addLinkToFile() {
   src=$1
   target=$2
   info "Adding link to $target..."
-  if [ ! -f $HOME/$target ]
+  if [ ! -f $target ]
   then
-    touch $HOME/$target
+    touch $target
   fi
-  if ! grep -q "$dotfilesDir/$src" $HOME/$target
+  if ! grep -q "$src" $target
   then
-    echo "source $dotfilesDir/$src" >> $HOME/$target;
+    echo "source $src" >> $target;
   fi
   success "Done."
 }
