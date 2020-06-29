@@ -42,7 +42,7 @@ hasProfile() {
 
 addPlugin() {
   sed 's/\"pluginfile/source \$HOME\/.dotfiles\/vim\/'"$1"'\/plugins.vim\
-\"pluginfile/g' $dotfilesDir/vim/plugins.vim > $dotfilesDir/vim/plugins.vim.tmp && mv $dotfilesDir/vim/plugins.vim.tmp $dotfilesDir/vim/plugins.vim
+\"pluginfile/g' $HOME/.plugins.vim > $HOME/.plugins.vim.tmp && mv $HOME/.plugins.vim.tmp $HOME/.plugins.vim
 }
 
 
@@ -66,6 +66,14 @@ fi
 addLinkToFile "zshrc.sh" ".zshrc"
 addLinkToFile "tmux.conf" ".tmux.conf"
 
+
+if [ -f $HOME/.plugins.vim ]
+then
+  mv $HOME/.plugins.vim $HOME/.plugins.vim.backup
+fi
+
+cp $dotfilesDir/vim/plugins.vim $HOME/.plugins.vim
+
 addPlugin basic
 
 if hasProfile extended
@@ -73,7 +81,7 @@ then
   addPlugin extended
 fi
 
-addLinkToFile "vim/plugins.vim" ".vimrc"
+addLinkToFile "$HOME/.plugins.vim" ".vimrc"
 addLinkToFile "vim/basic/vimrc" ".vimrc"
 
 if hasProfile extended
