@@ -13,8 +13,13 @@ Add these via `--profiles=`, e.g. `--profiles=web,python`
 
 Name|Details
 -|-
-basic|todo
-extended|todo
+basic|base profile, already included
+dev|nerdtree, git, markdown, ranger, fzf
+js|coc, jest
+python|python
+ruby|ruby
+writing|goyo, seoul, limelight
+or|zimpl
 
 ## Complete system setup including dotfiles
 
