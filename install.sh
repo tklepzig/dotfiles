@@ -28,24 +28,25 @@ do
     esac
 done
 
-hasProfile() {
-  local IFS=','
-  for profile in $profiles
-  do
-    if [ "$profile" = "$1" ]
-    then
-      return 0
-    fi
-  done
-  return 1
-}
-
 addPlugin() {
   sed 's/\"pluginfile/source \$HOME\/.dotfiles\/vim\/'"$1"'\/plugins.vim\
 \"pluginfile/g' $HOME/.plugins.vim > $HOME/.plugins.vim.tmp && mv $HOME/.plugins.vim.tmp $HOME/.plugins.vim
 }
 
-
+installProfiles() {
+  local IFS=','
+  for profile in $profiles
+  do
+    info "Installing Profile $profile..."
+    addPlugin $profile
+    addLinkToFile "$dotfilesDir/vim/$profile/vimrc" "$HOME/.vimrc"
+    if [ -f $dotfilesDir/vim/$profile/install.sh ]
+    then
+      source $dotfilesDir/vim/$profile/install.sh
+    fi
+    success "Done."
+  done
+}
 
 info "Searching for Git..."
 if ! isProgramInstalled git
@@ -63,32 +64,6 @@ then
   success "Done."
 fi
 
-addLinkToFile "$dotfilesDir/zshrc.sh" "$HOME/.zshrc"
-addLinkToFile "$dotfilesDir/tmux.conf" "$HOME/.tmux.conf"
-
-
-if [ -f $HOME/.plugins.vim ]
-then
-  mv $HOME/.plugins.vim $HOME/.plugins.vim.backup
-fi
-
-cp $dotfilesDir/vim/plugins.vim $HOME/.plugins.vim
-
-addPlugin basic
-
-if hasProfile extended
-then
-  addPlugin extended
-fi
-
-addLinkToFile "$HOME/.plugins.vim" "$HOME/.vimrc"
-addLinkToFile "$dotfilesDir/vim/basic/vimrc" "$HOME/.vimrc"
-
-if hasProfile extended
-then
-  addLinkToFile "$dotfilesDir/vim/extended/vimrc" "$HOME/.vimrc"
-fi
-
 if [ "$updateOnly" = "0" ]
 then
   info "Creating Backup..."
@@ -103,13 +78,21 @@ then
   success "Done."
 fi
 
-if hasProfile extended
+addLinkToFile "$dotfilesDir/zshrc.sh" "$HOME/.zshrc"
+addLinkToFile "$dotfilesDir/tmux.conf" "$HOME/.tmux.conf"
+
+checkInstallation tmux
+checkInstallation zsh
+checkInstallation lynx
+
+if [ -f $HOME/.plugins.vim ]
 then
-  info "Creating Symlinks..."
-  mkdir -p $HOME/.vim
-  ln -sf $dotfilesDir/vim/extended/coc-settings.json $HOME/.vim/coc-settings.json
-  success "Done."
+  mv $HOME/.plugins.vim $HOME/.plugins.vim.backup
 fi
+cp $dotfilesDir/vim/plugins.vim $HOME/.plugins.vim
+addLinkToFile "$HOME/.plugins.vim" "$HOME/.vimrc"
+
+installProfiles
 
 if [ ! -d "$HOME/.vim/autoload/plug.vim" ]
 then
@@ -142,15 +125,4 @@ then
   info "Setting default shell to zsh..."
   chsh -s $(which zsh)
   success "Done. Please notice: In order to use the new shell, you have to logout and back in."
-fi
-
-checkInstallation tmux
-checkInstallation zsh
-checkInstallation lynx
-
-if hasProfile extended
-then
-  checkInstallation ag silversearcher-ag
-  checkInstallation ranger
-  checkInstallation fzf
 fi
