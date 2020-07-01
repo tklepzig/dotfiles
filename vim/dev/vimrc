@@ -1,4 +1,36 @@
-" NERDTress File highlighting
+" Enable TOC window auto-fit
+let g:vim_markdown_toc_autofit = 1
+let g:vim_markdown_folding_disabled = 1
+
+let g:airline_theme = 'codedark'
+
+highlight GitGutterAdd    ctermfg=2
+highlight GitGutterChange ctermfg=3
+highlight GitGutterDelete ctermfg=1
+
+let g:gitgutter_map_keys = 0
+
+let g:NERDCustomDelimiters = { 'javascript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' } }
+let g:NERDCustomDelimiters = { 'typescript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' } }
+
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#fnamemod = ':t'
+let g:airline#extensions#tabline#left_sep = '|'
+let g:airline#extensions#tabline#left_alt_sep = '|'
+let airline#extensions#tabline#tabs_label = ''
+let airline#extensions#tabline#show_splits = 0
+let g:airline#extensions#tabline#show_close_button = 0
+let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+
+let g:ctrlsf_auto_close = {
+      \ "normal" : 0,
+      \ "compact": 0
+      \}
+let g:ctrlsf_default_view_mode = 'compact'
+
+let g:ranger_map_keys = 0
+
+" NERDTree File highlighting
 function! NERDTreeHighlightFile(extension, fg, bg, guifg, guibg)
  exec 'autocmd filetype nerdtree highlight ' . a:extension .' ctermbg='. a:bg .' ctermfg='. a:fg .' guibg='. a:guibg .' guifg='. a:guifg
  exec 'autocmd filetype nerdtree syn match ' . a:extension .' #^\s\+.*'. a:extension .'$#'
@@ -35,3 +67,5 @@ let NERDTreeShowHidden = 1
 
 " Keep NERD Tree open in new tabs
 " autocmd BufWinEnter * NERDTreeMirror
+
+source $HOME/.dotfiles/vim/dev/mappings.vim
