@@ -16,7 +16,7 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias t='tmux'
 
-alias dotfiles-update='curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh | bash -s -- -u'
+alias dotfiles-update='curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh | bash -s'
 alias dotfiles-tabula-rasa="$dotfilesDir/tabula-rasa.sh"
 if isOS linux
 then

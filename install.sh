@@ -10,22 +10,18 @@ else
   source $dotfilesDir/common.sh
 fi
 
-updateOnly=0
 skipClone=0
 profiles="basic,extended"
 for var in "$@"
 do
-    case "$var" in
-        "--skip-clone")
-            skipClone=1
-            ;;
-        "-u")
-            updateOnly=1
-            ;;
-          --profiles=*)
-            profiles="${profiles},${var#*=}"
-            ;;
-    esac
+  case "$var" in
+    "--skip-clone")
+      skipClone=1
+      ;;
+    --profiles=*)
+      profiles="${profiles},${var#*=}"
+      ;;
+  esac
 done
 
 addPlugin() {
@@ -51,8 +47,8 @@ installProfiles() {
 info "Searching for Git..."
 if ! isProgramInstalled git
 then
-    error "No Git found!"
-    exit
+  error "No Git found!"
+  exit
 fi
 success "Git found: $(which git)."
 
@@ -61,20 +57,6 @@ then
   info "Cloning Repo..."
   rm -rf $dotfilesDir
   git clone --depth=1 https://github.com/tklepzig/dotfiles.git $dotfilesDir > /dev/null 2>&1
-  success "Done."
-fi
-
-if [ "$updateOnly" = "0" ]
-then
-  info "Creating Backup..."
-  if [ -d $HOME/.vim ]
-  then
-    cp -r $HOME/.vim $HOME/.vim-backup
-  fi
-  if [ -d $HOME/.zsh ]
-  then
-    cp -r $HOME/.zsh $HOME/.zsh-backup
-  fi
   success "Done."
 fi
 
@@ -96,9 +78,9 @@ installProfiles
 
 if [ ! -d "$HOME/.vim/autoload/plug.vim" ]
 then
-    info "Installing vim-plug..."
-    curl -fLo $HOME/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim>/dev/null 2>&1
-    success "Done."
+  info "Installing vim-plug..."
+  curl -fLo $HOME/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim>/dev/null 2>&1
+  success "Done."
 fi
 
 info "Installing vim plugins..."
