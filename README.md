@@ -5,7 +5,7 @@ My dotfiles for git, zsh, tmux and vim.
 ## Installation
 
     curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh \
-    | bash -s --profiles=[comma separated list of profiles, see below]
+    | bash -s -- --profiles=[comma separated list of profiles, see below]
 
 ## Profiles
 
