@@ -11,7 +11,7 @@ else
 fi
 
 skipClone=0
-profiles="basic,extended"
+profiles="basic"
 for var in "$@"
 do
   case "$var" in
