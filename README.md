@@ -13,7 +13,6 @@ Add these via `--profiles=`, e.g. `--profiles=web,python`
 
 Name|Details
 -|-
-basic|Base Profile, always included
 dev|Development in General
 web|Web Development
 python|Python Support
