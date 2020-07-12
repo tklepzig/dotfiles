@@ -28,7 +28,9 @@ git config --global alias.dt "difftool --dir-diff"
 git config --global alias.dts "difftool --dir-diff --staged"
 
 git config --global alias.d "diff --word-diff"
+git config --global alias.dw "diff --color --word-diff-regex=."
 git config --global alias.ds "diff --staged --word-diff"
+git config --global alias.dws "diff --staged --color --word-diff-regex=."
 
 git config --global alias.l "$logCommon -10"
 git config --global alias.ll "$logCommon"
