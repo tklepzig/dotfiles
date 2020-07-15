@@ -62,7 +62,7 @@ precmd() {
     fi
 
     elapsed=$(($now-$timer))
-    elapsedPrompt="%F{cyan}Elapsed Time: ${elapsed}ms%{$reset_color%}${NEWLINE}"
+    elapsedPrompt="%{$reset_color%}[${elapsed} ms]%{$reset_color%}${NEWLINE}"
     unset timer
   fi
 
