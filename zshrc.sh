@@ -40,6 +40,8 @@ export EDITOR=vi
 # Actually, no, use vi mode of course!
 bindkey -v
 
+bindkey -M viins 'jj' vi-cmd-mode
+
 autoload -Uz vcs_info
 setopt prompt_subst
 
