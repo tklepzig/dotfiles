@@ -37,7 +37,8 @@ cdpath=(~ ~/development)
 export EDITOR=vi
 
 # But still use emacs-style zsh bindings (see https://superuser.com/a/457401)
-bindkey -e
+# Actually, no, use vi mode of course!
+bindkey -v
 
 autoload -Uz vcs_info
 setopt prompt_subst
