@@ -63,8 +63,14 @@ precmd() {
       now=$(($(date +%s%0N)/1000000))
     fi
 
+
     elapsed=$(($now-$timer))
-    elapsedPrompt="%{$reset_color%}[${elapsed} ms]%{$reset_color%}${NEWLINE}"
+    elapsedHours=$(printf %02d $(($elapsed / 3600000)))
+    elapsedMinutes=$(printf %02d $((($elapsed % 3600000) / 60000)))
+    elapsedSeconds=$(printf %02d $((($elapsed % 60000) / 1000)))
+    elapsedMilliseconds=$(printf %04d $(($elapsed % 1000)))
+    elapsedTime="${elapsedHours}:${elapsedMinutes}:${elapsedSeconds}.${elapsedMilliseconds}"
+    elapsedPrompt="%{$reset_color%}[${elapsedTime}]%{$reset_color%}${NEWLINE}"
     unset timer
   fi
 
