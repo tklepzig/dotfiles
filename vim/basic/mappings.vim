@@ -54,3 +54,11 @@ vnoremap // y/\V<C-r>=escape(@",'/\')<CR><CR>
 
 nmap <S-j> 3<C-e>
 nmap <S-k> 3<C-y>
+
+" make search results appear in the middle of the screen
+:nnoremap n nzz
+:nnoremap N Nzz
+:nnoremap * *zz
+:nnoremap # #zz
+:nnoremap g* g*zz
+:nnoremap g# g#zz
