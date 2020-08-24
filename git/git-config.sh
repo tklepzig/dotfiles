@@ -84,6 +84,7 @@ git config --global alias.bcD "!f() { git remote prune origin; git branch -vv | 
 git config --global alias.bfc "!f() { currentBranch=\$(git rev-parse --abbrev-ref HEAD); echo \$(git log master..\${1:-\$currentBranch}  --oneline --pretty=format:'%h' | tail -1); }; f"
 # List all changed files included in this branch compared to master at the time the branch has been created
 git config --global alias.bf "!f() { git diff --name-only  \$(git merge-base \${1:-master} HEAD); }; f"
+git config --global alias.bfp "!f() { git diff -p --word-diff  \$(git merge-base \${1:-master} HEAD); }; f"
 git config --global alias.rbib "!f() { currentBranch=\$(git rev-parse --abbrev-ref HEAD); git rebase -i \$(git log master..\${1:-\$currentBranch}  --oneline --pretty=format:'%h' | tail -1)^; }; f"
 
 git config --global alias.f "fetch"
