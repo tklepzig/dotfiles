@@ -47,6 +47,7 @@ let g:coc_global_extensions = [
       \'coc-tsserver',
       \'coc-snippets',
       \'coc-prettier',
+      \'coc-styled-components',
       \'https://github.com/andys8/vscode-jest-snippets',
       \'https://github.com/akamud/vscode-javascript-snippet-pack',
       \'coc-python',
