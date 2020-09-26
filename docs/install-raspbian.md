@@ -13,4 +13,4 @@ network={
        key_mgmt=WPA-PSK
 }
 ```
-For getting hashed password: Run `wpa_passphrase "<ssid>" "<password>"`
+For getting hashed password: Run `wpa_passphrase "<ssid>"` and then enter the password.
