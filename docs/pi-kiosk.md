@@ -12,12 +12,16 @@
     vi ~/kiosk.sh
 
 ```
-xset s off         # don't activate screensaver
-xset -dpms         # disable DPMS (Energy Star) features.
-xset s noblank     # don't blank the video device
-unclutter -idle 0  # hide cursor
+# do not forget chmod 777
+#!/bin/bash
 
-chromium-browser --noerrdialogs --disable-session-crashed-bubble --disable-infobars --kiosk http://localhost:82
+xset s off
+xset -dpms
+xset s noblank
+unclutter -display :0 -noevents -grab &
+
+/usr/bin/chromium-browser --incognito --noerrdialogs --disable-session-crashed-bubble --disable-infobars --kiosk http://localhost &
+
 ```
 
 
