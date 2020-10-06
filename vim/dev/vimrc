@@ -30,6 +30,9 @@ let g:ctrlsf_default_view_mode = 'compact'
 
 let g:ranger_map_keys = 0
 
+" Disable preview window (for e.g. :GFiles)
+let g:fzf_preview_window = ''
+
 " NERDTree File highlighting
 function! NERDTreeHighlightFile(extension, fg, bg, guifg, guibg)
  exec 'autocmd filetype nerdtree highlight ' . a:extension .' ctermbg='. a:bg .' ctermfg='. a:fg .' guibg='. a:guibg .' guifg='. a:guifg
