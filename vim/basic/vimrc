@@ -140,5 +140,4 @@ hi EndOfBuffer ctermbg=NONE
 hi LineNr ctermbg=NONE
 hi SignColumn ctermbg=NONE
 
-" Set syntax scheme to json and format it (by using python, make sure it is installed)
-command Json set syntax=json | execute '%!python -m json.tool'
+command CopyFilename let @* = expand("%")
