@@ -10,9 +10,14 @@ else
   source $dotfilesDir/common.sh
 fi
 
-removeLinkFromFile ".zshrc"
-removeLinkFromFile ".vimrc"
-removeLinkFromFile ".tmux.conf"
+removePatternFromFile ".zshrc" ".dotfiles"
+removePatternFromFile ".vimrc" ".dotfiles"
+removePatternFromFile ".vimrc" ".plugins.vim"
+removePatternFromFile ".tmux.conf" ".dotfiles"
+
+info "Removing ~/.plugins.vim..."
+rm $HOME/.plugins.vim
+success "Done."
 
 info "Removing ~/.vim..."
 rm -rf $HOME/.vim

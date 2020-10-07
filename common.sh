@@ -77,12 +77,13 @@ addLinkToFile() {
   success "Done."
 }
 
-removeLinkFromFile() {
+removePatternFromFile() {
   target=$1
-  info "Remove link from $target..."
+  pattern=$2
+  info "Remove link from $target... with pattern $pattern"
   if [ -f $HOME/$target ]
   then
-    sed /.dotfiles/d $HOME/$target > $HOME/$target.tmp && mv $HOME/$target.tmp $HOME/$target
+    sed /$pattern/d $HOME/$target > $HOME/$target.tmp && mv $HOME/$target.tmp $HOME/$target
   fi
   success "Done."
 }
