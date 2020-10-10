@@ -50,3 +50,7 @@ alias nu='npm uninstall'
 alias nid='npm install -D'
 alias nr='npm run'
 alias niwt="f(){ npm i \$1 && npm i -D @types/\$1; unset -f f }; f"
+
+# TODO
+# add auto-increment number as prefix to every file (remove -n to apply changes)
+#rename -n 's/(.+)/our $i; sprintf("%02d-$1", 1+$i++)/e' *
