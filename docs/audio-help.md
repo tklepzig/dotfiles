@@ -13,3 +13,8 @@ where n is 0=auto, 1=headphones, 2=hdmi
 
 get current output
 amixer cget numid=3
+
+### Get rid of white noise
+
+In /boot/config.txt add the following line:
+`audio_pwm_mode=2`
