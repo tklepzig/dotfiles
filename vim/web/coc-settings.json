@@ -8,12 +8,6 @@
   },
   "python.jediEnabled": false,
   "codeLens.enable": true,
-  "coc.preferences.formatOnSaveFiletypes": [
-    "json",
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact",
-    "html"
-  ]
+  "eslint.autoFixOnSave": true,
+  "coc.preferences.formatOnSaveFiletypes": ["*"]
 }

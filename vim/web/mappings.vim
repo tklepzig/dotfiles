@@ -60,7 +60,6 @@ endfunction
 
 " Remap for rename current word
 nmap <leader>rr <Plug>(coc-rename)
-nnoremap <silent> <leader>ri :call AleIgnore()<CR>
 
 " Remap for format selected region
 "xmap <leader>f  <Plug>(coc-format-selected)
