@@ -63,6 +63,9 @@ set backupdir=/tmp//,.
 set directory=/tmp//,.
 set undodir=/tmp//,.
 
+" Maintain undo history between sessions
+set undofile
+
 set backspace=2   " Backspace deletes like most programs in insert mode
 
 " Decrease maximum column length in which to search for syntax items
