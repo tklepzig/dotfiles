@@ -59,9 +59,9 @@ set printoptions=paper:letter
 " Make backspace delete lots of things
 set backspace=indent,eol,start
 
-set backupdir=/tmp//,.
-set directory=/tmp//,.
-set undodir=/tmp//,.
+set backupdir=~/.vim/.backup/,/tmp//,.
+set directory=~/.vim/.swp/,/tmp//,.
+set undodir=~/.vim/.undo/,/tmp//,.
 
 " Maintain undo history between sessions
 set undofile
