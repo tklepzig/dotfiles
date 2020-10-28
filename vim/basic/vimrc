@@ -1,12 +1,8 @@
 set nocompatible
 set tabstop=2 softtabstop=2 expandtab shiftwidth=2 smarttab
 
-" Enable syntax highlighting.
 syntax on
 
-" File-type highlighting and configuration.
-" Run :filetype (without args) to see what you may have
-" to turn on yourself, or just set them all to be sure.
 filetype on
 filetype plugin on
 filetype indent on
@@ -34,17 +30,13 @@ set matchtime=0
 " The “Press ENTER or type command to continue” prompt is jarring and usually unnecessary. You can shorten command-line text and other info tokens with.
 set shortmess=atI
 
-
-" Now in the bottom right corner of the status line there will be something like: 529, 35 68%, representing line 529, column 35, about 68% of the way to the end.
 set ruler
 set showcmd
 
 " A running gvim will always have a window title, but when vim is run within an xterm, by default it inherits the terminal’s current title.
 set title
 
-
 " Search options
-" Highlight search terms
 set hlsearch
 set incsearch
 set ignorecase
@@ -56,9 +48,6 @@ set visualbell
 set noerrorbells
 set printoptions=paper:letter
 
-" Make backspace delete lots of things
-set backspace=indent,eol,start
-
 set backupdir=~/.vim/.backup/,/tmp//,.
 set directory=~/.vim/.swp/,/tmp//,.
 set undodir=~/.vim/.undo/,/tmp//,.
@@ -66,34 +55,25 @@ set undodir=~/.vim/.undo/,/tmp//,.
 " Maintain undo history between sessions
 set undofile
 
-set backspace=2   " Backspace deletes like most programs in insert mode
+" Set backspace to delete as usual in insert mode
+set backspace=indent,eol,start
 
 " Decrease maximum column length in which to search for syntax items
 set synmaxcol=200
 
+" Disable folding
 set nofoldenable
 
-autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
-
-" set filetypes as typescript.tsx
-autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx
-
+" Enable auto completion
 set omnifunc=syntaxcomplete#Complete
 set completeopt=noinsert,menuone,menu
 
-" Allow us to use Ctrl-s and Ctrl-q as keybinds
-"silent !stty -ixon
-
-" Restore default behaviour when leaving Vim.
-"autocmd VimLeave * silent !stty ixon
-
+" Use system clipboard
 if has('macunix')
   set clipboard=unnamed
 else
   set clipboard=unnamedplus
 endif
-
-autocmd BufRead,BufNewFile *.zpl set filetype=zimpl
 
 " see https://unix.stackexchange.com/a/383044
 " Triger `autoread` when files changes on disk
