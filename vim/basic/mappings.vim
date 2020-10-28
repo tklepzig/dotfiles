@@ -44,6 +44,7 @@ inoremap <expr> <PageDown> pumvisible()    ? "\<PageDown>\<C-p>\<C-n>" : "\<Page
 inoremap <expr> <PageUp>   pumvisible()    ? "\<PageUp>\<C-p>\<C-n>"   : "\<PageUp>"
 
 nnoremap <leader>s :w<CR>
+nnoremap <leader>S :wa<CR>
 
 nnoremap <leader>- <C-o><CR>
 nnoremap <leader>+ <C-i><CR>
