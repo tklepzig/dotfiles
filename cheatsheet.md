@@ -7,3 +7,8 @@
 https://vim.fandom.com/wiki/All_the_right_moves
 
 Move current line to line N: `:mN`
+
+vi( --> first level of ()
+v2i( --> parent level of ()
+v3i( --> parent parent level of ()
+v4i( --> you got it...
