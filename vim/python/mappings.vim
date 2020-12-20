@@ -1,3 +1,3 @@
 let mapleader = "\<space>"
 
-nmap <leader>yr :w \| call VimuxRunCommandInDir("python", 1)<cr>
+nmap <leader>x :w \| call VimuxRunCommandInDir("python3", 1)<cr>
