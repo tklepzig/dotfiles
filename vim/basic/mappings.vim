@@ -11,8 +11,7 @@ nmap <Leader>w<Tab> <C-w><C-p>
 nnoremap <leader>b :ls<cr>:b<space>
 nnoremap <leader>B :ls!<cr>:b<space>
 nnoremap <Leader>q :bd<CR>
-nnoremap <Leader>Q :bufdo! bd<CR>
-nnoremap <Leader>Qc :%bd\|e#\|bd#<CR>
+nnoremap <Leader>Q :%bd\|e#\|bd#<CR>
 nnoremap <leader><Tab> :b#<cr>
 nnoremap <leader><BS> :noh<cr>
 nmap H ^
