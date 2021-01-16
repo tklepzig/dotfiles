@@ -9,5 +9,6 @@
   "python.jediEnabled": false,
   "codeLens.enable": true,
   "eslint.autoFixOnSave": true,
-  "coc.preferences.formatOnSaveFiletypes": ["*"]
+  "coc.preferences.formatOnSaveFiletypes": ["*"],
+  "javascript.suggestionActions.enabled": false
 }
