@@ -15,6 +15,7 @@ let g:gitgutter_map_keys = 0
 
 let g:NERDCustomDelimiters = { 'javascript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' } }
 let g:NERDCustomDelimiters = { 'typescript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' } }
+let g:NERDTreeWinSize=50
 
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#fnamemod = ':t'
