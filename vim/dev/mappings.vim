@@ -1,7 +1,16 @@
 let mapleader = "\<space>"
 
-nnoremap <Leader>n :NERDTreeFind<CR>
-nnoremap <Leader>N :NERDTreeToggle<CR>
+function! NERDTreeSmartToggle()
+  if @% == ""
+    NERDTreeToggle
+  elseif (exists("t:NERDTreeBufName") && bufwinnr(t:NERDTreeBufName) != -1)
+    NERDTreeClose
+  else
+    NERDTreeFind
+  endif
+endfun
+
+nnoremap <silent> <leader>n :call NERDTreeSmartToggle()<CR>
 nnoremap <Leader>p :GFiles<CR>
 nnoremap <Leader>P :History<CR>
 nnoremap <Leader>; :Commands<CR>
