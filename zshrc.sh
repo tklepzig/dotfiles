@@ -114,19 +114,7 @@ precmd() {
     # response=$(curl -s "https://api.github.com/search/issues?q=repo:user/repo+type:pr+state:open&access_token=$token" 2>/dev/null)
     # prCount=$(echo $response | sed -En "s/^.*\"total_count\": ([0-9]+),.*$/\1/p")
 
-    battery=$(source $dotfilesDir/battery.sh)
-    if [[ -z $battery ]]
-    then
-      RPROMPT='%T'
-    else
-      batteryColor=""
-      if [[ $battery -lt 16 ]]
-      then
-        batteryColor="%{$fg_bold[red]%}"
-      fi
-
-      RPROMPT='%T | $batteryColor$battery%%%{$reset_color%}'
-    fi
+    RPROMPT='%T'
   fi
 }
 
