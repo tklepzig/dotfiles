@@ -62,6 +62,7 @@ fi
 
 addLinkToFile "$dotfilesDir/zshrc.sh" "$HOME/.zshrc"
 
+addLinkToFile "$dotfilesDir/tmux/tmux.common.conf" "$HOME/.tmux.conf"
 if isOS darwin
 then
   addLinkToFile "$dotfilesDir/tmux/tmux.osx.conf" "$HOME/.tmux.conf"
