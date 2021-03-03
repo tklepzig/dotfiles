@@ -25,6 +25,9 @@ let airline#extensions#tabline#tabs_label = ''
 let airline#extensions#tabline#show_splits = 0
 let g:airline#extensions#tabline#show_close_button = 0
 let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+"
+" Disable branch info in airline footer
+let g:airline_section_b = ''
 
 let g:ctrlsf_auto_close = {
       \ "normal" : 0,
