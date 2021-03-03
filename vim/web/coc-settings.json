@@ -10,5 +10,9 @@
   "codeLens.enable": true,
   "eslint.autoFixOnSave": true,
   "coc.preferences.formatOnSaveFiletypes": ["*"],
-  "javascript.suggestionActions.enabled": false
+  "javascript.suggestionActions.enabled": false,
+  "solargraph.formatting": true,
+  "solargraph.autoformat": true,
+  "solargraph.hover": true,
+  "solargraph.diagnostics": true
 }
