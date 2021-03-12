@@ -127,3 +127,6 @@ command CopyFilename let @* = expand("%")
 
 " Show possible commands after tab when entering command
 set wildmenu
+
+" Always show at least four lines above/below the cursor
+set scrolloff=4
