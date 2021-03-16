@@ -11,9 +11,18 @@ function! NERDTreeSmartToggle()
 endfun
 
 nnoremap <silent> <leader>n :call NERDTreeSmartToggle()<CR>
+
+nnoremap <Leader>/ :History/<CR>
+nnoremap <Leader>: :History:<CR>
+nnoremap <Leader>o :Files<CR>
+nnoremap <Leader>of :Files<CR>
+nnoremap <Leader>og :GFiles?<CR>
+nnoremap <Leader>ob :Buffers<CR>
+nnoremap <Leader>ol :Lines<CR>
 nnoremap <Leader>p :GFiles<CR>
 nnoremap <Leader>P :History<CR>
 nnoremap <Leader>; :Commands<CR>
+
 nnoremap <leader>, :VimuxPromptCommand<cr>
 nnoremap <leader>vp :VimuxPromptCommand<cr>
 nnoremap <leader>vl :VimuxRunLastCommand<cr>
