@@ -41,7 +41,12 @@ alias dcl='docker-compose logs -f'
 alias dp='docker system prune -f && docker rmi -f $(docker images -q)'
 alias ccp='xclip -selection clipboard'
 alias v='vi .'
-alias r='ranger'
+
+# With `. ranger` (or `source ranger`) the last visited directory will be used for the shell when exiting ranger
+# If you want to go back where you left off, just enter `cd -`
+# See also https://unix.stackexchange.com/a/570812 and https://github.com/ranger/ranger/blob/master/ranger.py
+alias r='. ranger'
+
 alias q='exit'
 alias ..='cd ..'
 alias ly="lynx -cfg $dotfilesDir/lynx.cfg"
