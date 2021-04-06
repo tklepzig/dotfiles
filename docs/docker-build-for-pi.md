@@ -1,0 +1,12 @@
+- In Dockerfile
+  - `FROM multiarch/alpine:armhf-edge`
+- Only Once on Dev: Register Multiarch Build Agent
+  - `docker run --rm --privileged multiarch/qemu-user-static:register --reset`
+- Dev
+  - `docker build -t scribbles:arm .`
+  - `docker save -o scribbles.tar.gz scribbles`
+  - _Copy to Pi (scp)_
+- Pi
+  - `docker load -i scribbles.tar.gz`
+- Autostart container
+  - `docker run --restart always -d -p 82:8080 scribbles`
