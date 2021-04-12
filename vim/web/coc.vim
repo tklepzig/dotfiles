@@ -52,5 +52,6 @@ let g:coc_global_extensions = [
       \'https://github.com/andys8/vscode-jest-snippets',
       \'https://github.com/akamud/vscode-javascript-snippet-pack',
       \'coc-python',
-      \'coc-solargraph'
+      \'coc-solargraph',
+      \'coc-vimlsp'
       \]

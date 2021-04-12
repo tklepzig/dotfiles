@@ -123,10 +123,19 @@ hi EndOfBuffer ctermbg=NONE
 hi LineNr ctermbg=NONE
 hi SignColumn ctermbg=NONE
 
-command CopyFilename let @* = expand("%")
+command! CopyFilename let @* = expand("%")
 
 " Show possible commands after tab when entering command
 set wildmenu
 
 " Always show at least four lines above/below the cursor
 set scrolloff=4
+
+function! SourceSelection() range
+  let tmpFile = tempname()
+  call writefile(getline(a:firstline, a:lastline), l:tmpFile)
+  execute "source " . l:tmpFile
+  call delete(l:tmpFile)
+endfunction
+command! -range SourceSelection <line1>,<line2>call SourceSelection()
+
