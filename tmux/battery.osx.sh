@@ -1,8 +1,16 @@
 #!/bin/bash
 
-value=$(pmset -g batt | egrep "([0-9]+)\%.*" -o --colour=auto | cut -f1 -d'%')
+pmsetString=$(pmset -g batt | egrep "([0-9]+)\%; (.*?); " -o)
+value=$(echo $pmsetString | cut -f1 -d'%' | xargs)
+mode=$(echo $pmsetString | cut -f2 -d';' | xargs)
 
-if [[ $value -lt 16 ]]
+if [[ "$mode" = "charging" ]]
+then
+    echo "#[fg=colour76]$value%"
+elif [[ $value -lt 31 ]]
+then
+    echo "#[fg=colour220]$value%"
+elif [[ $value -lt 16 ]]
 then
     echo "#[fg=colour196]$value%"
 else
