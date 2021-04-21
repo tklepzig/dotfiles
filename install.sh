@@ -70,6 +70,7 @@ else
   addLinkToFile "$dotfilesDir/tmux/tmux.linux.conf" "$HOME/.tmux.conf"
 fi
 
+checkInstallation exa
 checkInstallation tmux
 checkInstallation zsh
 checkInstallation lynx

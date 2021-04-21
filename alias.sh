@@ -10,6 +10,15 @@ fi
 alias la='ls -A'
 alias ll='ls -lh'
 alias lla='ls -Ahl'
+
+if isProgramInstalled exa
+then
+    alias ls='exa'
+    alias la='exa -a'
+    alias ll='exa -l'
+    alias lla='exa -la'
+fi
+
 alias rmr='rm -rf'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
