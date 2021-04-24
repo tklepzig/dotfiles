@@ -6,3 +6,4 @@ function! SourceSelection() range
 endfunction
 command! -range SourceSelection let b:winview = winsaveview() | <line1>,<line2>call SourceSelection() | call winrestview(b:winview) | unlet b:winview
 
+command! Themis :VimuxRunCommand expand("$HOME") . "/.vim/vim-plug/vim-themis/bin/themis " . expand("%")
