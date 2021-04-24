@@ -11,14 +11,15 @@ My dotfiles for git, zsh, tmux and vim.
 
 Add these via `--profiles=`, e.g. `--profiles=web,python`
 
-Name|Details
--|-
-dev|Development in General
-web|Web Development
-python|Python Support
-ruby|Ruby Support
-writing|Distraction free writing
-or|ZIMPL Support
+| Name    | Details                    |
+| ------- | -------------------------- |
+| dev     | Development in General     |
+| web     | Web Development            |
+| python  | Python Support             |
+| ruby    | Ruby Support               |
+| writing | Distraction free writing   |
+| or      | ZIMPL Support              |
+| viml    | VimL/Vimscript Development |
 
 ## Complete system setup including dotfiles
 
