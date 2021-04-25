@@ -49,7 +49,8 @@ alias dce='docker-compose exec'
 alias dcl='docker-compose logs -f'
 alias dp='docker system prune -f && docker rmi -f $(docker images -q)'
 alias ccp='xclip -selection clipboard'
-alias v='vi .'
+alias v='vim .'
+alias vs='vim -S'
 
 # With `. ranger` (or `source ranger`) the last visited directory will be used for the shell when exiting ranger
 # If you want to go back where you left off, just enter `cd -`
