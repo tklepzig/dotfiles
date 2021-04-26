@@ -9,8 +9,6 @@ nmap <leader>jj <esc>
 nmap <Leader>w <C-w>
 nmap <Leader>w<Tab> <C-w><C-p>
 nnoremap <leader>wQ :mksession!\|:qa<cr>
-nnoremap <leader>b :ls<cr>:b<space>
-nnoremap <leader>B :ls!<cr>:b<space>
 nnoremap <Leader>q :bd<CR>
 nnoremap <Leader>Q :%bd\|e#\|bd#<CR>
 nnoremap <leader><Tab> :b#<cr>
