@@ -1,13 +1,16 @@
 let mapleader = "\<space>"
 
 " Remap Ctrl+C to Escape to ensure triggering InsertLeave
-map <C-c> <esc>
-imap <C-c> <esc><esc>
-imap jj <esc><esc>
-nmap <leader>jj <esc>
+noremap <C-c> <esc>
+inoremap <C-c> <esc><esc>
+
+inoremap jj <esc><esc>
 
 nmap <Leader>w <C-w>
-nmap <Leader>w<Tab> <C-w><C-p>
+
+nnoremap <silent> <Leader>wz :<C-U>execute 'resize ' . (v:count ? v:count : '')<cr>
+nnoremap <silent> <Leader>wZ :<C-U>execute 'vertical resize ' . (v:count ? v:count : '')<cr>
+nnoremap <Leader>w<Tab> :wincmd p<cr>
 nnoremap <leader>wQ :mksession!\|:qa<cr>
 nnoremap <Leader>q :bd<CR>
 nnoremap <Leader>Q :%bd\|e#\|bd#<CR>
@@ -18,15 +21,15 @@ vmap H ^
 nmap L $
 vmap L $
 
-nmap <leader>w1 :1wincmd w<cr>
-nmap <leader>w2 :2wincmd w<cr>
-nmap <leader>w3 :3wincmd w<cr>
-nmap <leader>w4 :4wincmd w<cr>
-nmap <leader>w5 :5wincmd w<cr>
-nmap <leader>w6 :6wincmd w<cr>
-nmap <leader>w7 :7wincmd w<cr>
-nmap <leader>w8 :8wincmd w<cr>
-nmap <leader>w9 :9wincmd w<cr>
+nnoremap <leader>w1 :1wincmd w<cr>
+nnoremap <leader>w2 :2wincmd w<cr>
+nnoremap <leader>w3 :3wincmd w<cr>
+nnoremap <leader>w4 :4wincmd w<cr>
+nnoremap <leader>w5 :5wincmd w<cr>
+nnoremap <leader>w6 :6wincmd w<cr>
+nnoremap <leader>w7 :7wincmd w<cr>
+nnoremap <leader>w8 :8wincmd w<cr>
+nnoremap <leader>w9 :9wincmd w<cr>
 
 " no arrow keys in edit mode
 inoremap <Left> <nop>
