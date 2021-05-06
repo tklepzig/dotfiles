@@ -23,7 +23,7 @@ alias rmr='rm -rf'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
-alias t='tmux'
+alias t='tmux new-session -n ""'
 
 alias dotfiles-update='curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh | bash -s'
 alias dotfiles-tabula-rasa="$dotfilesDir/tabula-rasa.sh"
