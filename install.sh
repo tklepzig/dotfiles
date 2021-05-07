@@ -62,13 +62,14 @@ fi
 
 addLinkToFile "$dotfilesDir/zshrc.sh" "$HOME/.zshrc"
 
-addLinkToFile "$dotfilesDir/tmux/tmux.common.conf" "$HOME/.tmux.conf"
 if isOS darwin
 then
-  addLinkToFile "$dotfilesDir/tmux/tmux.osx.conf" "$HOME/.tmux.conf"
+  addLinkToFile "$dotfilesDir/tmux/vars.osx.conf" "$HOME/.tmux.conf"
 else
-  addLinkToFile "$dotfilesDir/tmux/tmux.linux.conf" "$HOME/.tmux.conf"
+  addLinkToFile "$dotfilesDir/tmux/vars.linux.conf" "$HOME/.tmux.conf"
 fi
+addLinkToFile "$dotfilesDir/tmux/tmux.conf" "$HOME/.tmux.conf"
+addLinkToFile "$dotfilesDir/tmux/themes/tmux.green.conf" "$HOME/.tmux.conf"
 
 checkInstallation exa
 checkInstallation tmux
