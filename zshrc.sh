@@ -4,18 +4,18 @@ dotfilesDir="$HOME/.dotfiles"
 
 isOS()
 {
-    if [[ "$OSTYPE:l" == *"$1:l"* ]]
-    then
-        return 0;
-    fi
+  if [[ "$OSTYPE:l" == *"$1:l"* ]]
+  then
+    return 0;
+  fi
 
-    return 1;
+  return 1;
 }
 
 isProgramInstalled()
 {
-    command -v $1 >/dev/null 2>&1 || { return 1 >&2; }
-    return 0
+  command -v $1 >/dev/null 2>&1 || { return 1 >&2; }
+  return 0
 }
 
 nl=$'\n'
@@ -129,40 +129,40 @@ upstreamIndicator ()
 
 topbar ()
 {
-    local default="$(tput setab 172)$(tput setaf 0)"
-    local accent="$(tput setab 32)$(tput setaf 15)"
-    local light="$(tput setab 179)$(tput setaf 0)"
-    local lighter="$(tput setab 222)$(tput setaf 0)"
-    local reset="$(tput sgr0)"
-    local nl=$'\n'
-    local width=$(tput cols)
+  local default="$(tput setab 172)$(tput setaf 0)"
+  local accent="$(tput setab 32)$(tput setaf 15)"
+  local light="$(tput setab 179)$(tput setaf 0)"
+  local lighter="$(tput setab 222)$(tput setaf 0)"
+  local reset="$(tput sgr0)"
+  local nl=$'\n'
+  local width=$(tput cols)
 
-    local start=" "
-    local user=" $(whoami) "
-    local host=" $(hostname -s) "
-    local repoStatus=$(command git status --porcelain 2> /dev/null | tail -n1)
-    local branch=" $(git rev-parse --abbrev-ref HEAD 2> /dev/null)$(upstreamIndicator) "
-    local branchColor="$([[ -n $repoStatus ]] && echo $accent || echo $default)"
-    local end=" "
+  local start=" "
+  local user=" $(whoami) "
+  local host=" $(hostname -s) "
+  local repoStatus=$(command git status --porcelain 2> /dev/null | tail -n1)
+  local branch=" $(git rev-parse --abbrev-ref HEAD 2> /dev/null)$(upstreamIndicator) "
+  local branchColor="$([[ -n $repoStatus ]] && echo $accent || echo $default)"
+  local end=" "
 
-    local fullMinWidth=$((${#start} + ${#user} + ${#host} + ${#branch} + ${#end} + 6))
-    local lightMinWidth=$((${#start} + ${#branch} + ${#end} + 4))
-    local fillFull="$(printf "%${$(($width - ${#start} - ${#user} - ${#host} - ${#branch} - ${#end} - 5))}s")"
-    local fillLight="$(printf "%${$(($width - ${#start} - ${#branch} - ${#end} - 3))}s")"
+  local fullMinWidth=$((${#start} + ${#user} + ${#host} + ${#branch} + ${#end} + 6))
+  local lightMinWidth=$((${#start} + ${#branch} + ${#end} + 4))
+  local fillFull="$(printf "%${$(($width - ${#start} - ${#user} - ${#host} - ${#branch} - ${#end} - 5))}s")"
+  local fillLight="$(printf "%${$(($width - ${#start} - ${#branch} - ${#end} - 3))}s")"
 
-    local full="$default$start$reset "
-    full+="$light$user$reset "
-    full+="$light$host$reset "
-    full+="$default$fillFull$reset "
-    full+="$branchColor$branch$reset "
-    full+="$default$end"
+  local full="$default$start$reset "
+  full+="$light$user$reset "
+  full+="$light$host$reset "
+  full+="$default$fillFull$reset "
+  full+="$branchColor$branch$reset "
+  full+="$default$end"
 
-    local light="$default$start$reset "
-    light+="$default$fillLight$reset "
-    light+="$default$branch$reset "
-    light+="$default$end"
+  local light="$default$start$reset "
+  light+="$default$fillLight$reset "
+  light+="$default$branch$reset "
+  light+="$default$end"
 
-    local mini="$default$(printf "%${width}s")$reset"
+  local mini="$default$(printf "%${width}s")$reset"
 
   # Save cursor position
   tput sc
@@ -179,7 +179,7 @@ topbar ()
       echo -ne "$light"
     fi
   else
-      echo -ne "$full"
+    echo -ne "$full"
   fi
   # Restore cursor position
   tput rc

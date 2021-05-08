@@ -4,18 +4,18 @@ dotfilesDir="$HOME/.dotfiles"
 
 isOS()
 {
-    if [[ "$OSTYPE:l" == *"$1:l"* ]]
-    then
-        return 0;
-    fi
+  if [[ "$OSTYPE:l" == *"$1:l"* ]]
+  then
+    return 0;
+  fi
 
-    return 1;
+  return 1;
 }
 
 isProgramInstalled()
 {
-    command -v $1 >/dev/null 2>&1 || { return 1 >&2; }
-    return 0
+  command -v $1 >/dev/null 2>&1 || { return 1 >&2; }
+  return 0
 }
 
 source $dotfilesDir/alias.sh
