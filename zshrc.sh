@@ -18,8 +18,6 @@ isProgramInstalled()
     return 0
 }
 
-NEWLINE=$'\n'
-
 source $dotfilesDir/alias.sh
 
 autoload -Uz colors compinit promptinit
@@ -52,6 +50,8 @@ bindkey -M viins 'jj' vi-cmd-mode
 autoload -Uz vcs_info
 setopt prompt_subst
 
+nl=$'\n'
+
 preexec() {
   if isOS darwin
   then
@@ -70,14 +70,13 @@ precmd() {
       now=$(($(date +%s%0N)/1000000))
     fi
 
-
     elapsed=$(($now-$timer))
     elapsedHours=$(printf %02d $(($elapsed / 3600000)))
     elapsedMinutes=$(printf %02d $((($elapsed % 3600000) / 60000)))
     elapsedSeconds=$(printf %02d $((($elapsed % 60000) / 1000)))
     elapsedMilliseconds=$(printf %03d $(($elapsed % 1000)))
-    elapsedTime="${elapsedHours}:${elapsedMinutes}:${elapsedSeconds}.${elapsedMilliseconds}"
-    elapsedPrompt="%{$reset_color%}[${elapsedTime}]%{$reset_color%}${NEWLINE}"
+    elapsedTime="[${elapsedHours}:${elapsedMinutes}:${elapsedSeconds}.${elapsedMilliseconds}]$nl"
+    #elapsedTime=" ${elapsedHours}:${elapsedMinutes}:${elapsedSeconds}.${elapsedMilliseconds} "
     unset timer
   fi
 
@@ -126,7 +125,7 @@ precmd() {
 }
 
 
-PROMPT='$elapsedPrompt%n@%m:%{$fg[yellow]%}%(5~|%-1~/…/%3~|%4~)%{$reset_color%}${NEWLINE}\$ '
+PROMPT='%{$reset_color%}$elapsedTime%{$reset_color%}%n@%m:%{$fg[yellow]%}%(5~|%-1~/…/%3~|%4~)%{$reset_color%}${nl}\$ '
 zstyle ':vcs_info:git:*' formats "%b"
 zstyle ':vcs_info:git:*' actionformats "%b %{$reset_color%}%{$fg_bold[blue]%}(%a)%{$reset_color%}"
 zstyle ':vcs_info:*' enable git
@@ -134,3 +133,57 @@ zstyle ':vcs_info:*' enable git
 # Necessary for added completions in .zsh/completion
 fpath=($HOME/.zsh/completion $fpath)
 autoload -Uz compinit && compinit -i
+
+
+return 0
+
+topbar ()
+{
+    local default="$(tput setab 172)$(tput setaf 0)"
+    local reset="$(tput sgr0)"
+    local branch="$(git rev-parse --abbrev-ref HEAD 2> /dev/null)"
+    local nl=$'\n'
+    local width=$(tput cols)
+    local minWidth=30
+
+    local start=" "
+    local left=" left "
+    local right=" $branch "
+    local end=" "
+    local fill="$(printf "%${$(($width - ${#start} - ${#left} - ${#right} - ${#end} - 4))}s")"
+
+    local result="$default$start$reset "
+    result+="$default$left$reset "
+    result+="$default$fill$reset "
+    result+="$default$right$reset "
+    result+="$default$end"
+
+  # Save cursor position
+  tput sc
+  # Move cursor to 0,0
+  tput cup 0 0
+  # Change scroll region to exclude the first line
+  tput csr 1 $(($(tput lines) - 2))
+  if [ $width -lt $minWidth ]
+  then
+      echo -ne "$default$(printf "%${width}s")$reset"
+  else
+      echo -ne "$result"
+  fi
+  # Restore cursor position
+  tput rc
+}
+
+grey=%K{238}%F{7}
+default=%F{172}
+fg=%k%F{172}
+light=%K{179}%F{0}
+lighter=%K{222}%F{0}
+lcarsAccentBg=%F{32}
+lcarsAccentFg=%F{15}
+reset=%f%k
+
+prefix=$(echo -e '\u27a4')
+bar='${$(topbar)//\%/%%}'
+PROMPT="$bar$nl$grey\$elapsedTime$reset$nl$default%n@%m:%(5~|%-1~/…/%3~|%4~)$nl$prefix $reset"
+
