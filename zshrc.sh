@@ -18,6 +18,15 @@ isProgramInstalled()
     return 0
 }
 
+nl=$'\n'
+greyTile=%K{238}%F{7}
+default=%F{172}
+light=%F{179}
+lighter=%F{222}
+accent=%F{32}
+accentTile=%K{32}%F{15}
+reset=%f%k
+
 source $dotfilesDir/alias.sh
 
 autoload -Uz colors compinit promptinit
@@ -26,6 +35,9 @@ promptinit
 compinit
 
 zstyle ':completion:*' menu select
+zstyle ':vcs_info:git:*' formats " "
+zstyle ':vcs_info:git:*' actionformats "$accentTile %a (%b) $reset"
+zstyle ':vcs_info:*' enable git
 
 setopt auto_cd
 setopt nonomatch
@@ -50,8 +62,6 @@ bindkey -M viins 'jj' vi-cmd-mode
 autoload -Uz vcs_info
 setopt prompt_subst
 
-nl=$'\n'
-
 preexec() {
   if isOS darwin
   then
@@ -75,88 +85,84 @@ precmd() {
     elapsedMinutes=$(printf %02d $((($elapsed % 3600000) / 60000)))
     elapsedSeconds=$(printf %02d $((($elapsed % 60000) / 1000)))
     elapsedMilliseconds=$(printf %03d $(($elapsed % 1000)))
-    elapsedTime="[${elapsedHours}:${elapsedMinutes}:${elapsedSeconds}.${elapsedMilliseconds}]$nl"
-    #elapsedTime=" ${elapsedHours}:${elapsedMinutes}:${elapsedSeconds}.${elapsedMilliseconds} "
+    elapsedTime=" ${elapsedHours}:${elapsedMinutes}:${elapsedSeconds}.${elapsedMilliseconds} "
     unset timer
   fi
 
   vcs_info
-  if [[ -n ${vcs_info_msg_0_} ]]; then
-    upstream=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2> /dev/null)
-
-    if [[ -z $upstream ]] then
-      upstream_prompt="#";
-    else
-      upstream_info=$(git rev-list --left-right --count $upstream...HEAD 2> /dev/null)
-      case "$upstream_info" in
-        "") # no upstream
-          upstream_prompt="" ;;
-        "0	0") # equal to upstream
-          upstream_prompt="=" ;;
-        "0	"*) # ahead of upstream
-          upstream_prompt=">" ;;
-        *"	0") # behind upstream
-          upstream_prompt="<" ;;
-        *)	    # diverged from upstream
-          upstream_prompt="<>" ;;
-      esac
-    fi
-
-    # vcs_info found something (the documentation got that backwards
-    # STATUS line taken from https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/git.zsh
-    STATUS=$(command git status --porcelain 2> /dev/null | tail -n1)
-    if [[ -n $STATUS ]]; then
-      RPROMPT='%{$fg_bold[red]%}${vcs_info_msg_0_} %{$fg_bold[cyan]%}$upstream_prompt%{$reset_color%}'
-    else
-      RPROMPT='%{$fg_bold[green]%}${vcs_info_msg_0_} %{$fg_bold[cyan]%}$upstream_prompt%{$reset_color%}'
-    fi
-  else
-    # nothing from vcs_info
-
-    # sample for github infos
-    # token=$(cat .gh-token)
-    # response=$(curl -s "https://api.github.com/search/issues?q=repo:user/repo+type:issue+state:open&access_token=$token" 2>/dev/null)
-    # issueCount=$(echo $response | sed -En "s/^.*\"total_count\": ([0-9]+),.*$/\1/p")
-    # response=$(curl -s "https://api.github.com/search/issues?q=repo:user/repo+type:pr+state:open&access_token=$token" 2>/dev/null)
-    # prCount=$(echo $response | sed -En "s/^.*\"total_count\": ([0-9]+),.*$/\1/p")
-
-    RPROMPT='%T'
-  fi
+  RPROMPT='${vcs_info_msg_0_}'
 }
-
-
-PROMPT='%{$reset_color%}$elapsedTime%{$reset_color%}%n@%m:%{$fg[yellow]%}%(5~|%-1~/…/%3~|%4~)%{$reset_color%}${nl}\$ '
-zstyle ':vcs_info:git:*' formats "%b"
-zstyle ':vcs_info:git:*' actionformats "%b %{$reset_color%}%{$fg_bold[blue]%}(%a)%{$reset_color%}"
-zstyle ':vcs_info:*' enable git
 
 # Necessary for added completions in .zsh/completion
 fpath=($HOME/.zsh/completion $fpath)
 autoload -Uz compinit && compinit -i
 
 
-return 0
+upstreamIndicator () 
+{
+  if [[ -z "$(git rev-parse --abbrev-ref HEAD 2> /dev/null)" ]]
+  then
+    echo ""
+    return
+  fi
+
+  upstream=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2> /dev/null)
+
+  if [[ -z $upstream ]] then
+    echo " #";
+  else
+    upstream_info=$(git rev-list --left-right --count $upstream...HEAD 2> /dev/null)
+    case "$upstream_info" in
+      "") # no upstream
+        echo "" ;;
+      "0	0") # equal to upstream
+        echo " =" ;;
+      "0	"*) # ahead of upstream
+        echo " >" ;;
+      *"	0") # behind upstream
+        echo " <" ;;
+      *)	    # diverged from upstream
+        echo " <>" ;;
+    esac
+  fi
+}
 
 topbar ()
 {
     local default="$(tput setab 172)$(tput setaf 0)"
+    local accent="$(tput setab 32)$(tput setaf 15)"
+    local light="$(tput setab 179)$(tput setaf 0)"
+    local lighter="$(tput setab 222)$(tput setaf 0)"
     local reset="$(tput sgr0)"
-    local branch="$(git rev-parse --abbrev-ref HEAD 2> /dev/null)"
     local nl=$'\n'
     local width=$(tput cols)
-    local minWidth=30
 
     local start=" "
-    local left=" left "
-    local right=" $branch "
+    local user=" $(whoami) "
+    local host=" $(hostname -s) "
+    local repoStatus=$(command git status --porcelain 2> /dev/null | tail -n1)
+    local branch=" $(git rev-parse --abbrev-ref HEAD 2> /dev/null)$(upstreamIndicator) "
+    local branchColor="$([[ -n $repoStatus ]] && echo $accent || echo $default)"
     local end=" "
-    local fill="$(printf "%${$(($width - ${#start} - ${#left} - ${#right} - ${#end} - 4))}s")"
 
-    local result="$default$start$reset "
-    result+="$default$left$reset "
-    result+="$default$fill$reset "
-    result+="$default$right$reset "
-    result+="$default$end"
+    local fullMinWidth=$((${#start} + ${#user} + ${#host} + ${#branch} + ${#end} + 6))
+    local lightMinWidth=$((${#start} + ${#branch} + ${#end} + 4))
+    local fillFull="$(printf "%${$(($width - ${#start} - ${#user} - ${#host} - ${#branch} - ${#end} - 5))}s")"
+    local fillLight="$(printf "%${$(($width - ${#start} - ${#branch} - ${#end} - 3))}s")"
+
+    local full="$default$start$reset "
+    full+="$light$user$reset "
+    full+="$light$host$reset "
+    full+="$default$fillFull$reset "
+    full+="$branchColor$branch$reset "
+    full+="$default$end"
+
+    local light="$default$start$reset "
+    light+="$default$fillLight$reset "
+    light+="$default$branch$reset "
+    light+="$default$end"
+
+    local mini="$default$(printf "%${width}s")$reset"
 
   # Save cursor position
   tput sc
@@ -164,26 +170,21 @@ topbar ()
   tput cup 0 0
   # Change scroll region to exclude the first line
   tput csr 1 $(($(tput lines) - 2))
-  if [ $width -lt $minWidth ]
+  if [ $width -lt $fullMinWidth ]
   then
-      echo -ne "$default$(printf "%${width}s")$reset"
+    if [ $width -lt $lightMinWidth ]
+    then
+      echo -ne "$mini"
+    else
+      echo -ne "$light"
+    fi
   else
-      echo -ne "$result"
+      echo -ne "$full"
   fi
   # Restore cursor position
   tput rc
 }
 
-grey=%K{238}%F{7}
-default=%F{172}
-fg=%k%F{172}
-light=%K{179}%F{0}
-lighter=%K{222}%F{0}
-lcarsAccentBg=%F{32}
-lcarsAccentFg=%F{15}
-reset=%f%k
-
-prefix=$(echo -e '\u27a4')
+prefix=$(echo -e '\u276f')
 bar='${$(topbar)//\%/%%}'
-PROMPT="$bar$nl$grey\$elapsedTime$reset$nl$default%n@%m:%(5~|%-1~/…/%3~|%4~)$nl$prefix $reset"
-
+PROMPT="$bar$nl$greyTile\$elapsedTime$reset$nl$light%(5~|%-1~/…/%3~|%4~)$nl$default$prefix $reset"
