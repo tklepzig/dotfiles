@@ -127,9 +127,37 @@ upstreamIndicator ()
   fi
 }
 
+topbar_show ()
+{
+  ZSH_TOP_BAR=""
+  clear
+}
+
+topbar_hide ()
+{
+  ZSH_TOP_BAR="hidden"
+  tput csr 0 $(($(tput lines)))
+  clear
+}
+
+set_topbar_title ()
+{
+  ZSH_TOP_BAR_TITLE="$1"
+}
+
+alias tbh='topbar_hide' 
+alias tbs='topbar_show' 
+alias tbt='set_topbar_title'
+
 topbar ()
 {
+  if [[ "$ZSH_TOP_BAR" = "hidden" ]]
+  then
+    return 0
+  fi
+
   local default="$(tput setab 172)$(tput setaf 0)"
+  local fg="$(tput setab 0)$(tput setaf 172)"
   local accent="$(tput setab 32)$(tput setaf 15)"
   local light="$(tput setab 179)$(tput setaf 0)"
   local lighter="$(tput setab 222)$(tput setaf 0)"
@@ -137,30 +165,43 @@ topbar ()
   local nl=$'\n'
   local width=$(tput cols)
 
-  local start=" "
-  local user=" $(whoami) "
-  local host=" $(hostname -s) "
-  local repoStatus=$(command git status --porcelain 2> /dev/null | tail -n1)
-  local branch=" $(git rev-parse --abbrev-ref HEAD 2> /dev/null)$(upstreamIndicator) "
-  local branchColor="$([[ -n $repoStatus ]] && echo $accent || echo $default)"
-  local end=" "
 
-  local fullMinWidth=$((${#start} + ${#user} + ${#host} + ${#branch} + ${#end} + 6))
-  local lightMinWidth=$((${#start} + ${#branch} + ${#end} + 4))
-  local fillFull="$(printf "%${$(($width - ${#start} - ${#user} - ${#host} - ${#branch} - ${#end} - 5))}s")"
-  local fillLight="$(printf "%${$(($width - ${#start} - ${#branch} - ${#end} - 3))}s")"
+  local title=$ZSH_TOP_BAR_TITLE
+  if [[ -n $title ]]
+  then
+    local start="   "
+    local end=" "
+    local fullMinWidth=$((${#start} + ${#title} + ${#end} + 2))
+    local lightMinWidth=$fullMinWidth
+    local fill="$(printf "%${$(($width - ${#start} - ${#title} - ${#end} - 2))}s")"
+    full="$default$start$fill$fg $title $default$end"
+    light=$full
+  else
+    local start=" "
+    local end=" "
+    local user=" $(whoami) "
+    local host=" $(hostname -s) "
+    local repoStatus=$(command git status --porcelain 2> /dev/null | tail -n1)
+    local branch=" $(git rev-parse --abbrev-ref HEAD 2> /dev/null)$(upstreamIndicator) "
+    local branchColor="$([[ -n $repoStatus ]] && echo $accent || echo $default)"
 
-  local full="$default$start$reset "
-  full+="$light$user$reset "
-  full+="$light$host$reset "
-  full+="$default$fillFull$reset "
-  full+="$branchColor$branch$reset "
-  full+="$default$end"
+    local fullMinWidth=$((${#start} + ${#user} + ${#host} + ${#branch} + ${#end} + 6))
+    local lightMinWidth=$((${#start} + ${#branch} + ${#end} + 4))
+    local fillFull="$(printf "%${$(($width - ${#start} - ${#user} - ${#host} - ${#branch} - ${#end} - 5))}s")"
+    local fillLight="$(printf "%${$(($width - ${#start} - ${#branch} - ${#end} - 3))}s")"
 
-  local light="$default$start$reset "
-  light+="$default$fillLight$reset "
-  light+="$default$branch$reset "
-  light+="$default$end"
+    local full="$default$start$reset "
+    full+="$light$user$reset "
+    full+="$light$host$reset "
+    full+="$default$fillFull$reset "
+    full+="$branchColor$branch$reset "
+    full+="$default$end"
+
+    local light="$default$start$reset "
+    light+="$default$fillLight$reset "
+    light+="$branchColor$branch$reset "
+    light+="$default$end"
+  fi
 
   local mini="$default$(printf "%${width}s")$reset"
 
@@ -169,7 +210,7 @@ topbar ()
   # Move cursor to 0,0
   tput cup 0 0
   # Change scroll region to exclude the first line
-  tput csr 1 $(($(tput lines) - 2))
+  tput csr 1 $(($(tput lines) - 1))
   if [ $width -lt $fullMinWidth ]
   then
     if [ $width -lt $lightMinWidth ]
@@ -181,6 +222,7 @@ topbar ()
   else
     echo -ne "$full"
   fi
+
   # Restore cursor position
   tput rc
 }
