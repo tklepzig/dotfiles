@@ -159,7 +159,7 @@ topbar ()
   fi
 
   local default="$(tput setab 172)$(tput setaf 0)"
-  local fg="$(tput setab 0)$(tput setaf 172)"
+  local fg="$(tput setaf 172)"
   local accent="$(tput setab 32)$(tput setaf 15)"
   local light="$(tput setab 179)$(tput setaf 0)"
   local lighter="$(tput setab 222)$(tput setaf 0)"
@@ -176,7 +176,7 @@ topbar ()
     local fullMinWidth=$((${#start} + ${#title} + ${#end} + 2))
     local lightMinWidth=$fullMinWidth
     local fill="$(printf "%${$(($width - ${#start} - ${#title} - ${#end} - 2))}s")"
-    full="$default$start$fill$fg $title $default$end"
+    full="$default$start$fill$reset$fg $title $default$end"
     light=$full
   else
     local start=" "
