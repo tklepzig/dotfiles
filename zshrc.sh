@@ -29,10 +29,11 @@ reset=%f%k
 
 source $dotfilesDir/alias.sh
 
-autoload -Uz colors compinit promptinit
+autoload -Uz colors compinit promptinit edit-command-line
 colors
 promptinit
 compinit
+zle -N edit-command-line
 
 zstyle ':completion:*' menu select
 zstyle ':vcs_info:git:*' formats " "
@@ -51,13 +52,14 @@ setopt inc_append_history
 cdpath=(~ ~/development)
 
 # Use vi as the default editor
-export EDITOR=vi
+export EDITOR=vim
+export VISUAL=vim
 
-# But still use emacs-style zsh bindings (see https://superuser.com/a/457401)
-# Actually, no, use vi mode of course!
+# Use vi-style zsh bindings
 bindkey -v
 
 bindkey -M viins 'jj' vi-cmd-mode
+bindkey -M vicmd v edit-command-line
 
 autoload -Uz vcs_info
 setopt prompt_subst
