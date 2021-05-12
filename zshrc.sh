@@ -28,8 +28,15 @@ accentTile=%K{32}%F{15}
 reset=%f%k
 
 source $dotfilesDir/alias.sh
+source $HOME/.asdf/asdf.sh
 
-autoload -Uz colors compinit promptinit edit-command-line
+# Add completions from .zsh/completion
+fpath=($HOME/.zsh/completion $fpath)
+
+# Add asdf completions
+fpath=(${ASDF_DIR}/completions $fpath)
+
+autoload -Uz colors compinit promptinit edit-command-line vcs_info
 colors
 promptinit
 compinit
@@ -40,14 +47,14 @@ zstyle ':vcs_info:git:*' formats " "
 zstyle ':vcs_info:git:*' actionformats "$accentTile %a (%b) $reset"
 zstyle ':vcs_info:*' enable git
 
-setopt auto_cd
-setopt nonomatch
-
 HISTFILE=$HOME/.history
 HISTSIZE=10000
 SAVEHIST=20000
 setopt hist_ignore_all_dups
 setopt inc_append_history
+setopt auto_cd
+setopt nonomatch
+setopt prompt_subst
 
 cdpath=(~ ~/development)
 
@@ -60,9 +67,6 @@ bindkey -v
 
 bindkey -M viins 'jj' vi-cmd-mode
 bindkey -M vicmd v edit-command-line
-
-autoload -Uz vcs_info
-setopt prompt_subst
 
 preexec() {
   if isOS darwin
@@ -95,12 +99,7 @@ precmd() {
   RPROMPT='${vcs_info_msg_0_}'
 }
 
-# Necessary for added completions in .zsh/completion
-fpath=($HOME/.zsh/completion $fpath)
-autoload -Uz compinit && compinit -i
-
-
-upstreamIndicator () 
+upstreamIndicator() 
 {
   if [[ -z "$(git rev-parse --abbrev-ref HEAD 2> /dev/null)" ]]
   then

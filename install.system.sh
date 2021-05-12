@@ -38,24 +38,22 @@ sudo apt-get -y install curl gnome-tweak-tool vim-gnome xdotool gparted sshfs tm
 success "Done."
 
 info "Installing Google Chrome..."
-. ./chrome.sh
+. ./scripts/chrome.sh
 success "Done."
 
-info "Installing Visual Studio Code Insiders..."
-. ./vscode.sh
-success "Done."
+# Skipped temporarily while testing setup with asdf
+  #info "Installing Git, npm, node..."
+  ## npm & nodejs, for version 13.x
+  #curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
 
-info "Installing Git, npm, node..."
-# npm & nodejs, for version 13.x
-curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+  ## yarn
+  ##curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+  ##echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 
-# yarn
-#curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-#echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-
-sudo apt-get -y update
-sudo apt-get -y install git nodejs #yarn
-success "Done."
+  #sudo apt-get -y update
+  #sudo apt-get -y install git nodejs #yarn
+  #success "Done."
+# --
 
 if isUbuntu
 then
@@ -70,6 +68,12 @@ then
     sudo apt-get -y install git seafile-gui
     success "Done."
 fi
+
+info "Installing asdf..."
+git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf
+cd $HOME/.asdf
+git checkout "$(git describe --abbrev=0 --tags)"
+cd -
 
 info "Installing some media tools..."
 sudo apt-get -y install winff easytag audacity gimp vlc
