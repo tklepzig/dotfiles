@@ -132,14 +132,16 @@ upstreamIndicator ()
 topbar_show ()
 {
   ZSH_TOP_BAR=""
-  clear
 }
 
 topbar_hide ()
 {
   ZSH_TOP_BAR="hidden"
+  tput sc
+  tput cup 0 0
+  tput el
   tput csr 0 $(($(tput lines)))
-  clear
+  tput rc
 }
 
 set_topbar_title ()
