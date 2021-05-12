@@ -23,4 +23,4 @@ Add these via `--profiles=`, e.g. `--profiles=web,python`
 
 ## Complete system setup including dotfiles
 
-    curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/system-setup/install.sh | bash -s
+    curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.system.sh | bash -s

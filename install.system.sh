@@ -3,11 +3,11 @@
 set -e
 dotfilesDir=$HOME/.dotfiles
 
-if [ ! -f $dotfilesDir/common.sh ]
+if [ ! -f $dotfilesDir/install.shared.sh ]
 then
-  source <(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/common.sh)
+  source <(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.shared.sh)
 else
-  source $dotfilesDir/common.sh
+  source $dotfilesDir/install.shared.sh
 fi
 
 info "Searching for Git..."
