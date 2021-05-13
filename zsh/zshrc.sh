@@ -28,7 +28,7 @@ accentTile=%K{32}%F{15}
 reset=%f%k
 
 source $dotfilesDir/zsh/alias.sh
-source $HOME/.asdf/asdf.sh
+#source $HOME/.asdf/asdf.sh
 
 # Add completions from .zsh/completion
 fpath=($HOME/.zsh/completion $fpath)
