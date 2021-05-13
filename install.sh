@@ -69,7 +69,6 @@ else
   addLinkToFile "$dotfilesDir/tmux/vars.linux.conf" "$HOME/.tmux.conf"
 fi
 addLinkToFile "$dotfilesDir/tmux/tmux.conf" "$HOME/.tmux.conf"
-addLinkToFile "$dotfilesDir/tmux/themes/tmux.lcars.conf" "$HOME/.tmux.conf"
 
 checkInstallation exa
 checkInstallation tmux
