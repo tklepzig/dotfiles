@@ -60,7 +60,7 @@ then
   success "Done."
 fi
 
-addLinkToFile "$dotfilesDir/zshrc.sh" "$HOME/.zshrc"
+addLinkToFile "$dotfilesDir/zsh/zshrc.sh" "$HOME/.zshrc"
 
 if isOS darwin
 then
