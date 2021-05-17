@@ -62,6 +62,12 @@ fi
 
 addLinkToFile "$dotfilesDir/zsh/zshrc.sh" "$HOME/.zshrc"
 
+info "Creating zsh sounds directory..."
+mkdir -p $HOME/.zsh-sounds
+cp $dotfilesDir/zsh/sounds-readme.md $HOME/.zsh-sounds/README.md
+success "Done."
+
+
 if isOS darwin
 then
   addLinkToFile "$dotfilesDir/tmux/vars.osx.conf" "$HOME/.tmux.conf"

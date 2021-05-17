@@ -78,6 +78,8 @@ preexec() {
 }
 
 precmd() {
+  lastExitCode=$?
+
   if [ $timer ]; then
     if isOS darwin
     then
@@ -93,10 +95,35 @@ precmd() {
     elapsedMilliseconds=$(printf %03d $(($elapsed % 1000)))
     elapsedTime=" ${elapsedHours}:${elapsedMinutes}:${elapsedSeconds}.${elapsedMilliseconds} "
     unset timer
+
+    playSound
   fi
 
   vcs_info
   RPROMPT='${vcs_info_msg_0_}'
+}
+
+playSound()
+{
+  player=""
+  if isOS darwin
+  then
+    player="afplay"
+  fi
+
+  if ! isProgramInstalled $player
+  then
+    return 0
+  fi
+
+  soundsPath="$HOME/.zsh-sounds"
+  if [ "$lastExitCode" != 0 ] && [ -f "$soundsPath/command-failed.mp3" ]
+  then
+    (&>/dev/null afplay -v 0.2 "$soundsPath/command-failed.mp3" &)
+  elif [ $elapsed -gt 60000 ] && [ -f "$soundsPath/long-running-command-success.mp3" ]
+  then
+    (&>/dev/null afplay -v 0.2 "$soundsPath/long-running-command-success.mp3" &)
+  fi
 }
 
 upstreamIndicator() 
