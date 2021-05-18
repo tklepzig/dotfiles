@@ -105,6 +105,11 @@ precmd() {
 
 playSound()
 {
+  if [[ $ZSH_SOUND = 0 ]]
+  then
+    return 0
+  fi
+
   player=""
   if isOS darwin
   then
@@ -260,3 +265,5 @@ topbar ()
 prefix=$(echo -e '\u276f')
 bar='${$(topbar)//\%/%%}'
 PROMPT="$bar$nl$greyTile\$elapsedTime$reset$nl$light%(5~|%-1~/…/%3~|%4~)$nl$default$prefix $reset"
+
+ZSH_SOUND=0
