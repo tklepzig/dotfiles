@@ -19,12 +19,14 @@ isProgramInstalled()
 }
 
 nl=$'\n'
-greyTile=%K{238}%F{7}
 default=%F{172}
 light=%F{179}
 lighter=%F{222}
-accent=%F{32}
+#accent=%F{32} too dark on black bg
+accent=%F{4}
 accentTile=%K{32}%F{15}
+defaultTile=%K{172}%F{0}
+greyTile=%K{238}%F{7}
 reset=%f%k
 
 source $dotfilesDir/zsh/alias.sh
@@ -43,8 +45,8 @@ compinit
 zle -N edit-command-line
 
 zstyle ':completion:*' menu select
-zstyle ':vcs_info:git:*' formats " "
-zstyle ':vcs_info:git:*' actionformats "$accentTile %a (%b) $reset"
+zstyle ':vcs_info:git:*' formats "%b"
+zstyle ':vcs_info:git:*' actionformats "%b (%a)"
 zstyle ':vcs_info:*' enable git
 
 HISTFILE=$HOME/.history
@@ -100,7 +102,20 @@ precmd() {
   fi
 
   vcs_info
-  RPROMPT='${vcs_info_msg_0_}'
+
+  local repoStatus=$(command git status --porcelain 2> /dev/null | tail -n1)
+  local branchColor="$([[ -n $repoStatus ]] && echo "$accentTile $reset$accent " || echo "$defaultTile $reset$default ")"
+  local repoInfoOrUser="$default%n@%m$reset$nl"
+
+  if [[ -n ${vcs_info_msg_0_} ]]
+  then
+    repoInfoOrUser="$branchColor${vcs_info_msg_0_}$(upstreamIndicator)$reset$nl"
+  fi
+
+  local prefix=$(echo -e '\u276f')
+  local bar='${$(topbar)//\%/%%}'
+  local path="%(5~|%-1~/…/%3~|%4~)"
+  PROMPT="$bar$greyTile\$elapsedTime$reset$nl$nl$repoInfoOrUser$light$path$nl$default$prefix $reset"
 }
 
 playSound()
@@ -262,8 +277,6 @@ topbar ()
   tput rc
 }
 
-prefix=$(echo -e '\u276f')
-bar='${$(topbar)//\%/%%}'
-PROMPT="$bar$nl$greyTile\$elapsedTime$reset$nl$light%(5~|%-1~/…/%3~|%4~)$nl$default$prefix $reset"
 
 ZSH_SOUND=0
+ZSH_TOP_BAR="hidden"
