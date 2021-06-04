@@ -160,33 +160,33 @@ upstreamIndicator()
   fi
 }
 
-infobar_show ()
+topbar_show ()
 {
-  ZSH_INFO_BAR=""
+  ZSH_TOP_BAR=""
 }
 
-infobar_hide ()
+topbar_hide ()
 {
-  ZSH_INFO_BAR="hidden"
+  ZSH_TOP_BAR="hidden"
   tput sc
-  tput cup $(tput lines) 0
+  tput cup 0 0
   tput el
   tput csr 0 $(($(tput lines)))
   tput rc
 }
 
-set_infobar_title ()
+set_topbar_title ()
 {
-  ZSH_INFO_BAR_TITLE="$1"
+  ZSH_TOP_BAR_TITLE="$1"
 }
 
-alias ibh='infobar_hide' 
-alias ibs='infobar_show' 
-alias ibt='set_infobar_title'
+alias tbh='topbar_hide' 
+alias tbs='topbar_show' 
+alias tbt='set_topbar_title'
 
-infobar ()
+topbar ()
 {
-  if [[ "$ZSH_INFO_BAR" = "hidden" ]]
+  if [[ "$ZSH_TOP_BAR" = "hidden" ]]
   then
     return 0
   fi
@@ -201,7 +201,7 @@ infobar ()
   local width=$(tput cols)
 
 
-  local title=$ZSH_INFO_BAR_TITLE
+  local title=$ZSH_TOP_BAR_TITLE
   if [[ -n $title ]]
   then
     local start="   "
@@ -242,19 +242,10 @@ infobar ()
 
   # Save cursor position
   tput sc
-
-  # Add a new line
-  tput il 1
-
-  # Change scroll region to exclude the last line
-  tput csr 0 $(($(tput lines) - 2))
-
-  # Move cursor to bottom
-  tput cup $(tput lines) 0
-
-  # Clear to the end of the line
-  tput el
-
+  # Move cursor to 0,0
+  tput cup 0 0
+  # Change scroll region to exclude the first line
+  tput csr 1 $(($(tput lines) - 1))
   if [ $width -lt $fullMinWidth ]
   then
     if [ $width -lt $lightMinWidth ]
@@ -272,7 +263,7 @@ infobar ()
 }
 
 prefix=$(echo -e '\u276f')
-bar='${$(infobar)//\%/%%}'
+bar='${$(topbar)//\%/%%}'
 PROMPT="$bar$nl$greyTile\$elapsedTime$reset$nl$light%(5~|%-1~/…/%3~|%4~)$nl$default$prefix $reset"
 
 ZSH_SOUND=0
