@@ -22,12 +22,11 @@ nl=$'\n'
 default=%F{172}
 light=%F{179}
 lighter=%F{222}
-#accent=%F{32} too dark on black bg
-accent=%F{4}
+accent=%F{32}
 accentTile=%K{32}%F{15}
 defaultTile=%K{172}%F{0}
 greyTile=%K{238}%F{7}
-reset=%f%k
+reset=%f%k%b
 
 source $dotfilesDir/zsh/alias.sh
 source $HOME/.asdf/asdf.sh
@@ -104,7 +103,7 @@ precmd() {
   vcs_info
 
   local repoStatus=$(command git status --porcelain 2> /dev/null | tail -n1)
-  local branchColor="$([[ -n $repoStatus ]] && echo "$accentTile $reset$accent " || echo "$defaultTile $reset$default ")"
+  local branchColor="$([[ -n $repoStatus ]] && echo "$accentTile $reset$accent%B " || echo "$defaultTile $reset$default%B ")"
   local repoInfoOrUser="$default%n@%m$reset$nl"
 
   if [[ -n ${vcs_info_msg_0_} ]]
