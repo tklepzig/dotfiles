@@ -137,9 +137,11 @@ playSound()
   fi
 
   soundsPath="$HOME/.zsh-sounds"
-  if [ "$lastExitCode" != 0 ] && [ -f "$soundsPath/command-failed.mp3" ]
+  # exit code 130 means the user pressed CTRL+C (128 + SIGINT -> 128 + 2)
+  # exit code 146/148 means the user pressed CTRL+Z (128 + SIGTSTP -> 128 + 20 (linux) or 18 (osx))
+  if [ "$lastExitCode" != 0 ] && [ "$lastExitCode" != 130 ] && [ "$lastExitCode" != 146 ] && [ "$lastExitCode" != 148 ] && [ -f "$soundsPath/command-failed.mp3" ]
   then
-    (&>/dev/null afplay -v 0.2 "$soundsPath/command-failed.mp3" &)
+    (&>/dev/null afplay -v 0.1 "$soundsPath/command-failed.mp3" &)
   elif [ $elapsed -gt 60000 ] && [ -f "$soundsPath/long-running-command-success.mp3" ]
   then
     (&>/dev/null afplay -v 0.2 "$soundsPath/long-running-command-success.mp3" &)
