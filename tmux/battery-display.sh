@@ -12,6 +12,11 @@ lcarsAccentFg=colour15
     read -r value
 } <<< "$(source $HOME/.dotfiles/tmux/battery.$1.sh)"
 
+if [[ -z $value ]]
+then
+    echo "#[bg=$lcarsDefaultBg]"
+    exit
+fi
 
 color="#[fg=$lcarsDefaultFg,bg=$lcarsDefaultLighterBg]"
 if [[ "$state" = "charging" ]]
