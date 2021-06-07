@@ -81,7 +81,12 @@ checkInstallation tmux
 checkInstallation zsh
 checkInstallation lynx
 
-if [ -f $HOME/.plugins.vim ]
+if [ ! -f "$HOME/.plugins.custom.vim" ]
+then
+  echo "Plug 'any/vim-plugin'" > $HOME/.plugins.custom.vim
+fi
+
+if [ -f "$HOME/.plugins.vim" ]
 then
   mv $HOME/.plugins.vim $HOME/.plugins.vim.backup
 fi
