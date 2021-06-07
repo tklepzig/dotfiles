@@ -1,1 +1,1 @@
-df -h --output=avail / | tail -1 | awk '{print $1}'
+df -h / | tail -1 | awk '{print $4}'
