@@ -68,6 +68,7 @@ bindkey -v
 
 bindkey -M viins 'jj' vi-cmd-mode
 bindkey -M vicmd v edit-command-line
+bindkey '^R' history-incremental-search-backward
 
 preexec() {
   if isOS darwin
