@@ -46,6 +46,10 @@ set smartcase
 " Blink if there is an error
 set visualbell
 set noerrorbells
+
+" Disable visual bell
+set t_vb=
+
 set printoptions=paper:letter
 
 set backupdir=~/.vim/.backup/,/tmp//,.
