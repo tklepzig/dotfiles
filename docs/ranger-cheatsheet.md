@@ -12,4 +12,5 @@ space - mark current file and jump to next one
 i - preview file
 a - rename
 g - goto locations, tab handling
+Tab - Switch tab (alternative to gt/gT)
 M - different options which info to show for each file/dir
