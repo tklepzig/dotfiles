@@ -1,6 +1,6 @@
 # How to handle different nppm logins on one machine
 
-## Approach 1: Using a ignored `.npmrc` file
+## Approach 1: Using an ignored `.npmrc` file
 
 1. In each project's `.gitignore` (and `.npmignore` for NPM modules) add this line: `.npmrc`. This will make sure you never commit (or publish) the `.npmrc` file.
 2. In each project's folder create `.npmrc` file containing this: `//registry.npmjs.org/:_authToken=11111111-1111-1111-1111-111111111111` (replace the GUID with an actual NPM auth token, e.g. you can grab it from `~/.npmrc`)
@@ -16,7 +16,7 @@
 
 > All the projects, which have this file committed, will use your environment variable NPM_TOKEN for npm auth.
 
-Either way, as the result all `npm` commands work as is, no need to pass `--userconfig` or anything.
+#### Either way, as the result all `npm` commands work as is, no need to pass `--userconfig` or anything.
 
 ## Check which user is currently used
 
