@@ -5,6 +5,7 @@ nnoremap <leader>tn :w \| TestNearest<CR>
 nnoremap <leader>tf :w \| TestFile<CR>
 nnoremap <leader>tl :w \| TestLast<CR>
 nnoremap <leader>tv :TestVisit<CR>
+nnoremap <leader>tz :VimuxZoomRunner<CR>
 
 " coc------------------------------------------------------------------------
 " Use tab for trigger completion with characters ahead and navigate.

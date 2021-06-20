@@ -27,7 +27,8 @@ nnoremap <leader>, :VimuxPromptCommand<cr>
 nnoremap <leader>vp :VimuxPromptCommand<cr>
 nnoremap <leader>vl :VimuxRunLastCommand<cr>
 nnoremap <leader>vi :VimuxInspectRunner<cr>
-nnoremap <leader>vz :VimuxZoomRunner<cr>:VimuxInspectRunner<cr>
+nnoremap <leader>vz :VimuxZoomRunner<cr>
+nnoremap <leader>vZ :VimuxZoomRunner<cr>:VimuxInspectRunner<cr>
 
 let g:airline#extensions#tabline#buffer_idx_mode = 1
 nmap <leader>1 <Plug>AirlineSelectTab1
