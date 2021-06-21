@@ -18,3 +18,5 @@ v4i( --> you got it...
 Save session (window layout, open buffers, ...): `:mksession [<filename>]`
 Restore session: `vim -S [<filename>]`
 (both commands use the default filename `Session.vim` if omitted)
+
+List all currently used highlight groups: `:source $VIMRUNTIME/syntax/hitest.vim`
