@@ -120,6 +120,7 @@ precmd() {
   fi
 
   local prefix=$(echo -e '\u276f')
+  #local prefix=$(echo -e '\u261e')
   local bar='${$(topbar)//\%/%%}'
   local path="%(5~|%-1~/…/%3~|%4~)"
   PROMPT="$bar$greyTile\$elapsedTime$reset$nl$nl$repoInfoOrUser$light$path$nl$default$prefix $reset"

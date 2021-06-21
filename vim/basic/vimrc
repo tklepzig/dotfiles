@@ -130,12 +130,7 @@ set splitright
 hi Normal ctermbg=NONE
 hi EndOfBuffer ctermbg=NONE
 hi LineNr ctermbg=NONE
-hi CursorLineNR ctermbg=NONE
 hi SignColumn ctermbg=NONE
-hi CursorLine ctermbg=NONE
-hi GitGutterAdd ctermbg=NONE
-hi GitGutterChange ctermbg=NONE
-hi GitGutterDelete ctermbg=NONE
 
 command! CopyFilename let @* = expand("%")
 
