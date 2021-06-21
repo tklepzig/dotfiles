@@ -29,13 +29,15 @@ greyTile=%K{238}%F{7}
 reset=%f%k%b
 
 source $dotfilesDir/zsh/alias.sh
-source $HOME/.asdf/asdf.sh
 
 # Add completions from .zsh/completion
 fpath=($HOME/.zsh/completion $fpath)
 
-# Add asdf completions
-fpath=(${ASDF_DIR}/completions $fpath)
+if [ -d "$HOME/.asdf" ]
+then
+  source $HOME/.asdf/asdf.sh
+  fpath=(${ASDF_DIR}/completions $fpath)
+fi
 
 autoload -Uz colors compinit promptinit edit-command-line vcs_info
 colors
