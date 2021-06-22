@@ -20,3 +20,5 @@ Restore session: `vim -S [<filename>]`
 (both commands use the default filename `Session.vim` if omitted)
 
 List all currently used highlight groups: `:source $VIMRUNTIME/syntax/hitest.vim`
+
+After starting vim, open last edited file (and more when pressing keep hitting `o`): <kbd>Ctrl</kbd> + <kbd>o</kbd> <kbd>o</kbd>
