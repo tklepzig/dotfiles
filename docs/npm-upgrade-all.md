@@ -15,10 +15,13 @@ This will upgrade all the version hints in the package.json file, to dependencie
 You are now ready to run the update:
 
 ```
-npm update # or npm install if you freshly cloned the repo
+npm update 
 ```
+(Or if you freshly cloned the repo `npm install`)
 
-> # For reference
+---
+
+> #### For reference
 >
-> `npm update` will update the packages according to their version regex
-> `npm outdated` show a list which packages are out of date
+> - `npm update` will update the packages according to their version regex
+> - `npm outdated` show a list which packages are out of date
