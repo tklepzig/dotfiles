@@ -15,8 +15,9 @@ This will upgrade all the version hints in the package.json file, to dependencie
 You are now ready to run the update:
 
 ```
-npm update 
+npm update
 ```
+
 (Or if you freshly cloned the repo `npm install`)
 
 ---
