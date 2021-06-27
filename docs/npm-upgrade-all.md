@@ -1,3 +1,11 @@
+# Edit, better: 
+
+```
+npx npm-check -u
+```
+
+# Old
+
 To update all packages to a new major version, install the npm-check-updates package globally:
 
 ```
