@@ -70,5 +70,5 @@ nnoremap <silent> "" :registers 0123456789abcdefghijklmnopqrstuvwxyz<CR>
 
 nnoremap <leader>u :UndotreeToggle \| UndotreeFocus<CR>
 
-nnoremap <silent> <leader>dr :%SourceSelection<cr>
-vnoremap <silent> <leader>dr :SourceSelection<cr>
+nnoremap <silent> <leader><leader> :BufferNavigatorToggle<cr>
+

@@ -139,3 +139,5 @@ set wildmenu
 
 " Always show at least four lines above/below the cursor
 set scrolloff=4
+
+let g:BufferNavigatorMapKeys = 0
