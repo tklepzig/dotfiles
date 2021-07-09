@@ -54,6 +54,7 @@ call NERDTreeHighlightFile('json', 'yellow', 'none', 'yellow', '#151515')
 call NERDTreeHighlightFile('html', 'yellow', 'none', 'yellow', '#151515')
 call NERDTreeHighlightFile('css', 'cyan', 'none', 'cyan', '#151515')
 call NERDTreeHighlightFile('js', 'Red', 'none', '#ffa500', '#151515')
+highlight Directory guibg=NONE ctermbg=NONE
 
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
