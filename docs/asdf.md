@@ -1,4 +1,4 @@
-Add (e.g. nodejs)
+Add plugin (e.g. nodejs)
 
 ```
 asdf plugin add nodejs
