@@ -75,6 +75,11 @@ cd $HOME/.asdf
 git checkout "$(git describe --abbrev=0 --tags)"
 cd -
 
+# ToDo
+# Install via asdf:
+#- vim
+#- npm, nodejs
+
 info "Installing some media tools..."
 sudo apt-get -y install winff easytag audacity gimp vlc
 success "Done."
