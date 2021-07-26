@@ -24,3 +24,22 @@ List all currently used highlight groups: `:source $VIMRUNTIME/syntax/hitest.vim
 After starting vim, open last edited file (and more when pressing keep hitting `o`): <kbd>Ctrl</kbd> + <kbd>o</kbd> <kbd>o</kbd>
 
 :set list --> display special chars
+
+# Spell Checking
+
+See also `:help spell`
+
+Enable:
+
+```
+:setlocal spell spelllang=en
+```
+
+Mark word under cursor as good and add it to your personal spellfile: `zg`
+Open list with suggestions: `z=`
+Apply first suggestion: `1z=`
+
+TODO
+map toggle setlocal spell
+map next misspelled word
+map prev misspelled word
