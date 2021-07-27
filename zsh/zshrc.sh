@@ -121,9 +121,8 @@ precmd() {
 
   local prefix=$(echo -e '\u276f')
   #local prefix=$(echo -e '\u261e')
-  local bar='${$(topbar)//\%/%%}'
   local path="%(5~|%-1~/…/%3~|%4~)"
-  PROMPT="$bar$greyTile\$elapsedTime$reset$nl$nl$repoInfoOrUser$light$path$nl$default$prefix $reset"
+  PROMPT="$greyTile\$elapsedTime$reset$nl$nl$repoInfoOrUser$light$path$nl$default$prefix $reset"
 }
 
 playSound()
@@ -185,108 +184,4 @@ upstreamIndicator()
   fi
 }
 
-topbar_show ()
-{
-  ZSH_TOP_BAR=""
-}
-
-topbar_hide ()
-{
-  ZSH_TOP_BAR="hidden"
-  tput sc
-  tput cup 0 0
-  tput el
-  tput csr 0 $(($(tput lines)))
-  tput rc
-}
-
-set_topbar_title ()
-{
-  ZSH_TOP_BAR_TITLE="$1"
-}
-
-alias tbh='topbar_hide' 
-alias tbs='topbar_show' 
-alias tbt='set_topbar_title'
-
-topbar ()
-{
-  if [[ "$ZSH_TOP_BAR" = "hidden" ]]
-  then
-    return 0
-  fi
-
-  local default="$(tput setab 172)$(tput setaf 0)"
-  local fg="$(tput setaf 172)"
-  local accent="$(tput setab 32)$(tput setaf 15)"
-  local light="$(tput setab 179)$(tput setaf 0)"
-  local lighter="$(tput setab 222)$(tput setaf 0)"
-  local reset="$(tput sgr0)"
-  local nl=$'\n'
-  local width=$(tput cols)
-
-
-  local title=$ZSH_TOP_BAR_TITLE
-  if [[ -n $title ]]
-  then
-    local start="   "
-    local end=" "
-    local fullMinWidth=$((${#start} + ${#title} + ${#end} + 2))
-    local lightMinWidth=$fullMinWidth
-    local fill="$(printf "%${$(($width - ${#start} - ${#title} - ${#end} - 2))}s")"
-    full="$default$start$fill$reset$fg $title $default$end"
-    light=$full
-  else
-    local start=" "
-    local end=" "
-    local user=" $(whoami) "
-    local host=" $(hostname -s) "
-    local repoStatus=$(command git status --porcelain 2> /dev/null | tail -n1)
-    local branch=" $(git rev-parse --abbrev-ref HEAD 2> /dev/null)$(upstreamIndicator) "
-    local branchColor="$([[ -n $repoStatus ]] && echo $accent || echo $default)"
-
-    local fullMinWidth=$((${#start} + ${#user} + ${#host} + ${#branch} + ${#end} + 6))
-    local lightMinWidth=$((${#start} + ${#branch} + ${#end} + 4))
-    local fillFull="$(printf "%${$(($width - ${#start} - ${#user} - ${#host} - ${#branch} - ${#end} - 5))}s")"
-    local fillLight="$(printf "%${$(($width - ${#start} - ${#branch} - ${#end} - 3))}s")"
-
-    local full="$default$start$reset "
-    full+="$light$user$reset "
-    full+="$light$host$reset "
-    full+="$default$fillFull$reset "
-    full+="$branchColor$branch$reset "
-    full+="$default$end"
-
-    local light="$default$start$reset "
-    light+="$default$fillLight$reset "
-    light+="$branchColor$branch$reset "
-    light+="$default$end"
-  fi
-
-  local mini="$default$(printf "%${width}s")$reset"
-
-  # Save cursor position
-  tput sc
-  # Move cursor to 0,0
-  tput cup 0 0
-  # Change scroll region to exclude the first line
-  tput csr 1 $(($(tput lines) - 1))
-  if [ $width -lt $fullMinWidth ]
-  then
-    if [ $width -lt $lightMinWidth ]
-    then
-      echo -ne "$mini"
-    else
-      echo -ne "$light"
-    fi
-  else
-    echo -ne "$full"
-  fi
-
-  # Restore cursor position
-  tput rc
-}
-
-
 ZSH_SOUND=0
-ZSH_TOP_BAR="hidden"
