@@ -17,14 +17,21 @@ let g:NERDCustomDelimiters = { 'javascript.tsx': { 'left': '//', 'leftAlt': '{/*
 let g:NERDCustomDelimiters = { 'typescript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' } }
 let g:NERDTreeWinSize=50
 
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#fnamemod = ':t'
-let g:airline#extensions#tabline#left_sep = '|'
-let g:airline#extensions#tabline#left_alt_sep = '|'
-let airline#extensions#tabline#tabs_label = ''
-let airline#extensions#tabline#show_splits = 0
-let g:airline#extensions#tabline#show_close_button = 0
-let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+let g:airline#extensions#tabline#enabled = 0
+
+hi TabLineFill ctermfg=NONE ctermbg=172
+hi TabLine ctermfg=0 ctermbg=172
+hi TabLineSel ctermfg=15 ctermbg=32
+highlight TabLinePadding ctermbg=NONE ctermfg=NONE
+
+function! CurrentBufferTabLine()
+  let bufname = fnamemodify(expand("%"), ":~:.")
+  let bufnr = bufnr("%")
+  let name = (buflisted(bufnr) && &modifiable ? "%#TabLineSel# " : "%#TabLine# ") . bufname
+  return '%#TabLineFill# %#TabLinePadding# ' . name . ' %#TabLinePadding# %#TabLineFill#'
+endfunction
+set showtabline=2
+set tabline=%!CurrentBufferTabLine()
 "
 " Disable branch info in airline footer
 let g:airline_section_b = ''
@@ -78,5 +85,6 @@ let NERDTreeShowHidden = 1
 
 " Keep NERD Tree open in new tabs
 " autocmd BufWinEnter * NERDTreeMirror
+
 
 source $HOME/.dotfiles/vim/dev/mappings.vim

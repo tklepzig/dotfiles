@@ -12,9 +12,10 @@ nnoremap <silent> <Leader>wz :<C-U>execute 'resize ' . (v:count ? v:count : '')<
 nnoremap <silent> <Leader>wZ :<C-U>execute 'vertical resize ' . (v:count ? v:count : '')<cr>
 nnoremap <Leader>w<Tab> :wincmd p<cr>
 nnoremap <leader>wQ :mksession!\|:qa<cr>
-nnoremap <Leader>q :bd<CR>
+nnoremap <Leader>q :bunload<CR>
 nnoremap <Leader>Q :%bd\|e#\|bd#<CR>
-nnoremap <leader><Tab> :b#<cr>
+nnoremap <leader>1 :b#<cr>
+nnoremap <leader><Tab> :BufferNavigatorToggle<cr>
 nnoremap <leader><BS> :noh<cr>
 nmap H ^
 vmap H ^
