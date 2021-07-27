@@ -139,3 +139,9 @@ set wildmenu
 
 " Always show at least four lines above/below the cursor
 set scrolloff=4
+
+function! s:ToggleSpellCheck(lang = "en")
+  execute "setlocal spell! spelllang=" . a:lang
+endfunction
+
+command! -nargs=? SpellCheckToggle :call <SID>ToggleSpellCheck(<f-args>)

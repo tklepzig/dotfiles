@@ -59,15 +59,18 @@ nmap <S-j> 3<C-e>
 nmap <S-k> 3<C-y>
 
 " make search results appear in the middle of the screen
-:nnoremap n nzz
-:nnoremap N Nzz
-:nnoremap * *zz
-:nnoremap # #zz
-:nnoremap g* g*zz
-:nnoremap g# g#zz
+nnoremap n nzz
+nnoremap N Nzz
+nnoremap * *zz
+nnoremap # #zz
+nnoremap g* g*zz
+nnoremap g# g#zz
 
 " List contents of all registers (that typically contain pasteable text) (from https://superuser.com/a/656954)
 nnoremap <silent> "" :registers 0123456789abcdefghijklmnopqrstuvwxyz<CR>
 
 nnoremap <leader>u :UndotreeToggle \| UndotreeFocus<CR>
 
+" Jump to next/prev spell check issue
+nnoremap <leader>c ]s
+nnoremap <leader>C [s
