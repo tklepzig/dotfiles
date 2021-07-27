@@ -14,3 +14,15 @@ sudo vi /etc/pam.d/sudo
 # Add the following as the first line
 auth sufficient pam_tid.so
 ```
+
+## Hide Dock completely
+
+```
+defaults write com.apple.dock autohide-delay -float 1000; killall Dock
+```
+
+Back to defaults:
+
+```
+defaults delete com.apple.Dock autohide-delay && killall Dock
+```
