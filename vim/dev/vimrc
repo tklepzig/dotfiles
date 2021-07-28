@@ -28,10 +28,13 @@ highlight TabLineLight ctermfg=0 ctermbg=179
 function! CurrentBufferTabLine()
   let bufpath = expand("%:~:.:h")
   let bufname = expand("%:t")
+  if empty(bufname)
+    let bufname = "[No Name]"
+  endif
   let bufnr = bufnr("%")
   let modified = getbufinfo(bufnr)[0].changed
 
-  let path = (len(bufpath) > 0 && bufpath != ".") ? "%#TabLineLight# " . bufpath . " %#TabLinePadding# " : ""
+  let path = (!empty(bufpath) && bufpath != ".") ? "%#TabLineLight# " . bufpath . " %#TabLinePadding# " : ""
   let name = (modified ? "%#TabLineSel# " : "%#TabLine# ") . bufname . " %#TabLinePadding# "
 
   return '%#TabLineFill# %#TabLinePadding# ' . path . name . '%#TabLineFill#'
