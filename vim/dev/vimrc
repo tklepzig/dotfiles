@@ -22,13 +22,19 @@ let g:airline#extensions#tabline#enabled = 0
 hi TabLineFill ctermfg=NONE ctermbg=172
 hi TabLine ctermfg=0 ctermbg=172
 hi TabLineSel ctermfg=15 ctermbg=32
-highlight TabLinePadding ctermbg=NONE ctermfg=NONE
+highlight TabLinePadding ctermfg=NONE ctermbg=NONE 
+highlight TabLineLight ctermfg=0 ctermbg=179
 
 function! CurrentBufferTabLine()
-  let bufname = fnamemodify(expand("%"), ":~:.")
+  let bufpath = expand("%:~:.:h")
+  let bufname = expand("%:t")
   let bufnr = bufnr("%")
-  let name = (buflisted(bufnr) && &modifiable ? "%#TabLineSel# " : "%#TabLine# ") . bufname
-  return '%#TabLineFill# %#TabLinePadding# ' . name . ' %#TabLinePadding# %#TabLineFill#'
+  let modified = getbufinfo(bufnr)[0].changed
+
+  let path = (len(bufpath) > 0 && bufpath != ".") ? "%#TabLineLight# " . bufpath . " %#TabLinePadding# " : ""
+  let name = (modified ? "%#TabLineSel# " : "%#TabLine# ") . bufname . " %#TabLinePadding# "
+
+  return '%#TabLineFill# %#TabLinePadding# ' . path . name . '%#TabLineFill#'
 endfunction
 set showtabline=2
 set tabline=%!CurrentBufferTabLine()
