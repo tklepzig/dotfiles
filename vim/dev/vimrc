@@ -31,11 +31,9 @@ function! CurrentBufferTabLine()
   if empty(bufname)
     let bufname = "[No Name]"
   endif
-  let bufnr = bufnr("%")
-  let modified = getbufinfo(bufnr)[0].changed
 
   let path = (!empty(bufpath) && bufpath != ".") ? "%#TabLineLight# " . bufpath . " %#TabLinePadding# " : ""
-  let name = (modified ? "%#TabLineSel# " : "%#TabLine# ") . bufname . " %#TabLinePadding# "
+  let name = (&modified ? "%#TabLineSel# " : "%#TabLine# ") . bufname . " %#TabLinePadding# "
 
   return '%#TabLineFill# %#TabLinePadding# ' . path . name . '%#TabLineFill#'
 endfunction
