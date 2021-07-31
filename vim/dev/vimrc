@@ -24,6 +24,7 @@ hi TabLine ctermfg=0 ctermbg=172
 hi TabLineSel ctermfg=15 ctermbg=32
 highlight TabLinePadding ctermfg=NONE ctermbg=NONE
 highlight TabLineLight ctermfg=0 ctermbg=179
+highlight TabLineLighter ctermfg=0 ctermbg=222
 
 function! CurrentBufferTabLine()
   let bufpath = expand("%:~:.:h")
@@ -32,11 +33,11 @@ function! CurrentBufferTabLine()
     let bufname = "[No Name]"
   endif
 
-  let readonlySuffix = &readonly ? " [RO]" : ""
   let path = (!empty(bufpath) && bufpath != ".") ? "%#TabLineLight# " . bufpath . " %#TabLinePadding# " : ""
-  let name = (&modified ? "%#TabLineSel# " : "%#TabLine# ") . bufname . readonlySuffix . " %#TabLinePadding# "
+  let name = (&modified ? "%#TabLineSel# " : "%#TabLine# ") . bufname . " %#TabLinePadding# "
+  let readonlyHint = &readonly ? "%=%#TabLinePadding# %#TabLineLighter# Read-Only " : ""
 
-  return '%#TabLineFill# %#TabLinePadding# ' . path . name . '%#TabLineFill#'
+  return '%#TabLineFill# %#TabLinePadding# ' . path . name . '%#TabLineFill#' . readonlyHint
 endfunction
 set showtabline=2
 set tabline=%!CurrentBufferTabLine()
