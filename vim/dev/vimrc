@@ -22,7 +22,7 @@ let g:airline#extensions#tabline#enabled = 0
 hi TabLineFill ctermfg=NONE ctermbg=172
 hi TabLine ctermfg=0 ctermbg=172
 hi TabLineSel ctermfg=15 ctermbg=32
-highlight TabLinePadding ctermfg=NONE ctermbg=NONE 
+highlight TabLinePadding ctermfg=NONE ctermbg=NONE
 highlight TabLineLight ctermfg=0 ctermbg=179
 
 function! CurrentBufferTabLine()
@@ -32,16 +32,23 @@ function! CurrentBufferTabLine()
     let bufname = "[No Name]"
   endif
 
+  let readonlySuffix = &readonly ? " [RO]" : ""
   let path = (!empty(bufpath) && bufpath != ".") ? "%#TabLineLight# " . bufpath . " %#TabLinePadding# " : ""
-  let name = (&modified ? "%#TabLineSel# " : "%#TabLine# ") . bufname . " %#TabLinePadding# "
+  let name = (&modified ? "%#TabLineSel# " : "%#TabLine# ") . bufname . readonlySuffix . " %#TabLinePadding# "
 
   return '%#TabLineFill# %#TabLinePadding# ' . path . name . '%#TabLineFill#'
 endfunction
 set showtabline=2
 set tabline=%!CurrentBufferTabLine()
 "
-" Disable branch info in airline footer
+" Disable branch info
 let g:airline_section_b = ''
+
+" Disable file name
+let g:airline_section_c = ''
+
+" Disable file encoding
+let g:airline_section_y = ''
 
 let g:ctrlsf_auto_close = {
       \ "normal" : 0,
