@@ -55,7 +55,7 @@ HISTSIZE=10000
 SAVEHIST=20000
 setopt hist_ignore_all_dups
 setopt inc_append_history
-setopt auto_cd
+unsetopt auto_cd
 setopt nonomatch
 setopt prompt_subst
 
