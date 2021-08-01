@@ -41,6 +41,45 @@ function! CurrentBufferTabLine()
 endfunction
 set showtabline=2
 set tabline=%!CurrentBufferTabLine()
+
+function! CocStatus()
+  if !exists(':CocCommand')
+    return ''
+  endif
+
+  let info = get(b:, 'coc_diagnostic_info', {})
+  if empty(info) 
+    return ''
+  endif
+
+  let errorCount = get(info, "error", 0)
+  if empty(errorCount)
+    return ''
+  endif
+
+  let errorLineNr = printf(' (L%d) ', (info.lnums)[0])
+  return 'E:'.errorCount.errorLineNr
+endfunction
+
+function! MyStatusLine()
+  let modeMap={
+        \ 'n'  : 'Normal',
+        \ 'v'  : 'Visual',
+        \ 'V'  : 'V·Line',
+        \ "\<C-V>" : 'V·Block',
+        \ 'i'  : 'Insert',
+        \ 'R'  : 'R',
+        \ 'Rv' : 'V·Replace',
+        \ 'c'  : 'Command',
+        \}
+  let modeRaw = mode()
+  let mode = get(modeMap, modeRaw, '['.modeRaw.']')
+  let cocStatus = CocStatus()
+  return ' '.mode.'%=%p%% %l/%L : %v '.cocStatus
+endfunction
+
+set laststatus=2
+"set statusline=%!MyStatusLine()
 "
 " Disable branch info
 let g:airline_section_b = ''
