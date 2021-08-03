@@ -78,6 +78,7 @@ function! StatusLine()
   return statusline
 endfunction
 
+set noruler
 set noshowmode
 set laststatus=2
 set statusline=%!StatusLine()
