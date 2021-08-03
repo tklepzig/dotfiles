@@ -5,91 +5,12 @@ command Json set syntax=json | execute '%!python -m json.tool'
 let g:vim_markdown_toc_autofit = 1
 let g:vim_markdown_folding_disabled = 1
 
-let g:airline_theme = 'codedark'
-
 highlight GitGutterAdd    ctermfg=2
 highlight GitGutterChange ctermfg=3
 highlight GitGutterDelete ctermfg=1
 
 let g:gitgutter_map_keys = 0
-
-let g:NERDCustomDelimiters = { 'javascript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' } }
-let g:NERDCustomDelimiters = { 'typescript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' } }
-let g:NERDTreeWinSize=50
-
-let g:airline#extensions#tabline#enabled = 0
-
-hi TabLineFill ctermfg=NONE ctermbg=172
-hi TabLine ctermfg=0 ctermbg=172
-hi TabLineSel ctermfg=15 ctermbg=32
-highlight TabLinePadding ctermfg=NONE ctermbg=NONE
-highlight TabLineLight ctermfg=0 ctermbg=179
-highlight TabLineLighter ctermfg=0 ctermbg=222
-
-function! CurrentBufferTabLine()
-  let bufpath = expand("%:~:.:h")
-  let bufname = expand("%:t")
-  if empty(bufname)
-    let bufname = "[No Name]"
-  endif
-
-  let path = (!empty(bufpath) && bufpath != ".") ? "%#TabLineLight# " . bufpath . " %#TabLinePadding# " : ""
-  let name = (&modified ? "%#TabLineSel# " : "%#TabLine# ") . bufname . " %#TabLinePadding# "
-  let readonlyHint = &readonly ? "%=%#TabLinePadding# %#TabLineLighter# Read-Only " : ""
-
-  return '%#TabLineFill# %#TabLinePadding# ' . path . name . '%#TabLineFill#' . readonlyHint
-endfunction
-set showtabline=2
-set tabline=%!CurrentBufferTabLine()
-
-function! CocStatus()
-  if !exists(':CocCommand')
-    return ''
-  endif
-
-  let info = get(b:, 'coc_diagnostic_info', {})
-  if empty(info) 
-    return ''
-  endif
-
-  let errorCount = get(info, "error", 0)
-  if empty(errorCount)
-    return ''
-  endif
-
-  let errorLineNr = printf(' (L%d) ', (info.lnums)[0])
-  return 'E:'.errorCount.errorLineNr
-endfunction
-
-function! MyStatusLine()
-  let modeMap={
-        \ 'n'  : 'Normal',
-        \ 'v'  : 'Visual',
-        \ 'V'  : 'V·Line',
-        \ "\<C-V>" : 'V·Block',
-        \ 'i'  : 'Insert',
-        \ 'R'  : 'R',
-        \ 'Rv' : 'V·Replace',
-        \ 'c'  : 'Command',
-        \}
-  let modeRaw = mode()
-  let mode = get(modeMap, modeRaw, '['.modeRaw.']')
-  let cocStatus = CocStatus()
-  return ' '.mode.'%=%p%% %l/%L : %v '.cocStatus
-endfunction
-
-set laststatus=2
-"set statusline=%!MyStatusLine()
 "
-" Disable branch info
-let g:airline_section_b = ''
-
-" Disable file name
-let g:airline_section_c = ''
-
-" Disable file encoding
-let g:airline_section_y = ''
-
 let g:ctrlsf_auto_close = {
       \ "normal" : 0,
       \ "compact": 0
@@ -100,6 +21,10 @@ let g:ranger_map_keys = 0
 
 " Disable preview window (for e.g. :GFiles)
 let g:fzf_preview_window = ''
+
+let g:NERDCustomDelimiters = { 'javascript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' } }
+let g:NERDCustomDelimiters = { 'typescript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' } }
+let g:NERDTreeWinSize=50
 
 " NERDTree File highlighting
 function! NERDTreeHighlightFile(extension, fg, bg, guifg, guibg)
@@ -122,23 +47,15 @@ let NERDTreeDirArrows = 1
 let NERDTreeQuitOnOpen = 1
 let NERDTreeShowHidden = 1
 
-" How can I open NERDTree automatically when vim starts up on opening a directory?
-" This window is tab-specific, meaning it's used by all windows in the tab. This trick also prevents NERDTree from hiding when first selecting a file.
-" Note: Executing vim ~/some-directory will open NERDTree and a new edit window. exe 'cd '.argv()[0] sets the pwd of the new edit window to ~/some-directory
-"autocmd StdinReadPre * let s:std_in=1
-"autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | wincmd p | endif
+function! s:SpellCheck(bang, lang = "en")
+  let prefix = ""
+  if a:bang
+    let prefix = "no" 
+  endif
+  execute "setlocal " . prefix . "spell spelllang=" . a:lang
+endfunction
 
-" Open NERD Tree when no file specified.
-"autocmd StdinReadPre * let s:std_in=1
-"autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+command! -nargs=? -bang SpellCheck :call <SID>SpellCheck(<bang>0, <f-args>)
 
-
-" Close NERD Tree when everything else is closed.
-" disabled for convenience, if closing all is desired, enter :qa
-" autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-
-" Keep NERD Tree open in new tabs
-" autocmd BufWinEnter * NERDTreeMirror
-
-
+source $HOME/.dotfiles/vim/dev/statusline.vim
 source $HOME/.dotfiles/vim/dev/mappings.vim
