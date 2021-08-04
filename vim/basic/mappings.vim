@@ -72,7 +72,3 @@ nnoremap g# g#zz
 nnoremap <silent> "" :registers 0123456789abcdefghijklmnopqrstuvwxyz<CR>
 
 nnoremap <leader>u :UndotreeToggle \| UndotreeFocus<CR>
-
-" Jump to next/prev spell check issue
-nnoremap <leader>c ]s
-nnoremap <leader>C [s

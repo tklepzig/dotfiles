@@ -56,3 +56,7 @@ vmap <leader>f <Plug>CtrlSFVwordExec
 
 " ranger
 nnoremap <leader>e :Ranger <CR>
+
+" Jump to next/prev spell check issue
+nnoremap <leader>c ]s
+nnoremap <leader>C [s
