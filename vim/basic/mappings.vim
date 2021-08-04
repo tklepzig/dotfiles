@@ -15,7 +15,6 @@ nnoremap <leader>wQ :mksession!\|:qa<cr>
 nnoremap <Leader>q :bunload<CR>
 nnoremap <Leader>Q :%bd\|e#\|bd#<CR>
 nnoremap <leader>1 :b#<cr>
-nnoremap <leader><Tab> :BufferNavigatorToggle<cr>
 nnoremap <leader><BS> :noh<cr>
 nmap H ^
 vmap H ^

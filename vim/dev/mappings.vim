@@ -30,6 +30,7 @@ nnoremap <leader>vi :VimuxInspectRunner<cr>
 nnoremap <leader>vz :VimuxZoomRunner<cr>
 nnoremap <leader>vZ :VimuxZoomRunner<cr>:VimuxInspectRunner<cr>
 
+nnoremap <leader><Tab> :BufferNavigatorToggle<cr>
 
 "" Go to last active tab
 "au TabLeave * let g:lasttab = tabpagenr()

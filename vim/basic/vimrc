@@ -97,7 +97,6 @@ colorscheme codedark
 " TODO light theme
 "set background=light
 "colorscheme PaperColor
-" TODO: find a suitable airline theme
 
 " Use nicer highlight colors
 hi Search ctermfg=black ctermbg=228
