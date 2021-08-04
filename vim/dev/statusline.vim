@@ -50,11 +50,13 @@ function! StatusLine()
 
     let bufpath = fnamemodify(bufname(bufnr), ":~:.:h")
     let bufname = fnamemodify(bufname(bufnr), ":t")
+    if empty(bufname)
+      let bufname = "[No Name]"
+    endif
+
     let inactiveLine = '%#LcarsInactive# '
     let inactiveLine .= '%#LcarsGap# '
-    let inactiveLine .= '%#LcarsInactive# '
-    let inactiveLine .= bufpath.' '
-    let inactiveLine .= '%#LcarsGap# '
+    let inactiveLine .= (!empty(bufpath) && bufpath != ".") ? '%#LcarsInactive# '.bufpath.' %#LcarsGap# ' : ''
     let inactiveLine .= '%#LcarsInactive# '
     let inactiveLine .= bufname.' '
     let inactiveLine .= '%#LcarsGap# '
