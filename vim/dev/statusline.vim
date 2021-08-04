@@ -48,11 +48,16 @@ function! StatusLine()
     let bufFiletype = getbufvar(bufnr, '&filetype')
     let bufReadonly = getbufvar(bufnr, '&readonly')
 
+    let bufpath = fnamemodify(bufname(bufnr), ":~:.:h")
+    let bufname = fnamemodify(bufname(bufnr), ":t")
     let inactiveLine = '%#LcarsInactive# '
     let inactiveLine .= '%#LcarsGap# '
     let inactiveLine .= '%#LcarsInactive# '
-    let inactiveLine .= fnamemodify(bufname(bufnr), ":t").' '
-    let inactiveLine .= '%#LcarsGap#'
+    let inactiveLine .= bufpath.' '
+    let inactiveLine .= '%#LcarsGap# '
+    let inactiveLine .= '%#LcarsInactive# '
+    let inactiveLine .= bufname.' '
+    let inactiveLine .= '%#LcarsGap# '
     let inactiveLine .= '%='
     let inactiveLine .= bufFiletype.' '.(bufReadonly ? '%r ' : '')
     let inactiveLine .= '%#LcarsInactive#'
