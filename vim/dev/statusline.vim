@@ -59,6 +59,7 @@ function! StatusLine()
     let inactiveLine .= bufname.' '
     let inactiveLine .= '%#LcarsGap# '
     let inactiveLine .= '%='
+    let inactiveLine .= '        '
     let inactiveLine .= bufFiletype.' '.(bufReadonly ? '%r ' : '')
     let inactiveLine .= '%#LcarsInactive#'
     let inactiveLine .= ' %p%% '
