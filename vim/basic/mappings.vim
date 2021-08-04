@@ -55,8 +55,11 @@ nnoremap <leader>+ <C-i><CR>
 " Hint: enter :g/ (short for :g//p) to list all  occurences in the current file
 vnoremap // y/\V<C-r>=escape(@",'/\')<CR><CR>
 
-nmap <S-j> 3<C-e>
-nmap <S-k> 3<C-y>
+nnoremap <S-j> 3<C-e>
+vnoremap <S-j> 3<C-e>
+
+nnoremap <S-k> 3<C-y>
+vnoremap <S-k> 3<C-y>
 
 " make search results appear in the middle of the screen
 nnoremap n nzz
