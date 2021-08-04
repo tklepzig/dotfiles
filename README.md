@@ -18,7 +18,6 @@ Add these via `--profiles=`, e.g. `--profiles=web,python`
 | python  | Python Support             |
 | ruby    | Ruby Support               |
 | writing | Distraction free writing   |
-| or      | ZIMPL Support              |
 | viml    | VimL/Vimscript Development |
 
 ## Complete system setup including dotfiles
