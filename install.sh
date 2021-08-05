@@ -2,6 +2,7 @@
 
 set -e
 dotfilesDir=$HOME/.dotfiles
+vimProfilesPath=$HOME/.vim-profiles
 
 if [ ! -f $dotfilesDir/install.shared.sh ]
 then
@@ -11,15 +12,11 @@ else
 fi
 
 skipClone=0
-profiles="basic"
 for var in "$@"
 do
   case "$var" in
     "--skip-clone")
       skipClone=1
-      ;;
-    --profiles=*)
-      profiles="${profiles},${var#*=}"
       ;;
   esac
 done
@@ -30,8 +27,8 @@ addPlugin() {
 }
 
 installProfiles() {
-  local IFS=','
-  for profile in $profiles
+  touch $vimProfilesPath
+  while read profile
   do
     info "Installing Profile $profile..."
     addPlugin $profile
@@ -41,7 +38,7 @@ installProfiles() {
       source $dotfilesDir/vim/$profile/install.sh
     fi
     success "Done."
-  done
+  done < <(echo "basic" && cat $vimProfilesPath)
 }
 
 info "Searching for Git..."

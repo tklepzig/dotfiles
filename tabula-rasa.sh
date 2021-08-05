@@ -19,6 +19,14 @@ info "Removing ~/.plugins.vim..."
 rm $HOME/.plugins.vim
 success "Done."
 
+info "Removing ~/.plugins.custom.vim..."
+rm $HOME/.plugins.custom.vim
+success "Done."
+
+info "Removing ~/.vim-profiles..."
+rm $HOME/.vim-profiles
+success "Done."
+
 info "Removing ~/.vim..."
 rm -rf $HOME/.vim
 success "Done."

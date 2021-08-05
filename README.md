@@ -4,12 +4,11 @@ My dotfiles for git, zsh, tmux and vim.
 
 ## Installation
 
-    curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh \
-    | bash -s -- --profiles=[comma separated list of profiles, see below]
+    curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh | bash -s
 
-## Profiles
+## Vim Profiles
 
-Add these via `--profiles=`, e.g. `--profiles=web,python`
+Add these to the file `~/.vim-profiles`, one profile name per line.
 
 | Name    | Details                    |
 | ------- | -------------------------- |
