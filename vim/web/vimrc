@@ -4,5 +4,14 @@ let test#strategy = "vimux"
 autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
 autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx
 
-source $HOME/.dotfiles/vim/web/coc.vim
+let g:coc_global_extensions = g:coc_global_extensions + [
+      \'coc-json',
+      \'coc-tsserver',
+      \'coc-prettier',
+      \'coc-eslint',
+      \'coc-styled-components',
+      \'https://github.com/andys8/vscode-jest-snippets',
+      \'https://github.com/akamud/vscode-javascript-snippet-pack',
+      \]
+
 source $HOME/.dotfiles/vim/web/mappings.vim

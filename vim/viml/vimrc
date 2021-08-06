@@ -1,3 +1,5 @@
+let g:coc_global_extensions = g:coc_global_extensions + ['coc-vimlsp']
+
 function! SourceSelection() range
   let tmpFile = tempname()
   call writefile(getline(a:firstline, a:lastline), l:tmpFile)
