@@ -8,7 +8,7 @@ My dotfiles for git, zsh, tmux and vim.
 
 ## Vim Profiles
 
-Add these to the file `~/.vim-profiles`, one profile name per line.
+Add these to `~/.vim-profiles`, one profile name per line.
 
 | Name    | Details                    |
 | ------- | -------------------------- |
