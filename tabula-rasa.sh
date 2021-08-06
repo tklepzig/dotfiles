@@ -1,5 +1,11 @@
 #!/bin/bash
 
+read -p "Please confirm (Type 'yes') " confirm
+if [ "$confirm" != "yes" ]
+then
+  exit 1 
+fi
+
 set -e
 dotfilesDir=$HOME/.dotfiles
 
