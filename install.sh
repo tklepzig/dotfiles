@@ -92,12 +92,6 @@ addLinkToFile "$HOME/.plugins.vim" "$HOME/.vimrc"
 
 installProfiles
 
-info "Linking coc settings..."
-mkdir -p $HOME/.vim
-ln -sf $dotfilesDir/vim/coc-settings.json $HOME/.vim/coc-settings.json
-success "Done."
-
-
 if [ ! -d "$HOME/.vim/autoload/plug.vim" ]
 then
   info "Installing vim-plug..."
