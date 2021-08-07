@@ -70,12 +70,6 @@ bindkey -v
 
 bindkey -M viins 'jj' vi-cmd-mode
 bindkey -M vicmd v edit-command-line
-#bindkey '^R' history-incremental-search-backward
-# use vi binding instead:
-# /  history search backward
-# ?  history search forward
-# n  repeat search
-# N  rev repeat search
 
 # start typing + [Up-Arrow] - fuzzy find history forward
 if [[ "${terminfo[kcuu1]}" != "" ]]; then

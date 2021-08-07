@@ -26,11 +26,11 @@ addPlugin() {
 \"pluginfile/g' $HOME/.plugins.vim > $HOME/.plugins.vim.tmp && mv $HOME/.plugins.vim.tmp $HOME/.plugins.vim
 }
 
-installProfiles() {
+installVimProfiles() {
   touch $vimProfilesPath
   while read profile
   do
-    info "Installing Profile $profile..."
+    info "Installing Vim Profile $profile..."
     addPlugin $profile
     addLinkToFile "$dotfilesDir/vim/$profile/vimrc" "$HOME/.vimrc"
     if [ -f $dotfilesDir/vim/$profile/install.sh ]
@@ -57,6 +57,32 @@ then
   success "Done."
 fi
 
+if [ ! -f "$HOME/.plugins.custom.vim" ]
+then
+  echo "Plug 'any/vim-plugin'" > $HOME/.plugins.custom.vim
+fi
+
+if [ -f "$HOME/.plugins.vim" ]
+then
+  mv $HOME/.plugins.vim $HOME/.plugins.vim.backup
+fi
+cp $dotfilesDir/vim/plugins.vim $HOME/.plugins.vim
+addLinkToFile "$HOME/.plugins.vim" "$HOME/.vimrc"
+
+installVimProfiles
+
+if [ ! -d "$HOME/.vim/autoload/plug.vim" ]
+then
+  info "Installing vim-plug..."
+  curl -fLo $HOME/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim>/dev/null 2>&1
+  success "Done."
+fi
+
+info "Installing vim plugins..."
+# "echo" to suppress the "Please press ENTER to continue...
+echo | vim +PlugInstall +qall > /dev/null 2>&1
+success "Done."
+
 addLinkToFile "$dotfilesDir/zsh/zshrc.sh" "$HOME/.zshrc"
 
 info "Creating zsh sounds directory..."
@@ -77,32 +103,6 @@ checkInstallation exa
 checkInstallation tmux
 checkInstallation zsh
 checkInstallation lynx
-
-if [ ! -f "$HOME/.plugins.custom.vim" ]
-then
-  echo "Plug 'any/vim-plugin'" > $HOME/.plugins.custom.vim
-fi
-
-if [ -f "$HOME/.plugins.vim" ]
-then
-  mv $HOME/.plugins.vim $HOME/.plugins.vim.backup
-fi
-cp $dotfilesDir/vim/plugins.vim $HOME/.plugins.vim
-addLinkToFile "$HOME/.plugins.vim" "$HOME/.vimrc"
-
-installProfiles
-
-if [ ! -d "$HOME/.vim/autoload/plug.vim" ]
-then
-  info "Installing vim-plug..."
-  curl -fLo $HOME/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim>/dev/null 2>&1
-  success "Done."
-fi
-
-info "Installing vim plugins..."
-# "echo" to suppress the "Please press ENTER to continue...
-echo | vim +PlugInstall +qall > /dev/null 2>&1
-success "Done."
 
 info "Configuring Git..."
 $dotfilesDir/git/git-config.sh
