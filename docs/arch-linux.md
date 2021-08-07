@@ -53,3 +53,4 @@ i3wm i3status (dmenu | dmenu-xft)
 - https://wiki.archlinux.org/title/Installation_guide
 - https://wiki.archlinux.org/title/GRUB
 - https://www.arcolinuxd.com/5-the-actual-installation-of-arch-linux-phase-1-bios/
+- https://averagelinuxuser.com/ubuntu-vs-arch-linux/
