@@ -48,6 +48,10 @@ pacman -S noto-fonts
 
 i3wm i3status (dmenu | dmenu-xft)
 
+ToDo
+Encrypt hdd (LUKS)
+gnome tweak tools
+
 # See also
 
 - https://wiki.archlinux.org/title/Installation_guide
