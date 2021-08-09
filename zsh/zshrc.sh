@@ -71,18 +71,28 @@ bindkey -v
 bindkey -M viins 'jj' vi-cmd-mode
 bindkey -M vicmd v edit-command-line
 
-# start typing + [Up-Arrow] - fuzzy find history forward
-if [[ "${terminfo[kcuu1]}" != "" ]]; then
+
+# search history with current entered text via up/down (starts-with search)
+if isOS darwin
+then
+  up='^[[A'
+  down='^[[B'
+#else if ...
+  #up=''
+  #down=''
+fi
+
+if [ $up ] && [ $down ]
+then
   autoload -U up-line-or-beginning-search
   zle -N up-line-or-beginning-search
-  bindkey "${terminfo[kcuu1]}" up-line-or-beginning-search
-fi
-# start typing + [Down-Arrow] - fuzzy find history backward
-if [[ "${terminfo[kcud1]}" != "" ]]; then
+  bindkey "$up" up-line-or-beginning-search
+
   autoload -U down-line-or-beginning-search
   zle -N down-line-or-beginning-search
-  bindkey "${terminfo[kcud1]}" down-line-or-beginning-search
+  bindkey "$down" down-line-or-beginning-search
 fi
+
 
 preexec() {
   if isOS darwin
