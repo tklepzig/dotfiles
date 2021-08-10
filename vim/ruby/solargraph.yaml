@@ -1,20 +1,17 @@
 include:
   - "**/*.rb"
-exclude:
-  - spec/**/*
-  - test/**/*
-  - vendor/**/*
-  - ".bundle/**/*"
+exclude: []
 require: []
 domains: []
 reporters:
   - rubocop
+  - require_not_found
 formatter:
   rubocop:
     cops: safe
     except: []
     only: []
     extra_args: []
-require_paths: []
+require_paths: ["lib", "app", "test", "spec"]
 plugins: []
 max_files: 5000
