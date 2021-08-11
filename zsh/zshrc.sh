@@ -53,11 +53,14 @@ zstyle ':vcs_info:*' enable git
 HISTFILE=$HOME/.history
 HISTSIZE=10000
 SAVEHIST=20000
+
 setopt hist_ignore_all_dups
 setopt inc_append_history
-unsetopt auto_cd
 setopt nonomatch
 setopt prompt_subst
+setopt correct
+
+unsetopt auto_cd
 
 cdpath=(~ ~/development)
 
