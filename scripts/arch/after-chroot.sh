@@ -4,7 +4,7 @@ then
 	exit
 fi
 
-ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+ln -s /usr/share/zoneinfo/Europe/Berlin /etc/localtime
 hwclock --systohc
 echo "Setting root password..."
 passwd

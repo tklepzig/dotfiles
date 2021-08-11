@@ -41,7 +41,7 @@ _Maybe:_ edit /etc/resolv.conf and use content from another working linux (?? --
 
 pacman -S xorg-server xorg-apps xorg-xinit gdm gnome-control-center network-manager-applet
 systemctl enable gdm
-systemctl startgdm
+systemctl start gdm
 
 _Maybe:_ pacman -S ttf-ubuntu-font-family
 pacman -S noto-fonts
@@ -51,6 +51,7 @@ i3wm i3status (dmenu | dmenu-xft)
 ToDo
 Encrypt hdd (LUKS)
 gnome tweak tools
+_Seems not to work:_ Resolution during installation: Add this parameter to kernel line on boot screen (press <kbd>e</kbd>): `nomodeset video=2048x1152`
 
 # See also
 
