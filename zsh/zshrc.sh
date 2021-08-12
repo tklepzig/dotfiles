@@ -23,9 +23,11 @@ default=%F{172}
 light=%F{179}
 lighter=%F{222}
 accent=%F{32}
+warning=%F{196}
 accentTile=%K{32}%F{15}
 defaultTile=%K{172}%F{0}
 greyTile=%K{238}%F{7}
+warningTile=%K{124}%F{255}
 reset=%f%k%b
 
 source $dotfilesDir/zsh/alias.sh
@@ -68,6 +70,8 @@ cdpath=(~ ~/development)
 export EDITOR=vim
 export VISUAL=vim
 
+export SPROMPT="$warningTile $reset Correct $warning%R$reset to $default%r$reset? (nyae)$reset"
+ 
 # Use vi-style zsh bindings
 bindkey -v
 
