@@ -1,4 +1,13 @@
-"autocmd! User GoyoEnter Limelight
-"autocmd! User GoyoLeave Limelight!
+function! s:ToggleWrite(bang)
+  if a:bang
+    Goyo! | Limelight!
+    set nowrap nolinebreak
+    colorscheme codedark
+  else
+    set wrap linebreak
+    colorscheme seoul256
+    Goyo | Limelight
+  endif
+endfunction
 
-command! Write Goyo | colorscheme seoul256 | Limelight
+command! -bang Write :call <SID>ToggleWrite(<bang>0)
