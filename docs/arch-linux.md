@@ -67,7 +67,8 @@ _Seems not to work:_ Resolution during installation: Add this parameter to kerne
   - `mount /dev/sda1 /mnt/boot`
 - Install packages: pacstrap /mnt ...
 - Generate fstab, chroot, locales, ...
-- Install grub and os-prober: `pacman -S grub os-prober`
+- Install grub: `pacman -S grub`
+  > Maybe also os-prober, but leave it out as first...
 - Get UUID of encrypted partition: `lsblk --output +UUID`
 - Add kernel parameter to `GRUB_CMDLINE_LINUX` in `/etc/default/grub`: `cryptdevice=UUID={UUID of encrypted partition}:cryptroot`
 - Add encrypt hook to `HOOKS` in `/etc/mkinitcpio.conf` (Add at the end): `HOOKS="... encrypt"`
