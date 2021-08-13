@@ -15,7 +15,7 @@
 
 # Installation
 
-    pacstrap /mnt base linux linux-firmware vim iwd terminus-font man-db man-pages texinfo networkmanager
+    pacstrap /mnt base base-devel linux linux-firmware vim iwd terminus-font man-db man-pages texinfo networkmanager
 
 # GRUB Bootloader
 
@@ -49,9 +49,32 @@ pacman -S noto-fonts
 i3wm i3status (dmenu | dmenu-xft)
 
 ToDo
-Encrypt hdd (LUKS)
 gnome tweak tools
 _Seems not to work:_ Resolution during installation: Add this parameter to kernel line on boot screen (press <kbd>e</kbd>): `nomodeset video=2048x1152`
+
+# Encrypted
+
+- Create partitions: cfdisk
+- Encrypt root partition: cryptsetup -s 512 -h sha512 -y -i 5000 luksFormat /dev/sda2
+- Unlock partition: cryptsetup open /dev/sda2 cryptroot
+  > To close it: `cryptsetup close cryptroot`
+- Format partitions:
+  - `mkfs.ext4 /dev/sda1`
+  - `mkfs.ext4 /dev/mapper/cryptroot`
+- Mount the partitions:
+  - `mount /dev/mapper/cryptroot /mnt`
+  - `mkdir /mnt/boot`
+  - `mount /dev/sda1 /mnt/boot`
+- Install packages: pacstrap /mnt ...
+- Generate fstab, chroot, locales, ...
+- Install grub and os-prober: `pacman -S grub os-prober`
+- Get UUID of encrypted partition: `lsblk --output +UUID`
+- Add kernel parameter to `GRUB_CMDLINE_LINUX` in `/etc/default/grub`: `cryptdevice=UUID={UUID of encrypted partition}:cryptroot`
+- Add encrypt hook to `HOOKS` in `/etc/mkinitcpio.conf` (Add at the end): `HOOKS="... encrypt"`
+- Regenerate initramfs image (ramdisk): `mkinitcpio -p linux`
+- Install grub: `grub-install --recheck /dev/sda`
+- Save its config file: `grub-mkconfig -o /boot/grub/grub.cfg`
+- Reboot
 
 # See also
 
@@ -59,3 +82,4 @@ _Seems not to work:_ Resolution during installation: Add this parameter to kerne
 - https://wiki.archlinux.org/title/GRUB
 - https://www.arcolinuxd.com/5-the-actual-installation-of-arch-linux-phase-1-bios/
 - https://averagelinuxuser.com/ubuntu-vs-arch-linux/
+- https://www.howtoforge.com/tutorial/how-to-install-arch-linux-with-full-disk-encryption/
