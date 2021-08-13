@@ -65,9 +65,9 @@ Recreate grub config:
 
 # Encrypted
 
-- Create partitions: cfdisk
-- Encrypt root partition: cryptsetup -s 512 -h sha512 -y -i 5000 luksFormat /dev/sda2
-- Unlock partition: cryptsetup open /dev/sda2 cryptroot
+- Create partitions: `cfdisk`
+- Encrypt root partition: `cryptsetup -s 512 -h sha512 -y -i 5000 luksFormat /dev/sda2`
+- Unlock partition: `cryptsetup open /dev/sda2 cryptroot`
   > To close it: `cryptsetup close cryptroot`
 - Format partitions:
   - `mkfs.ext4 /dev/sda1`
