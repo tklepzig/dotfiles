@@ -52,6 +52,17 @@ ToDo
 gnome tweak tools
 _Seems not to work:_ Resolution during installation: Add this parameter to kernel line on boot screen (press <kbd>e</kbd>): `nomodeset video=2048x1152`
 
+# GRUB Hidden Menu
+
+Edit /etc/default/grub:
+
+    GRUB_TIMEOUT=0
+    GRUB_TIMEOUT_STYLE='hidden'
+
+Recreate grub config:
+
+    grub-mkconfig -o /boot/grub/grub.cfg
+
 # Encrypted
 
 - Create partitions: cfdisk
