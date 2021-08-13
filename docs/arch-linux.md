@@ -88,6 +88,20 @@ Recreate grub config:
 - Save its config file: `grub-mkconfig -o /boot/grub/grub.cfg`
 - Reboot
 
+## Use keyfile in addition to passphrase
+
+- Recommended: Format usb stick with ext4
+- Create key file: `dd bs=512 count=4 if=/dev/random of=/media/usbstick/mykeyfile iflag=fullblock`
+- Deny access to others than root: `chmod 600 /etc/mykeyfile`
+- Add a keyslot for the keyfile to the LUKS header: `cryptsetup luksAddKey /dev/sda2 /media/usbstick/mykeyfile`
+  > Manually unlocking a partition using a keyfile: `cryptsetup open /dev/sda2 cryptroot --key-file /media/usbstick/mykeyfile`
+- Unlocking the root partition at boot
+  - Edit `MODULES` in `/etc/mkinitcpio.conf` and add the usb stick's filesystem (e.g. ext4 or vfat): `MODULES=(ext4)`
+  - Regenerate initramfs image (ramdisk): `mkinitcpio -p linux`
+  - Add kernel parameter to `GRUB_CMDLINE_LINUX` in `/etc/default/grub`: `cryptkey=UUID={UUID of usb stick partition with key file}:auto:/absolute/path/to/mykeyfile`
+  - Update grub config file: `grub-mkconfig -o /boot/grub/grub.cfg`
+- See also https://wiki.archlinux.org/title/Dm-crypt/Device_encryption#Keyfiles
+
 # See also
 
 - https://wiki.archlinux.org/title/Installation_guide
