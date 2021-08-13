@@ -80,8 +80,14 @@ bindkey -M vicmd v edit-command-line
 
 
 # search history with current entered text via up/down (starts-with search)
-up='^[[A'
-down='^[[B'
+if isOS darwin
+then
+  up='^[[A'
+  down='^[[B'
+else
+  up='^[OA'
+  down='^[OB'
+fi
 
 if [ $up ] && [ $down ]
 then
