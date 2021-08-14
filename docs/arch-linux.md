@@ -1,21 +1,61 @@
-# Adjust font
+# 1. Setup live system
 
-    ls /usr/share/kbd/consolefonts
     setfont ter-128n
 
-# Set keyboard layout
+> List available fonts: `ls /usr/share/kbd/consolefonts`
 
-    ls /usr/share/kbd/keymaps/\*_/_.map.gz
     loadkeys de-latin1
 
-# Network
+> List available keyboard layouts: `ls /usr/share/kbd/keymaps/\*_/_.map.gz`
 
     iwctl
     station wlan0 ...
 
-# Installation
+    todo
+
+# 2. Install linux and additional packages
 
     pacstrap /mnt base base-devel linux linux-firmware vim iwd terminus-font man-db man-pages texinfo networkmanager
+
+## 2a. Encryption
+
+    todo
+
+# 3. Setup system while chrooted
+
+    arch-chroot /mnt
+    todo
+
+## 3a. BIOS
+
+    pacman -S grub
+    grub-install --recheck /dev/sda
+    grub-mkconfig -o /boot/grub/grub.cfg
+
+## 3b. UEFI
+
+Ensure the EFI system partition is mounted (`/efi`)
+
+    pacman -S grub efibootmgr
+    grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB
+    grub-mkconfig -o /boot/grub/grub.cfg
+
+# 4. Reboot
+
+# 5. Post-Installation
+
+    pacman -S xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts
+
+> Also `network-manager-applet`?
+
+    systemctl enable gdm
+    systemctl enable NetworkManager
+    systemctl enable iwd
+    systemctl enable systemd-resolved
+
+    systemctl start gdm
+
+---
 
 # GRUB Bootloader
 
@@ -37,20 +77,20 @@ systemctl enable NetworkManager
 systemctl enable iwd
 systemctl enable systemd-resolved
 
-_Maybe:_ edit /etc/resolv.conf and use content from another working linux (?? --> improve this tip)
+~~Edit /etc/resolv.conf and use content from another working linux (?? --> improve this tip)~~
 
 pacman -S xorg-server xorg-apps xorg-xinit gdm gnome-control-center network-manager-applet
 systemctl enable gdm
 systemctl start gdm
 
-_Maybe:_ pacman -S ttf-ubuntu-font-family
+~~pacman -S ttf-ubuntu-font-family~~
 pacman -S noto-fonts
 
 i3wm i3status (dmenu | dmenu-xft)
 
 ToDo
 gnome tweak tools
-_Seems not to work:_ Resolution during installation: Add this parameter to kernel line on boot screen (press <kbd>e</kbd>): `nomodeset video=2048x1152`
+~~Resolution during installation: Add this parameter to kernel line on boot screen (press <kbd>e</kbd>): `nomodeset video=2048x1152`~~
 
 # GRUB Hidden Menu
 
@@ -62,6 +102,14 @@ Edit /etc/default/grub:
 Recreate grub config:
 
     grub-mkconfig -o /boot/grub/grub.cfg
+
+# UEFI
+
+- Ensure we're chrooted into the system
+- Ensure the EFI system partition is mounted (`/efi`)
+- `pacman -S grub efibootmgr`
+- `grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB`
+- `grub-mkconfig -o /boot/grub/grub.cfg`
 
 # Encrypted
 
@@ -79,7 +127,9 @@ Recreate grub config:
 - Install packages: pacstrap /mnt ...
 - Generate fstab, chroot, locales, ...
 - Install grub: `pacman -S grub`
-  > Maybe also os-prober, but leave it out as first...
+  > - Install os-prober as well if other operating systems should be auto-detected
+  > - If you get the following output: `Warning: os-prober will not be executed to detect other bootable partitions`:
+  >   - Edit `/etc/default/grub` and add/uncomment `GRUB_DISABLE_OS_PROBER=false`
 - Get UUID of encrypted partition: `lsblk --output +UUID`
 - Add kernel parameter to `GRUB_CMDLINE_LINUX` in `/etc/default/grub`: `cryptdevice=UUID={UUID of encrypted partition}:cryptroot`
 - Add encrypt hook to `HOOKS` in `/etc/mkinitcpio.conf` (Add at the end): `HOOKS="... encrypt"`
