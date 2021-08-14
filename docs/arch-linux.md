@@ -1,4 +1,4 @@
-# 1. Setup live system
+# Setup live system
 
     setfont ter-128n
 
@@ -13,26 +13,34 @@
 
     todo
 
-# 2. Install linux and additional packages
+# Install linux and additional packages
 
     pacstrap /mnt base base-devel linux linux-firmware vim iwd terminus-font man-db man-pages texinfo networkmanager
 
-## 2a. Encryption
+## Without encryption
 
     todo
 
-# 3. Setup system while chrooted
+## With encrypted root partition
+
+    todo
+
+### Use a keyfile in addition to passphrase
+
+    todo
+
+# Setup system while chrooted
 
     arch-chroot /mnt
     todo
 
-## 3a. BIOS
+## BIOS
 
     pacman -S grub
     grub-install --recheck /dev/sda
     grub-mkconfig -o /boot/grub/grub.cfg
 
-## 3b. UEFI
+## UEFI
 
 Ensure the EFI system partition is mounted (`/efi`)
 
@@ -40,9 +48,9 @@ Ensure the EFI system partition is mounted (`/efi`)
     grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB
     grub-mkconfig -o /boot/grub/grub.cfg
 
-# 4. Reboot
+# Reboot
 
-# 5. Post-Installation
+# Post-Installation
 
     pacman -S xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts
 
