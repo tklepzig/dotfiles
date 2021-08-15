@@ -1,52 +1,103 @@
 # Setup live system
 
-    setfont ter-128n
-
-> List available fonts: `ls /usr/share/kbd/consolefonts`
+Keyboard layout
 
     loadkeys de-latin1
 
 > List available keyboard layouts: `ls /usr/share/kbd/keymaps/\*_/_.map.gz`
 
-    iwctl
-    station wlan0 ...
+Font
 
-    todo
+    setfont ter-128n
+
+> List available fonts: `ls /usr/share/kbd/consolefonts`
+
+Connect to WiFi
+
+    iwctl
+    station list
+    station <wlan interface> connect <SSID>
+
+Date and Time
+
+    timedatectl set-ntp true
+    timedatectl set-timezone Europe/Berlin
+
+# Partitioning
+
+    cfdisk
+
+Create boot partition
+
+_BIOS_
+
+    /boot, type: ext4, 512M
+
+_UEFI_
+
+    /efi, type: EFI System Parttion, 512M
+
+Create swap partition
+
+    TODO (even necessary?, size?)
+
+Create root partition
+
+    /mnt, type ext4, All remaining space
+
+_Without encryption_
+
+    mounting, formatting,...
+
+_With encrypted root partition_
+
+    mounting, formatting,...
 
 # Install linux and additional packages
 
     pacstrap /mnt base base-devel linux linux-firmware vim iwd terminus-font man-db man-pages texinfo networkmanager
 
-## Without encryption
+# Setup system
 
-    todo
+Generate fstab
 
-## With encrypted root partition
+    genfstab -U /mnt >> /mnt/etc/fstab
 
-    todo
-
-### Use a keyfile in addition to passphrase
-
-    todo
-
-# Setup system while chrooted
+Chroot into system
 
     arch-chroot /mnt
-    todo
 
-## BIOS
+Date and Time
+
+Localization
+
+Network Configuration
+
+Root Password
+
+Boot Loader
+
+TODO: Encryption stuff
+
+_BIOS_
 
     pacman -S grub
     grub-install --recheck /dev/sda
     grub-mkconfig -o /boot/grub/grub.cfg
 
-## UEFI
+_UEFI_
 
 Ensure the EFI system partition is mounted (`/efi`)
 
     pacman -S grub efibootmgr
     grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB
     grub-mkconfig -o /boot/grub/grub.cfg
+
+> - Install os-prober as well if other operating systems should be auto-detected
+> - If you get the following output: `Warning: os-prober will not be executed to detect other bootable partitions`:
+>   - Edit `/etc/default/grub` and add/uncomment `GRUB_DISABLE_OS_PROBER=false`
+
+TODO: `If you have an Intel or AMD CPU, enable microcode updates in addition`
 
 # Reboot
 
