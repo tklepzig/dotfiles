@@ -60,14 +60,6 @@ vnoremap <S-j> 3<C-e>
 nnoremap <S-k> 3<C-y>
 vnoremap <S-k> 3<C-y>
 
-" make search results appear in the middle of the screen
-nnoremap n nzz
-nnoremap N Nzz
-nnoremap * *zz
-nnoremap # #zz
-nnoremap g* g*zz
-nnoremap g# g#zz
-
 " List contents of all registers (that typically contain pasteable text) (from https://superuser.com/a/656954)
 nnoremap <silent> "" :registers 0123456789abcdefghijklmnopqrstuvwxyz<CR>
 
