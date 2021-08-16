@@ -27,25 +27,20 @@ Date and Time
 
     cfdisk
 
-Create boot partition
+## Create boot partition
 
-_BIOS_
+    BIOS: /boot, type: ext4, 512M
+    UEFI: /efi, type: EFI System Parttion, 512M
 
-    /boot, type: ext4, 512M
-
-_UEFI_
-
-    /efi, type: EFI System Parttion, 512M
-
-Create swap partition
+## Create swap partition
 
     TODO (even necessary?, size? --> size of RAM + sqrt(size of RAM))
 
-Create root partition
+## Create root partition
 
     /mnt, type ext4, All remaining space
 
-_Without encryption_
+### Without encryption
 
 Format partitions
 
@@ -63,7 +58,7 @@ Mount the partitions
       UEFI: mount /dev/sda1 /mnt/efi
       TODO: swap
 
-_With encrypted root partition_
+### With encrypted root partition
 
 Encrypt root partition
 
@@ -91,11 +86,11 @@ Mount the partitions
       UEFI: mount /dev/sda1 /mnt/efi
       TODO: swap
 
-# Install linux and additional packages
+# Package Installation
 
     pacstrap /mnt base base-devel linux linux-firmware vim iwd terminus-font man-db man-pages texinfo networkmanager
 
-# Setup system
+# System Setup
 
 Generate fstab
 
@@ -130,9 +125,9 @@ Root Password
 
     passwd
 
-Boot Loader
+## Boot Loader
 
-_With Encryption_
+### With Encryption
 
 Do the following after `pacman -S grub` and before `grub-install`:
 
@@ -152,13 +147,13 @@ Regenerate initramfs image (ramdisk)
 
     mkinitcpio -p linux
 
-_BIOS_
+### BIOS
 
     pacman -S grub
     grub-install --recheck /dev/sda
     grub-mkconfig -o /boot/grub/grub.cfg
 
-_UEFI_
+### UEFI
 
     pacman -S grub efibootmgr
     grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB
@@ -191,17 +186,41 @@ TODO: gnome tweak tools
 
 ## Add keyfile in addition to passphrase to decrypt root partition
 
-- Recommended: Format usb stick with ext4
-- Create key file: `dd bs=512 count=4 if=/dev/random of=/media/usbstick/mykeyfile iflag=fullblock`
-- Deny access to others than root: `chmod 600 /etc/mykeyfile`
-- Add a keyslot for the keyfile to the LUKS header: `cryptsetup luksAddKey /dev/sda2 /media/usbstick/mykeyfile`
-  > Manually unlocking a partition using a keyfile: `cryptsetup open /dev/sda2 cryptroot --key-file /media/usbstick/mykeyfile`
-- Unlocking the root partition at boot
-  - Edit `MODULES` in `/etc/mkinitcpio.conf` and add the usb stick's filesystem (e.g. ext4 or vfat): `MODULES=(ext4)`
-  - Regenerate initramfs image (ramdisk): `mkinitcpio -p linux`
-  - Add kernel parameter to `GRUB_CMDLINE_LINUX` in `/etc/default/grub`: `cryptkey=UUID={UUID of usb stick partition with key file}:auto:/absolute/path/to/mykeyfile`
-  - Update grub config file: `grub-mkconfig -o /boot/grub/grub.cfg`
-- See also
+Recommended: Format usb stick with ext4
+
+Create key file
+
+    dd bs=512 count=4 if=/dev/random of=/media/usbstick/mykeyfile iflag=fullblock
+
+Deny access to others than root
+
+    chmod 600 /etc/mykeyfile
+
+Add a keyslot for the keyfile to the LUKS header
+
+    cryptsetup luksAddKey /dev/sda2 /media/usbstick/mykeyfile
+
+> Manually unlocking a partition using a keyfile
+>
+> `cryptsetup open /dev/sda2 cryptroot --key-file /media/usbstick/mykeyfile`
+
+### Unlocking the root partition at boot
+
+Edit `MODULES` in `/etc/mkinitcpio.conf` and add the usb stick's filesystem (e.g. ext4 or vfat)
+
+    MODULES=(ext4)
+
+Regenerate initramfs image (ramdisk)
+
+    mkinitcpio -p linux
+
+Add kernel parameter to `GRUB_CMDLINE_LINUX` in `/etc/default/grub`
+
+    cryptkey=UUID={UUID of usb stick partition with key file}:auto:/absolute/path/to/mykeyfile
+
+Update grub config file
+
+    grub-mkconfig -o /boot/grub/grub.cfg
 
 ## GRUB Hidden Menu
 
