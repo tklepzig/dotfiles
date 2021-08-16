@@ -1,4 +1,6 @@
-# Setup live system
+# Install Arch Linux
+
+### Setup live system
 
 Keyboard layout
 
@@ -23,24 +25,24 @@ Date and Time
     timedatectl set-ntp true
     timedatectl set-timezone Europe/Berlin
 
-# Create partitions and mount them
+### Create partitions and mount them
 
     cfdisk
 
-## Create boot partition
+#### Create boot partition
 
     BIOS: /boot, type: ext4, 512M
     UEFI: /efi, type: EFI System Parttion, 512M
 
-## Create swap partition
+#### Create swap partition
 
     TODO (even necessary?, size? --> size of RAM + sqrt(size of RAM))
 
-## Create root partition
+#### Create root partition
 
     /mnt, type ext4, All remaining space
 
-### Without encryption
+##### Without encryption
 
 Format partitions
 
@@ -58,7 +60,7 @@ Mount the partitions
       UEFI: mount /dev/sda1 /mnt/efi
       TODO: swap
 
-### With encrypted root partition
+##### With encrypted root partition
 
 Encrypt root partition
 
@@ -86,11 +88,11 @@ Mount the partitions
       UEFI: mount /dev/sda1 /mnt/efi
       TODO: swap
 
-# Package Installation
+### Package Installation
 
     pacstrap /mnt base base-devel linux linux-firmware vim iwd terminus-font man-db man-pages texinfo networkmanager
 
-# System Setup
+### System Setup
 
 Generate fstab
 
@@ -125,9 +127,9 @@ Root Password
 
     passwd
 
-## Boot Loader
+#### Boot Loader
 
-### With Encryption
+##### With Encryption
 
 Do the following after `pacman -S grub` and before `grub-install`:
 
@@ -147,13 +149,13 @@ Regenerate initramfs image (ramdisk)
 
     mkinitcpio -p linux
 
-### BIOS
+##### BIOS
 
     pacman -S grub
     grub-install --recheck /dev/sda
     grub-mkconfig -o /boot/grub/grub.cfg
 
-### UEFI
+##### UEFI
 
     pacman -S grub efibootmgr
     grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB
@@ -165,9 +167,7 @@ Regenerate initramfs image (ramdisk)
 
 TODO: `If you have an Intel or AMD CPU, enable microcode updates in addition`
 
-# Reboot
-
-# Post-Installation
+### Post-Installation
 
     pacman -S xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts
 
@@ -182,9 +182,9 @@ TODO: gnome tweak tools
 
     systemctl start gdm
 
-# Additional stuff
+### Additional stuff
 
-## Add keyfile in addition to passphrase to decrypt root partition
+#### Add keyfile in addition to passphrase to decrypt root partition
 
 Recommended: Format usb stick with ext4
 
@@ -204,7 +204,7 @@ Add a keyslot for the keyfile to the LUKS header
 >
 > `cryptsetup open /dev/sda2 cryptroot --key-file /media/usbstick/mykeyfile`
 
-### Unlocking the root partition at boot
+##### Unlocking the root partition at boot
 
 Edit `MODULES` in `/etc/mkinitcpio.conf` and add the usb stick's filesystem (e.g. ext4 or vfat)
 
@@ -222,7 +222,7 @@ Update grub config file
 
     grub-mkconfig -o /boot/grub/grub.cfg
 
-## GRUB Hidden Menu
+#### GRUB Hidden Menu
 
 Edit /etc/default/grub:
 
@@ -233,7 +233,7 @@ Recreate grub config:
 
     grub-mkconfig -o /boot/grub/grub.cfg
 
-## How to power off properly
+#### How to power off properly
 
 One of these:
 
@@ -241,7 +241,7 @@ One of these:
     $ halt -p
     $ shutdown -h now
 
-# References
+### References
 
 - https://wiki.archlinux.org/title/Installation_guide
 - https://wiki.archlinux.org/title/GRUB
