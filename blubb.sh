@@ -36,7 +36,7 @@ digits[:]="00000,00100,00000,00100,00000"
 
 renderTimeString() {
   timeString=$(date "+%H:%M")
-  timeRow=$(($(tput lines) / 2 - 2))
+  timeRow=$(($(tput lines) / 2 - 3))
   timeCol=$(($(tput cols) / 2 - 15))
 
   for (( i=0; i<${#timeString}; i++ )); do
