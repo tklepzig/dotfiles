@@ -9,7 +9,6 @@ reset="$(tput sgr0)"
 nl=$'\n'
 width=$(tput cols)
 
-tmux set -g status
 tput civis
 
 # Test Area to build digit strings
@@ -67,12 +66,16 @@ bar="$default$(printf "%${width}s")$reset"
 tput cup 0 0
 echo -ne "$bar"
 
-tput cup $(tput lines) 0
-echo -ne "$bar"
-
 while true
 do
   renderTimeString
+
+  ssid="$(iwgetid -r)"
+  tput cup $(($(tput lines) - 3)) $(($(tput cols) / 2 - ${#ssid} / 2))
+  echo -ne "$ssid"
+  strength="$(iwconfig wlp0s20f3 | awk -F'[ =]+' '/Signal level/ {print $7}')"
+  tput cup $(($(tput lines) - 2)) $(($(tput cols) / 2 - ${#strength} / 2))
+  echo -ne "$strength"
 
   if read -k1 -s -t 1
   then
@@ -80,4 +83,10 @@ do
   fi  
 done
 
-tmux set -g status
+# TODO
+# Appointments
+# GH notifications
+# Mails
+# SSID (iwgetid -r)
+# Signal strength (iwconfig <interface> | awk -F'[ =]+' '/Signal level/ {print $7}', https://eyesaas.com/wi-fi-signal-strength/)
+
