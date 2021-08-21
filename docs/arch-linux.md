@@ -175,7 +175,20 @@ Regenerate initramfs image (ramdisk)
 > - If you get the following output: `Warning: os-prober will not be executed to detect other bootable partitions`:
 >   - Edit `/etc/default/grub` and add/uncomment `GRUB_DISABLE_OS_PROBER=false`
 
-TODO: `If you have an Intel or AMD CPU, enable microcode updates in addition`
+##### Enable processor-specific microcode updates
+
+Depending on the processor, install the suitable package
+
+> Get processor info: `cat /proc/cpuinfo`
+
+    AMD
+        pacman -S amd-ucode
+    Intel
+        pacman -S intel-ucode
+
+Recreate grub config
+
+    grub-mkconfig -o /boot/grub/grub.cfg
 
 ### Post-Installation
 
@@ -183,7 +196,7 @@ TODO: `If you have an Intel or AMD CPU, enable microcode updates in addition`
     systemctl enable --now wpa_supplicant
     systemctl enable --now systemd-resolved
 
-    pacman -S xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts gnome-tweaks gnome-keyring
+    pacman -S xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts gnome-tweaks gnome-keyring gnome-terminal nautilus
 
     systemctl enable --now gdm
 
@@ -199,15 +212,15 @@ Create key file
 
 Deny access to others than root
 
-    chmod 600 /etc/mykeyfile
+    chmod 600 /media/usbstick/mykeyfile
 
 Add a keyslot for the keyfile to the LUKS header
 
-    cryptsetup luksAddKey /dev/sda2 /media/usbstick/mykeyfile
+    cryptsetup luksAddKey /dev/sda3 /media/usbstick/mykeyfile
 
 > Manually unlocking a partition using a keyfile
 >
-> `cryptsetup open /dev/sda2 cryptroot --key-file /media/usbstick/mykeyfile`
+> `cryptsetup open /dev/sda3 cryptroot --key-file /media/usbstick/mykeyfile`
 
 ##### Unlocking the root partition at boot
 
@@ -223,18 +236,17 @@ Add kernel parameter to `GRUB_CMDLINE_LINUX` in `/etc/default/grub`
 
     cryptkey=UUID={UUID of usb stick partition with key file}:auto:/absolute/path/to/mykeyfile
 
-Update grub config file
+Recreate grub config
 
     grub-mkconfig -o /boot/grub/grub.cfg
 
 #### GRUB Hidden Menu
 
-Edit /etc/default/grub:
+    vim /etc/default/grub
+        GRUB_TIMEOUT=0
+        GRUB_TIMEOUT_STYLE=hidden
 
-    GRUB_TIMEOUT=0
-    GRUB_TIMEOUT_STYLE='hidden'
-
-Recreate grub config:
+Recreate grub config
 
     grub-mkconfig -o /boot/grub/grub.cfg
 
