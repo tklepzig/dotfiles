@@ -31,8 +31,10 @@ Date and Time
 
 #### Create boot partition
 
-    BIOS: /boot, type: ext4, 512M
-    UEFI: /efi, type: EFI System Parttion, 512M
+    BIOS
+        /boot, type: ext4, 512M
+    UEFI
+        /efi, type: EFI System Parttion, 512M
 
 #### Create swap partition
 
@@ -46,18 +48,22 @@ Date and Time
 
 Format partitions
 
-    BIOS: mkfs.ext4 /dev/sda1
-    UEFI: mkfs.fat -F32 /dev/sda1
+    BIOS
+        mkfs.ext4 /dev/sda1
+    UEFI
+        mkfs.fat -F32 /dev/sda1
     mkswap /dev/sda2
     mkfs.ext4 /dev/sda3
 
 Mount the partitions
 
       mount /dev/sda3 /mnt
-      BIOS: mkdir /mnt/boot
-      UEFI: mkdir /mnt/efi
-      BIOS: mount /dev/sda1 /mnt/boot
-      UEFI: mount /dev/sda1 /mnt/efi
+      BIOS
+          mkdir /mnt/boot
+          mount /dev/sda1 /mnt/boot
+      UEFI
+          mkdir /mnt/efi
+          mount /dev/sda1 /mnt/efi
       swapon /dev/sda2
 
 ##### With encrypted root partition
@@ -74,18 +80,22 @@ Unlock partition
 
 Format partitions
 
-    BIOS: mkfs.ext4 /dev/sda1
-    UEFI: mkfs.fat -F32 /dev/sda1
+    BIOS
+        mkfs.ext4 /dev/sda1
+    UEFI
+        mkfs.fat -F32 /dev/sda1
     mkswap /dev/sda2
     mkfs.ext4 /dev/mapper/cryptroot
 
 Mount the partitions
 
       mount /dev/mapper/cryptroot /mnt
-      BIOS: mkdir /mnt/boot
-      UEFI: mkdir /mnt/efi
-      BIOS: mount /dev/sda1 /mnt/boot
-      UEFI: mount /dev/sda1 /mnt/efi
+      BIOS
+          mkdir /mnt/boot
+          mount /dev/sda1 /mnt/boot
+      UEFI
+          mkdir /mnt/efi
+          mount /dev/sda1 /mnt/efi
       swapon /dev/sda2
 
 ### Package Installation
