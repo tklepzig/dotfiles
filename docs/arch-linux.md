@@ -100,7 +100,7 @@ Mount the partitions
 
 ### Package Installation
 
-    pacstrap /mnt base base-devel linux linux-firmware vim iwd terminus-font man-db man-pages texinfo networkmanager
+    pacstrap /mnt base base-devel linux linux-firmware vim terminus-font man-db man-pages texinfo networkmanager wpa_supplicant
 
 ### System Setup
 
@@ -179,18 +179,13 @@ TODO: `If you have an Intel or AMD CPU, enable microcode updates in addition`
 
 ### Post-Installation
 
-    pacman -S xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts
+    systemctl enable --now NetworkManager
+    systemctl enable --now wpa_supplicant
+    systemctl enable --now systemd-resolved
 
-TODO: gnome tweak tools
+    pacman -S xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts gnome-tweaks gnome-keyring
 
-> Also `network-manager-applet`?
-
-    systemctl enable gdm
-    systemctl enable NetworkManager
-    systemctl enable iwd
-    systemctl enable systemd-resolved
-
-    systemctl start gdm
+    systemctl enable --now gdm
 
 ### Additional stuff
 
@@ -250,6 +245,18 @@ One of these:
     $ systemctl poweroff
     $ halt -p
     $ shutdown -h now
+
+#### Using iwctl instead of `networkmanager` and `wpa_supplicant`
+
+Instead of installing `networkmanager` and `wpa_supplicant`:
+
+    pacman -S iwd
+
+    vim /etc/iwd/main.conf
+        [General]
+        EnableNetworkConfiguration=true
+
+    systemctl enable --now iwd
 
 ### References
 
