@@ -25,6 +25,12 @@ Date and Time
     timedatectl set-ntp true
     timedatectl set-timezone Europe/Berlin
 
+### BIOS or UEFI?
+
+    ls /sys/firmware/efi/efivars
+
+If the command shows the directory without error, then the system is booted in UEFI mode, otherwise in BIOS.
+
 ### Create partitions and mount them
 
     cfdisk
@@ -34,11 +40,13 @@ Date and Time
     BIOS
         /boot, type: ext4, 512M
     UEFI
-        /efi, type: EFI System Parttion, 512M
+        /efi, type: EFI System Partition, 512M
 
 #### Create swap partition
 
     [SWAP], type: Linux Swap, Size of RAM + sqrt(Size of RAM)
+
+> Get memory info: `cat /proc/meminfo`
 
 #### Create root partition
 
