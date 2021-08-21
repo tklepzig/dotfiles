@@ -99,6 +99,11 @@ else
 fi
 addLinkToFile "$dotfilesDir/tmux/tmux.conf" "$HOME/.tmux.conf"
 
+if isProgramInstalled kitty
+then
+  addLinkToFile "$dotfilesDir/kitty/kitty.conf" "$HOME/.config/kitty/kitty.conf" "include"
+fi
+
 checkInstallation exa
 checkInstallation tmux
 checkInstallation zsh

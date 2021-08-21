@@ -20,6 +20,7 @@ removePatternFromFile ".zshrc" ".dotfiles"
 removePatternFromFile ".vimrc" ".dotfiles"
 removePatternFromFile ".vimrc" ".plugins.vim"
 removePatternFromFile ".tmux.conf" ".dotfiles"
+removePatternFromFile ".config/kitty/kitty.conf" ".dotfiles"
 
 info "Removing ~/.plugins.vim..."
 rm $HOME/.plugins.vim

@@ -65,6 +65,7 @@ error()
 addLinkToFile() {
   src=$1
   target=$2
+  cmd=${3:-source}
   info "Adding link to $target..."
   if [ ! -f $target ]
   then
@@ -72,7 +73,7 @@ addLinkToFile() {
   fi
   if ! grep -q "$src" $target
   then
-    echo "source $src" >> $target;
+    echo "$cmd $src" >> $target;
   fi
   success "Done."
 }
