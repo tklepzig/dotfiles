@@ -21,6 +21,9 @@ vmap H ^
 nmap L $
 vmap L $
 
+nnoremap <silent> <leader>! :ExecuteSelection<cr>
+vnoremap <silent> <leader>! :ExecuteSelection<cr>
+
 nnoremap <leader>w1 :1wincmd w<cr>
 nnoremap <leader>w2 :2wincmd w<cr>
 nnoremap <leader>w3 :3wincmd w<cr>

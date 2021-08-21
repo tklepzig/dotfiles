@@ -90,6 +90,11 @@ autocmd FocusGained,BufEnter,CursorHold,CursorHoldI * if mode() != 'c' | checkti
 autocmd FileChangedShellPost *
   \ echohl WarningMsg | echo "File changed on disk. Buffer reloaded." | echohl None
 
+function! s:ExecuteSelection() range
+  execute "!"."clear && ".join(getline(a:firstline, a:lastline), " && ")
+endfunction
+command! -range ExecuteSelection <line1>,<line2>call <SID>ExecuteSelection()
+
 source $HOME/.dotfiles/vim/basic/mappings.vim
 
 colorscheme codedark
