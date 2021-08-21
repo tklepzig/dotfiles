@@ -36,7 +36,7 @@ Date and Time
 
 #### Create swap partition
 
-    TODO (even necessary?, size? --> size of RAM + sqrt(size of RAM))
+    [SWAP], type: Linux Swap, Size of RAM + sqrt(Size of RAM)
 
 #### Create root partition
 
@@ -48,27 +48,27 @@ Format partitions
 
     BIOS: mkfs.ext4 /dev/sda1
     UEFI: mkfs.fat -F32 /dev/sda1
-    mkfs.ext4 /dev/sda2
-    TODO: swap
+    mkswap /dev/sda2
+    mkfs.ext4 /dev/sda3
 
 Mount the partitions
 
-      mount /dev/sda2 /mnt
+      mount /dev/sda3 /mnt
       BIOS: mkdir /mnt/boot
       UEFI: mkdir /mnt/efi
       BIOS: mount /dev/sda1 /mnt/boot
       UEFI: mount /dev/sda1 /mnt/efi
-      TODO: swap
+      swapon /dev/sda2
 
 ##### With encrypted root partition
 
 Encrypt root partition
 
-    cryptsetup -s 512 -h sha512 -y -i 5000 luksFormat /dev/sda2
+    cryptsetup -s 512 -h sha512 -y -i 5000 luksFormat /dev/sda3
 
 Unlock partition
 
-    cryptsetup open /dev/sda2 cryptroot
+    cryptsetup open /dev/sda3 cryptroot
 
 > To close it: `cryptsetup close cryptroot`
 
@@ -76,8 +76,8 @@ Format partitions
 
     BIOS: mkfs.ext4 /dev/sda1
     UEFI: mkfs.fat -F32 /dev/sda1
+    mkswap /dev/sda2
     mkfs.ext4 /dev/mapper/cryptroot
-    TODO: swap
 
 Mount the partitions
 
@@ -86,7 +86,7 @@ Mount the partitions
       UEFI: mkdir /mnt/efi
       BIOS: mount /dev/sda1 /mnt/boot
       UEFI: mount /dev/sda1 /mnt/efi
-      TODO: swap
+      swapon /dev/sda2
 
 ### Package Installation
 
