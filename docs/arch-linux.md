@@ -39,28 +39,22 @@ If the command shows the directory without error, then the system is booted in U
 
     cfdisk
 
-#### Create boot partition
-
-    BIOS
-        /boot, type: ext4, 512M
-    UEFI
-        /efi, type: EFI System Partition, 512M
-
-#### Create swap partition
-
-    [SWAP], type: Linux Swap, Size of RAM + sqrt(Size of RAM)
-
 > Get memory info
 >
 >     cat /proc/meminfo
 
-#### Create root partition
+#### Without encryption
 
-    /mnt, type ext4, All remaining space
+Create
 
-##### Without encryption
+    BIOS
+        /dev/sda1 -> /boot, type: ext4, 512M
+    UEFI
+        /dev/sda1 -> /efi, type: EFI System Partition, 512M
+    /dev/sda2 -> [SWAP], type: Linux Swap, Size of RAM + sqrt(Size of RAM)
+    /dev/sda3 -> /mnt, type ext4, All remaining space
 
-Format partitions
+Format
 
     BIOS
         mkfs.ext4 /dev/sda1
@@ -69,7 +63,7 @@ Format partitions
     mkswap /dev/sda2
     mkfs.ext4 /dev/sda3
 
-Mount the partitions
+Mount
 
       mount /dev/sda3 /mnt
       BIOS
@@ -80,43 +74,66 @@ Mount the partitions
           mount /dev/sda1 /mnt/efi
       swapon /dev/sda2
 
-##### With encrypted root partition
+#### With encrypted root partition
+
+Create
+
+    BIOS
+        /dev/sda1 -> /boot, type: ext4, 512M
+        /dev/sda2 -> [SWAP], type: Linux Swap, Size of RAM + sqrt(Size of RAM)
+        /dev/sda3 -> /mnt, type ext4, All remaining space
+    UEFI
+        /dev/sda1 -> /efi, type: EFI System Partition, 512M
+        /dev/sda2 -> /boot, type: ext4, 512M
+        /dev/sda3 -> [SWAP], type: Linux Swap, Size of RAM + sqrt(Size of RAM)
+        /dev/sda4 -> /mnt, type ext4, All remaining space
 
 Encrypt root partition
 
-    cryptsetup -s 512 -h sha512 -y -i 5000 luksFormat /dev/sda3
+    BIOS
+        cryptsetup -s 512 -h sha512 -y -i 5000 luksFormat /dev/sda3
+    UEFI
+        cryptsetup -s 512 -h sha512 -y -i 5000 luksFormat /dev/sda4
 
-Unlock partition
+Unlock root partition
 
-    cryptsetup open /dev/sda3 cryptroot
+    BIOS
+        cryptsetup open /dev/sda3 cryptroot
+    UEFI
+        cryptsetup open /dev/sda4 cryptroot
 
 > To close it
 >
 >     cryptsetup close cryptroot
 
-Format partitions
+Format
 
     BIOS
         mkfs.ext4 /dev/sda1
+        mkswap /dev/sda2
     UEFI
         mkfs.fat -F32 /dev/sda1
-    mkswap /dev/sda2
+        mkfs.ext4 /dev/sda2
+        mkswap /dev/sda3
     mkfs.ext4 /dev/mapper/cryptroot
 
-Mount the partitions
+Mount
 
-      mount /dev/mapper/cryptroot /mnt
-      BIOS
-          mkdir /mnt/boot
-          mount /dev/sda1 /mnt/boot
-      UEFI
-          mkdir /mnt/efi
-          mount /dev/sda1 /mnt/efi
-      swapon /dev/sda2
+    mount /dev/mapper/cryptroot /mnt
+    BIOS
+        mkdir /mnt/boot
+        mount /dev/sda1 /mnt/boot
+        swapon /dev/sda2
+    UEFI
+        mkdir /mnt/efi
+        mount /dev/sda1 /mnt/efi
+        mkdir /mnt/boot
+        mount /dev/sda2 /mnt/boot
+        swapon /dev/sda3
 
 ### Package Installation
 
-    pacstrap /mnt base base-devel linux linux-firmware vim terminus-font man-db man-pages texinfo networkmanager wpa_supplicant
+    pacstrap /mnt base base-devel linux linux-firmware vim terminus-font man-db man-pages texinfo networkmanager wpa_supplicant xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts gnome-tweaks gnome-keyring gnome-terminal nautilus
 
 ### System Setup
 
@@ -210,13 +227,16 @@ Recreate grub config
 
 ### Post-Installation
 
+Enable and start systemd services
+
     systemctl enable --now NetworkManager
     systemctl enable --now wpa_supplicant
     systemctl enable --now systemd-resolved
-
-    pacman -S xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts gnome-tweaks gnome-keyring gnome-terminal nautilus
-
     systemctl enable --now gdm
+
+Users and Groups
+
+    TODO
 
 ### Additional stuff
 
@@ -234,11 +254,11 @@ Deny access to others than root
 
 Add a keyslot for the keyfile to the LUKS header
 
-    cryptsetup luksAddKey /dev/sda3 /media/usbstick/mykeyfile
+    cryptsetup luksAddKey /dev/sda[3/4] /media/usbstick/mykeyfile
 
 > Manually unlocking a partition using a keyfile
 >
->     cryptsetup open /dev/sda3 cryptroot --key-file /media/usbstick/mykeyfile
+>     cryptsetup open /dev/sda[3/4] cryptroot --key-file /media/usbstick/mykeyfile
 
 ##### Unlocking the root partition at boot
 
