@@ -6,13 +6,17 @@ Keyboard layout
 
     loadkeys de-latin1
 
-> List available keyboard layouts: `ls /usr/share/kbd/keymaps/\*_/_.map.gz`
+> List available keyboard layouts
+>
+>     ls /usr/share/kbd/keymaps/\*_/_.map.gz
 
 Font
 
     setfont ter-128n
 
-> List available fonts: `ls /usr/share/kbd/consolefonts`
+> List available fonts
+>
+>     ls /usr/share/kbd/consolefonts
 
 Connect to WiFi
 
@@ -46,7 +50,9 @@ If the command shows the directory without error, then the system is booted in U
 
     [SWAP], type: Linux Swap, Size of RAM + sqrt(Size of RAM)
 
-> Get memory info: `cat /proc/meminfo`
+> Get memory info
+>
+>     cat /proc/meminfo
 
 #### Create root partition
 
@@ -84,7 +90,9 @@ Unlock partition
 
     cryptsetup open /dev/sda3 cryptroot
 
-> To close it: `cryptsetup close cryptroot`
+> To close it
+>
+>     cryptsetup close cryptroot
 
 Format partitions
 
@@ -153,7 +161,7 @@ Do the following after `pacman -S grub` and before `grub-install`:
 
 Get UUID of encrypted partition
 
-    lsblk --output +UUID
+    lsblk -o +UUID
 
 Add kernel parameter to `GRUB_CMDLINE_LINUX` in `/etc/default/grub`
 
@@ -187,7 +195,9 @@ Regenerate initramfs image (ramdisk)
 
 Depending on the processor, install the suitable package
 
-> Get processor info: `cat /proc/cpuinfo`
+> Get processor info
+>
+>     cat /proc/cpuinfo
 
     AMD
         pacman -S amd-ucode
@@ -228,7 +238,7 @@ Add a keyslot for the keyfile to the LUKS header
 
 > Manually unlocking a partition using a keyfile
 >
-> `cryptsetup open /dev/sda3 cryptroot --key-file /media/usbstick/mykeyfile`
+>     cryptsetup open /dev/sda3 cryptroot --key-file /media/usbstick/mykeyfile
 
 ##### Unlocking the root partition at boot
 
@@ -257,6 +267,11 @@ Recreate grub config
 Recreate grub config
 
     grub-mkconfig -o /boot/grub/grub.cfg
+
+> Show GRUB menu on boot:
+>
+> - BIOS: Hold down Shift while GRUB is loading
+> - UEFI: Press Esc several times while GRUB is loading
 
 #### How to power off properly
 
