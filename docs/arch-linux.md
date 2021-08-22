@@ -165,7 +165,7 @@ Get UUID of encrypted partition
 
 Add kernel parameter to `GRUB_CMDLINE_LINUX` in `/etc/default/grub`
 
-    cryptdevice=UUID={UUID of encrypted partition}:cryptroot
+    cryptdevice=UUID=<UUID of encrypted partition>:cryptroot
 
 Add encrypt hook to `HOOKS` in `/etc/mkinitcpio.conf` (Add at the end)
 
@@ -252,7 +252,7 @@ Regenerate initramfs image (ramdisk)
 
 Add kernel parameter to `GRUB_CMDLINE_LINUX` in `/etc/default/grub`
 
-    cryptkey=UUID={UUID of usb stick partition with key file}:auto:/absolute/path/to/mykeyfile
+    cryptkey=UUID=<UUID of usb stick partition with key file>:auto:/absolute/path/to/mykeyfile
 
 Recreate grub config
 
