@@ -67,6 +67,12 @@ alias nid='npm install -D'
 alias nr='npm run'
 alias niwt="f(){ npm i \$1 && npm i -D @types/\$1; unset -f f }; f"
 
+if isProgramInstalled pacman
+then
+    alias pmi='pacman -S'
+    alias pmu='pacman -R'
+fi
+
 # TODO
 # add auto-increment number as prefix to every file (remove -n to apply changes)
 #rename -n 's/(.+)/our $i; sprintf("%02d-$1", 1+$i++)/e' *

@@ -18,7 +18,3 @@ Add these to `~/.vim-profiles`, one profile name per line.
 | ruby    | Ruby Support               |
 | writing | Distraction free writing   |
 | viml    | VimL/Vimscript Development |
-
-## Complete system setup including dotfiles
-
-    curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.system.sh | bash -s

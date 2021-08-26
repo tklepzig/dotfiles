@@ -9,15 +9,14 @@ isOS()
     return 1;
 }
 
-isUbuntu()
+isArch()
 {
-    shopt -s nocasematch
-    if [[ `uname -v` == *"ubuntu"* ]]
-    then
-        return 0;
-    fi
+  if [ -f "/etc/arch-release" ]
+  then
+    return 0;
+  fi
 
-    return 1;
+  return 1;
 }
 
 isProgramInstalled()
@@ -66,25 +65,25 @@ addLinkToFile() {
   src=$1
   target=$2
   cmd=${3:-source}
-  info "Adding link to $target..."
   if [ ! -f $target ]
   then
     touch $target
   fi
   if ! grep -q "$src" $target
   then
+    info "Adding link to $target..."
     echo "$cmd $src" >> $target;
+    success "Done."
   fi
-  success "Done."
 }
 
 removePatternFromFile() {
   target=$1
   pattern=$2
-  info "Remove link from $target... with pattern $pattern"
   if [ -f $HOME/$target ]
   then
+    info "Remove link from $target... with pattern $pattern"
     sed /$pattern/d $HOME/$target > $HOME/$target.tmp && mv $HOME/$target.tmp $HOME/$target
+    success "Done."
   fi
-  success "Done."
 }

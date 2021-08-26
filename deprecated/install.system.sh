@@ -3,6 +3,17 @@
 set -e
 dotfilesDir=$HOME/.dotfiles
 
+isUbuntu()
+{
+    shopt -s nocasematch
+    if [[ `uname -v` == *"ubuntu"* ]]
+    then
+        return 0;
+    fi
+
+    return 1;
+}
+
 if [ ! -f $dotfilesDir/install.shared.sh ]
 then
   source <(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.shared.sh)

@@ -4,12 +4,7 @@ set -e
 dotfilesDir=$HOME/.dotfiles
 vimProfilesPath=$HOME/.vim-profiles
 
-if [ ! -f $dotfilesDir/install.shared.sh ]
-then
-  source <(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.shared.sh)
-else
-  source $dotfilesDir/install.shared.sh
-fi
+source <(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/shared.sh)
 
 skipClone=0
 for var in "$@"
