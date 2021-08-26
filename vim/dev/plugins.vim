@@ -1,5 +1,6 @@
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
+Plug 'fladson/vim-kitty'
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'PhilRunninger/nerdtree-visual-selection'
