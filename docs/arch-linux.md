@@ -260,7 +260,7 @@ Additional Software
     makepkg -si
     cd -
 
-    yay -S google-chrome insomnia seafile-client winff
+    yay -S google-chrome seafile-client winff
 
 > Upgrade with yay:
 >
