@@ -236,25 +236,22 @@ Enable and start systemd services
 
 Additional Software
 
-    pacman -S gvim zsh tmux seafile-client xdotool gparted sshfs pwgen xclip the_silver_searcher ranger peco tig fzf lynx exa winff easytag audacity gimp vlc
-
-asdf
+    pacman -S gvim zsh tmux xclip the_silver_searcher ranger tig fzf lynx
+    pacman -S seafile-client xdotool gparted exa peco sshfs pwgen winff easytag audacity gimp vlc
 
     git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf
     cd $HOME/.asdf
     git checkout "$(git describe --abbrev=0 --tags)"
-
-AUR Helper
+    cd -
 
     git clone https://aur.archlinux.org/yay-git.git
     cd yay
     makepkg -si
-
-Install Google Chrome
+    cd -
 
     yay -S google-chrome
 
-> Upgrade:
+> Upgrade with yay:
 >
 >     yay -Syu
 
