@@ -133,7 +133,7 @@ Mount
 
 ### Package Installation
 
-    pacstrap /mnt base base-devel linux linux-firmware gvim terminus-font man-db man-pages texinfo networkmanager wpa_supplicant xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts gnome-tweaks gnome-keyring
+    pacstrap /mnt base base-devel linux linux-firmware gvim zsh tmux terminus-font man-db man-pages texinfo networkmanager wpa_supplicant xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts gnome-tweaks gnome-keyring
 
 ### System Setup
 
@@ -234,11 +234,21 @@ Enable and start systemd services
     systemctl enable --now systemd-resolved
     systemctl enable gdm
 
+Add non-privileged user
+
+    useradd -m -s /usr/bin/zsh <username>
+    passwd <username>
+
+Add user to sudoers file
+
+    visudo
+        <username>   ALL=(ALL) ALL
+
 Additional Software
 
-    pacman -S zsh tmux kitty xclip the_silver_searcher ranger tig fzf lynx xdotool exa peco sshfs pwgen
-    pacman -S nautilus seafile-client gparted insomnia
-    pacman -S winff easytag audacity gimp vlc
+    pacman -S kitty xclip the_silver_searcher ranger tig fzf lynx xdotool exa peco sshfs pwgen
+    pacman -S nautilus gparted
+    pacman -S easytag audacity gimp vlc
 
     git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf
     cd $HOME/.asdf
@@ -246,11 +256,11 @@ Additional Software
     cd -
 
     git clone https://aur.archlinux.org/yay-git.git
-    cd yay
+    cd yay-git
     makepkg -si
     cd -
 
-    yay -S google-chrome
+    yay -S google-chrome insomnia seafile-client winff
 
 > Upgrade with yay:
 >
@@ -261,10 +271,6 @@ Gnome Settings
     gsettings set org.gnome.desktop.interface show-battery-percentage true
     gsettings set org.gnome.shell enable-hot-corners false
     gsettings set org.gnome.shell.app-switcher current-workspace-only true
-
-Users and Groups
-
-    TODO
 
 Start Gnome
 

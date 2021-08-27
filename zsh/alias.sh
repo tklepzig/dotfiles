@@ -73,6 +73,9 @@ then
     alias pmu='pacman -R'
 fi
 
+# Passing aliases when using sudo
+alias sudo='sudo '
+
 # TODO
 # add auto-increment number as prefix to every file (remove -n to apply changes)
 #rename -n 's/(.+)/our $i; sprintf("%02d-$1", 1+$i++)/e' *
