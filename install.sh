@@ -49,16 +49,6 @@ addLinkToFile() {
   fi
 }
 
-skipClone=0
-for var in "$@"
-do
-  case "$var" in
-    "--skip-clone")
-      skipClone=1
-      ;;
-  esac
-done
-
 addPlugin() {
   sed 's/\"pluginfile/source \$HOME\/.dotfiles\/vim\/'"$1"'\/plugins.vim\
 \"pluginfile/g' $HOME/.plugins.vim > $HOME/.plugins.vim.tmp && mv $HOME/.plugins.vim.tmp $HOME/.plugins.vim
@@ -78,6 +68,16 @@ installVimProfiles() {
     success "Done."
   done < <(echo "basic" && cat $vimProfilesPath)
 }
+
+skipClone=0
+for var in "$@"
+do
+  case "$var" in
+    "--skip-clone")
+      skipClone=1
+      ;;
+  esac
+done
 
 info "Searching for Git..."
 if ! isProgramInstalled git
@@ -123,11 +123,10 @@ success "Done."
 
 addLinkToFile "$dotfilesDir/zsh/zshrc.sh" "$HOME/.zshrc"
 
-info "Creating zsh sounds directory..."
+info "Setting up zsh sounds..."
 mkdir -p $HOME/.zsh-sounds
 cp $dotfilesDir/zsh/sounds-readme.md $HOME/.zsh-sounds/README.md
 success "Done."
-
 
 if isOS darwin
 then
@@ -151,7 +150,6 @@ info "Configuring Git..."
 $dotfilesDir/git/git-config.sh
 success "Done."
 
-# Docker completion for zsh
 if isProgramInstalled docker
 then
   info "Installing docker completion..."
