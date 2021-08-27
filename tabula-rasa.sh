@@ -9,7 +9,18 @@ fi
 set -e
 dotfilesDir=$HOME/.dotfiles
 
-source <(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/shared.sh)
+source <(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/logger.sh)
+
+removePatternFromFile() {
+  target=$1
+  pattern=$2
+  if [ -f $HOME/$target ]
+  then
+    info "Remove link from $target... with pattern $pattern"
+    sed /$pattern/d $HOME/$target > $HOME/$target.tmp && mv $HOME/$target.tmp $HOME/$target
+    success "Done."
+  fi
+}
 
 removePatternFromFile ".zshrc" ".dotfiles"
 removePatternFromFile ".vimrc" ".dotfiles"

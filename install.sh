@@ -4,7 +4,50 @@ set -e
 dotfilesDir=$HOME/.dotfiles
 vimProfilesPath=$HOME/.vim-profiles
 
-source <(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/shared.sh)
+source <(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/logger.sh)
+
+isOS()
+{
+    shopt -s nocasematch
+    if [[ "$OSTYPE" == *"$1"* ]]
+    then
+        return 0;
+    fi
+
+    return 1;
+}
+
+isProgramInstalled()
+{
+    command -v $1 >/dev/null 2>&1 || { return 1 >&2; }
+    return 0
+}
+
+checkInstallation()
+{
+  [[ -n $2 ]] && installName=$2 || installName=$1
+
+  if ! isProgramInstalled $1
+  then
+    error "Warning: $1 is not installed (Try \"apt install $installName\")"
+  fi
+}
+
+addLinkToFile() {
+  src=$1
+  target=$2
+  cmd=${3:-source}
+  if [ ! -f $target ]
+  then
+    touch $target
+  fi
+  if ! grep -q "$src" $target
+  then
+    info "Adding link to $target..."
+    echo "$cmd $src" >> $target;
+    success "Done."
+  fi
+}
 
 skipClone=0
 for var in "$@"
