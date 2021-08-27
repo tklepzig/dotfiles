@@ -250,6 +250,8 @@ Additional Software
     pacman -S nautilus gparted
     pacman -S easytag audacity gimp vlc
 
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/JetBrains/JetBrainsMono/master/install_manual.sh)"
+
     git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf
     cd $HOME/.asdf
     git checkout "$(git describe --abbrev=0 --tags)"
