@@ -133,7 +133,7 @@ Mount
 
 ### Package Installation
 
-    pacstrap /mnt base base-devel linux linux-firmware gvim terminus-font man-db man-pages texinfo networkmanager wpa_supplicant xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts gnome-tweaks gnome-keyring gnome-terminal nautilus
+    pacstrap /mnt base base-devel linux linux-firmware gvim terminus-font man-db man-pages texinfo networkmanager wpa_supplicant xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts gnome-tweaks gnome-keyring
 
 ### System Setup
 
@@ -232,12 +232,13 @@ Enable and start systemd services
     systemctl enable --now NetworkManager
     systemctl enable --now wpa_supplicant
     systemctl enable --now systemd-resolved
-    systemctl enable --now gdm
+    systemctl enable gdm
 
 Additional Software
 
-    pacman -S gvim zsh tmux xclip the_silver_searcher ranger tig fzf lynx
-    pacman -S seafile-client xdotool gparted exa peco sshfs pwgen winff easytag audacity gimp vlc
+    pacman -S zsh tmux kitty xclip the_silver_searcher ranger tig fzf lynx xdotool exa peco sshfs pwgen
+    pacman -S nautilus seafile-client gparted insomnia
+    pacman -S winff easytag audacity gimp vlc
 
     git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf
     cd $HOME/.asdf
@@ -264,6 +265,10 @@ Gnome Settings
 Users and Groups
 
     TODO
+
+Start Gnome
+
+    systemctl start gdm
 
 ### Additional stuff
 
