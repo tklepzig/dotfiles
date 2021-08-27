@@ -133,7 +133,7 @@ Mount
 
 ### Package Installation
 
-    pacstrap /mnt base base-devel linux linux-firmware gvim zsh tmux terminus-font man-db man-pages texinfo networkmanager wpa_supplicant xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts gnome-tweaks gnome-keyring
+    pacstrap /mnt base base-devel linux linux-firmware gvim zsh tmux terminus-font man-db man-pages texinfo networkmanager wpa_supplicant xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts gnome-tweaks gnome-keyring eog
 
 ### System Setup
 
@@ -248,7 +248,7 @@ Additional Software
 
     pacman -S kitty xclip the_silver_searcher ranger tig fzf lynx xdotool exa peco sshfs pwgen
     pacman -S nautilus gparted
-    pacman -S easytag audacity gimp vlc
+    pacman -S easytag audacity gimp vlc pqiv
 
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/JetBrains/JetBrainsMono/master/install_manual.sh)"
 
@@ -271,7 +271,7 @@ Additional Software
 Gnome Settings
 
     gsettings set org.gnome.desktop.interface show-battery-percentage true
-    gsettings set org.gnome.shell enable-hot-corners false
+    gsettings set org.gnome.desktop.interface enable-hot-corners false
     gsettings set org.gnome.shell.app-switcher current-workspace-only true
 
 Start Gnome

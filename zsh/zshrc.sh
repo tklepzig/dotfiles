@@ -80,6 +80,7 @@ bindkey -M vicmd v edit-command-line
 
 
 # search history with current entered text via up/down (starts-with search)
+# If it does not work on the current OS, try to find out the correct code with `cat -v` or `Ctrl+V`
 if isOS darwin
 then
   up='^[[A'
