@@ -357,6 +357,12 @@ Instead of installing `networkmanager` and `wpa_supplicant`:
 
     systemctl reboot --firmware-setup
 
+#### Systemd Timers
+
+    TODO
+
+> https://wiki.archlinux.de/title/Systemd/Timers
+
 ### References
 
 - https://wiki.archlinux.org/title/Installation_guide
