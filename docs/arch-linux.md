@@ -353,6 +353,10 @@ Instead of installing `networkmanager` and `wpa_supplicant`:
 
     systemctl enable --now iwd
 
+#### Boot into BIOS/UEFI
+
+    systemctl reboot --firmware-setup
+
 ### References
 
 - https://wiki.archlinux.org/title/Installation_guide
