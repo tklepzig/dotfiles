@@ -16,6 +16,8 @@ set number
 " Do not wrap lines.
 set nowrap
 
+set nostartofline
+
 " Show matching brackets.
 set showmatch
 
