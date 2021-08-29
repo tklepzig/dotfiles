@@ -81,25 +81,17 @@ bindkey -M vicmd v edit-command-line
 
 # search history with current entered text via up/down (starts-with search)
 # If it does not work on the current OS, try to find out the correct code with `cat -v` or `Ctrl+V`
-if isOS darwin
-then
-  up='^[[A'
-  down='^[[B'
-else
-  up='^[OA'
-  down='^[OB'
-fi
+# and set the two variables below accordingly BEFORE sourcing this script
+ZSH_HISTORY_KEY_UP='^[[A'
+ZSH_HISTORY_KEY_DOWN='^[[B'
 
-if [ $up ] && [ $down ]
-then
-  autoload -U up-line-or-beginning-search
-  zle -N up-line-or-beginning-search
-  bindkey "$up" up-line-or-beginning-search
+autoload -U up-line-or-beginning-search
+zle -N up-line-or-beginning-search
+bindkey "$ZSH_HISTORY_KEY_UP" up-line-or-beginning-search
 
-  autoload -U down-line-or-beginning-search
-  zle -N down-line-or-beginning-search
-  bindkey "$down" down-line-or-beginning-search
-fi
+autoload -U down-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey "$ZSH_HISTORY_KEY_DOWN" down-line-or-beginning-search
 
 
 preexec() {
