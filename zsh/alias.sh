@@ -52,6 +52,7 @@ alias dp='docker system prune -f && docker rmi -f $(docker images -q)'
 alias ccp='xclip -selection clipboard'
 alias v='vim'
 alias vs='vim -S'
+alias vbf="vim \$(g bf)"
 
 # With `. ranger` (or `source ranger`) the last visited directory will be used for the shell when exiting ranger
 # If you want to go back where you left off, just enter `cd -`
