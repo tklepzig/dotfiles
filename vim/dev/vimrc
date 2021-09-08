@@ -22,6 +22,9 @@ let g:ranger_map_keys = 0
 " Disable preview window (for e.g. :GFiles)
 let g:fzf_preview_window = ''
 
+" Add <> to autoclose
+let g:AutoPairs={'<':'>', '(':')', '[':']', '{':'}',"'":"'",'"':'"', "`":"`", '```':'```', '"""':'"""', "'''":"'''"}
+
 let g:NERDCustomDelimiters = { 'javascript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' } }
 let g:NERDCustomDelimiters = { 'typescript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' } }
 let g:NERDTreeWinSize=50
