@@ -54,6 +54,9 @@ alias v='vim'
 alias vs='vim -S'
 alias vbf="vim \$(g bf)"
 
+# Get weather forecast (optional add location as parameter, e.g. weather berlin)
+alias weather="f(){ curl https://v2.wttr.in/\$1; unset -f f }; f"
+
 # With `. ranger` (or `source ranger`) the last visited directory will be used for the shell when exiting ranger
 # If you want to go back where you left off, just enter `cd -`
 # See also https://unix.stackexchange.com/a/570812 and https://github.com/ranger/ranger/blob/master/ranger.py
