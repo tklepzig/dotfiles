@@ -16,7 +16,7 @@ removePatternFromFile() {
   pattern=$2
   if [ -f $HOME/$target ]
   then
-    info "Remove link from $target... with pattern $pattern"
+    info "Remove link from $target with pattern $pattern..."
     sed /$pattern/d $HOME/$target > $HOME/$target.tmp && mv $HOME/$target.tmp $HOME/$target
     success "Done."
   fi
