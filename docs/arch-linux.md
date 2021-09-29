@@ -133,7 +133,7 @@ Mount
 
 ### Package Installation
 
-    pacstrap /mnt base base-devel linux linux-firmware gvim zsh tmux terminus-font man-db man-pages texinfo networkmanager wpa_supplicant xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts gnome-keyring
+    pacstrap /mnt base base-devel linux linux-firmware ntfs-3g git gvim zsh tmux terminus-font man-db man-pages texinfo networkmanager wpa_supplicant xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts gnome-keyring
 
 ### System Setup
 
@@ -184,9 +184,11 @@ Add kernel parameter to `GRUB_CMDLINE_LINUX` in `/etc/default/grub`
 
     cryptdevice=UUID=<UUID of encrypted partition>:cryptroot
 
-Add encrypt hook to `HOOKS` in `/etc/mkinitcpio.conf` (Add at the end)
+Add `keymap` and `encrypt` hook to `HOOKS` in `/etc/mkinitcpio.conf` (Add at the end)
 
-    HOOKS="... encrypt"
+    HOOKS="... keymap encrypt"
+
+> The `keymap` hook must occur **before** the `encrypt` hook. It is necessary to allow non-US keyboard layout, otherwise using a non-US keyboard for entering the passphrase could be a challenge...
 
 Regenerate initramfs image (ramdisk)
 
@@ -244,11 +246,17 @@ Add user to sudoers file
     visudo
         <username>   ALL=(ALL) ALL
 
-Additional Software
+Start Gnome
 
-    pacman -S kitty xclip the_silver_searcher ranger tig fzf lynx xdotool exa peco sshfs pwgen
-    pacman -S nautilus gparted eog gnome-tweaks gdmap
-    pacman -S easytag audacity gimp vlc pqiv
+    systemctl start gdm
+
+Setup WiFi, Keyboard Layout, etc.
+
+Additional Software (run as non-privileged user)
+
+    sudo pacman -S kitty xclip the_silver_searcher ranger tig fzf lynx xdotool exa peco sshfs pwgen
+    sudo pacman -S nautilus gparted eog gnome-tweaks gdmap
+    sudo pacman -S easytag audacity gimp vlc pqiv
 
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/JetBrains/JetBrainsMono/master/install_manual.sh)"
 
@@ -273,10 +281,6 @@ Gnome Settings
     gsettings set org.gnome.desktop.interface show-battery-percentage true
     gsettings set org.gnome.desktop.interface enable-hot-corners false
     gsettings set org.gnome.shell.app-switcher current-workspace-only true
-
-Start Gnome
-
-    systemctl start gdm
 
 ### Additional stuff
 
