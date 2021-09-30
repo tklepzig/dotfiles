@@ -147,7 +147,13 @@ precmd() {
     repoInfoOrUser="$branchColor${vcs_info_msg_0_}$(upstreamIndicator)$reset$nl"
   fi
 
-  local prefix=$(echo -e '\u276f')
+  if [ "$EUID" != 0 ]
+  then
+    local prefix=$(echo -e '\u276f')
+  else
+    # special prompt prefix for root
+    local prefix="$warning#"
+  fi
   #local prefix=$(echo -e '\u261e')
   local path="%(5~|%-1~/…/%3~|%4~)"
   PROMPT="$greyTile\$elapsedTime$reset\$lastExitCodeString$reset$nl$nl$repoInfoOrUser$light$path$nl$default$prefix $reset"
