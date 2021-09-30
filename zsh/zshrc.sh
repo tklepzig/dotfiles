@@ -125,6 +125,12 @@ precmd() {
     elapsedSeconds=$(printf %02d $((($elapsed % 60000) / 1000)))
     elapsedMilliseconds=$(printf %03d $(($elapsed % 1000)))
     elapsedTime=" ${elapsedHours}:${elapsedMinutes}:${elapsedSeconds}.${elapsedMilliseconds} "
+
+    if [ "$lastExitCode" != 0 ]
+    then
+      lastExitCodeString=" $warningTile $lastExitCode "
+    fi
+
     unset timer
 
     playSound
@@ -144,7 +150,7 @@ precmd() {
   local prefix=$(echo -e '\u276f')
   #local prefix=$(echo -e '\u261e')
   local path="%(5~|%-1~/…/%3~|%4~)"
-  PROMPT="$greyTile\$elapsedTime$reset$nl$nl$repoInfoOrUser$light$path$nl$default$prefix $reset"
+  PROMPT="$greyTile\$elapsedTime$reset\$lastExitCodeString$reset$nl$nl$repoInfoOrUser$light$path$nl$default$prefix $reset"
 }
 
 playSound()
