@@ -129,6 +129,8 @@ precmd() {
     if [ "$lastExitCode" != 0 ]
     then
       lastExitCodeString=" $warningTile $lastExitCode "
+    else
+      lastExitCodeString=""
     fi
 
     unset timer
