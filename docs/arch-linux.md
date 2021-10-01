@@ -133,7 +133,7 @@ Mount
 
 ### Package Installation
 
-    pacstrap /mnt base base-devel linux linux-firmware ntfs-3g git gvim zsh tmux terminus-font man-db man-pages texinfo networkmanager wpa_supplicant xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts gnome-keyring
+    pacstrap /mnt base base-devel linux linux-firmware ntfs-3g kitty git gvim zsh tmux terminus-font man-db man-pages texinfo networkmanager wpa_supplicant xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts gnome-keyring
 
 ### System Setup
 
@@ -254,7 +254,7 @@ Setup WiFi, Keyboard Layout, etc.
 
 Additional Software (run as non-privileged user)
 
-    sudo pacman -S kitty xclip the_silver_searcher ranger tig fzf lynx xdotool exa peco sshfs pwgen
+    sudo pacman -S xclip the_silver_searcher ranger tig fzf lynx xdotool exa peco sshfs pwgen mat2
     sudo pacman -S nautilus gparted eog gnome-tweaks gdmap
     sudo pacman -S easytag audacity gimp vlc pqiv
 
