@@ -93,7 +93,8 @@ autocmd FileChangedShellPost *
   \ echohl WarningMsg | echo "File changed on disk. Buffer reloaded." | echohl None
 
 function! s:ExecuteSelection() range
-  execute "!"."clear && ".join(getline(a:firstline, a:lastline), " && ")
+  let linesWithoutEmpty = filter(copy(getline(a:firstline, a:lastline)), 'len(v:val)')
+  execute "!"."clear && ".join(linesWithoutEmpty, " && ")
 endfunction
 command! -range ExecuteSelection <line1>,<line2>call <SID>ExecuteSelection()
 
