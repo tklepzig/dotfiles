@@ -18,4 +18,7 @@ Plug 'francoiscabrol/ranger.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'tklepzig/vim-buffer-navigator'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Pin to commit just before issue was introduced to work around
+" https://github.com/neoclide/coc-prettier/issues/134
+" https://github.com/bobwhitelock/dotfiles/issues/29.
+Plug 'neoclide/coc.nvim', {'commit': 'f8e339d0', 'do': 'yarn install --frozen-lockfile'}
