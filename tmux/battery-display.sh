@@ -1,12 +1,5 @@
 #!/usr/bin/env zsh
 
-lcarsDefaultBg=colour172
-lcarsDefaultLightBg=colour179
-lcarsDefaultLighterBg=colour222
-lcarsDefaultFg=colour0
-lcarsAccentBg=colour32
-lcarsAccentFg=colour15
-
 {
     read -r state
     read -r value
@@ -14,25 +7,25 @@ lcarsAccentFg=colour15
 
 if [[ -z $value ]]
 then
-    echo "#[bg=$lcarsDefaultBg]"
+    echo "#[bg=$primaryBg]"
     exit
 fi
 
-color="#[fg=$lcarsDefaultFg,bg=$lcarsDefaultLighterBg]"
+color="#[fg=$primaryFg,bg=$primaryLighterBg]"
 if [[ "$state" = "charging" ]]
 then
-    color="#[fg=$lcarsDefaultFg,bg=$lcarsDefaultBg]"
+    color="#[fg=$primaryFg,bg=$primaryBg]"
 elif [[ $value -lt 16 ]]
 then
     if [[ "$(($(date '+%s') % 3))" = "1" ]]
     then
-        color="#[fg=colour196,bg=terminal,bold]"
+        color="#[fg=$criticalBg,bg=terminal,bold]"
     else
-        color="#[fg=$lcarsAccentFg,bg=colour196,bold]"
+        color="#[fg=$criticalFg,bg=$criticalBg,bold]"
     fi
 elif [[ $value -lt 31 ]]
 then
-    color="#[fg=$lcarsDefaultFg,bg=colour220,bold]"
+    color="#[fg=$warningFg,bg=$warningBg,bold]"
 fi
 
 echo "$color $value%"

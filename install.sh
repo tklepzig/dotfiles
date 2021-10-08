@@ -128,6 +128,7 @@ mkdir -p $HOME/.zsh-sounds
 cp $dotfilesDir/zsh/sounds-readme.md $HOME/.zsh-sounds/README.md
 success "Done."
 
+addLinkToFile "$dotfilesDir/tmux/colours.conf" "$HOME/.tmux.conf"
 if isOS darwin
 then
   addLinkToFile "$dotfilesDir/tmux/vars.osx.conf" "$HOME/.tmux.conf"
