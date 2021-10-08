@@ -3,7 +3,7 @@
 {
     read -r state
     read -r value
-} <<< "$(source $HOME/.dotfiles/tmux/free-space.sh)"
+} <<< "$(source $HOME/.dotfiles/tmux/free-space.zsh)"
 
 color="#[fg=$primaryFg,bg=$primaryLightBg]"
 if [[ "$state" = "warning" ]]

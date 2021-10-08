@@ -123,7 +123,7 @@ echo | vim +PlugInstall +qall > /dev/null 2>&1
 success "Done."
 
 addLinkToFile "$dotfilesDir/colours.zsh" "$HOME/.zshrc"
-addLinkToFile "$dotfilesDir/zsh/zshrc.sh" "$HOME/.zshrc"
+addLinkToFile "$dotfilesDir/zsh/zshrc.zsh" "$HOME/.zshrc"
 
 info "Setting up zsh sounds..."
 mkdir -p $HOME/.zsh-sounds

@@ -3,7 +3,7 @@
 {
     read -r state
     read -r value
-} <<< "$(source $HOME/.dotfiles/tmux/battery.$1.sh)"
+} <<< "$(source $HOME/.dotfiles/tmux/battery.$1.zsh)"
 
 if [[ -z $value ]]
 then

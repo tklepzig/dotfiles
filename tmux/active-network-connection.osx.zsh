@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env zsh
 
 routeResult=$(route get google.de 2>&1)
 

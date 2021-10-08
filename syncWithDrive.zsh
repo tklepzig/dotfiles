@@ -2,7 +2,7 @@
 
 if [ -z $1 ]
 then
-	echo "Usage: syncWithDrive.sh /path/to/drive"
+	echo "Usage: syncWithDrive.zsh /path/to/drive"
 	exit 1
 fi
 
