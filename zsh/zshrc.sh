@@ -19,15 +19,15 @@ isProgramInstalled()
 }
 
 nl=$'\n'
-default=%F{172}
-light=%F{179}
-lighter=%F{222}
-accent=%F{32}
-warning=%F{196}
-accentTile=%K{32}%F{15}
-defaultTile=%K{172}%F{0}
-greyTile=%K{238}%F{7}
-warningTile=%K{124}%F{255}
+default=%F{$primaryBg}
+light=%F{$primaryLightBg}
+lighter=%F{$primaryLighterBg}
+accent=%F{$accentBg}
+warning=%F{$criticalBg}
+accentTile=%K{$accentBg}%F{$accentFg}
+defaultTile=%K{$primaryBg}%F{$primaryFg}
+greyTile=%K{$infoBg}%F{$infoFg}
+warningTile=%K{$criticalBg}%F{$criticalFg}
 reset=%f%k%b
 
 source $dotfilesDir/zsh/alias.sh

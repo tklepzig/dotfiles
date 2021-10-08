@@ -95,6 +95,7 @@ then
   success "Done."
 fi
 
+addLinkToFile "$dotfilesDir/colours.vim" "$HOME/.vimrc"
 if [ ! -f "$HOME/.plugins.custom.vim" ]
 then
   echo "Plug 'any/vim-plugin'" > $HOME/.plugins.custom.vim
@@ -121,6 +122,7 @@ info "Installing vim plugins..."
 echo | vim +PlugInstall +qall > /dev/null 2>&1
 success "Done."
 
+addLinkToFile "$dotfilesDir/colours.zsh" "$HOME/.zshrc"
 addLinkToFile "$dotfilesDir/zsh/zshrc.sh" "$HOME/.zshrc"
 
 info "Setting up zsh sounds..."
@@ -128,7 +130,7 @@ mkdir -p $HOME/.zsh-sounds
 cp $dotfilesDir/zsh/sounds-readme.md $HOME/.zsh-sounds/README.md
 success "Done."
 
-addLinkToFile "$dotfilesDir/tmux/colours.conf" "$HOME/.tmux.conf"
+addLinkToFile "$dotfilesDir/colours.zsh" "$HOME/.tmux.conf"
 if isOS darwin
 then
   addLinkToFile "$dotfilesDir/tmux/vars.osx.conf" "$HOME/.tmux.conf"

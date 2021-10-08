@@ -1,10 +1,10 @@
-highlight LcarsPrimary ctermfg=0 ctermbg=172
-highlight LcarsAccent ctermfg=15 ctermbg=32
-highlight LcarsGap ctermfg=NONE ctermbg=NONE
-highlight LcarsLight ctermfg=0 ctermbg=179
-highlight LcarsLighter ctermfg=0 ctermbg=222
-highlight LcarsError ctermfg=255 ctermbg=124
-highlight LcarsInactive ctermfg=255 ctermbg=237
+execute 'highlight LcarsPrimary ctermfg='.primaryFg.' ctermbg='.primaryBg
+execute 'highlight LcarsAccent ctermfg='.accentFg.' ctermbg='.accentBg
+execute 'highlight LcarsGap ctermfg=NONE ctermbg=NONE'
+execute 'highlight LcarsLight ctermfg='.primaryFg.' ctermbg='.primaryLightBg
+execute 'highlight LcarsLighter ctermfg='.primaryFg.' ctermbg='.primaryLighterBg
+execute 'highlight LcarsError ctermfg='.criticalFg.' ctermbg='.criticalBg
+execute 'highlight LcarsInactive ctermfg='.infoFg.' ctermbg='.infoBg
 
 function! CurrentBufferTabLine()
   let bufpath = expand("%:~:.:h")
