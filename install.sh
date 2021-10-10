@@ -95,7 +95,7 @@ then
   success "Done."
 fi
 
-source $dotfilesDir/generateVimColours.zsh 
+source $dotfilesDir/setTheme.zsh 
 
 addLinkToFile "$dotfilesDir/colours.vim" "$HOME/.vimrc"
 if [ ! -f "$HOME/.plugins.custom.vim" ]

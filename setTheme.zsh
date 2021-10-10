@@ -1,12 +1,19 @@
 #!/usr/bin/env zsh
 
-if [ -z $1 ]
+theme=$1
+if [ -z $theme ]
 then
-  cd $HOME/.dotfiles
-  git checkout .
-else
-  cat $HOME/.dotfiles/themes/colours.$1.zsh > $HOME/.dotfiles/colours.zsh
+  theme=lcars
 fi
 
-source $HOME/.dotfiles/generateVimColours.zsh 
+cat $HOME/.dotfiles/themes/colours.$theme.zsh > $HOME/.dotfiles/colours.zsh
+
+rm -f $HOME/.dotfiles/colours.vim
+while read -r line
+do
+  [[ -z $line ]] && continue
+  [[ $line =~ ^#.* ]] && continue
+  echo "let $line" >> $HOME/.dotfiles/colours.vim
+done <$HOME/.dotfiles/colours.zsh
+
 tmux source-file $HOME/.tmux.conf
