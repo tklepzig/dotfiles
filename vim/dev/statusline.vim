@@ -2,7 +2,6 @@ execute 'highlight LcarsPrimary ctermfg='.primaryFg.' ctermbg='.primaryBg
 execute 'highlight LcarsAccent ctermfg='.accentFg.' ctermbg='.accentBg
 execute 'highlight LcarsGap ctermfg=NONE ctermbg=NONE'
 execute 'highlight LcarsLight ctermfg='.primaryFg.' ctermbg='.primaryLightBg
-execute 'highlight LcarsLighter ctermfg='.primaryFg.' ctermbg='.primaryLighterBg
 execute 'highlight LcarsError ctermfg='.criticalFg.' ctermbg='.criticalBg
 execute 'highlight LcarsInactive ctermfg='.infoFg.' ctermbg='.infoBg
 

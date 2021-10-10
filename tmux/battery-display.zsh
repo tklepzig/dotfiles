@@ -11,7 +11,7 @@ then
     exit
 fi
 
-color="#[fg=$primaryFg,bg=$primaryLighterBg]"
+color="#[fg=$primaryFg,bg=$primaryLightBg]"
 if [[ "$state" = "charging" ]]
 then
     color="#[fg=$primaryFg,bg=$primaryBg]"

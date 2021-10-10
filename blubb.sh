@@ -4,7 +4,6 @@ default="$(tput setab 172)$(tput setaf 0)"
 fg="$(tput setaf 172)"
 accent="$(tput setab 32)$(tput setaf 15)"
 light="$(tput setab 179)$(tput setaf 0)"
-lighter="$(tput setab 222)$(tput setaf 0)"
 reset="$(tput sgr0)"
 nl=$'\n'
 width=$(tput cols)

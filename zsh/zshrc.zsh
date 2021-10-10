@@ -21,7 +21,6 @@ isProgramInstalled()
 nl=$'\n'
 default=%F{$primaryBg}
 light=%F{$primaryLightBg}
-lighter=%F{$primaryLighterBg}
 accent=%F{$accentBg}
 warning=%F{$criticalBg}
 accentTile=%K{$accentBg}%F{$accentFg}
