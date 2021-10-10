@@ -1,8 +1,9 @@
-primaryBg=172
-primaryLightBg=179
 primaryFg=0
-accentBg=32
+primaryBg=172
+secondaryFg=0
+secondaryBg=179
 accentFg=15
+accentBg=32
 
 inactivePaneBorder=244
 inactivePaneBackground=236

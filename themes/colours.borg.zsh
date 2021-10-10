@@ -1,6 +1,7 @@
-primaryBg=22
-primaryLightBg=28
 primaryFg=157
+primaryBg=22
+secondaryFg=157
+secondaryBg=28
 accentBg=70
 accentFg=0
 

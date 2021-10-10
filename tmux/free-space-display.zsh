@@ -5,7 +5,7 @@
     read -r value
 } <<< "$(source $HOME/.dotfiles/tmux/free-space.zsh)"
 
-color="#[fg=$primaryFg,bg=$primaryLightBg]"
+color="#[fg=$secondaryFg,bg=$secondaryBg]"
 if [[ "$state" = "warning" ]]
 then
     color="#[fg=$warningFg,bg=$warningBg,bold]"

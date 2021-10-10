@@ -1,9 +1,9 @@
-execute 'highlight LcarsPrimary ctermfg='.primaryFg.' ctermbg='.primaryBg
-execute 'highlight LcarsAccent ctermfg='.accentFg.' ctermbg='.accentBg
-execute 'highlight LcarsGap ctermfg=NONE ctermbg=NONE'
-execute 'highlight LcarsLight ctermfg='.primaryFg.' ctermbg='.primaryLightBg
-execute 'highlight LcarsError ctermfg='.criticalFg.' ctermbg='.criticalBg
-execute 'highlight LcarsInactive ctermfg='.infoFg.' ctermbg='.infoBg
+execute 'highlight Primary ctermfg='.primaryFg.' ctermbg='.primaryBg
+execute 'highlight Accent ctermfg='.accentFg.' ctermbg='.accentBg
+execute 'highlight Gap ctermfg=NONE ctermbg=NONE'
+execute 'highlight Secondary ctermfg='.secondaryFg.' ctermbg='.secondaryBg
+execute 'highlight Error ctermfg='.criticalFg.' ctermbg='.criticalBg
+execute 'highlight Inactive ctermfg='.infoFg.' ctermbg='.infoBg
 
 function! CurrentBufferTabLine()
   let bufpath = expand("%:~:.:h")
@@ -12,10 +12,10 @@ function! CurrentBufferTabLine()
     let bufname = "[No Name]"
   endif
 
-  let path = (!empty(bufpath) && bufpath != ".") ? "%#LcarsLight# " . bufpath . " %#LcarsGap# " : ""
-  let name = (&modified ? "%#LcarsAccent# " : "%#LcarsPrimary# ") . bufname . " %#LcarsGap# "
+  let path = (!empty(bufpath) && bufpath != ".") ? "%#Secondary# " . bufpath . " %#Gap# " : ""
+  let name = (&modified ? "%#Accent# " : "%#Primary# ") . bufname . " %#Gap# "
 
-  return '%#LcarsPrimary# %#LcarsGap# ' . path . name . '%#LcarsPrimary#'
+  return '%#Primary# %#Gap# ' . path . name . '%#Primary#'
 endfunction
 set showtabline=2
 set tabline=%!CurrentBufferTabLine()
@@ -53,35 +53,35 @@ function! StatusLine()
       let bufname = "[No Name]"
     endif
 
-    let inactiveLine = '%#LcarsInactive# '
-    let inactiveLine .= '%#LcarsGap# '
-    let inactiveLine .= (!empty(bufpath) && bufpath != ".") ? '%#LcarsInactive# '.bufpath.' %#LcarsGap# ' : ''
-    let inactiveLine .= '%#LcarsInactive# '
+    let inactiveLine = '%#Inactive# '
+    let inactiveLine .= '%#Gap# '
+    let inactiveLine .= (!empty(bufpath) && bufpath != ".") ? '%#Inactive# '.bufpath.' %#Gap# ' : ''
+    let inactiveLine .= '%#Inactive# '
     let inactiveLine .= bufname.' '
-    let inactiveLine .= '%#LcarsGap# '
+    let inactiveLine .= '%#Gap# '
     let inactiveLine .= '%='
     let inactiveLine .= '        '
     let inactiveLine .= bufFiletype.' '.(bufReadonly ? '%r ' : '')
-    let inactiveLine .= '%#LcarsInactive#'
+    let inactiveLine .= '%#Inactive#'
     let inactiveLine .= ' %p%% '
-    let inactiveLine .= '%#LcarsGap# '
-    let inactiveLine .= '%#LcarsInactive#'
+    let inactiveLine .= '%#Gap# '
+    let inactiveLine .= '%#Inactive#'
     let inactiveLine .= ' %l/%L : %v '
     return inactiveLine
   endif
 
   let modeMap = {
-        \ 'n': { 'name': ' NORMAL ', 'highlight': '%#LcarsPrimary#' },
-        \ 'i': { 'name': ' INSERT ', 'highlight': '%#LcarsAccent#' },
-        \ 'v': { 'name': ' VISUAL ', 'highlight': '%#LcarsLight#' },
-        \ 'V': { 'name': ' VISUAL LINE ', 'highlight': '%#LcarsLight#' },
-        \ "\<C-V>": { 'name': ' VISUAL BLOCK ', 'highlight': '%#LcarsLight#' },
-        \ 'c': { 'name': ' COMMAND ', 'highlight': '%#LcarsLight#' },
-        \ 't': { 'name': ' TERMINAL ', 'highlight': '%#LcarsLight#' }
+        \ 'n': { 'name': ' NORMAL ', 'highlight': '%#Primary#' },
+        \ 'i': { 'name': ' INSERT ', 'highlight': '%#Accent#' },
+        \ 'v': { 'name': ' VISUAL ', 'highlight': '%#Secondary#' },
+        \ 'V': { 'name': ' VISUAL LINE ', 'highlight': '%#Secondary#' },
+        \ "\<C-V>": { 'name': ' VISUAL BLOCK ', 'highlight': '%#Secondary#' },
+        \ 'c': { 'name': ' COMMAND ', 'highlight': '%#Secondary#' },
+        \ 't': { 'name': ' TERMINAL ', 'highlight': '%#Secondary#' }
         \}
 
   let modeRaw = mode()
-  let modeFallback = { 'name': '['.modeRaw.']', 'highlight': '%#LcarsLight#' }
+  let modeFallback = { 'name': '['.modeRaw.']', 'highlight': '%#Secondary#' }
   let mode = get(modeMap, modeRaw, modeFallback)
 
   let modeName = get(mode, 'name')
@@ -89,20 +89,20 @@ function! StatusLine()
   let cocStatus = CocStatus()
 
   let line = modeHighlight.' '
-  let line .= '%#LcarsGap# '
+  let line .= '%#Gap# '
   let line .= modeHighlight.modeName
-  let line .= '%#LcarsGap# '
+  let line .= '%#Gap# '
   let line .= '%='
   let line .= &filetype.' '.(&readonly ? '%r ' : '')
   let line .= modeHighlight
   let line .= ' %p%% '
-  let line .= '%#LcarsGap# '
+  let line .= '%#Gap# '
   let line .= modeHighlight
   let line .= ' %l/%L : %v '
 
   if !empty(cocStatus)
-    let line .= '%#LcarsGap# '
-    let line .= '%#LcarsError#'.cocStatus
+    let line .= '%#Gap# '
+    let line .= '%#Error#'.cocStatus
   endif
 
   return line

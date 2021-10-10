@@ -20,7 +20,7 @@ isProgramInstalled()
 
 nl=$'\n'
 default=%F{$primaryBg}
-light=%F{$primaryLightBg}
+secondary=%F{$secondaryBg}
 accent=%F{$accentBg}
 warning=%F{$criticalBg}
 accentTile=%K{$accentBg}%F{$accentFg}
@@ -157,7 +157,7 @@ precmd() {
   fi
   #local prefix=$(echo -e '\u261e')
   local path="%(5~|%-1~/…/%3~|%4~)"
-  PROMPT="$greyTile\$elapsedTime$reset\$lastExitCodeString$reset$nl$nl$repoInfoOrUser$light$path$nl$default$prefix $reset"
+  PROMPT="$greyTile\$elapsedTime$reset\$lastExitCodeString$reset$nl$nl$repoInfoOrUser$secondary$path$nl$default$prefix $reset"
 }
 
 playSound()
