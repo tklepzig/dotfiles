@@ -19,12 +19,12 @@ isProgramInstalled()
 }
 
 nl=$'\n'
-default=%F{$primaryBg}
-secondary=%F{$secondaryBg}
-accent=%F{$accentBg}
+primary=%F{$primaryText}
+secondary=%F{$secondaryText}
+accent=%F{$accentText}
 warning=%F{$criticalBg}
+primaryTile=%K{$primaryBg}%F{$primaryFg}
 accentTile=%K{$accentBg}%F{$accentFg}
-defaultTile=%K{$primaryBg}%F{$primaryFg}
 greyTile=%K{$infoBg}%F{$infoFg}
 warningTile=%K{$criticalBg}%F{$criticalFg}
 reset=%f%k%b
@@ -69,7 +69,7 @@ cdpath=(~ ~/development)
 export EDITOR=vim
 export VISUAL=vim
 
-export SPROMPT="$warningTile $reset Correct $warning%R$reset to $default%r$reset? (nyae)$reset"
+export SPROMPT="$warningTile $reset Correct $warning%R$reset to $primary%r$reset? (nyae)$reset"
  
 # Use vi-style zsh bindings
 bindkey -v
@@ -140,8 +140,8 @@ precmd() {
   vcs_info
 
   local repoStatus=$(command git status --porcelain 2> /dev/null | tail -n1)
-  local branchColor="$([[ -n $repoStatus ]] && echo "$accentTile $reset$accent%B " || echo "$defaultTile $reset$default%B ")"
-  local repoInfoOrUser="$default%n@%m$reset$nl"
+  local branchColor="$([[ -n $repoStatus ]] && echo "$accentTile $reset$accent%B " || echo "$primaryTile $reset$primary%B ")"
+  local repoInfoOrUser="$primary%n@%m$reset$nl"
 
   if [[ -n ${vcs_info_msg_0_} ]]
   then
@@ -157,7 +157,7 @@ precmd() {
   fi
   #local prefix=$(echo -e '\u261e')
   local path="%(5~|%-1~/…/%3~|%4~)"
-  PROMPT="$greyTile\$elapsedTime$reset\$lastExitCodeString$reset$nl$nl$repoInfoOrUser$secondary$path$nl$default$prefix $reset"
+  PROMPT="$greyTile\$elapsedTime$reset\$lastExitCodeString$reset$nl$nl$repoInfoOrUser$secondary$path$nl$primary$prefix $reset"
 }
 
 playSound()
