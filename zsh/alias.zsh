@@ -73,8 +73,7 @@ alias niwt="f(){ npm i \$1 && npm i -D @types/\$1; unset -f f }; f"
 
 if isProgramInstalled pacman
 then
-    alias pmi='pacman -S'
-    alias pmu='pacman -R'
+    alias pm='sudo pacman'
 fi
 
 # Passing aliases when using sudo
