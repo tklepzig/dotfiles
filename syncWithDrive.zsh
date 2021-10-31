@@ -7,4 +7,4 @@ then
 fi
 
 dotfilesDir=$HOME/.dotfiles
-rsync -avz --stats --delete --exclude  ".git" "$dotfilesDir/" "$1/dotfiles"
+rsync -avz --stats --delete --filter="dir-merge,- .gitignore" --exclude  ".git" "$dotfilesDir/" "$1/dotfiles"
