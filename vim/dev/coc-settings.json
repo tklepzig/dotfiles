@@ -14,5 +14,6 @@
   "solargraph.formatting": true,
   "solargraph.autoformat": true,
   "solargraph.hover": true,
-  "solargraph.diagnostics": true
+  "solargraph.diagnostics": true,
+  "solargraph.transport": "stdio"
 }
