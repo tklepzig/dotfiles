@@ -3,6 +3,10 @@ function! s:ToggleWrite(bang)
     Goyo! | Limelight!
     set nowrap nolinebreak
     colorscheme codedark
+    hi Normal ctermbg=NONE
+    hi EndOfBuffer ctermbg=NONE
+    hi LineNr ctermbg=NONE
+    hi SignColumn ctermbg=NONE
   else
     set wrap linebreak
     colorscheme seoul256
