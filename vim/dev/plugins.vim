@@ -22,3 +22,5 @@ Plug 'tklepzig/vim-buffer-navigator'
 " https://github.com/neoclide/coc-prettier/issues/134
 " https://github.com/bobwhitelock/dotfiles/issues/29.
 Plug 'neoclide/coc.nvim', {'commit': 'f8e339d0', 'do': 'yarn install --frozen-lockfile'}
+Plug 'tpope/vim-abolish'
+
