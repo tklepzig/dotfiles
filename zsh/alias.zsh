@@ -53,7 +53,7 @@ alias ccp='xclip -selection clipboard'
 alias v='vim'
 alias vs='vim -S'
 alias vbf="vim \$(g bf)"
-alias vdf="f(){ vim \$(git diff --name-only \$([ -n \"\$1\" ] && echo \"HEAD HEAD~\$1\")); unset -f f }; f"
+alias vdf="f(){ vim \$(git diff --name-only \$([ -n \"\$1\" ] && [ "\${#1}" -gt 2 ] && echo \"\$1\" || echo \"HEAD HEAD~\$1\")); unset -f f }; f"
 
 # Get weather forecast (optional add location as parameter, e.g. weather berlin)
 alias weather="f(){ curl https://v2.wttr.in/\$1; unset -f f }; f"
