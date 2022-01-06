@@ -52,8 +52,15 @@ alias dp='docker system prune -f && docker rmi -f $(docker images -q)'
 alias ccp='xclip -selection clipboard'
 alias v='vim'
 alias vs='vim -S'
+
+# Open all files of current branch
 alias vbf="vim \$(g bf)"
-alias vdf="f(){ vim \$(git diff --name-only \$([ -n \"\$1\" ] && [ "\${#1}" -gt 2 ] && echo \"\$1\" || echo \"HEAD HEAD~\$1\")); unset -f f }; f"
+
+# Open all files which are currently changed or created (git diff)
+alias vdf="f(){ git a; files=\$(git ds --name-only); git r; vim \$(echo \"\$files\"); unset -f f }; f"
+
+# Open all files of a specific commit $1
+alias vcf="f(){ vim \$(git show --pretty='format:' --name-only \"\$1\"); unset -f f }; f"
 
 # Get weather forecast (optional add location as parameter, e.g. weather berlin)
 alias weather="f(){ curl https://v2.wttr.in/\$1; unset -f f }; f"

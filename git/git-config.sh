@@ -126,6 +126,9 @@ git config --global alias.wtl "worktree list"
 git config --global alias.cp "cherry-pick"
 git config --global alias.cpn "cherry-pick -n"
 
+# cpn all changes of branch $1
+git config --global alias.cnb "!f() { git cherry-pick -n \$(git merge-base master \$1)..\$1; }; f"
+
 git config --global alias.rv "revert"
 git config --global alias.rvn "revert -n"
 
