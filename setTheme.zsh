@@ -16,7 +16,7 @@ do
   echo "let $line" >> $HOME/.dotfiles/colours.vim
 done <$HOME/.dotfiles/colours.zsh
 
-if [ -n $TMUX ] && [ -f $HOME/.tmux.conf ]
+if [ -n "$TMUX" ] && [ -f $HOME/.tmux.conf ]
 then
   tmux source-file $HOME/.tmux.conf
 fi
