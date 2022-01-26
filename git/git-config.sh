@@ -19,6 +19,8 @@ git config --global pull.rebase true
 git config --global core.editor "vim"
 git config --global color.status always
 git config --global grep.extendedRegexp true
+git config --global help.autoCorrect prompt
+
 
 # aliases
 git config --global alias.s  "status -sb"
@@ -109,10 +111,11 @@ git config --global alias.sw "show --word-diff --format=\"%C(yellow)%h%C(reset) 
 git config --global alias.swn "show --word-diff --name-status --format=\"%C(yellow)%h%C(reset) - %C(cyan)(%ar)%C(reset) %s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%Creset\""
 
 git config --global alias.st "stash"
+git config --global alias.sts "stash --staged"
 git config --global alias.stp "stash pop"
 git config --global alias.stl "$stashCommon"
 git config --global alias.sta "stash apply"
-git config --global alias.sts "stash show"
+git config --global alias.stsw "stash show --word-diff-regex=."
 
 git config --global alias.t "tag"
 git config --global alias.td "tag -d"
