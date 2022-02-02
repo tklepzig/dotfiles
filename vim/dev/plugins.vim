@@ -1,5 +1,6 @@
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
+Plug 'mzlogin/vim-markdown-toc'
 Plug 'fladson/vim-kitty'
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
@@ -20,4 +21,3 @@ Plug 'junegunn/fzf.vim'
 Plug 'tklepzig/vim-buffer-navigator'
 Plug 'neoclide/coc.nvim'
 Plug 'tpope/vim-abolish'
-
