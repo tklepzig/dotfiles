@@ -11,3 +11,5 @@ function! s:AlternateSafe()
 endfunction
 
 command! AlternateSafe :call <SID>AlternateSafe()
+
+source $HOME/.dotfiles/vim/ruby/mappings.vim
