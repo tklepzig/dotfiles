@@ -1,2 +1,13 @@
 let g:coc_global_extensions = g:coc_global_extensions + ['coc-solargraph']
 iab de do<cr>end<esc>O
+
+function! s:AlternateSafe()
+  try
+    A
+  catch /^Vim\%((\a\+)\)\=:E345:/
+    let path = matchstr(v:exception, '.*"\zs.*\ze".*')
+    execute 'e ' . path
+  endtry
+endfunction
+
+command! AlternateSafe :call <SID>AlternateSafe()
