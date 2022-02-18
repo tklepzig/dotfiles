@@ -9,7 +9,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'junegunn/gv.vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'scrooloose/nerdcommenter'
-Plug 'sheerun/vim-polyglot'
+Plug 'sheerun/vim-polyglot', {'commit': '4d4aa5fe553a47ef5c5c6d0a97bb487fdfda2d5b'}
 Plug 'tpope/vim-surround'
 Plug 'jiangmiao/auto-pairs'
 Plug 'dyng/ctrlsf.vim'
@@ -19,5 +19,5 @@ Plug 'francoiscabrol/ranger.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'tklepzig/vim-buffer-navigator'
-Plug 'neoclide/coc.nvim'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'tpope/vim-abolish'
