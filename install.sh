@@ -114,6 +114,8 @@ fi
 cp $dotfilesDir/vim/plugins.vim $HOME/.plugins.vim
 addLinkToFile "$HOME/.plugins.vim" "$HOME/.vimrc"
 
+addLinkToFile "$dotfilesDir/colours.zsh" "$HOME/.zshrc"
+
 installProfiles
 
 if [ ! -d "$HOME/.vim/autoload/plug.vim" ]
@@ -128,7 +130,9 @@ info "Installing vim plugins..."
 echo | vim +PlugInstall +qall > /dev/null 2>&1
 success "Done."
 
-addLinkToFile "$dotfilesDir/colours.zsh" "$HOME/.zshrc"
+# TODO
+# Ensure the following line is in .zshrc after all df includes
+# [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 info "Setting up zsh sounds..."
 mkdir -p $HOME/.zsh-sounds
