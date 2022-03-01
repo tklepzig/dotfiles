@@ -29,7 +29,7 @@ greyTile=%K{$infoBg}%F{$infoFg}
 warningTile=%K{$criticalBg}%F{$criticalFg}
 reset=%f%k%b
 
-source $dotfilesDir/zsh/alias.zsh
+source $dotfilesDir/zsh/basic/alias.zsh
 
 # Add completions from .zsh/completion
 fpath=($HOME/.zsh/completion $fpath)

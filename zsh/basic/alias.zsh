@@ -27,6 +27,7 @@ alias t='tmux new-session -n ""'
 alias ta='tmux a'
 
 alias dotfiles-update='curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh | bash -s'
+alias dfu='dotfiles-update'
 alias dotfiles-tabula-rasa="$dotfilesDir/tabula-rasa.sh"
 if isOS linux
 then

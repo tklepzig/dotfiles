@@ -6,9 +6,9 @@ My dotfiles for git, zsh, tmux and vim.
 
     curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh | bash -s
 
-## Vim Profiles
+## Profiles
 
-Add these to `~/.vim-profiles`, one profile name per line.
+Add these to `~/.df-profiles`, one profile name per line.
 
 | Name    | Details                    |
 | ------- | -------------------------- |

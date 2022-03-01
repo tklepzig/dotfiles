@@ -2,7 +2,7 @@
 
 set -e
 dotfilesDir=$HOME/.dotfiles
-vimProfilesPath=$HOME/.vim-profiles
+profilesPath=$HOME/.df-profiles
 
 source <(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/logger.sh)
 
@@ -49,24 +49,28 @@ addLinkToFile() {
   fi
 }
 
-addPlugin() {
+addVimPlugin() {
   sed 's/\"pluginfile/source \$HOME\/.dotfiles\/vim\/'"$1"'\/plugins.vim\
 \"pluginfile/g' $HOME/.plugins.vim > $HOME/.plugins.vim.tmp && mv $HOME/.plugins.vim.tmp $HOME/.plugins.vim
 }
 
-installVimProfiles() {
-  touch $vimProfilesPath
+installProfiles() {
+  touch $profilesPath
   while read profile
   do
-    info "Installing Vim Profile $profile..."
-    addPlugin $profile
+    info "Installing Profile $profile..."
+
+    addVimPlugin $profile
     addLinkToFile "$dotfilesDir/vim/$profile/vimrc" "$HOME/.vimrc"
     if [ -f $dotfilesDir/vim/$profile/install.sh ]
     then
       source $dotfilesDir/vim/$profile/install.sh
     fi
+
+    addLinkToFile "$dotfilesDir/zsh/$profile/zshrc.zsh" "$HOME/.zshrc"
+
     success "Done."
-  done < <(echo "basic" && cat $vimProfilesPath)
+  done < <(echo "basic" && cat $profilesPath)
 }
 
 skipClone=0
@@ -110,7 +114,7 @@ fi
 cp $dotfilesDir/vim/plugins.vim $HOME/.plugins.vim
 addLinkToFile "$HOME/.plugins.vim" "$HOME/.vimrc"
 
-installVimProfiles
+installProfiles
 
 if [ ! -d "$HOME/.vim/autoload/plug.vim" ]
 then
@@ -125,7 +129,6 @@ echo | vim +PlugInstall +qall > /dev/null 2>&1
 success "Done."
 
 addLinkToFile "$dotfilesDir/colours.zsh" "$HOME/.zshrc"
-addLinkToFile "$dotfilesDir/zsh/zshrc.zsh" "$HOME/.zshrc"
 
 info "Setting up zsh sounds..."
 mkdir -p $HOME/.zsh-sounds
