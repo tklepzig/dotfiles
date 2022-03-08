@@ -93,3 +93,6 @@ alias sudo='sudo '
 # TODO
 # add auto-increment number as prefix to every file (remove -n to apply changes)
 #rename -n 's/(.+)/our $i; sprintf("%02d-$1", 1+$i++)/e' *
+
+# Delete recursively all node_modules folders
+#find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +
