@@ -91,6 +91,8 @@ augroup mygroup
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
+hi CocUnusedHighlight ctermfg=250
+
 " Use `:Format` to format current buffer
 command! -nargs=0 Format :call CocAction('format')
 
