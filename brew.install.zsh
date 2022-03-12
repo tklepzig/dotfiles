@@ -1,5 +1,7 @@
 #!/usr/bin/env zsh
 
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
 brew install git
 brew install --cask kitty google-chrome
 
