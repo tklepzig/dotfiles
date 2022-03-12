@@ -10,6 +10,7 @@ git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf
 cd $HOME/.asdf
 git checkout "$(git describe --abbrev=0 --tags)"
 cd -
+source $HOME/.zshrc
 
 for plugin in nodejs python ruby vim
 do
