@@ -11,7 +11,7 @@ cd $HOME/.asdf
 git checkout "$(git describe --abbrev=0 --tags)"
 cd -
 
-for plugin in nodejs python
+for plugin in nodejs python ruby vim
 do
   asdf plugin add $plugin
   asdf install $plugin latest
