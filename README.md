@@ -4,7 +4,7 @@ My dotfiles for git, zsh, tmux and vim.
 
 ## Installation
 
-    curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh | bash -s
+    /usr/bin/env zsh -c "$(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh)"
 
 ## Profiles
 

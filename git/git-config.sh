@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env zsh
 
 logFormat="%C(yellow)%h%C(reset) %C(cyan)%><(15)%ad%C(reset) %s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%Creset"
 withLess="-c core.pager='less -SRF'"

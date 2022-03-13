@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env zsh
+
 git fetch
 currentBranch=$(git symbolic-ref HEAD)
 if [ "$1" = "--all" ]

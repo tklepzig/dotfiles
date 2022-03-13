@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env zsh
 
 set -e
 dotfilesDir=$HOME/.dotfiles
@@ -8,13 +8,12 @@ source <(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/log
 
 isOS()
 {
-    shopt -s nocasematch
-    if [[ "$OSTYPE" == *"$1"* ]]
-    then
-        return 0;
-    fi
+  if [[ "$OSTYPE:l" == *"$1:l"* ]]
+  then
+    return 0;
+  fi
 
-    return 1;
+  return 1;
 }
 
 isProgramInstalled()
@@ -83,10 +82,20 @@ do
   esac
 done
 
+info "Searching for zsh..."
+if ! isProgramInstalled zsh
+then
+  error "No zsh found!"
+  error "Aborting"
+  exit
+fi
+success "zsh found: $(which zsh)."
+
 info "Searching for Git..."
 if ! isProgramInstalled git
 then
   error "No Git found!"
+  error "Aborting"
   exit
 fi
 success "Git found: $(which git)."
@@ -171,7 +180,7 @@ then
   success "Done."
 fi
 
-if isProgramInstalled zsh && [ "$SHELL" != "$(which zsh)" ]
+if [ "$SHELL" != "$(which zsh)" ]
 then
   info "Setting default shell to zsh..."
   chsh -s $(which zsh)

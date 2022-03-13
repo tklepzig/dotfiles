@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env zsh
 
 checkInstallation ag silversearcher-ag
 checkInstallation ranger

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env zsh
 
 mkdir -p $HOME/.vim/.backup
 mkdir -p $HOME/.vim/.swp
