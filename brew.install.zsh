@@ -12,4 +12,4 @@ brew install wget wemux websocat btop lynx ddgr exa fzf pqiv ranger the_silver_s
 brew install --cask gimp insomnia licecap raycast vnc-viewer ultimaker-cura seafile-client audacity vlc iterm2
 
 brew install awscli
-brew install --cask docker browserstacklocal slack discord tunnelblick gpg-suite
+brew install --cask docker browserstacklocal slack discord tunnelblick gpg-suite visual-studio-code
