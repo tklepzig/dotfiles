@@ -146,3 +146,13 @@ set wildmenu
 
 " Always show at least four lines above/below the cursor
 set scrolloff=4
+
+function! s:SynStack()
+  for synItem in synstack(line("."), col("."))
+    let synItemId = synIDtrans(synItem)
+    let itemName = synIDattr(synItem, "name")
+    let idName = synIDattr(synItemId, "name")
+    echo itemName "->" idName
+  endfor
+endfunction
+command! SynStack call <SID>SynStack()
