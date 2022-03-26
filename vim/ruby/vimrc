@@ -26,8 +26,8 @@ augroup END
 
 let g:BufferNavigatorWidth = 50
 let g:BufferNavigatorHighlightRules = [
-      \["rubySpecDir", "spec", "NONE", "106", "NONE", "green"],
-      \["rubySpecFile", ".*_spec\.rb", "NONE", "154", "NONE", "green"],
+      \["rubySpecDir", "dir", "spec", "NONE", "106", "NONE", "green"],
+      \["rubySpecFile", "file", ".*_spec\.rb", "NONE", "154", "NONE", "green"],
       \]
 
 source $HOME/.dotfiles/vim/ruby/mappings.vim

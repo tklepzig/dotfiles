@@ -1,3 +1,17 @@
+" Enable TOC window auto-fit
+let g:vim_markdown_toc_autofit = 1
+let g:vim_markdown_folding_disabled = 1
+
+function! s:SpellCheck(bang, lang = "en")
+  let prefix = ""
+  if a:bang
+    let prefix = "no" 
+  endif
+  execute "setlocal " . prefix . "spell spelllang=" . a:lang
+endfunction
+
+command! -nargs=? -bang SpellCheck :call <SID>SpellCheck(<bang>0, <f-args>)
+
 function! s:ToggleWrite(bang)
   if a:bang
     Goyo! | Limelight!

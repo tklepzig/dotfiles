@@ -1,10 +1,6 @@
 " Set syntax scheme to json and format it (by using python, make sure it is installed)
 command Json set syntax=json | execute '%!python -m json.tool'
 
-" Enable TOC window auto-fit
-let g:vim_markdown_toc_autofit = 1
-let g:vim_markdown_folding_disabled = 1
-
 highlight GitGutterAdd    ctermfg=2
 highlight GitGutterChange ctermfg=3
 highlight GitGutterDelete ctermfg=1
@@ -46,16 +42,6 @@ let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 let NERDTreeQuitOnOpen = 1
 let NERDTreeShowHidden = 1
-
-function! s:SpellCheck(bang, lang = "en")
-  let prefix = ""
-  if a:bang
-    let prefix = "no" 
-  endif
-  execute "setlocal " . prefix . "spell spelllang=" . a:lang
-endfunction
-
-command! -nargs=? -bang SpellCheck :call <SID>SpellCheck(<bang>0, <f-args>)
 
 " =============================================================
 " Coc Settings

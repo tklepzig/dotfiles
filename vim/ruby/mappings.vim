@@ -1,3 +1,6 @@
 let mapleader = "\<space>"
 
-nnoremap <leader>2 :AlternateSafe<CR>
+augroup ruby
+    autocmd!
+    autocmd FileType ruby nnoremap <buffer> <leader>2 :AlternateSafe<cr>
+augroup END
