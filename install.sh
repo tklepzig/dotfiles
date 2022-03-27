@@ -108,7 +108,7 @@ then
   success "Done."
 fi
 
-source $dotfilesDir/setTheme.zsh 
+source $dotfilesDir/setTheme.zsh
 
 addLinkToFile "$dotfilesDir/colours.vim" "$HOME/.vimrc"
 if [ ! -f "$HOME/.plugins.custom.vim" ]
@@ -160,6 +160,11 @@ addLinkToFile "$dotfilesDir/tmux/tmux.conf" "$HOME/.tmux.conf"
 if isProgramInstalled kitty
 then
   addLinkToFile "$dotfilesDir/kitty/kitty.conf" "$HOME/.config/kitty/kitty.conf" "include"
+
+  if [ "$DOTFILES_THEME" = "lcars-light" ]
+  then
+    addLinkToFile "$dotfilesDir/kitty/kitty.lcars-light.conf" "$HOME/.config/kitty/kitty.conf" "include"
+  fi
 fi
 
 checkInstallation exa

@@ -79,6 +79,10 @@ augroup end
 
 hi CocUnusedHighlight ctermfg=250
 
+if dotfilesTheme == "lcars-light"
+  hi CocHighlightText ctermbg=248
+endif
+
 " Use `:Format` to format current buffer
 command! -nargs=0 Format :call CocAction('format')
 

@@ -3,7 +3,7 @@
 theme=$1
 if [ -z $theme ]
 then
-  theme=lcars
+  theme="${DOTFILES_THEME:-lcars}"
 fi
 
 cat $HOME/.dotfiles/themes/colours.$theme.zsh > $HOME/.dotfiles/colours.zsh

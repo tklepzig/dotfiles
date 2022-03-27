@@ -1,15 +1,15 @@
-primaryFg=0
-primaryBg=172
+primaryFg=15
+primaryBg=24
 primaryText=172
 secondaryFg=0
-secondaryBg=179
+secondaryBg=32
 secondaryText=179
-accentFg=15
-accentBg=32
-accentText=32
+accentFg=232
+accentBg=172
+accentText=172
 
 inactivePaneBorder=244
-inactivePaneBackground=236
+inactivePaneBackground=255
 
 infoFg=7
 infoBg=238
@@ -17,5 +17,3 @@ warningFg=0
 warningBg=220
 criticalFg=0
 criticalBg=124
-
-# primary 166

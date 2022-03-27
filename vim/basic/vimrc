@@ -1,3 +1,5 @@
+let dotfilesTheme = exists('$DOTFILES_THEME') ? $DOTFILES_THEME : 'lcars'
+
 set nocompatible
 set tabstop=2 softtabstop=2 expandtab shiftwidth=2 smarttab
 
@@ -102,16 +104,18 @@ source $HOME/.dotfiles/vim/basic/mappings.vim
 
 colorscheme codedark
 
-" TODO light theme
-"set background=light
-"colorscheme PaperColor
-
 " Use nicer highlight colors
 hi Search ctermfg=black ctermbg=228
 set cursorline
 hi CursorLine ctermbg=237
 hi CursorLineNR ctermfg=39
 hi CursorColumn ctermbg=238
+
+if dotfilesTheme == "lcars-light"
+  set background=light
+  colorscheme PaperColor
+  hi CursorLine ctermbg=251
+endif
 
 augroup BgHighlight
     autocmd!
