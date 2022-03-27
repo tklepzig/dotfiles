@@ -36,10 +36,6 @@ info "Removing ~/.plugins.custom.vim..."
 rm $HOME/.plugins.custom.vim
 success "Done."
 
-info "Removing ~/.df-profiles..."
-rm $HOME/.df-profiles
-success "Done."
-
 info "Removing ~/.vim..."
 rm -rf $HOME/.vim
 success "Done."

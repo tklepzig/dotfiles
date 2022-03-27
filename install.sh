@@ -2,7 +2,7 @@
 
 set -e
 dotfilesDir=$HOME/.dotfiles
-profilesPath=$HOME/.df-profiles
+#profilesPath=$HOME/.df-profiles
 
 source <(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/logger.sh)
 
@@ -54,8 +54,7 @@ addVimPlugin() {
 }
 
 installProfiles() {
-  touch $profilesPath
-  while read profile
+  for profile in basic $DOTFILES_PROFILES
   do
     info "Installing Profile $profile..."
 
@@ -69,7 +68,7 @@ installProfiles() {
     addLinkToFile "$dotfilesDir/zsh/$profile/zshrc.zsh" "$HOME/.zshrc"
 
     success "Done."
-  done < <(echo "basic" && cat $profilesPath)
+  done
 }
 
 skipClone=0
