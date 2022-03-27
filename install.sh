@@ -54,7 +54,7 @@ addVimPlugin() {
 }
 
 installProfiles() {
-  for profile in basic $DOTFILES_PROFILES
+  for profile in basic ${=DOTFILES_PROFILES}
   do
     info "Installing Profile $profile..."
 
