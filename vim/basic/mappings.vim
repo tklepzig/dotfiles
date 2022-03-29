@@ -67,3 +67,10 @@ vnoremap <S-k> 3<C-y>
 nnoremap <silent> "" :registers 0123456789abcdefghijklmnopqrstuvwxyz<CR>
 
 nnoremap <leader>u :UndotreeToggle \| UndotreeFocus<CR>
+
+function! s:BigSmallWin()
+  wincmd =
+  let width = winwidth(0)
+  execute 'vertical resize ' . float2nr(width + width * 0.2)
+endfunction
+nnoremap <silent> <Leader>w# :call <SID>BigSmallWin()<cr>
