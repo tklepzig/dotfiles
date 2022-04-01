@@ -10,12 +10,8 @@ git config --global credential.helper store
 git config --global push.default simple
 git config --global fetch.prune true
 git config --global pull.rebase true
-#git config --global diff.tool meld
-#git config --global merge.tool kdiff3
-#git config --global mergetool.keepBackup false
-#git config --global merge.kdiff3.keepBackup false
-#git config --global merge.kdiff3.trustExitCode false
-#git config --global merge.kdiff3.keepTemporaries false
+git config --global diff.tool vimdiff
+git config --global merge.tool vimdiff
 git config --global core.editor "vim"
 git config --global color.status always
 git config --global grep.extendedRegexp true
