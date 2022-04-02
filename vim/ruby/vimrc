@@ -14,12 +14,12 @@ command! AlternateSafe :call <SID>AlternateSafe()
 augroup filetype_ruby
     autocmd!
     autocmd FileType ruby iab <buffer> de do<cr>end<esc>O
-    autocmd FileType ruby iab <buffer> desc describe '' do<cr>end<esc>kf'
-    autocmd FileType ruby iab <buffer> ite it '' do<cr>end<esc>kf'
-    autocmd FileType ruby iab <buffer> ctx context '' do<cr>end<esc>kf'
-    autocmd FileType ruby iab <buffer> defe def <cr>end<esc>k$
-    autocmd FileType ruby iab <buffer> classe class <cr>end<esc>k$
-    autocmd FileType ruby iab <buffer> ife if <cr>end<esc>k
+    autocmd FileType ruby iab <buffer> desc describe 'title' do<cr>end<esc>O
+    autocmd FileType ruby iab <buffer> it it 'does' do<cr>end<esc>O
+    autocmd FileType ruby iab <buffer> ctx context 'with sth' do<cr>end<esc>O
+    autocmd FileType ruby iab <buffer> def def<cr>end<esc>kA
+    autocmd FileType ruby iab <buffer> class class<cr>end<esc>kA
+    autocmd FileType ruby iab <buffer> if if<cr>end<esc>kA
     autocmd FileType ruby iab <buffer> pry require 'pry'; binding.pry
 augroup END
 
