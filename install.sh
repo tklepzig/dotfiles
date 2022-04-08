@@ -36,6 +36,7 @@ addLinkToFile() {
   src=$1
   target=$2
   cmd=${3:-source}
+
   if [ ! -f $target ]
   then
     touch $target
@@ -108,8 +109,10 @@ then
 fi
 
 source $dotfilesDir/setTheme.zsh
-
 addLinkToFile "$dotfilesDir/colours.vim" "$HOME/.vimrc"
+addLinkToFile "$dotfilesDir/colours.zsh" "$HOME/.zshrc"
+addLinkToFile "$dotfilesDir/colours.zsh" "$HOME/.tmux.conf"
+
 if [ ! -f "$HOME/.plugins.custom.vim" ]
 then
   echo "\"Plug 'any/vim-plugin'" > $HOME/.plugins.custom.vim
@@ -121,8 +124,6 @@ then
 fi
 cp $dotfilesDir/vim/plugins.vim $HOME/.plugins.vim
 addLinkToFile "$HOME/.plugins.vim" "$HOME/.vimrc"
-
-addLinkToFile "$dotfilesDir/colours.zsh" "$HOME/.zshrc"
 
 installProfiles
 
@@ -147,7 +148,6 @@ mkdir -p $HOME/.zsh-sounds
 cp $dotfilesDir/zsh/sounds-readme.md $HOME/.zsh-sounds/README.md
 success "Done."
 
-addLinkToFile "$dotfilesDir/colours.zsh" "$HOME/.tmux.conf"
 if isOS darwin
 then
   addLinkToFile "$dotfilesDir/tmux/vars.osx.conf" "$HOME/.tmux.conf"
