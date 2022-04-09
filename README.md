@@ -8,7 +8,7 @@ My dotfiles for git, zsh, tmux and vim.
 
 ## Profiles
 
-Add these to `~/.df-profiles`, one profile name per line.
+The following profiles are available:
 
 | Name    | Details                    |
 | ------- | -------------------------- |
@@ -18,3 +18,8 @@ Add these to `~/.df-profiles`, one profile name per line.
 | ruby    | Ruby Support               |
 | writing | Distraction free writing   |
 | viml    | VimL/Vimscript Development |
+
+Add these to the environment variable `DOTFILES_PROFILES` space-separated in your `.zshrc`. It must be set before the dotfiles stuff is sourced.
+For example:
+
+    export DOTFILES_PROFILES="dev web"
