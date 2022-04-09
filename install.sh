@@ -133,9 +133,9 @@ then
   success "Done."
 fi
 
-info "Installing vim plugins..."
+info "Installing and updating vim plugins..."
 # "echo" to suppress the "Please press ENTER to continue...
-echo | vim +PlugInstall +qall > /dev/null 2>&1
+echo | vim +PlugInstall +PlugUpdate +qall > /dev/null 2>&1
 success "Done."
 
 # TODO
