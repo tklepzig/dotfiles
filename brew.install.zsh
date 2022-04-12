@@ -8,7 +8,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 brew install git
 brew install --cask kitty google-chrome
 
-brew install wget wemux websocat btop lynx ddgr exa pqiv ranger the_silver_searcher tig tmux bat pam-reattach
+brew install wget wemux websocat btop lynx ddgr exa pqiv ranger the_silver_searcher tig tmux bat pam-reattach jless
 brew install --cask gimp insomnia licecap raycast vnc-viewer ultimaker-cura seafile-client audacity vlc iterm2
 
 brew install awscli
