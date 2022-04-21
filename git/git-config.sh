@@ -12,11 +12,20 @@ git config --global fetch.prune true
 git config --global pull.rebase true
 git config --global diff.tool vimdiff
 git config --global merge.tool vimdiff
-git config --global core.editor "vim"
+git config --global core.editor vim
 git config --global color.status always
 git config --global grep.extendedRegexp true
 git config --global help.autoCorrect prompt
 
+
+# Try delta (https://dandavison.github.io/delta) as diff viewer
+git config --global core.pager delta
+git config --global diff.colorMoved default
+git config --global merge.conflictstyle diff3
+git config --global interactive.diffFilter "delta --color-only"
+git config --global delta.navigate true
+git config --global delta.side-by-side true
+git config --global delta.line-numbers true
 
 # aliases
 git config --global alias.s  "status -sb"
