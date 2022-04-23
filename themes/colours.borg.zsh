@@ -5,7 +5,7 @@ secondaryFg=232
 secondaryBg=28
 secondaryText=40
 accentFg=0
-accentBg=70
+accentBg=184
 accentText=76
 
 inactivePaneBorder=244
