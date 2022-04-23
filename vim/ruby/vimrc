@@ -23,6 +23,10 @@ augroup filetype_ruby
     autocmd FileType ruby iab <buffer> pry require 'pry'; binding.pry
 augroup END
 
+augroup skeletons_ruby
+  autocmd BufNewFile,BufReadPost *_spec\.rb if getline(1,'$') == [''] | 0r $HOME/.dotfiles/vim/ruby/skeletons/spec.rb | endif
+augroup END
+
 let g:BufferNavigatorWidth = 50
 let g:BufferNavigatorHighlightRules = [
       \["rubySpecDir", "dir", "spec", "NONE", "106", "NONE", "green"],
