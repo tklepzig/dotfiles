@@ -1,12 +1,12 @@
 primaryFg=7
 primaryBg=22
-primaryText=34
+primaryText=28
 secondaryFg=232
 secondaryBg=28
-secondaryText=40
+secondaryText=34
 accentFg=0
 accentBg=184
-accentText=76
+accentText=184
 
 inactivePaneBorder=244
 inactivePaneBackground=236
