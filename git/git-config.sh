@@ -117,6 +117,7 @@ git config --global alias.swn "show --word-diff --name-status --format=\"%C(yell
 
 git config --global alias.st "stash"
 git config --global alias.sts "stash --staged"
+git config --global alias.stk "stash --keep-index"
 git config --global alias.stp "stash pop"
 git config --global alias.stl "$stashCommon"
 git config --global alias.sta "stash apply"
