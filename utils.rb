@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class String
   def accent
     colorize "\e[1;34m"

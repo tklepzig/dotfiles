@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 DOTFILES_PATH ||= "#{ENV['HOME']}/.dotfiles-ruby"
 
