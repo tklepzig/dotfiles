@@ -112,7 +112,7 @@ source $dotfilesDir/setTheme.zsh
 addLinkToFile "$dotfilesDir/colours.vim" "$HOME/.vimrc"
 if [ ! -f "$HOME/.plugins.custom.vim" ]
 then
-  echo "#Plug 'any/vim-plugin'" > $HOME/.plugins.custom.vim
+  echo "\"Plug 'any/vim-plugin'" > $HOME/.plugins.custom.vim
 fi
 
 if [ -f "$HOME/.plugins.vim" ]
