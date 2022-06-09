@@ -13,7 +13,8 @@ else
         echo "#[default] #[fg=$secondaryFg,bg=$secondaryBg] VPN #[default] "
     else
         device=$(networksetup -listnetworkserviceorder | grep $interface | sed -E -n 's/.*: (.*),.*/\1/p')
-        echo "#[default] #[fg=$secondaryFg,bg=$secondaryBg] $device #[default] "
+        ssid=$(/System/Library/PrivateFrameworks/Apple80211.framework/Resources/airport -I  | awk -F' SSID: '  '/ SSID: / {print $2}')
+        echo "#[default] #[fg=$secondaryFg,bg=$secondaryBg] $device ($ssid) #[default] "
     fi
 fi
 
