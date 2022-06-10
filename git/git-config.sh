@@ -88,11 +88,11 @@ git config --global alias.bv "branch -vv"
 git config --global alias.bc "!f() { git remote prune origin; git branch -vv | grep 'origin/.*: gone]' | awk '{print \$1}' | xargs git branch -d; }; f"
 git config --global alias.bcD "!f() { git remote prune origin; git branch -vv | grep 'origin/.*: gone]' | awk '{print \$1}' | xargs git branch -D; }; f"
 # Show the commit hash of the first commit of the current or given branch --> "BranchFirstCommit"
-git config --global alias.bfc "!f() { currentBranch=\$(git rev-parse --abbrev-ref HEAD); echo \$(git log master..\${1:-\$currentBranch}  --oneline --pretty=format:'%h' | tail -1); }; f"
-# List all changed files included in this branch compared to master at the time the branch has been created
-git config --global alias.bf "!f() { git diff --name-only  \$(git merge-base \${1:-master} HEAD); }; f"
-git config --global alias.bfp "!f() { git diff -p --word-diff  \$(git merge-base \${1:-master} HEAD); }; f"
-git config --global alias.rbib "!f() { currentBranch=\$(git rev-parse --abbrev-ref HEAD); git rebase -i \$(git log master..\${1:-\$currentBranch}  --oneline --pretty=format:'%h' | tail -1)^; }; f"
+git config --global alias.bfc "!f() { defaultBranch=\$([ -f \"\$(git rev-parse --show-toplevel)/.git/refs/heads/master\" ] && echo master || echo main); currentBranch=\$(git rev-parse --abbrev-ref HEAD); echo \$(git log \$defaultBranch..\${1:-\$currentBranch}  --oneline --pretty=format:'%h' | tail -1); }; f"
+# List all changed files included in this branch compared to the default branch at the time the branch has been created
+git config --global alias.bf "!f() { defaultBranch=\$([ -f \"\$(git rev-parse --show-toplevel)/.git/refs/heads/master\" ] && echo master || echo main); git diff --name-only  \$(git merge-base \${1:-\$defaultBranch} HEAD); }; f"
+git config --global alias.bfp "!f() { defaultBranch=\$([ -f \"\$(git rev-parse --show-toplevel)/.git/refs/heads/master\" ] && echo master || echo main); git diff -p --word-diff  \$(git merge-base \${1:-\$defaultBranch} HEAD); }; f"
+git config --global alias.rbib "!f() { defaultBranch=\$([ -f \"\$(git rev-parse --show-toplevel)/.git/refs/heads/master\" ] && echo master || echo main); currentBranch=\$(git rev-parse --abbrev-ref HEAD); git rebase -i \$(git log \$defaultBranch..\${1:-\$currentBranch}  --oneline --pretty=format:'%h' | tail -1)^; }; f"
 
 git config --global alias.f "fetch"
 git config --global alias.fm "!f() { . ~/.dotfiles/git/git-fetch-merge.sh; }; f"
@@ -136,7 +136,7 @@ git config --global alias.cp "cherry-pick"
 git config --global alias.cpn "cherry-pick -n"
 
 # cpn all changes of branch $1
-git config --global alias.cnb "!f() { git cherry-pick -n \$(git merge-base master \$1)..\$1; }; f"
+git config --global alias.cnb "!f() { defaultBranch=\$([ -f \"\$(git rev-parse --show-toplevel)/.git/refs/heads/master\" ] && echo master || echo main); git cherry-pick -n \$(git merge-base \$defaultBranch \$1)..\$1; }; f"
 
 git config --global alias.rv "revert"
 git config --global alias.rvn "revert -n"
