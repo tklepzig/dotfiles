@@ -97,6 +97,15 @@ autoload -U down-line-or-beginning-search
 zle -N down-line-or-beginning-search
 bindkey "$ZSH_HISTORY_KEY_DOWN" down-line-or-beginning-search
 
+# Put the name of the default branch into $m (either master or main)
+chpwd() {
+  gitRoot=$(git rev-parse --show-toplevel 2>/dev/null)
+  if [ $? = 0 ]
+  then
+    gitDefaultBranch=$([ -f "$gitRoot/.git/refs/heads/master" ] && echo master || echo main)
+    m=$gitDefaultBranch
+  fi
+}
 
 preexec() {
   if isOS darwin
