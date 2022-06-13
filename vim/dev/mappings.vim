@@ -61,6 +61,9 @@ nnoremap <leader>e :Ranger <CR>
 nnoremap <leader>c ]s
 nnoremap <leader>C [s
 
+nnoremap gJ :call GoToNextIndent(1)<CR>
+nnoremap gK :call GoToNextIndent(-1)<CR>
+
 " Coc
 " Use tab for trigger completion with characters ahead and navigate.
 " Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
