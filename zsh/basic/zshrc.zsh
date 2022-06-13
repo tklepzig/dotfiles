@@ -83,7 +83,7 @@ bindkey -M vicmd v edit-command-line
 # and set ZSH_HISTORY_KEY_UP and ZSH_HISTORY_KEY_DOWN accordingly BEFORE sourcing this script
 if [ ! $ZSH_HISTORY_KEY_UP ]
 then
-  ZSH_HISTORY_KEY_UP='$terminfo[kcuu1]'
+  ZSH_HISTORY_KEY_UP='^[[A'
 fi
 autoload -U up-line-or-beginning-search
 zle -N up-line-or-beginning-search
@@ -91,7 +91,7 @@ bindkey "$ZSH_HISTORY_KEY_UP" up-line-or-beginning-search
 
 if [ ! $ZSH_HISTORY_KEY_DOWN ]
 then
-  ZSH_HISTORY_KEY_DOWN='$terminfo[kcud1]'
+  ZSH_HISTORY_KEY_DOWN='^[[B'
 fi
 autoload -U down-line-or-beginning-search
 zle -N down-line-or-beginning-search
