@@ -162,3 +162,6 @@ endfunction
 command! SynStack call <SID>SynStack()
 
 command! SearchCount echo searchcount({ "maxcount": 0 }).total
+
+"hybrid line numbers
+set number relativenumber
