@@ -4,17 +4,17 @@ routeResult=$(route get google.de 2>&1)
 
 if [[ "$routeResult" == *"bad address"* ]]
 then
-    echo "#[default] #[fg=$secondaryFg,bg=$secondaryBg] Offline #[default] "
+    echo "#[fg=$secondaryFg,bg=$secondaryBg] Offline #[default] "
 else
     interface=$(echo "$routeResult" | grep interface | awk '{print $2}')
 
     if [[ "$interface" == *"utun"* ]]
     then
-        echo "#[default] #[fg=$secondaryFg,bg=$secondaryBg] VPN #[default] "
+        echo "#[fg=$secondaryFg,bg=$secondaryBg] VPN #[default] "
     else
         device=$(networksetup -listnetworkserviceorder | grep $interface | sed -E -n 's/.*: (.*),.*/\1/p')
         ssid=$(/System/Library/PrivateFrameworks/Apple80211.framework/Resources/airport -I  | awk -F' SSID: '  '/ SSID: / {print $2}')
-        echo "#[default] #[fg=$secondaryFg,bg=$secondaryBg] $device ($ssid) #[default] "
+        echo "#[fg=$secondaryFg,bg=$secondaryBg] $device ($ssid) #[default] "
     fi
 fi
 
