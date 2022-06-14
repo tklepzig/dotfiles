@@ -62,7 +62,9 @@ nnoremap <leader>c ]s
 nnoremap <leader>C [s
 
 nnoremap gJ :call GoToNextIndent(1)<CR>
+vnoremap gJ :call GoToNextIndent(1)<CR>
 nnoremap gK :call GoToNextIndent(-1)<CR>
+vnoremap gK :call GoToNextIndent(-1)<CR>
 
 " Coc
 " Use tab for trigger completion with characters ahead and navigate.
