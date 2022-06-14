@@ -15,5 +15,6 @@
   "solargraph.autoformat": true,
   "solargraph.hover": true,
   "solargraph.diagnostics": true,
-  "solargraph.transport": "stdio"
+  "solargraph.transport": "stdio",
+  "prettier.formatterPriority": 1
 }
