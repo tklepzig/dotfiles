@@ -103,7 +103,8 @@ function! JumpToSameIndent(direction, inVisualMode)
   let matchIndent = 0
   while !matchIndent && currentLine != line('$') + 1 && currentLine != -1
     let currentLine += a:direction == 'down' ? 1 : -1
-    let matchIndent = getline(currentLine) !~ '^\s*$' && indent(currentLine) == indent('.')
+    let lineText = getline(currentLine)
+    let matchIndent = lineText !~ '^\s*$' && trim(lineText) !~ '^[\]\)\}]$' && indent(currentLine) == indent('.')
   endwhile
 
   if (matchIndent)
