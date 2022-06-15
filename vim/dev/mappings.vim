@@ -61,10 +61,10 @@ nnoremap <leader>e :Ranger <CR>
 nnoremap <leader>c ]s
 nnoremap <leader>C [s
 
-nnoremap gJ :call GoToNextIndent(1)<CR>
-vnoremap gJ :call GoToNextIndent(1)<CR>
-nnoremap gK :call GoToNextIndent(-1)<CR>
-vnoremap gK :call GoToNextIndent(-1)<CR>
+nnoremap <silent> gJ :call JumpToSameIndent('down', 0)<CR>
+vnoremap <silent> gJ :call JumpToSameIndent('down', 1)<CR>
+nnoremap <silent> gK :call JumpToSameIndent('up', 0)<CR>
+vnoremap <silent> gK :call JumpToSameIndent('up', 1)<CR>
 
 " Coc
 " Use tab for trigger completion with characters ahead and navigate.

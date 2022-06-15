@@ -96,20 +96,23 @@ let g:coc_snippet_next = '<tab>'
 
 let g:coc_global_extensions = ['coc-snippets']
 
-" from https://vi.stackexchange.com/a/12870 
-function! GoToNextIndent(inc)
-    let [_, line, col, _] = getpos('.')
+function! JumpToSameIndent(direction, inVisualMode)
+  let line = line('.')
 
-    let currentLine = line
-    let matchIndent = 0
-    while !matchIndent && currentLine != line('$') + 1 && currentLine != -1
-        let currentLine += a:inc
-        let matchIndent = getline(currentLine) !~ '^\s*$' && indent(currentLine) == indent('.')
-    endwhile
+  let currentLine = line
+  let matchIndent = 0
+  while !matchIndent && currentLine != line('$') + 1 && currentLine != -1
+    let currentLine += a:direction == 'down' ? 1 : -1
+    let matchIndent = getline(currentLine) !~ '^\s*$' && indent(currentLine) == indent('.')
+  endwhile
 
-    if (matchIndent)
-        call setpos('.', [0, currentLine, col])
+  if (matchIndent)
+    if (a:inVisualMode)
+      norm! gv
     endif
+
+    execute 'norm! ' . currentLine . 'G'
+  endif
 endfunction
 
 source $HOME/.dotfiles/vim/dev/statusline.vim
