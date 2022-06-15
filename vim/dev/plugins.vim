@@ -20,3 +20,4 @@ Plug 'tklepzig/vim-buffer-navigator'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'tpope/vim-abolish'
 Plug 'mracos/mermaid.vim'
+Plug 'wellle/context.vim'
