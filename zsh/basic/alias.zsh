@@ -83,6 +83,8 @@ alias nr='npm run'
 alias niwt="f(){ npm i \$1 && npm i -D @types/\$1; unset -f f }; f"
 alias nmc="find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
 
+alias ai="asdf install"
+
 if isProgramInstalled pacman
 then
     alias pm='sudo pacman'
