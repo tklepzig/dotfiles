@@ -81,6 +81,7 @@ git config --global alias.pf "push --force-with-lease"
 
 git config --global alias.c "checkout"
 git config --global alias.cb "checkout -b"
+git config --global alias.cm "!f() { $setDefaultBranch; git checkout \$defaultBranch; }; f"
 
 git config --global alias.b "branch"
 git config --global alias.bd "branch -d"
@@ -109,6 +110,7 @@ git config --global alias.mt "mergetool"
 git config --global alias.rb "rebase"
 git config --global alias.rbc "rebase --continue"
 git config --global alias.rba "rebase --abort"
+git config --global alias.rbm "!f() { $setDefaultBranch; git rebase \$defaultBranch; }; f"
 
 git config --global alias.undo "!f() { git reset --hard \$1 && git clean -df \$1; }; f"
 
