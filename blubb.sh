@@ -1,9 +1,12 @@
 #!/usr/bin/env zsh
 
-default="$(tput setab 172)$(tput setaf 0)"
-fg="$(tput setaf 172)"
-accent="$(tput setab 32)$(tput setaf 15)"
-light="$(tput setab 179)$(tput setaf 0)"
+${accentText:s/colour/}
+primaryTile="$(tput setab ${primaryBg:s/colour/})$(tput setaf ${primaryFg:s/colour/})"
+primary="$(tput setaf ${primaryText:s/colour/})"
+secondaryTile="$(tput setab ${secondaryBg:s/colour/})$(tput setaf ${secondaryFg:s/colour/})"
+secondary="$(tput setaf ${secondaryText:s/colour/})"
+accentTile="$(tput setab ${accentBg:s/colour/})$(tput setaf ${accentFg:s/colour/})"
+accent="$(tput setaf ${accentText:s/colour/})"
 reset="$(tput sgr0)"
 nl=$'\n'
 
@@ -62,7 +65,7 @@ digits[Z]="11111,00010,00100,01000,11111"
 renderString() {
   string=$1
   stringRow=$2
-  colour=${3:-$default}
+  colour=${3:-$primaryTile}
 
   if [ "$stringRow" = "top" ]
   then 
@@ -103,20 +106,23 @@ renderString() {
 while true
 do
   tput cup 0 0
-  echo -ne "$default$(printf "%$(tput cols)s")$reset"
+  echo -ne "$primaryTile$(printf "%$(tput cols)s")$reset"
 
-  renderString $(date "+%H:%M") centre 
+  renderString $(date "+%H:%M") centre $secondaryTile
   renderString "S.H.I.E.L.D." top
-  renderString "0-8-4" bottom $accent
+  renderString "0-8-4" bottom $accentTile
 
   #ssid="$(iwgetid -r)"
   #tput cup $(($(tput lines) - 3)) $(($(tput cols) / 2 - ${#ssid} / 2))
   #echo -ne "$ssid"
+
+  tput cup $(($(tput lines) - 3)) $(($(tput cols) / 2 + 20))
+  echo -ne "$(tput setaf ${accentText:s/colour/})blubb"
   #strength="$(iwconfig wlp0s20f3 | awk -F'[ =]+' '/Signal level/ {print $7}')"
   #tput cup $(($(tput lines) - 2)) $(($(tput cols) / 2 - ${#strength} / 2))
   #echo -ne "$strength"
 
-  if read -k1 -s -t 1 char
+  if read -k 1 -s -t 1 char
   then
     if [ "$char" = "r" ]
     then
