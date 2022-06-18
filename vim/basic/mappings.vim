@@ -20,6 +20,7 @@ nmap H ^
 vmap H ^
 nmap L $
 vmap L $
+vnoremap <silent> P "0p
 
 nnoremap <silent> <leader>! :ExecuteSelection<cr>
 vnoremap <silent> <leader>! :ExecuteSelection<cr>
