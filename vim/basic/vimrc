@@ -167,3 +167,5 @@ command! SearchCount echo searchcount({ "maxcount": 0 }).total
 set number relativenumber
 
 command! -bang Q qa<bang>
+
+set wildoptions=pum

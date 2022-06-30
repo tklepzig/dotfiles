@@ -1,5 +1,7 @@
 let g:coc_global_extensions = g:coc_global_extensions + ['coc-vimlsp']
 
+" TODO :so can handle visual selection by itself, writing to tmp file necessary??
+" TODO Add possibility for running vim9 scripts (:vim9 so)
 function! SourceSelection() range
   let tmpFile = tempname()
   call writefile(getline(a:firstline, a:lastline), l:tmpFile)
