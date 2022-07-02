@@ -1,7 +1,8 @@
 #!/usr/bin/env zsh
 isOS()
 {
-    if [[ "$OSTYPE:l" == *"$1:l"* ]]
+    shopt -s nocasematch
+    if [[ "$OSTYPE" == *"$1"* ]]
     then
         return 0;
     fi
