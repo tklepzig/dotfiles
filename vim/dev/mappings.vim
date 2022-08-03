@@ -67,18 +67,17 @@ nnoremap <silent> zk :call JumpToSameIndent('up', 0)<CR>
 vnoremap <silent> zk :call JumpToSameIndent('up', 1)<CR>
 
 " Coc
-" Use tab for trigger completion with characters ahead and navigate.
-" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
-"inoremap <silent><expr> <TAB>
-      "\ pumvisible() ? "\<C-n>" :
-      "\ <SID>check_back_space() ? "\<TAB>" :
-      "\ coc#refresh()
-"inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-" Use tab to trigger snippets
+" Use <down> and <up> to navigate completion list:
+inoremap <silent><expr> <Down>
+      \ coc#pum#visible() ? coc#pum#next(1) : "\<Down>"
+inoremap <expr><Up> coc#pum#visible() ? coc#pum#prev(1) : "\<Up>"
+
+" Map <tab> for trigger completion, completion confirm, snippet expand and jump
 inoremap <silent><expr> <TAB>
-      \ pumvisible() ? coc#_select_confirm() :
-      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+      \ coc#pum#visible() ? coc#_select_confirm() :
+      \ coc#expandableOrJumpable() ?
+      \ "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
       \ <SID>check_back_space() ? "\<TAB>" :
       \ coc#refresh()
 
@@ -87,14 +86,14 @@ function! s:check_back_space() abort
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
-" Use <c-x> to trigger completion.
+let g:coc_snippet_next = '<tab>'
+
+" Use <CR> to confirm completion
+inoremap <expr> <cr> coc#pum#visible() ? coc#_select_confirm() : "\<CR>"
+
+" Use <c-x> to trigger completion
 inoremap <silent><expr> <c-x> coc#refresh()
 
-" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
-" Coc only does snippet and additional edit on confirm.
-inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-" Or use `complete_info` if your vim support it, like:
-" inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
 
 " Navigate diagnostics
 nmap <silent> <leader>K <Plug>(coc-diagnostic-prev)
