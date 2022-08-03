@@ -78,6 +78,7 @@ augroup mygroup
 augroup end
 
 hi CocUnusedHighlight ctermfg=250
+hi CocMenuSel ctermfg=0
 
 if dotfilesTheme == "lcars-light"
   hi CocHighlightText ctermbg=248
