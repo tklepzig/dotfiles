@@ -89,7 +89,8 @@ endfunction
 let g:coc_snippet_next = '<tab>'
 
 " Use <CR> to confirm completion
-inoremap <expr> <cr> coc#pum#visible() ? coc#_select_confirm() : "\<CR>"
+" No abbreviations with carriage returns in it are possible anymore
+"inoremap <expr> <cr> coc#pum#visible() ? coc#_select_confirm() : "\<CR>"
 
 " Use <c-x> to trigger completion
 inoremap <silent><expr> <c-x> coc#refresh()
