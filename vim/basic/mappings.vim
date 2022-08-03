@@ -51,8 +51,8 @@ inoremap <expr> <PageUp>   pumvisible()    ? "\<PageUp>\<C-p>\<C-n>"   : "\<Page
 nnoremap <leader>s :w<CR>
 nnoremap <leader>S :wa<CR>
 
-nnoremap <leader>- <C-o><CR>
-nnoremap <leader>+ <C-i><CR>
+nnoremap <leader>- <C-o>
+nnoremap <leader>+ <C-i>
 
 " Enter // to search for currently visually selected block
 " Hint: enter :g/ (short for :g//p) to list all  occurences in the current file
