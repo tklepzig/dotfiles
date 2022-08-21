@@ -135,6 +135,9 @@ do
   sleep 0.2
 done
 
+clear
+tput cnorm
+
 # TODO
 # Appointments
 # GH notifications
