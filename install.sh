@@ -184,7 +184,14 @@ then
   success "Done."
 fi
 
-if [ "$SHELL" != "$(which zsh)" ]
+if isOS darwin
+then
+  defaultShell=$(dscl . -read $HOME/ UserShell | sed 's/UserShell: //')
+else
+  defaultShell=$(grep ^$(id -un): /etc/passwd | cut -d : -f 7-)
+fi
+
+if [ "$defaultShell" != "$(which zsh)" ]
 then
   info "Setting default shell to zsh..."
   chsh -s $(which zsh)
