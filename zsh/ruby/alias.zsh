@@ -1,5 +1,6 @@
 alias b="bundle"
 alias ba="bundle add"
+alias bo="bundle open"
 alias be="bundle exec"
 alias ber="bundle exec rake"
 alias berdb="ENV=test bundle exec rake db:create db:migrate"
