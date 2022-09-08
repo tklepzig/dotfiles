@@ -169,3 +169,4 @@ set number relativenumber
 command! -bang Q qa<bang>
 
 set wildoptions=pum
+set shiftround
