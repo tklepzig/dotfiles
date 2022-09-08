@@ -12,7 +12,7 @@ endfunction
 
 command! -nargs=? -bang SpellCheck :call <SID>SpellCheck(<bang>0, <f-args>)
 
-function! s:ToggleWrite(bang)
+function! s:ToggleWrite(bang, width)
   if a:bang
     Goyo! | Limelight!
     set nowrap nolinebreak
@@ -24,8 +24,8 @@ function! s:ToggleWrite(bang)
   else
     set wrap linebreak
     colorscheme seoul256
-    Goyo | Limelight
+    execute "Goyo " . a:width . " | Limelight"
   endif
 endfunction
 
-command! -bang Write :call <SID>ToggleWrite(<bang>0)
+command! -nargs=* -bang Write :call <SID>ToggleWrite(<bang>0, <q-args>)
