@@ -25,6 +25,7 @@ augroup END
 
 augroup skeletons_ruby
   autocmd BufNewFile,BufReadPost *_spec\.rb if getline(1,'$') == [''] | 0r $HOME/.dotfiles/vim/ruby/skeletons/spec.rb | endif
+  autocmd BufNewFile,BufReadPost *.rb if getline(1,'$') == [''] | 0r $HOME/.dotfiles/vim/ruby/skeletons/ruby.rb | endif
 augroup END
 
 let g:BufferNavigatorWidth = 50
