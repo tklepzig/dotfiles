@@ -93,8 +93,8 @@ git config --global alias.bcD "!f() { git remote prune origin; git branch -vv | 
 # Show the commit hash of the first commit of the current or given branch --> "BranchFirstCommit"
 git config --global alias.bfc "!f() { $setDefaultBranch; currentBranch=\$(git rev-parse --abbrev-ref HEAD); echo \$(git log \$defaultBranch..\${1:-\$currentBranch}  --oneline --pretty=format:'%h' | tail -1); }; f"
 # List all changed files included in this branch compared to the default branch at the time the branch has been created
-git config --global alias.bf "!f() { $setDefaultBranch; git diff --name-only  \$(git merge-base \${1:-\$defaultBranch} HEAD); }; f"
-git config --global alias.bfp "!f() { $setDefaultBranch; git diff -p --word-diff  \$(git merge-base \${1:-\$defaultBranch} HEAD); }; f"
+git config --global alias.bf "!f() { $setDefaultBranch; git diff --name-only \$(git merge-base \${1:-\$defaultBranch} HEAD); git ls-files --others --exclude-standard; }; f"
+git config --global alias.bfp "!f() { $setDefaultBranch; git diff -p --word-diff \$(git merge-base \${1:-\$defaultBranch} HEAD); }; f"
 git config --global alias.rbib "!f() { $setDefaultBranch; currentBranch=\$(git rev-parse --abbrev-ref HEAD); git rebase -i \$(git log \$defaultBranch..\${1:-\$currentBranch}  --oneline --pretty=format:'%h' | tail -1)^; }; f"
 
 git config --global alias.f "fetch"
