@@ -1,5 +1,6 @@
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.tsx, *.jsx'
 let test#strategy = "vimux"
+let g:test#echo_command = 0
 
 autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
 autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx
