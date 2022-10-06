@@ -11,6 +11,11 @@ endfunction
 
 command! AlternateSafe :call <SID>AlternateSafe()
 
+let g:projectionist_heuristics = { ".git/":
+      \ { "lib/web/*_controller.rb": { "alternate": "spec/requests/{}_request_spec.rb" }, 
+      \   "spec/requests/*_request_spec.rb": { "alternate": "lib/web/{}_controller.rb" }}
+      \ }
+
 augroup filetype_ruby
     autocmd!
     autocmd FileType ruby iab <buffer> de do<cr>end<esc>O
