@@ -6,6 +6,8 @@ Metrics/AbcSize:
   Enabled: false
 Style/FrozenStringLiteralComment:
   Enabled: false
-#TODO: https://github.com/rubocop/ruby-style-guide
-#TODO: https://docs.rubocop.org/rubocop/cops_style.html
-#TODO: https://gist.github.com/lfender6445/9919357
+# TODO: https://github.com/rubocop/ruby-style-guide
+# TODO: https://rubystyle.guide/
+# TODO: https://docs.rubocop.org/rubocop/cops_style.html
+# TODO: https://gist.github.com/lfender6445/9919357
+# TODO: https://apidock.com/ruby/
