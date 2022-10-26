@@ -22,6 +22,9 @@ nmap L $
 vmap L $
 vnoremap <silent> P "0p
 
+" see :help Y
+map Y y$
+
 nnoremap <silent> <leader>! :ExecuteSelection<cr>
 vnoremap <silent> <leader>! :ExecuteSelection<cr>
 
