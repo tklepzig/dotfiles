@@ -21,6 +21,7 @@ vmap H ^
 nmap L $
 vmap L $
 vnoremap <silent> P "0p
+nnoremap <leader>$ :shell<cr>
 
 " see :help Y
 map Y y$

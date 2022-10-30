@@ -166,7 +166,15 @@ precmd() {
   fi
   #local prefix=$(echo -e '\u261e')
   local path="%(5~|%-1~/…/%3~|%4~)"
-  PROMPT="$greyTile\$elapsedTime$reset\$lastExitCodeString$reset$nl$nl$repoInfoOrUser$secondary$path$nl$primary$prefix $reset"
+
+  if [ -n "$VIMRUNTIME" ]
+  then
+    local inVimOrPrefix="${accentTile}vim $prefix$reset "
+  else
+    local inVimOrPrefix="$primary$prefix$reset "
+  fi
+
+  PROMPT="$greyTile\$elapsedTime$reset\$lastExitCodeString$reset$nl$nl$repoInfoOrUser$secondary$path$nl$inVimOrPrefix"
 }
 
 playSound()

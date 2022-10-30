@@ -53,6 +53,7 @@ alias dce='docker compose exec'
 alias dcl='docker compose logs -f'
 alias dp='docker system prune -f && docker rmi -f $(docker images -q)'
 alias ccp='xclip -selection clipboard'
+alias vim='test -n "$VIMRUNTIME" && exit || vim'
 alias v='vim'
 alias vs='vim -S'
 
