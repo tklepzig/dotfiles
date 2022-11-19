@@ -2,6 +2,8 @@
 let g:vim_markdown_toc_autofit = 1
 let g:vim_markdown_folding_disabled = 1
 
+"let g:vimtex_syntax_conceal_disable = 1
+
 function! s:SpellCheck(bang, lang = "en")
   let prefix = ""
   if a:bang
@@ -30,8 +32,3 @@ endfunction
 
 command! -nargs=* -bang Write :call <SID>ToggleWrite(<bang>0, <q-args>)
 
-" TODO: Introduce setup for ~/.vim/ftplugin/<filetype>.vim and move it there
-augroup filetype_tex
-    autocmd!
-    autocmd BufNew,BufRead *.tex setlocal conceallevel=0
-augroup END
