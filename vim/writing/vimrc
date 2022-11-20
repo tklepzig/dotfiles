@@ -2,7 +2,7 @@
 let g:vim_markdown_toc_autofit = 1
 let g:vim_markdown_folding_disabled = 1
 
-"let g:vimtex_syntax_conceal_disable = 1
+let g:vimtex_syntax_conceal_disable = 1
 
 function! s:SpellCheck(bang, lang = "en")
   let prefix = ""
