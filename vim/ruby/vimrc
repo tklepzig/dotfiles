@@ -47,4 +47,14 @@ let g:BufferNavigatorHighlightRules = [
       \["rubySpecFile", "file", ".*_spec\.rb", "NONE", "154", "NONE", "green"],
       \]
 
+" temporary, move to new plugin with sidebar window using vim9script
+function! s:TestOutline()
+  let describes = execute('g/^\s*describe')
+  let contexts = execute('g/^\s*context')
+  let its = execute('g/^\s*it')
+  let result = describes . contexts . its
+  echo join(sort(split(result, "\n")), "\n")
+endfunction
+command! TestOutline :call <SID>TestOutline()
+
 source $HOME/.dotfiles/vim/ruby/mappings.vim
