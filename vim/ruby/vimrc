@@ -53,6 +53,10 @@ function! s:TestOutline()
   let contexts = execute('g/^\s*context')
   let its = execute('g/^\s*it')
   let result = describes . contexts . its
+  let result = substitute(result, "' do", "", "g")
+  let result = substitute(result, "it '", "it ", "g")
+  let result = substitute(result, "context '", "", "g")
+  let result = substitute(result, "describe '", "", "g")
   echo join(sort(split(result, "\n")), "\n")
 endfunction
 command! TestOutline :call <SID>TestOutline()
