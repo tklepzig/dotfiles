@@ -146,3 +146,8 @@ git config --global alias.rvn "revert -n"
 
 git config --global alias.prn "!f() { . ~/.dotfiles/git/git-github-pr.sh new; }; f"
 git config --global alias.pro "!f() { . ~/.dotfiles/git/git-github-pr.sh; }; f"
+
+
+#search for regex in all files history
+#git log -G regex [-- path/to/specific file]
+#git log -p -G regex [-- path/to/specific file]
