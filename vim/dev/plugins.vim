@@ -20,5 +20,6 @@ Plug 'tklepzig/vim-buffer-navigator'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'tpope/vim-abolish'
 Plug 'mracos/mermaid.vim'
+Plug 'markonm/traces.vim'
 "performance problems while scrolling...
 "Plug 'wellle/context.vim'
