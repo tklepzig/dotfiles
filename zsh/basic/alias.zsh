@@ -44,6 +44,7 @@ alias g='git'
 alias gk='LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 gitk --all &'
 alias gg='LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 git gui &'
 alias gsa="$dotfilesDir/git/git-status-all.sh"
+alias gfa="$dotfilesDir/git/git-fetch-all.sh"
 alias c='clear'
 alias d='docker'
 alias dc='docker compose'
