@@ -48,7 +48,7 @@ let g:BufferNavigatorHighlightRules = [
       \]
 
 " temporary, move to new plugin with sidebar window using vim9script
-function! s:TestOutline()
+function! s:TestOutlineOld()
   let describes = execute('g/^\s*describe')
   let contexts = execute('g/^\s*context')
   let its = execute('g/^\s*it')
@@ -59,6 +59,5 @@ function! s:TestOutline()
   let result = substitute(result, "describe '", "", "g")
   echo join(sort(split(result, "\n")), "\n")
 endfunction
-command! TestOutline :call <SID>TestOutline()
 
 source $HOME/.dotfiles/vim/ruby/mappings.vim
