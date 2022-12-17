@@ -7,9 +7,9 @@
     "<C-c>": "do:exit"
   },
   "python.jediEnabled": false,
-  "codeLens.enable": true,
+  "codeLens.enable": false,
   "eslint.autoFixOnSave": true,
-  "coc.preferences.formatOnSaveFiletypes": ["*"],
+  "coc.preferences.formatOnSave": true,
   "javascript.suggestionActions.enabled": false,
   "solargraph.formatting": true,
   "solargraph.autoformat": true,
