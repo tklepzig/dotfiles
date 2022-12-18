@@ -139,6 +139,14 @@ info "Installing and updating vim plugins..."
 echo | vim +PlugInstall +PlugUpdate +qall > /dev/null 2>&1
 success "Done."
 
+if [ ${DOTFILES_PROFILES#*dev} != $DOTFILES_PROFILES ]
+then
+  # The dev profile is activated and so the coc plugin is installed
+  info "Updating coc extensions..."
+  echo | vim +CocUpdate +qall > /dev/null 2>&1
+  success "Done."
+fi
+
 # TODO
 # Ensure the following line is in .zshrc after all df includes
 # [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
