@@ -4,9 +4,15 @@ primaryText=28
 secondaryFg=232
 secondaryBg=34
 secondaryText=34
+# secondary brighter? (old accent color)
+#secondaryBg=76
+#secondaryText=76
 accentFg=0
-accentBg=76
-accentText=76
+# old, lime-like, too similar to primary
+#accentBg=76
+#accentText=76
+accentBg=202
+accentText=202
 
 inactivePaneBorder=244
 inactivePaneBackground=236
