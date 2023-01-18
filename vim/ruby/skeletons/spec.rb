@@ -12,7 +12,7 @@ RSpec.describe SUT do
     end
   end
 
-  describe '.class_methods' do
+  describe '.class_method' do
     it 'does sth' do
     end
 
