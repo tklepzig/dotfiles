@@ -58,6 +58,11 @@ addLinkToFile() {
 }
 
 addVimPlugin() {
+  if [ -f "$dotfilesDir/vim/$1/plugins.vim.override" ]
+  then
+    $dotfilesDir/merge.rb "$dotfilesDir/vim/$1/plugins.vim" "$dotfilesDir/vim/$1/plugins.vim.override"
+  fi
+
   sed 's/\"pluginfile/source \$HOME\/.dotfiles\/vim\/'"$1"'\/plugins.vim\
 \"pluginfile/g' $HOME/.plugins.vim > $HOME/.plugins.vim.tmp && mv $HOME/.plugins.vim.tmp $HOME/.plugins.vim
 }
