@@ -41,10 +41,18 @@ addLinkToFile() {
   then
     touch $target
   fi
+
   if ! grep -q "$src" $target
   then
     info "Adding link to $target..."
     echo "$cmd $src" >> $target;
+    success "Done."
+  fi
+
+  if [ -f "$src.override" ] && ! grep -q "$src.override" $target
+  then
+    info "Adding override to $target..."
+    echo "$cmd $src.override" >> $target;
     success "Done."
   fi
 }
