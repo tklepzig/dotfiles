@@ -91,13 +91,24 @@ end
 
 def add_link_to_file(link, file, command = 'source')
   File.new(file, 'w') unless File.exist?(file)
-  `grep -q #{link} #{file}`
 
+  `grep -q #{link} #{file}`
   return if $CHILD_STATUS.success?
 
   Logger.log 'Adding link to ', file.accent, '...', newline: false
   File.open(file, 'a') do |f|
     f.puts "#{command} #{link}"
+  end
+  Logger.log ' Done.'.success
+
+  return unless File.exist?("#{link}.override")
+
+  `grep -q "#{link}.override" #{file}`
+  return if $CHILD_STATUS.success?
+
+  Logger.log 'Adding override to ', file.accent, '...', newline: false
+  File.open(file, 'a') do |f|
+    f.puts "#{command} #{link}.override"
   end
   Logger.log ' Done.'.success
 end
