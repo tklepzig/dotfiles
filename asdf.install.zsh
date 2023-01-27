@@ -12,7 +12,7 @@ git checkout "$(git describe --abbrev=0 --tags)"
 cd -
 source $HOME/.zshrc
 
-for plugin in nodejs python ruby vim
+for plugin in nodejs python ruby vim ctop
 do
   asdf plugin add $plugin
   asdf install $plugin latest
