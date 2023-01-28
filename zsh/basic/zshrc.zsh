@@ -34,12 +34,6 @@ source $dotfilesDir/zsh/basic/alias.zsh
 # Add completions from .zsh/completion
 fpath=($HOME/.zsh/completion $fpath)
 
-if [ -d "$HOME/.asdf" ]
-then
-  source $HOME/.asdf/asdf.sh
-  fpath=(${ASDF_DIR}/completions $fpath)
-fi
-
 autoload -Uz colors compinit promptinit edit-command-line vcs_info
 colors
 promptinit

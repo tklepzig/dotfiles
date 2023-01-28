@@ -10,7 +10,14 @@ git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf
 cd $HOME/.asdf
 git checkout "$(git describe --abbrev=0 --tags)"
 cd -
-source $HOME/.zshrc
+
+
+if ! grep -q 'source $HOME/.asdf/asdf.sh' $HOME/.zshrc
+then
+  echo 'source $HOME/.asdf/asdf.sh' >> $HOME/.zshrc;
+  echo 'fpath=(${ASDF_DIR}/completions $fpath)' >> $HOME/.zshrc;
+  source $HOME/.zshrc
+fi
 
 for plugin in nodejs python ruby vim ctop
 do
@@ -18,3 +25,6 @@ do
   asdf install $plugin latest
   asdf global $plugin latest
 done
+
+
+
