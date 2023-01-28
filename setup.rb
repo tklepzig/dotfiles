@@ -246,8 +246,26 @@ def install
   `#{DF_PATH}/git/git-config.sh`
   Logger.log ' Done.'.success
 
-  # docker stuff
-  # set default shell to zsh if necessary
+  if program_installed? 'docker'
+    Logger.log 'Installing docker completion...', newline: false
+    `mkdir -p #{HOME}/.zsh/completion`
+    `curl -L https://raw.githubusercontent.com/docker/cli/master/contrib/completion/zsh/_docker > #{HOME}/.zsh/completion/_docker 2>/dev/null`
+    `curl -L https://raw.githubusercontent.com/docker/compose/master/contrib/completion/zsh/_docker-compose > #{HOME}/.zsh/completion/_docker-compose 2>/dev/null`
+    Logger.log ' Done.'.success
+  end
+
+  default_shell = if OS.mac?
+                    `dscl . -read #{HOME}/ UserShell | sed 's/UserShell: //'`
+                  else
+                    `grep ^$(id -un): /etc/passwd | cut -d : -f 7-`
+                  end
+
+  if default_shell != `which zsh`
+    Logger.log 'Setting default shell to zsh...', newline: false
+    `chsh -s $(which zsh)`
+    Logger.log ' Done.'.success
+    Logger.log 'Please notice: In order to use the new shell, you have to logout and back in.'.accent
+  end
 end
 
 def tabula_rasa
