@@ -13,19 +13,10 @@ DF_PATH ||= "#{HOME}/.dotfiles"
 # https://rubystyle.guide/
 # TODO: symlink my own global config to $HOME/.rubocop.yml
 
-def merge(base_path, override_path)
-  base = File.readlines(base_path)
-  override = File.readlines(override_path)
-
-  result = base.reject { |line| override.include?("-#{line}") }
-  result += override.reject { |line| line.start_with?('-') }
-  File.write(base_path, result.join)
-end
-
 def link_vim_plugins(profile)
-  if File.exist?("#{DF_PATH}/vim/#{profile}/plugins.vim.override")
+  if File.exist?("#{DF_PATH}/vim/#{profile}/plugins.override.vim")
     merge("#{DF_PATH}/vim/#{profile}/plugins.vim",
-          "#{DF_PATH}/vim/#{profile}/plugins.vim.override")
+          "#{DF_PATH}/vim/#{profile}/plugins.override.vim")
   end
 
   `sed 's/\\"pluginfile/source $HOME\\/.dotfiles\\/vim\\/#{profile}\\/plugins.vim\\

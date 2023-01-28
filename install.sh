@@ -49,18 +49,19 @@ addLinkToFile() {
     success "Done."
   fi
 
-  if [ -f "$src.override" ] && ! grep -q "$src.override" $target
+  override=$($dotfilesDir/find_override.rb "$src")
+  if [ -f "$override" ] && ! grep -q "$override" $target
   then
     info "Adding override to $target..."
-    echo "$cmd $src.override" >> $target;
+    echo "$cmd $override" >> $target;
     success "Done."
   fi
 }
 
 addVimPlugin() {
-  if [ -f "$dotfilesDir/vim/$1/plugins.vim.override" ]
+  if [ -f "$dotfilesDir/vim/$1/plugins.override.vim" ]
   then
-    $dotfilesDir/merge.rb "$dotfilesDir/vim/$1/plugins.vim" "$dotfilesDir/vim/$1/plugins.vim.override"
+    $dotfilesDir/merge.rb "$dotfilesDir/vim/$1/plugins.vim" "$dotfilesDir/vim/$1/plugins.override.vim"
   fi
 
   sed 's/\"pluginfile/source \$HOME\/.dotfiles\/vim\/'"$1"'\/plugins.vim\

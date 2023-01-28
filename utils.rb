@@ -58,6 +58,22 @@ module OS
   end
 end
 
+def find_override(file_path)
+  return "#{file_path}.override" if File.exist?("#{file_path}.override")
+
+  override_before_extension = file_path.gsub(/(.*)(\..+)$/, '\1.override\2')
+  return override_before_extension if File.exist?(override_before_extension)
+end
+
+def merge(base_path, override_path)
+  base = File.readlines(base_path)
+  override = File.readlines(override_path)
+
+  result = base.reject { |line| override.include?("-#{line}") }
+  result += override.reject { |line| line.start_with?('-') }
+  File.write(base_path, result.join)
+end
+
 def program_installed?(program)
   result = `sh -c 'command -v #{program}'`
   return true unless result.empty?
@@ -101,14 +117,16 @@ def add_link_to_file(link, file, command = 'source')
   end
   Logger.log ' Done.'.success
 
-  return unless File.exist?("#{link}.override")
+  override = find_override(link)
 
-  `grep -q "#{link}.override" #{file}`
+  return unless override
+
+  `grep -q "#{override}" #{file}`
   return if $CHILD_STATUS.success?
 
   Logger.log 'Adding override to ', file.accent, '...', newline: false
   File.open(file, 'a') do |f|
-    f.puts "#{command} #{link}.override"
+    f.puts "#{command} #{override}"
   end
   Logger.log ' Done.'.success
 end
