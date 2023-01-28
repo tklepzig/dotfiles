@@ -1,9 +1,8 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# neeeded for $CHILD_STATUS
+# neeeded for $CHILD_STATUS and $PROGRAM_NAME
 require 'English'
-require_relative './utils'
 
 HOME ||= ENV['HOME']
 DF_PROFILES ||= ENV['DOTFILES_PROFILES']
@@ -12,6 +11,136 @@ DF_PATH ||= "#{HOME}/.dotfiles"
 
 # https://rubystyle.guide/
 # TODO: symlink my own global config to $HOME/.rubocop.yml
+
+class String
+  def accent
+    colorize "\e[1;34m"
+  end
+
+  def success
+    colorize "\e[0;92m"
+  end
+
+  def error
+    colorize "\e[0;91m"
+  end
+
+  private
+
+  def colorize(color)
+    "#{color}#{self}\e[0m"
+  end
+end
+
+module Logger
+  @level = 0
+
+  def self.log(*message_parts, newline: true)
+    message = message_parts.join
+    message = message.rjust(message.length + 2 * @level)
+
+    if newline
+      puts message
+    else
+      print message
+    end
+  end
+
+  def self.indent
+    @level += 1
+  end
+
+  def self.outdent
+    @level -= 1
+    @level = 0 if @level.negative?
+  end
+
+  def self.reset_indentation
+    @level = 0
+  end
+end
+
+module OS
+  def self.mac?
+    (/darwin/ =~ RUBY_PLATFORM) != nil
+  end
+
+  def self.linux?
+    (/linux/ =~ RUBY_PLATFORM) != nil
+  end
+end
+
+def find_override(file_path)
+  return "#{file_path}.override" if File.exist?("#{file_path}.override")
+
+  override_before_extension = file_path.gsub(/(.*)(\..+)$/, '\1.override\2')
+  return override_before_extension if File.exist?(override_before_extension)
+end
+
+def merge(base_path, override_path)
+  base = File.readlines(base_path)
+  override = File.readlines(override_path)
+
+  result = base.reject { |line| override.include?("-#{line}") }
+  result += override.reject { |line| line.start_with?('-') }
+  File.write(base_path, result.join)
+end
+
+def program_installed?(program)
+  result = `sh -c 'command -v #{program}'`
+  return true unless result.empty?
+
+  false
+end
+
+def check_mandatory_installation(program)
+  Logger.log 'Searching for ', program.accent, '...', newline: false
+
+  unless program_installed? program
+    Logger.log ' Not found, aborting'.error
+    exit(false)
+  end
+
+  path = `which #{program}`
+  Logger.log " Found: #{path.strip}.".success
+end
+
+def check_optional_installation(program, install_name = program)
+  Logger.log 'Searching for ', program.accent, '...', newline: false
+
+  if program_installed? program
+    Logger.log ' Found.'.success
+    return
+  end
+
+  Logger.log " Not Found. (Try \"sudo pacman -S #{install_name}\")".error
+end
+
+def add_link_to_file(link, file, command = 'source')
+  File.new(file, 'w') unless File.exist?(file)
+
+  `grep -q #{link} #{file}`
+  return if $CHILD_STATUS.success?
+
+  Logger.log 'Adding link to ', file.accent, '...', newline: false
+  File.open(file, 'a') do |f|
+    f.puts "#{command} #{link}"
+  end
+  Logger.log ' Done.'.success
+
+  override = find_override(link)
+
+  return unless override
+
+  `grep -q "#{override}" #{file}`
+  return if $CHILD_STATUS.success?
+
+  Logger.log 'Adding override to ', file.accent, '...', newline: false
+  File.open(file, 'a') do |f|
+    f.puts "#{command} #{override}"
+  end
+  Logger.log ' Done.'.success
+end
 
 def link_vim_plugins(profile)
   if File.exist?("#{DF_PATH}/vim/#{profile}/plugins.override.vim")
@@ -31,10 +160,13 @@ def install_profiles
     link_vim_plugins profile
     add_link_to_file "#{DF_PATH}/vim/#{profile}/vimrc", "#{HOME}/.vimrc"
 
-    # setup_file = "#{DF_PATH}/vim/#{profile}/install.rb"
-    # require_relative setup_file if File.exist?(setup_file)
+    # TODO: install.sh not working 100% since it contains:
+    # - checkInstallation
+    # $dotfilesDir
     setup_file = "#{DF_PATH}/vim/#{profile}/install.sh"
     `source "#{setup_file}"` if File.exist?(setup_file)
+    # setup_file = "#{DF_PATH}/vim/#{profile}/install.rb"
+    # require_relative setup_file if File.exist?(setup_file)
 
     add_link_to_file "#{DF_PATH}/zsh/#{profile}/zshrc.zsh", "#{HOME}/.zshrc"
 
@@ -43,72 +175,87 @@ def install_profiles
   end
 end
 
-check_mandatory_installation 'zsh'
+def install
+  check_mandatory_installation 'git'
+  check_mandatory_installation 'zsh'
 
-`source "#{DF_PATH}/setTheme.zsh"`
-add_link_to_file "#{DF_PATH}/colours.vim", "#{HOME}/.vimrc"
-add_link_to_file "#{DF_PATH}/colours.zsh", "#{HOME}/.zshrc"
-add_link_to_file "#{DF_PATH}/colours.zsh", "#{HOME}/.tmux.conf"
-
-unless File.exist?("#{HOME}/.plugins.custom.vim")
-  File.write("#{HOME}/.plugins.custom.vim",
-             "\"Plug 'any/vim-plugin'")
-end
-
-`cp #{DF_PATH}/vim/plugins.vim #{HOME}/.plugins.vim`
-add_link_to_file "#{HOME}/.plugins.vim", "#{HOME}/.vimrc"
-
-install_profiles
-
-unless Dir.exist?("#{HOME}/.vim/autoload/plug.vim")
-  Logger.log 'Installing vim-plug...'
-  `curl -fLo #{HOME}/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim>/dev/null 2>&1`
+  Logger.log "Cloning repo to #{DF_PATH}..."
+  `rm -rf #{DF_PATH}`
+  `git clone --depth=1 https://github.com/tklepzig/dotfiles.git #{DF_PATH} > /dev/null 2>&1`
   Logger.log 'Done.'.success
-end
 
-Logger.log ' "Installing and updating vim plugins..."'
-# "echo" to suppress the "Please press ENTER to continue...
-`echo | vim +PlugInstall +PlugUpdate +qall > /dev/null 2>&1`
-Logger.log 'Done.'.success
+  `source "#{DF_PATH}/setTheme.zsh"`
+  add_link_to_file "#{DF_PATH}/colours.vim", "#{HOME}/.vimrc"
+  add_link_to_file "#{DF_PATH}/colours.zsh", "#{HOME}/.zshrc"
+  add_link_to_file "#{DF_PATH}/colours.zsh", "#{HOME}/.tmux.conf"
 
-if DF_PROFILES.include?('dev')
-  # The dev profile is activated and so the coc plugin is installed
-  Logger.log 'Updating coc extensions...'
-  `echo | vim +CocUpdate +qall > /dev/null 2>&1`
-  Logger.log 'Done.'.success
-end
-
-# TODO
-# Ensure the following line is in .zshrc after all df includes
-# [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-Logger.log 'Setting up zsh sounds...'
-`mkdir -p #{HOME}/.zsh-sounds`
-`cp #{DF_PATH}/zsh/sounds-readme.md #{HOME}/.zsh-sounds/README.md`
-Logger.log 'Done.'.success
-
-if OS.mac?
-  add_link_to_file "#{DF_PATH}/tmux/vars.osx.conf", "#{HOME}/.tmux.conf"
-else
-  add_link_to_file "#{DF_PATH}/tmux/vars.linux.conf", "#{HOME}/.tmux.conf"
-end
-add_link_to_file "#{DF_PATH}/tmux/tmux.conf", "#{HOME}/.tmux.conf"
-
-if program_installed? 'kitty'
-  add_link_to_file "#{DF_PATH}/kitty/kitty.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
-
-  if DF_THEME == 'lcars-light'
-    add_link_to_file "#{DF_PATH}/kitty/kitty.lcars-light.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
+  unless File.exist?("#{HOME}/.plugins.custom.vim")
+    File.write("#{HOME}/.plugins.custom.vim",
+               "\"Plug 'any/vim-plugin'")
   end
+
+  `cp #{DF_PATH}/vim/plugins.vim #{HOME}/.plugins.vim`
+  add_link_to_file "#{HOME}/.plugins.vim", "#{HOME}/.vimrc"
+
+  install_profiles
+
+  unless Dir.exist?("#{HOME}/.vim/autoload/plug.vim")
+    Logger.log 'Installing vim-plug...'
+    `curl -fLo #{HOME}/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim>/dev/null 2>&1`
+    Logger.log 'Done.'.success
+  end
+
+  Logger.log ' "Installing and updating vim plugins..."'
+  # "echo" to suppress the "Please press ENTER to continue...
+  `echo | vim +PlugInstall +PlugUpdate +qall > /dev/null 2>&1`
+  Logger.log 'Done.'.success
+
+  if DF_PROFILES.include?('dev')
+    # The dev profile is activated and so the coc plugin is installed
+    Logger.log 'Updating coc extensions...'
+    `echo | vim +CocUpdate +qall > /dev/null 2>&1`
+    Logger.log 'Done.'.success
+  end
+
+  # TODO
+  # Ensure the following line is in .zshrc after all df includes
+  # [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+  Logger.log 'Setting up zsh sounds...'
+  `mkdir -p #{HOME}/.zsh-sounds`
+  `cp #{DF_PATH}/zsh/sounds-readme.md #{HOME}/.zsh-sounds/README.md`
+  Logger.log 'Done.'.success
+
+  if OS.mac?
+    add_link_to_file "#{DF_PATH}/tmux/vars.osx.conf", "#{HOME}/.tmux.conf"
+  else
+    add_link_to_file "#{DF_PATH}/tmux/vars.linux.conf", "#{HOME}/.tmux.conf"
+  end
+  add_link_to_file "#{DF_PATH}/tmux/tmux.conf", "#{HOME}/.tmux.conf"
+
+  if program_installed? 'kitty'
+    add_link_to_file "#{DF_PATH}/kitty/kitty.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
+
+    if DF_THEME == 'lcars-light'
+      add_link_to_file "#{DF_PATH}/kitty/kitty.lcars-light.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
+    end
+  end
+
+  check_optional_installation 'exa'
+  check_optional_installation 'tmux'
+  check_optional_installation 'lynx'
+
+  Logger.log 'Configuring Git...'
+  `#{DF_PATH}/git/git-config.sh`
+  Logger.log 'Done.'.success
+
+  # docker stuff
+  # set default shell to zsh if necessary
 end
 
-check_optional_installation 'exa'
-check_optional_installation 'tmux'
-check_optional_installation 'lynx'
+def tabula_rasa
+  # TODO: add here and then remove separate shell script file
+end
 
-Logger.log 'Configuring Git...'
-`#{DF_PATH}/git/git-config.sh`
-Logger.log 'Done.'.success
-
-# docker stuff
-# set default shell to zsh if necessary
+# only run installation if script is invoked directly and not by requiring it
+install if __FILE__ == $PROGRAM_NAME
