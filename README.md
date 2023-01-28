@@ -4,9 +4,12 @@ My dotfiles.
 
 ## Installation
 
-    /usr/bin/env zsh -c "$(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh)"
+    /usr/bin/env zsh -c "$(curl -Ls https://raw.githubusercontent.com/
+    tklepzig/dotfiles/master/install.sh)"
+
     # Experimental
-    # /usr/bin/env ruby -e "$(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/setup.rb)"
+    # /usr/bin/env ruby -e "$(curl -Ls https://raw.githubusercontent.com/
+    tklepzig/dotfiles/master/setup.rb)"
 
 ## Profiles
 
