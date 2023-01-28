@@ -160,13 +160,10 @@ def install_profiles
     link_vim_plugins profile
     add_link_to_file "#{DF_PATH}/vim/#{profile}/vimrc", "#{HOME}/.vimrc"
 
-    # TODO: install.sh not working 100% since it contains:
-    # - checkInstallation
-    # $dotfilesDir
-    setup_file = "#{DF_PATH}/vim/#{profile}/install.sh"
-    `source "#{setup_file}"` if File.exist?(setup_file)
-    # setup_file = "#{DF_PATH}/vim/#{profile}/install.rb"
-    # require_relative setup_file if File.exist?(setup_file)
+    # setup_file = "#{DF_PATH}/vim/#{profile}/install.sh"
+    # `source "#{setup_file}"` if File.exist?(setup_file)
+    setup_file = "#{DF_PATH}/vim/#{profile}/install.rb"
+    require_relative setup_file if File.exist?(setup_file)
 
     add_link_to_file "#{DF_PATH}/zsh/#{profile}/zshrc.zsh", "#{HOME}/.zshrc"
 
