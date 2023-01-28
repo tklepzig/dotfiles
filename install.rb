@@ -20,7 +20,7 @@ def link_vim_plugins(profile)
   end
 
   `sed 's/\\"pluginfile/source $HOME\\/.dotfiles\\/vim\\/#{profile}\\/plugins.vim\\
-\\"pluginfile/g' $HOME/.plugins.vim > $HOME/.plugins.vim.tmp && mv $HOME/.plugins.vim.tmp $HOME/.plugins.vim`
+\\"pluginfile/g' #{HOME}/.plugins.vim > #{HOME}/.plugins.vim.tmp && mv #{HOME}/.plugins.vim.tmp #{HOME}/.plugins.vim`
 end
 
 def install_profiles
@@ -47,16 +47,16 @@ check_mandatory_installation 'zsh'
 
 `source "#{DF_PATH}/setTheme.zsh"`
 add_link_to_file "#{DF_PATH}/colours.vim", "#{HOME}/.vimrc"
-add_link_to_file "#{DF_PATH}/colours.vim", "#{HOME}/.zshrc"
-add_link_to_file "#{DF_PATH}/colours.vim", "#{HOME}/.tmux.conf"
+add_link_to_file "#{DF_PATH}/colours.zsh", "#{HOME}/.zshrc"
+add_link_to_file "#{DF_PATH}/colours.zsh", "#{HOME}/.tmux.conf"
 
-if File.exist?("#{HOME}/.plugins.custom.vim")
+unless File.exist?("#{HOME}/.plugins.custom.vim")
   File.write("#{HOME}/.plugins.custom.vim",
              "\"Plug 'any/vim-plugin'")
 end
 
 `cp #{DF_PATH}/vim/plugins.vim #{HOME}/.plugins.vim`
-add_link_to_file "#{DF_PATH}/vim/plugins.vim", "#{HOME}/.vimrc"
+add_link_to_file "#{HOME}/.plugins.vim", "#{HOME}/.vimrc"
 
 install_profiles
 
@@ -94,7 +94,7 @@ else
 end
 add_link_to_file "#{DF_PATH}/tmux/tmux.conf", "#{HOME}/.tmux.conf"
 
-if program_installed? kitty
+if program_installed? 'kitty'
   add_link_to_file "#{DF_PATH}/kitty/kitty.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
 
   if DF_THEME == 'lcars-light'
