@@ -34,6 +34,7 @@ success "Done."
 
 info "Removing vim-plug and installed plugins"
 rm $HOME/.vim/autoload/plug.vim
+rm $HOME/.vim/coc-settings.json
 rm -rf $HOME/.vim/vim-plug
 success "Done."
 
