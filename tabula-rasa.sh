@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-read -p "Please confirm (Type 'yes') " confirm
+read "confirm?Please confirm (Type 'yes') "
 if [ "$confirm" != "yes" ]
 then
   exit 1 
