@@ -176,10 +176,10 @@ def install
   check_mandatory_installation 'git'
   check_mandatory_installation 'zsh'
 
-  Logger.log "Cloning repo to #{DF_PATH}..."
+  Logger.log "Cloning repo to #{DF_PATH}...", newline: false
   `rm -rf #{DF_PATH}`
   `git clone --depth=1 https://github.com/tklepzig/dotfiles.git #{DF_PATH} > /dev/null 2>&1`
-  Logger.log 'Done.'.success
+  Logger.log ' Done.'.success
 
   `source "#{DF_PATH}/setTheme.zsh"`
   add_link_to_file "#{DF_PATH}/colours.vim", "#{HOME}/.vimrc"
@@ -197,31 +197,31 @@ def install
   install_profiles
 
   unless Dir.exist?("#{HOME}/.vim/autoload/plug.vim")
-    Logger.log 'Installing vim-plug...'
+    Logger.log 'Installing vim-plug...', newline: false
     `curl -fLo #{HOME}/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim>/dev/null 2>&1`
-    Logger.log 'Done.'.success
+    Logger.log ' Done.'.success
   end
 
-  Logger.log ' "Installing and updating vim plugins..."'
+  Logger.log 'Installing and updating vim plugins...', newline: false
   # "echo" to suppress the "Please press ENTER to continue...
   `echo | vim +PlugInstall +PlugUpdate +qall > /dev/null 2>&1`
-  Logger.log 'Done.'.success
+  Logger.log ' Done.'.success
 
   if DF_PROFILES.include?('dev')
     # The dev profile is activated and so the coc plugin is installed
-    Logger.log 'Updating coc extensions...'
+    Logger.log 'Updating coc extensions...', newline: false
     `echo | vim +CocUpdate +qall > /dev/null 2>&1`
-    Logger.log 'Done.'.success
+    Logger.log ' Done.'.success
   end
 
   # TODO
   # Ensure the following line is in .zshrc after all df includes
   # [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-  Logger.log 'Setting up zsh sounds...'
+  Logger.log 'Setting up zsh sounds...', newline: false
   `mkdir -p #{HOME}/.zsh-sounds`
   `cp #{DF_PATH}/zsh/sounds-readme.md #{HOME}/.zsh-sounds/README.md`
-  Logger.log 'Done.'.success
+  Logger.log ' Done.'.success
 
   if OS.mac?
     add_link_to_file "#{DF_PATH}/tmux/vars.osx.conf", "#{HOME}/.tmux.conf"
@@ -242,9 +242,9 @@ def install
   check_optional_installation 'tmux'
   check_optional_installation 'lynx'
 
-  Logger.log 'Configuring Git...'
+  Logger.log 'Configuring Git...', newline: false
   `#{DF_PATH}/git/git-config.sh`
-  Logger.log 'Done.'.success
+  Logger.log ' Done.'.success
 
   # docker stuff
   # set default shell to zsh if necessary

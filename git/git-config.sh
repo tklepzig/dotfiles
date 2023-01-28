@@ -6,7 +6,8 @@ reflogCommon="-c core.pager='less -SRF' reflog --date=human --format='%C(yellow)
 stashCommon="-c core.pager='less -SRF' stash list --date=human --format='%C(yellow)%h%C(reset) %C(dim yellow)%<(10)%gd%C(reset) %C(cyan)%><(15)%ad%C(reset) %gs%C(reset)'"
 
 # general config
-git config --global credential.helper store git config --global push.default simple
+git config --global credential.helper store
+git config --global push.default simple
 git config --global fetch.prune true
 git config --global pull.rebase true
 git config --global diff.tool vimdiff
