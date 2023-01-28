@@ -4,11 +4,11 @@ My dotfiles.
 
 ## Installation
 
-    /usr/bin/env zsh -c "$(curl -Ls https://raw.githubusercontent.com/
+    /usr/bin/env zsh -c "$(curl -Ls https://raw.githubusercontent.com/\
     tklepzig/dotfiles/master/install.sh)"
 
-    # Experimental
-    # /usr/bin/env ruby -e "$(curl -Ls https://raw.githubusercontent.com/
+    # Experimental, new setup written in ruby
+    /usr/bin/env ruby -e "$(curl -Ls https://raw.githubusercontent.com/\
     tklepzig/dotfiles/master/setup.rb)"
 
 ## Profiles
@@ -24,7 +24,8 @@ The following profiles are available:
 | writing | Distraction free writing   |
 | viml    | VimL/Vimscript Development |
 
-Add these to the environment variable `DOTFILES_PROFILES` space-separated in your `.zshrc`. It must be set before the dotfiles stuff is sourced.
+Add these to the environment variable `DOTFILES_PROFILES` space-separated in your `.zshrc`.  
+It must be set before the dotfiles stuff is sourced.  
 For example:
 
     export DOTFILES_PROFILES="dev web"
