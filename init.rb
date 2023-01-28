@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-DOTFILES_PATH ||= "#{ENV['HOME']}/.dotfiles-ruby"
+DOTFILES_PATH ||= "#{ENV['HOME']}/.dotfiles"
 
 def program_installed?(program)
   result = `sh -c 'command -v #{program}'`
@@ -16,9 +16,9 @@ unless program_installed?('git')
 end
 
 puts "Cloning repo to #{DOTFILES_PATH}..."
-# `rm -rf #{DOTFILES_PATH}`
-# `git clone --depth=1 https://github.com/tklepzig/dotfiles.git #{DOTFILES_PATH} > /dev/null 2>&1`
+`rm -rf #{DOTFILES_PATH}`
+`git clone --depth=1 https://github.com/tklepzig/dotfiles.git #{DOTFILES_PATH} > /dev/null 2>&1`
 puts 'Done.'
 puts 'Continue with install script...'
 
-# require "#{DOTFILES_PATH}/install"
+require "#{DOTFILES_PATH}/install"
