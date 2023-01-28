@@ -32,12 +32,9 @@ info "Removing ~/.plugins.vim..."
 rm $HOME/.plugins.vim
 success "Done."
 
-info "Removing ~/.plugins.custom.vim..."
-rm $HOME/.plugins.custom.vim
-success "Done."
-
-info "Removing ~/.vim..."
-rm -rf $HOME/.vim
+info "Removing vim-plug and installed plugins"
+rm $HOME/.vim/autoload/plug.vim
+rm -rf $HOME/.vim/vim-plug
 success "Done."
 
 info "Removing ~/.zsh..."
