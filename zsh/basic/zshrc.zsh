@@ -72,6 +72,14 @@ bindkey -M viins 'jj' vi-cmd-mode
 bindkey -M vicmd v edit-command-line
 
 
+# Make HOME, END and DEL working (is sometimes necessary?!)
+bindkey '\e[H'  beginning-of-line
+bindkey '\e[F'  end-of-line
+bindkey '\e[3~' delete-char
+# inside tmux the keycodes differ for whatever reason...
+bindkey '\e[1~'  beginning-of-line
+bindkey '\e[4~'  end-of-line
+
 # search history with current entered text via up/down (starts-with search)
 # If it does not work on the current OS, try to find out the correct code with `cat -v` or `Ctrl+V`
 # and set ZSH_HISTORY_KEY_UP and ZSH_HISTORY_KEY_DOWN accordingly BEFORE sourcing this script
