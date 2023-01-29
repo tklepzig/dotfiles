@@ -5,5 +5,5 @@ Add the following line at the end of ~/.zshrc (after the include from .dotfiles)
 
 # Soundfiles
 
-`command-failed.mp3` - Command exits with exit code != 0
-`long-running-command-success.mp3` - Any command which took longer than one minute exits successfully
+`command-failed.wav` - Command exits with exit code != 0
+`long-running-command-success.wav` - Any command which took longer than one minute exits successfully

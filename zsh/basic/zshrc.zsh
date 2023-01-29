@@ -64,7 +64,7 @@ export EDITOR=vim
 export VISUAL=vim
 
 export SPROMPT="$warningTile $reset Correct $warning%R$reset to $primary%r$reset? (nyae)$reset"
- 
+
 # Use vi-style zsh bindings
 bindkey -v
 
@@ -189,7 +189,9 @@ playSound()
   player=""
   if isOS darwin
   then
-    player="afplay"
+    player="afplay -v 0.2"
+  else
+    player="aplay"
   fi
 
   if ! isProgramInstalled $player
@@ -200,12 +202,12 @@ playSound()
   soundsPath="$HOME/.zsh-sounds"
   # exit code 130 means the user pressed CTRL+C (128 + SIGINT -> 128 + 2)
   # exit code 146/148 means the user pressed CTRL+Z (128 + SIGTSTP -> 128 + 20 (linux) or 18 (osx))
-  if [ "$lastExitCode" != 0 ] && [ "$lastExitCode" != 130 ] && [ "$lastExitCode" != 146 ] && [ "$lastExitCode" != 148 ] && [ -f "$soundsPath/command-failed.mp3" ]
+  if [ -f "$soundsPath/command-failed.wav" ] && [ "$lastExitCode" != 0 ] && [ "$lastExitCode" != 130 ] && [ "$lastExitCode" != 146 ] && [ "$lastExitCode" != 148 ]
   then
-    (&>/dev/null afplay -v 0.1 "$soundsPath/command-failed.mp3" &)
-  elif [ $elapsed -gt 60000 ] && [ -f "$soundsPath/long-running-command-success.mp3" ]
+    (&>/dev/null $player "$soundsPath/command-failed.wav" &)
+  elif [ -f "$soundsPath/long-running-command-success.wav" ] && [ $elapsed -gt 60000 ]
   then
-    (&>/dev/null afplay -v 0.2 "$soundsPath/long-running-command-success.mp3" &)
+    (&>/dev/null $player "$soundsPath/long-running-command-success.wav" &)
   fi
 }
 
