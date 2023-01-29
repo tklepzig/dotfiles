@@ -214,10 +214,6 @@ def install
     Logger.log ' Done.'.success
   end
 
-  # TODO
-  # Ensure the following line is in .zshrc after all df includes
-  # [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
   Logger.log 'Setting up zsh sounds...', newline: false
   `mkdir -p #{HOME}/.zsh-sounds`
   `cp #{DF_PATH}/zsh/sounds-readme.md #{HOME}/.zsh-sounds/README.md`
@@ -236,6 +232,13 @@ def install
     if DF_THEME == 'lcars-light'
       add_link_to_file "#{DF_PATH}/kitty/kitty.lcars-light.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
     end
+  end
+
+  unless Dir.exist?("#{HOME}/.fzf")
+    Logger.log 'Installing fzf...', newline: false
+    `git clone --depth 1 https://github.com/junegunn/fzf.git #{HOME}/.fzf > /dev/null 2>&1`
+    `#{HOME}/.fzf/install --all > /dev/null 2>&1`
+    Logger.log ' Done.'.success
   end
 
   check_optional_installation 'exa'

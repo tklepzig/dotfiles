@@ -14,5 +14,3 @@ brew install --cask gimp insomnia licecap raycast vnc-viewer ultimaker-cura seaf
 brew install awscli
 brew install --cask docker browserstacklocal slack discord tunnelblick gpg-suite visual-studio-code
 
-git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
-$HOME/.fzf/install

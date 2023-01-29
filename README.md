@@ -4,12 +4,13 @@ My dotfiles.
 
 ## Installation
 
-    /usr/bin/env zsh -c "$(curl -Ls https://raw.githubusercontent.com/\
-    tklepzig/dotfiles/master/install.sh)"
-
-    # Experimental, new setup written in ruby
     /usr/bin/env ruby -e "$(curl -Ls https://raw.githubusercontent.com/\
     tklepzig/dotfiles/master/setup.rb)"
+
+> Deprecated shell based setup
+>
+>     /usr/bin/env zsh -c "$(curl -Ls https://raw.githubusercontent.com/\
+>     tklepzig/dotfiles/master/install.sh)"
 
 ## Profiles
 
@@ -29,3 +30,8 @@ It must be set before the dotfiles stuff is sourced.
 For example:
 
     export DOTFILES_PROFILES="dev web"
+
+## asdf setup
+
+     /usr/bin/env zsh -c "$(curl -Ls https://raw.githubusercontent.com/\
+     tklepzig/dotfiles/master/asdf.install.sh)"
