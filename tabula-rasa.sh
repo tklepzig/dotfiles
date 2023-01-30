@@ -17,16 +17,16 @@ removePatternFromFile() {
   if [ -f $HOME/$target ]
   then
     info "Remove link from $target with pattern $pattern..."
-    sed /$pattern/d $HOME/$target > $HOME/$target.tmp && mv $HOME/$target.tmp $HOME/$target
+    sed "/$pattern/d" $HOME/$target > $HOME/$target.tmp && mv $HOME/$target.tmp $HOME/$target
     success "Done."
   fi
 }
 
-removePatternFromFile ".zshrc" ".dotfiles"
-removePatternFromFile ".vimrc" ".dotfiles"
+removePatternFromFile ".zshrc" "\.dotfiles"
+removePatternFromFile ".vimrc" "\.dotfiles"
 removePatternFromFile ".vimrc" ".plugins.vim"
-removePatternFromFile ".tmux.conf" ".dotfiles"
-removePatternFromFile ".config/kitty/kitty.conf" ".dotfiles"
+removePatternFromFile ".tmux.conf" "\.dotfiles"
+removePatternFromFile ".config/kitty/kitty.conf" "\.dotfiles"
 
 info "Removing ~/.plugins.vim..."
 rm $HOME/.plugins.vim
