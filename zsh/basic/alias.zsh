@@ -1,4 +1,4 @@
-dotfilesRepo = ${DOTFILES_REPO:-"tklepzig/dotfiles"}
+dotfilesRepo=${DOTFILES_REPO:-"tklepzig/dotfiles"}
 
 alias mkcd='function __mkcd() { mkdir "$1"; cd "$1"; unset -f __mkcd; }; __mkcd'
 

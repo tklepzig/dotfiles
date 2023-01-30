@@ -121,7 +121,7 @@ def write_link(link, file, command = 'source')
   `grep -q #{link} #{file}`
   return if $CHILD_STATUS.success?
 
-  Logger.log "Adding #{link} to ", file.accent, '...', newline: false
+  Logger.log 'Adding link to ', file.accent, '...', newline: false
   File.open(file, 'a') do |f|
     f.puts "#{command} #{link}"
   end
