@@ -116,30 +116,26 @@ def check_optional_installation(program, install_name = program)
   Logger.log " Not Found. (Try \"sudo pacman -S #{install_name}\")".error
 end
 
-def add_link_to_file(link, file, command = 'source')
-  File.new(file, 'w') unless File.exist?(file)
-
+def write_link(link, file, command = 'source')
   `grep -q #{link} #{file}`
   return if $CHILD_STATUS.success?
 
-  Logger.log 'Adding link to ', file.accent, '...', newline: false
+  Logger.log "Adding #{link} to ", file.accent, '...', newline: false
   File.open(file, 'a') do |f|
     f.puts "#{command} #{link}"
   end
   Logger.log ' Done.'.success
+end
+
+def add_link_with_override(link, file, command = 'source')
+  File.new(file, 'w') unless File.exist?(file)
+
+  write_link(link, file, command)
 
   override = find_override(link)
-
   return unless override
 
-  `grep -q "#{override}" #{file}`
-  return if $CHILD_STATUS.success?
-
-  Logger.log 'Adding override to ', file.accent, '...', newline: false
-  File.open(file, 'a') do |f|
-    f.puts "#{command} #{override}"
-  end
-  Logger.log ' Done.'.success
+  write_link(override, file, command)
 end
 
 def link_vim_plugins(profile)
@@ -158,14 +154,14 @@ def install_profiles
     Logger.indent
 
     link_vim_plugins profile
-    add_link_to_file "#{DF_PATH}/vim/#{profile}/vimrc", "#{HOME}/.vimrc"
+    add_link_with_override "#{DF_PATH}/vim/#{profile}/vimrc", "#{HOME}/.vimrc"
 
     # setup_file = "#{DF_PATH}/vim/#{profile}/install.sh"
     # `source "#{setup_file}"` if File.exist?(setup_file)
     setup_file = "#{DF_PATH}/vim/#{profile}/install.rb"
     require_relative setup_file if File.exist?(setup_file)
 
-    add_link_to_file "#{DF_PATH}/zsh/#{profile}/zshrc.zsh", "#{HOME}/.zshrc"
+    add_link_with_override "#{DF_PATH}/zsh/#{profile}/zshrc.zsh", "#{HOME}/.zshrc"
 
     Logger.reset_indentation
     Logger.log 'Done.'.success
@@ -182,9 +178,9 @@ def install
   Logger.log ' Done.'.success
 
   `source "#{DF_PATH}/setTheme.zsh"`
-  add_link_to_file "#{DF_PATH}/colours.vim", "#{HOME}/.vimrc"
-  add_link_to_file "#{DF_PATH}/colours.zsh", "#{HOME}/.zshrc"
-  add_link_to_file "#{DF_PATH}/colours.zsh", "#{HOME}/.tmux.conf"
+  add_link_with_override "#{DF_PATH}/colours.vim", "#{HOME}/.vimrc"
+  add_link_with_override "#{DF_PATH}/colours.zsh", "#{HOME}/.zshrc"
+  add_link_with_override "#{DF_PATH}/colours.zsh", "#{HOME}/.tmux.conf"
 
   unless File.exist?("#{HOME}/.plugins.custom.vim")
     File.write("#{HOME}/.plugins.custom.vim",
@@ -192,7 +188,7 @@ def install
   end
 
   `cp #{DF_PATH}/vim/plugins.vim #{HOME}/.plugins.vim`
-  add_link_to_file "#{HOME}/.plugins.vim", "#{HOME}/.vimrc"
+  add_link_with_override "#{HOME}/.plugins.vim", "#{HOME}/.vimrc"
 
   install_profiles
 
@@ -220,17 +216,17 @@ def install
   Logger.log ' Done.'.success
 
   if OS.mac?
-    add_link_to_file "#{DF_PATH}/tmux/vars.osx.conf", "#{HOME}/.tmux.conf"
+    add_link_with_override "#{DF_PATH}/tmux/vars.osx.conf", "#{HOME}/.tmux.conf"
   else
-    add_link_to_file "#{DF_PATH}/tmux/vars.linux.conf", "#{HOME}/.tmux.conf"
+    add_link_with_override "#{DF_PATH}/tmux/vars.linux.conf", "#{HOME}/.tmux.conf"
   end
-  add_link_to_file "#{DF_PATH}/tmux/tmux.conf", "#{HOME}/.tmux.conf"
+  add_link_with_override "#{DF_PATH}/tmux/tmux.conf", "#{HOME}/.tmux.conf"
 
   if program_installed? 'kitty'
-    add_link_to_file "#{DF_PATH}/kitty/kitty.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
+    add_link_with_override "#{DF_PATH}/kitty/kitty.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
 
     if DF_THEME == 'lcars-light'
-      add_link_to_file "#{DF_PATH}/kitty/kitty.lcars-light.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
+      add_link_with_override "#{DF_PATH}/kitty/kitty.lcars-light.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
     end
   end
 
