@@ -4,6 +4,7 @@
 # neeeded for $CHILD_STATUS and $PROGRAM_NAME
 require 'English'
 
+DF_REPO ||= ENV['DOTFILES_REPO'] || 'tklepzig/dotfiles'
 HOME ||= ENV['HOME']
 DF_PROFILES ||= ENV['DOTFILES_PROFILES']
 DF_THEME ||= ENV['DOTFILES_THEME']
@@ -174,7 +175,7 @@ def install
 
   Logger.log "Cloning repo to #{DF_PATH}...", newline: false
   `rm -rf #{DF_PATH}`
-  `git clone --depth=1 https://github.com/tklepzig/dotfiles.git #{DF_PATH} > /dev/null 2>&1`
+  `git clone --depth=1 https://github.com/#{DF_REPO}.git #{DF_PATH} > /dev/null 2>&1`
   Logger.log ' Done.'.success
 
   `source "#{DF_PATH}/setTheme.zsh"`

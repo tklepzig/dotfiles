@@ -1,3 +1,5 @@
+dotfilesRepo = ${DOTFILES_REPO:-"tklepzig/dotfiles"}
+
 alias mkcd='function __mkcd() { mkdir "$1"; cd "$1"; unset -f __mkcd; }; __mkcd'
 
 if isOS darwin
@@ -26,7 +28,7 @@ alias egrep='egrep --color=auto'
 alias t='tmux new-session -n ""'
 alias ta='tmux a'
 
-alias dotfiles-update='/usr/bin/env ruby -e "$(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/setup.rb)"'
+alias dotfiles-update="/usr/bin/env ruby -e '$(curl -Ls https://raw.githubusercontent.com/$dotfilesRepo/master/setup.rb)'"
 alias dfu='dotfiles-update'
 alias dotfiles-update-legacy='/usr/bin/env zsh -c "$(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh)"'
 alias dotfiles-tabula-rasa="$dotfilesDir/tabula-rasa.sh"
