@@ -165,11 +165,6 @@ fi
 # Ensure the following line is in .zshrc after all df includes
 # [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-info "Setting up zsh sounds..."
-mkdir -p $HOME/.zsh-sounds
-cp $dotfilesDir/zsh/sounds-readme.md $HOME/.zsh-sounds/README.md
-success "Done."
-
 if isOS darwin
 then
   addLinkToFile "$dotfilesDir/tmux/vars.osx.conf" "$HOME/.tmux.conf"

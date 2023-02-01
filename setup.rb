@@ -211,11 +211,6 @@ def install
     Logger.log ' Done.'.success
   end
 
-  Logger.log 'Setting up zsh sounds...', newline: false
-  `mkdir -p #{HOME}/.zsh-sounds`
-  `cp #{DF_PATH}/zsh/sounds-readme.md #{HOME}/.zsh-sounds/README.md`
-  Logger.log ' Done.'.success
-
   if OS.mac?
     add_link_with_override "#{DF_PATH}/tmux/vars.osx.conf", "#{HOME}/.tmux.conf"
   else

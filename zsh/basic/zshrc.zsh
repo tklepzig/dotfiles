@@ -144,8 +144,6 @@ precmd() {
     fi
 
     unset timer
-
-    playSound
   fi
 
   vcs_info
@@ -179,38 +177,6 @@ precmd() {
   PROMPT="$greyTile\$elapsedTime$reset\$lastExitCodeString$reset$nl$nl$repoInfoOrUser$secondary$path$nl$inVimOrPrefix"
 }
 
-playSound()
-{
-  if [[ $ZSH_SOUND = 0 ]]
-  then
-    return 0
-  fi
-
-  player=""
-  if isOS darwin
-  then
-    player="afplay -v 0.2"
-  else
-    player="aplay"
-  fi
-
-  if ! isProgramInstalled $player
-  then
-    return 0
-  fi
-
-  soundsPath="$HOME/.zsh-sounds"
-  # exit code 130 means the user pressed CTRL+C (128 + SIGINT -> 128 + 2)
-  # exit code 146/148 means the user pressed CTRL+Z (128 + SIGTSTP -> 128 + 20 (linux) or 18 (osx))
-  if [ -f "$soundsPath/command-failed.wav" ] && [ "$lastExitCode" != 0 ] && [ "$lastExitCode" != 130 ] && [ "$lastExitCode" != 146 ] && [ "$lastExitCode" != 148 ]
-  then
-    (&>/dev/null $player "$soundsPath/command-failed.wav" &)
-  elif [ -f "$soundsPath/long-running-command-success.wav" ] && [ $elapsed -gt 60000 ]
-  then
-    (&>/dev/null $player "$soundsPath/long-running-command-success.wav" &)
-  fi
-}
-
 upstreamIndicator() 
 {
   if [[ -z "$(git rev-parse --abbrev-ref HEAD 2> /dev/null)" ]]
@@ -239,5 +205,3 @@ upstreamIndicator()
     esac
   fi
 }
-
-ZSH_SOUND=0

@@ -32,6 +32,7 @@ alias dotfiles-update='/usr/bin/env ruby -e "$(curl -Ls https://raw.githubuserco
 alias dfu='dotfiles-update'
 alias dotfiles-update-legacy='/usr/bin/env zsh -c "$(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh)"'
 alias dotfiles-tabula-rasa="$dotfilesDir/tabula-rasa.sh"
+alias notify="$dotfilesDir/notify.rb"
 if isOS linux
 then
     alias n='nautilus .'
