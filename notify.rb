@@ -13,4 +13,4 @@ exit(false) unless program_installed? player.split(/\s/).first
 sound_path = "#{HOME}/.zsh-sounds/notify.wav"
 exit(false) unless File.exist? sound_path
 
-`#{player} #{sound_path}`
+`#{player} #{sound_path} > /dev/null 2>&1`
