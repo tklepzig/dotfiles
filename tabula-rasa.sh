@@ -9,7 +9,7 @@ fi
 set -e
 dotfilesDir=$HOME/.dotfiles
 
-source <(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/logger.sh)
+source <(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/deprecated/logger.sh)
 
 removePatternFromFile() {
   target=$1

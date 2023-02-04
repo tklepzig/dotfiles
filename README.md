@@ -7,11 +7,6 @@ My dotfiles.
     /usr/bin/env ruby -e "$(curl -Ls https://raw.githubusercontent.com/\
     tklepzig/dotfiles/master/setup.rb)"
 
-> Deprecated shell based setup
->
->     /usr/bin/env zsh -c "$(curl -Ls https://raw.githubusercontent.com/\
->     tklepzig/dotfiles/master/install.sh)"
-
 ## Profiles
 
 The following profiles are available:
