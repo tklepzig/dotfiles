@@ -178,7 +178,7 @@ def install
   `git clone --depth=1 https://github.com/#{DF_REPO}.git #{DF_PATH} > /dev/null 2>&1`
   Logger.log ' Done.'.success
 
-  `source "#{DF_PATH}/setTheme.zsh"`
+  `#{DF_PATH}/setTheme.zsh`
   add_link_with_override "#{DF_PATH}/colours.vim", "#{HOME}/.vimrc"
   add_link_with_override "#{DF_PATH}/colours.zsh", "#{HOME}/.zshrc"
   add_link_with_override "#{DF_PATH}/colours.zsh", "#{HOME}/.tmux.conf"
