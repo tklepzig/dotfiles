@@ -160,7 +160,7 @@ def install_profiles
     # setup_file = "#{DF_PATH}/vim/#{profile}/install.sh"
     # `source "#{setup_file}"` if File.exist?(setup_file)
     setup_file = "#{DF_PATH}/vim/#{profile}/install.rb"
-    require_relative setup_file if File.exist?(setup_file)
+    require setup_file if File.exist?(setup_file)
 
     add_link_with_override "#{DF_PATH}/zsh/#{profile}/zshrc.zsh", "#{HOME}/.zshrc"
 
