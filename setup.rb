@@ -6,7 +6,7 @@ require 'English'
 
 DF_REPO ||= ENV['DOTFILES_REPO'] || 'tklepzig/dotfiles'
 HOME ||= ENV['HOME']
-DF_PROFILES ||= ENV['DOTFILES_PROFILES']
+DF_PROFILES ||= ENV['DOTFILES_PROFILES'] || ''
 DF_THEME ||= ENV['DOTFILES_THEME']
 DF_PATH ||= "#{HOME}/.dotfiles"
 
