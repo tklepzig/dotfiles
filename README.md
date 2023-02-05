@@ -28,5 +28,5 @@ For example:
 
 ## asdf setup
 
-     /usr/bin/env zsh -c "$(curl -Ls https://raw.githubusercontent.com/\
-     tklepzig/dotfiles/master/asdf.install.sh)"
+    /usr/bin/env zsh -c "$(curl -Ls https://raw.githubusercontent.com/\
+    tklepzig/dotfiles/master/asdf.install.zsh)"
