@@ -157,8 +157,6 @@ def install_profiles
     link_vim_plugins profile
     add_link_with_override "#{DF_PATH}/vim/#{profile}/vimrc", "#{HOME}/.vimrc"
 
-    # setup_file = "#{DF_PATH}/vim/#{profile}/install.sh"
-    # `source "#{setup_file}"` if File.exist?(setup_file)
     setup_file = "#{DF_PATH}/vim/#{profile}/install.rb"
     require setup_file if File.exist?(setup_file)
 
