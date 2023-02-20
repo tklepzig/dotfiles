@@ -1,4 +1,4 @@
-let g:coc_global_extensions = g:coc_global_extensions + ['coc-solargraph']
+let g:coc_global_extensions = g:coc_global_extensions + ['coc-solargraph', 'coc-db']
 
 function! s:AlternateSafe()
   try
