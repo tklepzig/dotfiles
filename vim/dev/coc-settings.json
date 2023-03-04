@@ -16,5 +16,11 @@
   "solargraph.hover": true,
   "solargraph.diagnostics": true,
   "solargraph.transport": "stdio",
-  "prettier.formatterPriority": 1
+  "prettier.formatterPriority": 1,
+  "json.schemas": [
+    {
+      "fileMatch": ["manifest.json"],
+      "url": "https://json.schemastore.org/chrome-manifest.json"
+    }
+  ]
 }
