@@ -109,6 +109,16 @@ chpwd() {
   fi
 }
 
+function zle-line-init zle-keymap-select {
+    case $KEYMAP in
+        (vicmd) viCmdIndicator="$accentTile NORMAL $reset$nl" ;;
+        (*)     viCmdIndicator="" ;;
+    esac
+    zle reset-prompt
+}
+zle -N zle-line-init
+zle -N zle-keymap-select
+
 preexec() {
   if isOS darwin
   then
@@ -174,7 +184,7 @@ precmd() {
     local inVimOrPrefix="$primary$prefix$reset "
   fi
 
-  PROMPT="$greyTile\$elapsedTime$reset\$lastExitCodeString$reset$nl$nl$repoInfoOrUser$secondary$path$nl$inVimOrPrefix"
+  PROMPT="$greyTile\$elapsedTime$reset\$lastExitCodeString$reset$nl$nl$repoInfoOrUser$secondary$path$nl\$viCmdIndicator$inVimOrPrefix"
 }
 
 upstreamIndicator() 
