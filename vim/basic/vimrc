@@ -170,3 +170,18 @@ command! -bang Q qa<bang>
 
 set wildoptions=pum
 set shiftround
+
+function! s:QuickMemo()
+  let path = $HOME . '/vim-quick-memo/'
+  let filePath = expand("%:t")
+
+  if empty(filePath)
+    if !isdirectory(path)
+      call mkdir(path)
+    endif
+    execute('w ' . path . strftime('%Y-%m-%d-%H:%M:%S.md'))
+  else
+    w
+  endif
+endfunction
+command! QuickMemo call <SID>QuickMemo()

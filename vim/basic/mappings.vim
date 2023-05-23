@@ -79,3 +79,5 @@ function! s:BigSmallWin()
   execute 'vertical resize ' . float2nr(width + width * 0.2)
 endfunction
 nnoremap <silent> <Leader>w# :call <SID>BigSmallWin()<cr>
+
+nnoremap <silent> <leader>m :QuickMemo<cr>
