@@ -175,13 +175,21 @@ function! s:QuickMemo()
   let path = $HOME . '/vim-quick-memo/'
   let filePath = expand("%:t")
 
-  if empty(filePath)
-    if !isdirectory(path)
-      call mkdir(path)
-    endif
-    execute('w ' . path . strftime('%Y-%m-%d-%H:%M:%S.md'))
-  else
+  if !empty(filePath)
     w
+    return
   endif
+
+  if !isdirectory(path)
+    call mkdir(path)
+  endif
+
+  let firstChars = ''
+  let firstLine = getline(1)
+  if !empty(firstLine)
+    let firstChars = '--' . firstLine[:29]
+  endif
+
+  execute('w ' . path . strftime('%Y-%m-%d-%H:%M:%S') . firstChars . '.md')
 endfunction
 command! QuickMemo call <SID>QuickMemo()
