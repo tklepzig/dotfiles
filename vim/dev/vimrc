@@ -125,6 +125,12 @@ function! JumpToSameIndent(direction, inVisualMode)
   endif
 endfunction
 
+let g:copilot_filetypes = {
+    \ 'gitcommit': v:true,
+    \ 'markdown': v:true,
+    \ 'yaml': v:true
+    \ }
+
 source $HOME/.dotfiles/vim/dev/statusline.vim
 source $HOME/.dotfiles/vim/dev/mappings.vim
 

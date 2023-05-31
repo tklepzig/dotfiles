@@ -1,0 +1,6 @@
+" Override augroup with just pry
+" TODO: Maybe as snippet
+" augroup filetype_ruby
+"     autocmd!
+"     autocmd FileType ruby iab <buffer> pry require 'pry'; binding.pry
+" augroup END

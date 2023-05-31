@@ -2,3 +2,8 @@ solargraph
 rubocop
 pry
 web_translate_it
+pry-toys
+pry-byebug
+pry-theme
+pry-inline
+awesome-print

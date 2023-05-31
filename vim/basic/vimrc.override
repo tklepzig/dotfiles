@@ -1,0 +1,25 @@
+colorscheme afterglow
+
+" source $HOME/.dotfiles/vim/basic/lcars.vim
+
+" let g:airline#extensions#tabline#enabled = 1
+" let g:airline#extensions#tabline#formatter = 'default'
+" let g:airline_section_b = ''
+" let g:airline_section_z ='%P'
+" let g:airline_section_y = ''
+" let g:airline_theme = 'lcars'
+
+" let g:airline_powerline_fonts = 1
+
+set scrolloff=15
+
+set norelativenumber
+
+if exists('+colorcolumn')
+ let &colorcolumn="80"
+ highlight ColorColumn ctermbg=236
+endif
+
+" Re-enable join
+" nunmap <C-j>
+" Use :j instead
