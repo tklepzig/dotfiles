@@ -216,5 +216,8 @@ upstreamIndicator()
   fi
 }
 
-# Map caps lock to escape
-setxkbmap -option caps:escape
+if isOS linux
+then
+  # Map caps lock to escape
+  setxkbmap -option caps:escape
+fi
