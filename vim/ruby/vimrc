@@ -12,16 +12,16 @@ endfunction
 command! AlternateSafe :call <SID>AlternateSafe()
 
 let g:projectionist_heuristics = { ".git/":
-      \ { "lib/web/*_controller.rb": { "alternate": [ "spec/requests/{}_request_spec.rb", 
-      \                                               "spec/requests/{}_get_request_spec.rb", 
-      \                                               "spec/requests/{}_post_request_spec.rb", 
-      \                                               "spec/requests/{}_patch_request_spec.rb", 
-      \                                               "spec/requests/{}_delete_request_spec.rb"] }, 
-      \   "spec/requests/*_get_request_spec.rb": { "alternate": "lib/web/{}_controller.rb" },
-      \   "spec/requests/*_post_request_spec.rb": { "alternate": "lib/web/{}_controller.rb" },
-      \   "spec/requests/*_patch_request_spec.rb": { "alternate": "lib/web/{}_controller.rb" },
-      \   "spec/requests/*_delete_request_spec.rb": { "alternate": "lib/web/{}_controller.rb" },
-      \   "spec/requests/*_request_spec.rb": { "alternate": "lib/web/{}_controller.rb" }}
+      \ { "lib/web/*_controller.rb": { "alternate": [ "spec/web/{}_request_spec.rb", 
+      \                                               "spec/web/{}_get_request_spec.rb", 
+      \                                               "spec/web/{}_post_request_spec.rb", 
+      \                                               "spec/web/{}_patch_request_spec.rb", 
+      \                                               "spec/web/{}_delete_request_spec.rb"] }, 
+      \   "spec/web/*_get_request_spec.rb": { "alternate": "lib/web/{}_controller.rb" },
+      \   "spec/web/*_post_request_spec.rb": { "alternate": "lib/web/{}_controller.rb" },
+      \   "spec/web/*_patch_request_spec.rb": { "alternate": "lib/web/{}_controller.rb" },
+      \   "spec/web/*_delete_request_spec.rb": { "alternate": "lib/web/{}_controller.rb" },
+      \   "spec/web/*_request_spec.rb": { "alternate": "lib/web/{}_controller.rb" }}
       \ }
 
 augroup filetype_ruby
