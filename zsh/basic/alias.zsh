@@ -88,6 +88,7 @@ alias ni='npm install'
 alias nu='npm uninstall'
 alias nid='npm install -D'
 alias nr='npm run'
+alias nrt='npm run test 2>&1 | grep ●'
 alias niwt="f(){ npm i \$1 && npm i -D @types/\$1; unset -f f }; f"
 alias nmc="find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
 
