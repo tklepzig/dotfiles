@@ -15,6 +15,8 @@ nnoremap <leader>wQ :mksession!\|:qa<cr>
 nnoremap <Leader>q :bunload<CR>
 nnoremap <Leader>Q :%bd\|e#\|bd#<CR>
 nnoremap <leader>1 :b#<cr>
+nnoremap <leader>l :bnext<cr>
+nnoremap <leader>h :bprevious<cr>
 nnoremap <leader><BS> :noh<cr>
 nmap H ^
 vmap H ^
