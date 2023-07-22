@@ -39,6 +39,7 @@ alias tb='cd $HOME/.toolbox && v $(fzf) && cd -'
 alias tbs='$HOME/.toolbox/docs/_serve.sh'
 
 alias notify="$dotfilesDir/notify.rb"
+alias battery-monitor="$dotfilesDir/battery-monitor.rb"
 if isOS linux
 then
     alias n='nautilus .'
