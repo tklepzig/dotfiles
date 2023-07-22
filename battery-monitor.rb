@@ -16,7 +16,7 @@ exit(false) unless File.exist? sound_path
 loop do
   state, value = `#{DF_PATH}/tmux/battery.#{OS.mac? ? 'osx' : 'linux'}.zsh`.split("\n")
 
-  if state != 'charging' && value.to_i < 10
+  if state != 'charging' && value.to_i < 16
     `#{player} #{sound_path} > /dev/null 2>&1`
     sleep 2
     next
