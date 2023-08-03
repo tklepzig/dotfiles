@@ -33,6 +33,11 @@ alias dfu='dotfiles-update'
 alias dotfiles-update-legacy='/usr/bin/env zsh -c "$(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh)"'
 alias dotfiles-tabula-rasa="$dotfilesDir/tabula-rasa.sh"
 
+alias toolbox-update='/usr/bin/env zsh -c "$(curl -Ls https://raw.githubusercontent.com/tklepzig/toolbox/master/install.sh)"'
+alias tbu='toolbox-update'
+alias tb='cd $HOME/.toolbox && v $(fzf) && cd -'
+alias tbs='$HOME/.toolbox/docs/_serve.sh'
+
 alias notify="$dotfilesDir/notify.rb"
 alias battery-monitor="$dotfilesDir/battery-monitor.rb"
 if isOS linux
