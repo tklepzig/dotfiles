@@ -33,10 +33,14 @@ alias dfu='dotfiles-update'
 alias dotfiles-update-legacy='/usr/bin/env zsh -c "$(curl -Ls https://raw.githubusercontent.com/tklepzig/dotfiles/master/install.sh)"'
 alias dotfiles-tabula-rasa="$dotfilesDir/tabula-rasa.sh"
 
+# TODO Move to toolbox
 alias toolbox-update='/usr/bin/env zsh -c "$(curl -Ls https://raw.githubusercontent.com/tklepzig/toolbox/master/install.sh)"'
 alias tbu='toolbox-update'
-alias tb='cd $HOME/.toolbox && v $(fzf) && cd -'
-alias tbs='$HOME/.toolbox/docs/_serve.sh'
+alias tb="cd $HOME/.toolbox && v \$(fzf) && cd -"
+alias tbs="$HOME/.toolbox/docs/_serve.sh"
+#TODO auto-generate aliases for tools
+alias tb-v="$HOME/.toolbox/tools/vicy/vicy.sh"
+alias tb-vs="cd $HOME/.toolbox/tools/vicy && npm start && cd -"
 
 alias notify="$dotfilesDir/notify.rb"
 alias battery-monitor="$dotfilesDir/battery-monitor.rb"
