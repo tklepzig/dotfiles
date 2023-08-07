@@ -1,4 +1,14 @@
 #!/usr/bin/env zsh
 
+isOS()
+{
+  if [[ "$OSTYPE:l" == *"$1:l"* ]]
+  then
+    return 0;
+  fi
+
+  return 1;
+}
+
 open=$(isOS linux && echo "xdg-open" || echo "open")
 $open "https://www.blitzortung.org/de/live_dynamic_maps3.php" > /dev/null

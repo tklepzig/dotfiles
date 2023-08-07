@@ -1,17 +1,7 @@
 #!/usr/bin/env zsh
-		
+
 scripts_path="$HOME/.dotfiles/toolbox/scripts"
 
-isOS()
-{
-  if [[ "$OSTYPE:l" == *"$1:l"* ]]
-  then
-    return 0;
-  fi
-
-  return 1;
-}
-		
 cmds=( $($scripts_path/run.rb --list) )
 
 scripts_completion() {
@@ -39,4 +29,3 @@ compdef scripts_completion \#
 		"$scripts_path/$cmd" $@
 	fi
 }
-
