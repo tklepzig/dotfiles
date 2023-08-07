@@ -3,7 +3,6 @@ sample-1:
   help: |-
     Some multiline
     help
-  params: My param
 sample-2:
   help: This is the help.
   params:
