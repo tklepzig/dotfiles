@@ -1,0 +1,11 @@
+#!/usr/bin/env zsh
+
+if $1 -eq "serve"
+then
+	$dotfilesDir/toolbox/tools/vicy/vicy.sh
+else
+	cd $dotfilesDir/toolbox/tools/vicy
+	npm start
+	cd -
+fi
+

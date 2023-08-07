@@ -1,0 +1,10 @@
+#!/usr/bin/env zsh
+
+if $1 -eq "serve"
+then
+	$dotfilesDir/toolbox/docs/_serve.sh
+else
+	cd $dotfilesDir/toolbox/docs
+	v \$(fzf)
+	cd -
+fi

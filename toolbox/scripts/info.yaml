@@ -8,3 +8,7 @@ sample-2:
   params:
     - A param
     - Another param
+vicy:
+  help: vicy [serve]
+docs:
+  help: docs [serve]
