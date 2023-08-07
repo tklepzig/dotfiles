@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "name": "Vicy",
+  "short_name": "Vicy",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#782222",
+  "background_color": "#1d1d1d",
+  "icons": [
+    {
+      "src": "assets/logo-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "assets/logo-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

@@ -189,6 +189,8 @@ def install
   `cp #{DF_PATH}/vim/plugins.vim #{HOME}/.plugins.vim`
   add_link_with_override "#{HOME}/.plugins.vim", "#{HOME}/.vimrc"
 
+  add_link_with_override "#{DF_PATH}/scripts/init.zsh", "#{HOME}/.zshrc"
+
   install_profiles
 
   unless Dir.exist?("#{HOME}/.vim/autoload/plug.vim")
@@ -253,12 +255,12 @@ def install
                     `grep ^$(id -un): /etc/passwd | cut -d : -f 7-`
                   end
 
-  if default_shell != `which zsh`
-    Logger.log 'Setting default shell to zsh...', newline: false
-    `chsh -s $(which zsh)`
-    Logger.log ' Done.'.success
-    Logger.log 'Please notice: In order to use the new shell, you have to logout and back in.'.accent
-  end
+  return unless default_shell != `which zsh`
+
+  Logger.log 'Setting default shell to zsh...', newline: false
+  `chsh -s $(which zsh)`
+  Logger.log ' Done.'.success
+  Logger.log 'Please notice: In order to use the new shell, you have to logout and back in.'.accent
 end
 
 def tabula_rasa

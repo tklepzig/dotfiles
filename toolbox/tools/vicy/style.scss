@@ -1,0 +1,94 @@
+$background: #1d1d1d;
+$foreground: #ededed;
+$primary: #782222;
+
+html {
+  font-size: 14px;
+}
+body,
+html {
+  background: $background;
+  height: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  color: $foreground;
+  font-family: "Open Sans", sans-serif;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  font-size: 1rem;
+  min-height: 18rem;
+  &:fullscreen {
+    width: 100%;
+  }
+  &:-webkit-full-screen {
+    width: 100%;
+  }
+  &:-moz-full-screen {
+    width: 100%;
+  }
+}
+
+#root {
+  height: 100%;
+  display: grid;
+  place-items: center stretch;
+  grid-template-columns: 1fr 2fr 1fr;
+}
+input,
+textarea {
+  margin: 0.25rem;
+  padding: 0.5rem;
+  border: 1px solid darken($background, 5%);
+  box-shadow: 0 0 6px 0 darken($background, 10%);
+  font-family: inherit;
+  font-size: 1rem;
+  background: lighten($background, 10%);
+  color: $foreground;
+  grid-column: span 2;
+  &:focus {
+    border: 1px solid $primary;
+    outline: none;
+  }
+}
+
+textarea {
+  resize: vertical;
+}
+
+button {
+  font-family: inherit;
+  font-size: 1rem;
+  color: $foreground;
+  padding: 8px 12px;
+  min-width: 80px;
+  outline: none;
+  margin: 4px;
+  box-sizing: content-box;
+  cursor: pointer;
+  transition: background 0.15s ease-out;
+  user-select: none;
+  background: $primary;
+  border: 1px solid darken($background, 5%);
+  box-shadow: 0 0 6px 0 darken($background, 10%);
+
+  &:active:not([disabled]) {
+    background: darken($primary, 10%);
+  }
+  &:focus:not([disabled]) {
+    border: 1px solid rgba($foreground, 0.5);
+  }
+  &[disabled] {
+    cursor: default;
+    opacity: 0.5;
+  }
+}
+
+article {
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  min-width: 300px;
+}

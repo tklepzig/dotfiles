@@ -1,0 +1,9 @@
+node_modules/
+*.conf
+*.crt
+*.csr
+*.key
+*.srl
+package-lock.json
+style.min.css
+vigenere.js

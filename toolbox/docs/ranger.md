@@ -1,0 +1,24 @@
+- dc - get dir size for current/selected dir(s)
+- o - order options
+- zh - toggle hidden files
+- zp - Toggle file preview
+- zP - Toggle dir preview
+- r - run (select from list or enter cmd)
+- yy - copy
+- yd - copy current dir to clipboard
+- yp - copy current path to clipboard
+- pp - paste
+- dd - cut
+- dD - delete
+- V - mark files
+- v - toggle marked files
+- space - mark current file and jump to next one
+- uv - unmark everything
+- i - preview file
+- a - rename
+- g - goto locations, tab handling
+- Alt + 1-9 - go to (or create) tab 1-9
+- Tab - Switch tab (alternative to gt/gT)
+- M - different options which info to show for each file/dir
+- ~ - Toggle view mode (default vs mc-like)
+- E - Edit current file in vim

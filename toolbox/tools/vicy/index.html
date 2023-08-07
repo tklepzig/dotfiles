@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="theme-color" content="#782222" />
+    <meta
+      name="viewport"
+      content="user-scalable=yes, initial-scale=1.0, maximum-scale=10.0, width=device-width"
+    />
+    <base href="/" />
+    <title>Vicy</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans"
+      rel="stylesheet"
+    />
+    <link href="style.min.css" rel="stylesheet" />
+    <link rel="manifest" href="manifest.json" />
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("sw.js");
+        });
+      }
+    </script>
+  </head>
+
+  <body>
+    <div id="root">
+      <article>
+        <input id="key" autoFocus placeholder="Key: .*{2,}" type="password" />
+        <input id="key-confirm" placeholder="Confirm Key" type="password" />
+        <textarea
+          spellcheck="false"
+          autocomplete="off"
+          id="text"
+          placeholder="Text: .*{1,}"
+          rows="3"
+        ></textarea>
+        <button id="encrypt" class="crypt" type="button" disabled>
+          Encrypt
+        </button>
+        <button id="decrypt" class="crypt" type="button" disabled>
+          Decrypt
+        </button>
+        <textarea
+          spellcheck="false"
+          autocomplete="off"
+          id="cipher"
+          placeholder="Cipher"
+          rows="3"
+        ></textarea>
+      </article>
+    </div>
+
+    <script>
+      // Hack to allow running the mostly node-targeted js file vigenere.js in the browser
+      var exports = {};
+    </script>
+    <script src="vigenere.js"></script>
+    <script>
+      const key = document.getElementById("key");
+      const keyConfirm = document.getElementById("key-confirm");
+      const text = document.getElementById("text");
+      const cipher = document.getElementById("cipher");
+      const encryptButton = document.getElementById("encrypt");
+      const decryptButton = document.getElementById("decrypt");
+
+      const check = () => {
+        encryptButton.disabled =
+          !isValidKey(key.value, keyConfirm.value) || !isValidText(text.value);
+        decryptButton.disabled =
+          !isValidKey(key.value, keyConfirm.value) ||
+          !isValidText(cipher.value);
+      };
+
+      const handleEncrypt = () => {
+        cipher.value = encrypt(text.value, key.value);
+      };
+
+      const handleDecrypt = () => {
+        text.value = decrypt(cipher.value, key.value);
+      };
+
+      encryptButton.addEventListener("click", handleEncrypt, false);
+      decryptButton.addEventListener("click", handleDecrypt, false);
+      key.addEventListener("input", check, false);
+      keyConfirm.addEventListener("input", check, false);
+      text.addEventListener("input", check, false);
+      cipher.addEventListener("input", check, false);
+    </script>
+  </body>
+</html>
