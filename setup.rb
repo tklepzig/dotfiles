@@ -8,7 +8,7 @@ DF_REPO ||= ENV['DOTFILES_REPO'] || 'tklepzig/dotfiles'
 HOME ||= ENV['HOME']
 DF_PROFILES ||= ENV['DOTFILES_PROFILES'] || ''
 DF_THEME ||= ENV['DOTFILES_THEME']
-DF_PATH ||= "#{HOME}/.dotfiles"
+DF_PATH ||= "#{HOME}/.dotfiles".freeze
 
 # https://rubystyle.guide/
 # TODO: symlink my own global config to $HOME/.rubocop.yml
@@ -189,7 +189,7 @@ def install
   `cp #{DF_PATH}/vim/plugins.vim #{HOME}/.plugins.vim`
   add_link_with_override "#{HOME}/.plugins.vim", "#{HOME}/.vimrc"
 
-  add_link_with_override "#{DF_PATH}/scripts/init.zsh", "#{HOME}/.zshrc"
+  add_link_with_override "#{DF_PATH}/toolbox/init.zsh", "#{HOME}/.zshrc"
 
   install_profiles
 
