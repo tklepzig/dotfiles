@@ -7,9 +7,15 @@ HOME ||= ENV['HOME']
 SCRIPTS_PATH ||= "#{HOME}/.dotfiles/toolbox/scripts".freeze
 
 infos = YAML.load_file("#{SCRIPTS_PATH}/info.yaml")
+
+if File.exist?("#{SCRIPTS_PATH}/info.additional.yaml")
+  infos_additional = YAML.load_file("#{SCRIPTS_PATH}/info.additional.yaml")
+  infos.merge!(infos_additional) if infos_additional
+end
+
 scripts = Dir.glob("#{SCRIPTS_PATH}/*").filter_map do |file|
   name = File.basename(file)
-  next if ['info.yaml', 'run.rb'].include?(name)
+  next if ['info.yaml', 'info.additional.yaml', 'run.rb'].include?(name)
 
   name
 end
