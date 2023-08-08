@@ -1,4 +1,6 @@
 #!/usr/bin/env zsh
 
-[ ! -f ./package-lock.json ] && npm i && npm run build
+cd $dotfiles_path/toolbox/tools/vicy
+[ ! -f package-lock.json ] && npm i && npm run build
 npm start
+cd -
