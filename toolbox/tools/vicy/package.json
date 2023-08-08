@@ -1,12 +1,11 @@
 {
   "scripts": {
-    "start": "live-server .",
+    "start": "npx --yes live-server .",
     "build": "tsc && sass style.scss:style.min.css -s compressed --no-source-map"
   },
   "dependencies": {
     "@types/node": "*",
     "typescript": "*",
-    "live-server": "*",
     "sass": "*"
   }
 }
