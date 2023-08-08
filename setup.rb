@@ -189,8 +189,8 @@ def install
   `cp #{DF_PATH}/vim/plugins.vim #{HOME}/.plugins.vim`
   add_link_with_override "#{HOME}/.plugins.vim", "#{HOME}/.vimrc"
 
-  Logger.log 'Initializing toolbox...', newline: false
-  `cd #{DF_PATH}/toolbox/tools/vicy && npm i && npm run build && cd -`
+  Logger.log 'Initializing toolbox...'
+  `cd #{DF_PATH}/toolbox/tools/vicy && npm i > /dev/null 2>&1 && npm run build > /dev/null 2>&1 && cd -`
   add_link_with_override "#{DF_PATH}/toolbox/init.zsh", "#{HOME}/.zshrc"
   Logger.log ' Done.'.success
 
