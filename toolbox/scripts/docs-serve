@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+
+$dotfiles_path/toolbox/docs/_serve.sh

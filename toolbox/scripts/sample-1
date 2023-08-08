@@ -1,2 +1,5 @@
 #!/usr/bin/env zsh
 
+
+echo $dotfiles_path
+echo $dotfiles_os

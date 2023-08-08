@@ -26,6 +26,10 @@ compdef scripts_completion \#
 
 		first_line=$(head -n 1 "$scripts_path/$cmd")
 		[[ $first_line != \#!* ]] && echo "Error: $cmd is missing a proper shebang line" && return 1
+
+		export dotfiles_path="$HOME/.dotfiles"
+		export dotfiles_os="${$(uname):l}"
+
 		"$scripts_path/$cmd" $@
 	fi
 }

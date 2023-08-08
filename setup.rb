@@ -189,7 +189,12 @@ def install
   `cp #{DF_PATH}/vim/plugins.vim #{HOME}/.plugins.vim`
   add_link_with_override "#{HOME}/.plugins.vim", "#{HOME}/.vimrc"
 
+  Logger.log 'Initializing toolbox...', newline: false
+  `cd #{DF_PATH}/toolbox/tools/vicy`
+  `npm i && npm run build`
+  `cd -`
   add_link_with_override "#{DF_PATH}/toolbox/init.zsh", "#{HOME}/.zshrc"
+  Logger.log ' Done.'.success
 
   install_profiles
 
