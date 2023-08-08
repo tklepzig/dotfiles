@@ -1,6 +1,3 @@
 #!/usr/bin/env zsh
 
-cd $dotfiles_path/toolbox/tools/vicy
-npm start
-cd -
-
+$dotfiles_path/toolbox/tools/vicy/vicy.sh
