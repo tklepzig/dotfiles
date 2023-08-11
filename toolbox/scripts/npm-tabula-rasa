@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+
+npm cache clean --force
+find . -name "node_modules" -type d  -exec rm -rf "{}" \;

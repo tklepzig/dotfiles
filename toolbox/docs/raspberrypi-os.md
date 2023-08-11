@@ -1,6 +1,6 @@
-# Raspberry Pi OS
+# Raspberry Pi
 
-## Write to sd card
+## Write OS to sd card
 
 unzip -p <raspbian-image-archive.zip> | sudo dd bs=4M of=</dev/sd-card> conv=fsync status=progress
 
@@ -39,6 +39,14 @@ show the same screen on hdmi and vncclient
     x11vnc -display :0 [ -usepw -listen IP_of_pi -allow allowed_ip_address ]
 
 > -display : screen number to get
-> -usepw   : use password security
-> -listen  : IP address of server (Pi IP)
-> -allow   : allowed client IPs (client IP, in your case Mac IP address)
+> -usepw : use password security
+> -listen : IP address of server (Pi IP)
+> -allow : allowed client IPs (client IP, in your case Mac IP address)
+
+## Echo GPU/CPU temperature
+
+    cpu=$(</sys/class/thermal/thermal_zone0/temp)
+    echo "$(date) @ $(hostname)"
+    echo "-------------------------------------------"
+    echo "GPU => $(/opt/vc/bin/vcgencmd measure_temp)"
+    echo "CPU => $((cpu/1000))'C"

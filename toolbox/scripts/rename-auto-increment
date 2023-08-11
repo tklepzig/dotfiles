@@ -1,3 +1,6 @@
+#!/usr/bin/env zsh
+
+#WIP
 start=1
 ext="mp3"
 for file in *.$ext; do
