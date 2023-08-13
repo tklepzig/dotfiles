@@ -1,6 +1,5 @@
-const maxChar = 126;
-const minChar = 32;
-const modValue = maxChar + 1 - minChar;
+const alphabet=" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~§ÄÖÜßäöü"
+const modValue = alphabet.length;
 
 // to support negative numbers
 const modX = (n: number, modulo: number) => {
@@ -56,24 +55,26 @@ export const decrypt = (text: string, key: string) => {
 
 const getShiftForIndex = (key: string, index: number) => {
   const char = key[index % key.length];
-  const shift = char.charCodeAt(0) - minChar;
+  const shift = alphabet.indexOf(char);
 
   return shift;
 };
 
 const getCharCode = (char: string) => {
-  return char.charCodeAt(0) - minChar;
+  return alphabet.indexOf(char);
 };
 
 const getStringFromCharCode = (code: number) => {
-  return String.fromCharCode(code + minChar);
+  return alphabet[code];
 };
+
+const isValidChar = (char: string) => alphabet.indexOf(char) !== -1;
 
 export const isValidKey = (key: string, keyConfirm: string) => {
   let isValid = key === keyConfirm && key.length > 1;
 
   for (const c of key) {
-    if (c.charCodeAt(0) < minChar || c.charCodeAt(0) > maxChar) {
+    if (!isValidChar(c)) {
       isValid = false;
       return;
     }
@@ -86,10 +87,7 @@ export const isValidText = (text: string) => {
   let isValid = text.length > 0;
 
   for (const c of text) {
-    if (
-      (c.charCodeAt(0) < minChar && c.charCodeAt(0) !== 10) ||
-      c.charCodeAt(0) > maxChar
-    ) {
+    if (!isValidChar(c) && !isLineBreak(c)) {
       isValid = false;
       return;
     }
