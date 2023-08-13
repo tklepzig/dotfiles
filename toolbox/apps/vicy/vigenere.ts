@@ -1,4 +1,5 @@
-const alphabet=" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~§ÄÖÜßäöü"
+const alphabet =
+  " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~§ÄÖÜßäöü";
 const modValue = alphabet.length;
 
 // to support negative numbers
@@ -71,27 +72,29 @@ const getStringFromCharCode = (code: number) => {
 const isValidChar = (char: string) => alphabet.indexOf(char) !== -1;
 
 export const isValidKey = (key: string, keyConfirm: string) => {
-  let isValid = key === keyConfirm && key.length > 1;
+  if (key.length < 2 || key !== keyConfirm) {
+    return false;
+  }
 
   for (const c of key) {
     if (!isValidChar(c)) {
-      isValid = false;
-      return;
+      return false;
     }
   }
 
-  return isValid;
+  return true;
 };
 
 export const isValidText = (text: string) => {
-  let isValid = text.length > 0;
+  if (text.length < 1) {
+    return false;
+  }
 
   for (const c of text) {
     if (!isValidChar(c) && !isLineBreak(c)) {
-      isValid = false;
-      return;
+      return false;
     }
   }
 
-  return isValid;
+  return true;
 };

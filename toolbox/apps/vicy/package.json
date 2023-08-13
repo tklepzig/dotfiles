@@ -1,10 +1,15 @@
 {
   "scripts": {
     "start": "npx --yes live-server .",
-    "build": "tsc && sass style.scss:style.min.css -s compressed --no-source-map"
+    "build": "tsc && sass style.scss:style.min.css -s compressed --no-source-map",
+    "test": "tsc && npx --yes jest",
+    "tsc:watch": "tsc -w",
+    "style:watch": "sass --watch style.scss:style.min.css -s compressed"
   },
   "dependencies": {
     "@types/node": "*",
+    "@types/jest": "*",
+    "ts-jest": "*",
     "typescript": "*",
     "sass": "*"
   }
