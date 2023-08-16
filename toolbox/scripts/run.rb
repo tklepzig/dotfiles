@@ -13,6 +13,11 @@ if File.exist?("#{SCRIPTS_PATH}/info.additional.yaml")
   infos.merge!(infos_additional) if infos_additional
 end
 
+if File.exist?("#{SCRIPTS_PATH}/info.local.yaml")
+  infos_local = YAML.load_file("#{SCRIPTS_PATH}/info.local.yaml")
+  infos.merge!(infos_local) if infos_local
+end
+
 scripts = Dir.glob("#{SCRIPTS_PATH}/*").filter_map do |file|
   name = File.basename(file)
   next if ['info.yaml', 'info.additional.yaml', 'run.rb'].include?(name)
