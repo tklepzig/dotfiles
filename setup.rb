@@ -8,7 +8,7 @@ DF_REPO ||= ENV['DOTFILES_REPO'] || 'tklepzig/dotfiles'
 HOME ||= ENV['HOME']
 DF_PROFILES ||= ENV['DOTFILES_PROFILES'] || ''
 DF_THEME ||= ENV['DOTFILES_THEME']
-DF_PATH ||= "#{HOME}/.dotfiles".freeze
+DF_PATH ||= "#{HOME}/.dotfiles"
 
 # https://rubystyle.guide/
 # TODO: symlink my own global config to $HOME/.rubocop.yml
