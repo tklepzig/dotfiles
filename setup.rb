@@ -171,9 +171,20 @@ def install
   check_mandatory_installation 'git'
   check_mandatory_installation 'zsh'
 
-  Logger.log "Cloning repo to #{DF_PATH}...", newline: false
-  `rm -rf #{DF_PATH}`
-  `git clone --depth=1 https://github.com/#{DF_REPO}.git #{DF_PATH} > /dev/null 2>&1`
+  if Dir.exist?(DF_PATH)
+    Logger.log "Found existing dotfiles in #{DF_PATH}, updating...", newline: false
+    Dir.chdir(DF_PATH) do
+      # Update repo
+      `git fetch --depth=1 > /dev/null 2>&1`
+      # Remove tracked changes
+      `git reset --hard origin/master > /dev/null 2>&1`
+      # Remove ignored changes
+      `git clean -fx > /dev/null 2>&1`
+    end
+  else
+    Logger.log "Cloning repo to #{DF_PATH}...", newline: false
+    `git clone --depth=1 https://github.com/#{DF_REPO}.git #{DF_PATH} > /dev/null 2>&1`
+  end
   Logger.log ' Done.'.success
 
   `#{DF_PATH}/setTheme.zsh`
