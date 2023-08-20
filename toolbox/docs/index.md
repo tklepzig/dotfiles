@@ -1,6 +1,5 @@
 # Toolbox - Docs
 - [anti-scam](anti-scam.md)
-- [apo](apo.md)
 - [arch-linux](arch-linux.md)
 - [asdf](asdf.md)
 - [bc](bc.md)

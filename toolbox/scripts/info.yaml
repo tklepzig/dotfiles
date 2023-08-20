@@ -12,3 +12,11 @@ weather:
   help: |-
     Usage: weather [location]
     Example: weather berlin
+luks-open:
+  help: Usage: luks-open path/to/container
+  params:
+    - Path to the container file
+luks-close:
+  help: Usage: luks-close path/to/container
+  params:
+    - Path to the container file

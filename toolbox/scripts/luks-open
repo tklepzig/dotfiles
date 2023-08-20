@@ -1,0 +1,6 @@
+#!/usr/bin/env zsh
+
+sudo cryptsetup open "$1" encrypted
+mkdir "$PWD/${1:t}.mount"
+sudo mount /dev/mapper/encrypted  "$PWD/${1:t}.mount"
+cd "$PWD/${1:t}.mount"

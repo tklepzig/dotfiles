@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+
+sudo umount "$PWD/${1:t}.mount"
+rm -r "$PWD/${1:t}.mount"
+sudo cryptsetup close encrypted
