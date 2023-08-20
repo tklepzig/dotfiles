@@ -4,6 +4,7 @@ const modValue = alphabet.length;
 
 // real modulo, not only the remainder
 // it fixes it for negative numbers, so that -1 mod 26 is not -1 but 25 (it begins again from the end)
+//TODO add tests
 const mod = (n: number, modulo: number) => {
   var remainder = n % modulo;
   return Math.floor(remainder >= 0 ? remainder : remainder + modulo);
@@ -17,11 +18,15 @@ const isLineBreak = (char: string) => {
   return char.charCodeAt(0) === 10;
 };
 
+//TODO add tests
 export const encrypt = (text: string, key: string) => {
+  //TODO: check if valid key and text
   return shiftTextByKey(text, key, "encrypt");
 };
 
+//TODO add tests
 export const decrypt = (cipher: string, key: string) => {
+  //TODO: check if valid key and cipher
   return shiftTextByKey(cipher, key, "decrypt");
 };
 
