@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+
+git log --all -pG"$1" -i | less -i -p"$1"
+
