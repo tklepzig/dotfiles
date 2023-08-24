@@ -98,8 +98,8 @@ git config --global alias.bfp "!f() { $setDefaultBranch; git diff -p --word-diff
 git config --global alias.rbib "!f() { $setDefaultBranch; currentBranch=\$(git rev-parse --abbrev-ref HEAD); git rebase -i \$(git log \$defaultBranch..\${1:-\$currentBranch}  --oneline --pretty=format:'%h' | tail -1)^; }; f"
 
 git config --global alias.f "fetch"
-git config --global alias.fm "!f() { . ~/.dotfiles/git/git-fetch-merge.sh; }; f"
-git config --global alias.fma "!f() { . ~/.dotfiles/git/git-fetch-merge.sh --all; }; f"
+git config --global alias.fm "!f() { . ~/.dotfiles/toolbox/scripts/git-fetch-merge; }; f"
+git config --global alias.fma "!f() { . ~/.dotfiles/toolbox/scripts/git-fetch-merge --all; }; f"
 
 git config --global alias.m "merge"
 git config --global alias.ma "merge --abort"
@@ -144,8 +144,8 @@ git config --global alias.cnb "!f() { $setDefaultBranch; git cherry-pick -n \$(g
 git config --global alias.rv "revert"
 git config --global alias.rvn "revert -n"
 
-git config --global alias.prn "!f() { . ~/.dotfiles/git/git-github-pr.sh new; }; f"
-git config --global alias.pro "!f() { . ~/.dotfiles/git/git-github-pr.sh; }; f"
+git config --global alias.prn "!f() { . ~/.dotfiles/toolbox/scripts/git-github-pr new; }; f"
+git config --global alias.pro "!f() { . ~/.dotfiles/toolbox/scripts/git-github-pr; }; f"
 
 
 #search for regex in all files history
