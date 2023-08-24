@@ -1,13 +1,4 @@
 ---
-sample-1:
-  help: |-
-    Some multiline
-    help
-sample-2:
-  help: This is the help.
-  params:
-    - A param
-    - Another param
 weather:
   help: |-
     Usage: weather [location]
