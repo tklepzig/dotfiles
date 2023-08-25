@@ -45,6 +45,23 @@ zstyle ':vcs_info:git:*' formats "%b"
 zstyle ':vcs_info:git:*' actionformats "%b (%a)"
 zstyle ':vcs_info:*' enable git
 
+#TODO
+#
+#zstyle ':completion:*' list-colors ${(s.:.)"di=32:ln=35:so=33:pi=33:ex=31:bd=1;34:cd=1;34:su=1;31:sg=1;31:tw=1;32:ow=1;32"}
+#
+#how to color completion via rule instead of using escape codes (see run.rb)
+#zstyle ':completion:*:default' list-colors '=(#b)*(XX *)=32=31' '=*=32'
+#zstyle ":completion:*:default" list-colors ${(s.:.)LS_COLORS} "ma=48;5;153;1"
+#https://zsh.sourceforge.io/Doc/Release/Zsh-Modules.html#Colored-completion-listings
+#https://www.ditig.com/256-colors-cheat-sheet
+#https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
+#https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
+#https://www.zsh.org/mla/users/2017/msg00334.html
+#https://superuser.com/questions/1200487/zsh-completion-list-colors-partial-colouring-issue
+#https://thevaluable.dev/zsh-completion-guide-examples/
+#https://github.com/ohmyzsh/ohmyzsh/issues/9728
+#https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org
+
 HISTFILE=$HOME/.history
 HISTSIZE=10000
 SAVEHIST=20000

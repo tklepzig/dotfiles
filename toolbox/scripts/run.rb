@@ -26,6 +26,18 @@ scripts = Dir.glob("#{SCRIPTS_PATH}/*").filter_map do |file|
 end
 
 if ARGV[0] == '--list'
+  scripts.each do |script|
+    description = if infos[script].respond_to?(:key?) && infos[script].key?('help')
+                    ":\e[0;32;2m#{infos[script]['help'].split("\n")[0]}\e[0m"
+                  else
+                    ":\e[0;15;2mNo help for #{script}\e[0m"
+                  end
+    puts "#{script}#{description}"
+  end
+  exit 0
+end
+
+if ARGV[0] == '--list-short'
   puts scripts
   exit 0
 end

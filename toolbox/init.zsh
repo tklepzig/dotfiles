@@ -11,7 +11,9 @@ then
 	done
 fi
 
-cmds=( $($scripts_path/run.rb --list) )
+cmds=( $($scripts_path/run.rb --list-short) )
+# ${(f)...} --> parameter expansion, split at new lines
+descs=( ${(f)"$($scripts_path/run.rb --list)"} )
 
 scripts_completion() {
 	#see also https://stackoverflow.com/a/73356136
@@ -38,7 +40,9 @@ scripts_completion() {
 		# if no custom completion exists use the line below for file system completion
 		_normal -p \#
 	else
-		compadd -a cmds
+		#compadd -d descs -a cmds
+		#compadd -a cmds
+		_describe -t descs 'commands' descs
 	fi
 }
 compdef scripts_completion \#
