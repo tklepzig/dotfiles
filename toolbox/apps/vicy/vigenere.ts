@@ -1,10 +1,16 @@
-const maxChar = 126;
-const minChar = 32;
-const modValue = maxChar + 1 - minChar;
+const alphabet =
+  " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~§ÄÖÜßäöü";
+const modValue = alphabet.length;
 
-// to support negative numbers
-const modX = (n: number, modulo: number) => {
-  return ((n % modulo) + modulo) % modulo;
+// real modulo, not only the remainder
+// it fixes it for negative numbers, so that -1 mod 26 is not -1 but 25 (it begins again from the end)
+//TODO add tests
+const mod = (n: number, modulo: number) => {
+  var remainder = n % modulo;
+  return Math.floor(remainder >= 0 ? remainder : remainder + modulo);
+
+  //shorter, but not so nice to read
+  //return ((n % modulo) + modulo) % modulo;
 };
 
 const LINE_BREAK = String.fromCharCode(10);
@@ -13,87 +19,71 @@ const isLineBreak = (char: string) => {
 };
 
 export const encrypt = (text: string, key: string) => {
-  let result = "";
+  if (!isValidKey(key, key)) throw new Error("Invalid key");
+  if (!isValidText(text)) throw new Error("Invalid text");
 
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-
-    if (isLineBreak(char)) {
-      result += LINE_BREAK;
-      continue;
-    }
-
-    let newIndex = getCharCode(char) + getShiftForIndex(key, i);
-
-    newIndex %= modValue;
-
-    result += getStringFromCharCode(newIndex);
-  }
-
-  return result;
+  return shiftTextByKey(text, key, "encrypt");
 };
 
-export const decrypt = (text: string, key: string) => {
-  let result = "";
+export const decrypt = (cipher: string, key: string) => {
+  if (!isValidKey(key, key)) throw new Error("Invalid key");
+  if (!isValidText(cipher)) throw new Error("Invalid cipher");
 
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-
-    if (isLineBreak(char)) {
-      result += LINE_BREAK;
-      continue;
-    }
-
-    let newIndex = getCharCode(char) - getShiftForIndex(key, i);
-
-    newIndex = modX(newIndex, modValue);
-
-    result += getStringFromCharCode(newIndex);
-  }
-
-  return result;
+  return shiftTextByKey(cipher, key, "decrypt");
 };
 
-const getShiftForIndex = (key: string, index: number) => {
-  const char = key[index % key.length];
-  const shift = char.charCodeAt(0) - minChar;
+const shiftTextByKey = (
+  text: string,
+  key: string,
+  mode: "encrypt" | "decrypt"
+) =>
+  text
+    .split("")
+    .map((char, index) => {
+      if (isLineBreak(char)) {
+        return LINE_BREAK;
+      }
 
-  return shift;
-};
+      const textIndex = alphabet.indexOf(char);
 
-const getCharCode = (char: string) => {
-  return char.charCodeAt(0) - minChar;
-};
+      const keyChar = key[mod(index, key.length)];
+      const keyIndex = alphabet.indexOf(keyChar);
 
-const getStringFromCharCode = (code: number) => {
-  return String.fromCharCode(code + minChar);
-};
+      const shiftedIndex = mod(
+        textIndex + keyIndex * (mode === "decrypt" ? -1 : 1),
+        modValue
+      );
+
+      return alphabet[shiftedIndex];
+    })
+    .join("");
+
+const isValidChar = (char: string) => alphabet.indexOf(char) !== -1;
 
 export const isValidKey = (key: string, keyConfirm: string) => {
-  let isValid = key === keyConfirm && key.length > 1;
+  if (key.length < 2 || key !== keyConfirm) {
+    return false;
+  }
 
   for (const c of key) {
-    if (c.charCodeAt(0) < minChar || c.charCodeAt(0) > maxChar) {
-      isValid = false;
-      return;
+    if (!isValidChar(c)) {
+      return false;
     }
   }
 
-  return isValid;
+  return true;
 };
 
 export const isValidText = (text: string) => {
-  let isValid = text.length > 0;
+  if (text.length < 1) {
+    return false;
+  }
 
   for (const c of text) {
-    if (
-      (c.charCodeAt(0) < minChar && c.charCodeAt(0) !== 10) ||
-      c.charCodeAt(0) > maxChar
-    ) {
-      isValid = false;
-      return;
+    if (!isValidChar(c) && !isLineBreak(c)) {
+      return false;
     }
   }
 
-  return isValid;
+  return true;
 };
