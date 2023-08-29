@@ -1,0 +1,9 @@
+g:Blubb = () => {
+  const line = getline(".")
+  const col = col(".")
+  const i1 = line->stridx("'")
+  const i2 = line->stridx("'", i1 + 1)
+  const inString = col > i1 && col < i2
+  echo inString
+} 
+
