@@ -1,4 +1,5 @@
 # Toolbox - Docs
+- [android](android.md)
 - [anti-scam](anti-scam.md)
 - [arch-linux](arch-linux.md)
 - [asdf](asdf.md)
@@ -32,6 +33,7 @@
 - [raspberrypi-os](raspberrypi-os.md)
 - [redshift](redshift.md)
 - [ruby](ruby.md)
+- [sailing](sailing.md)
 - [smart](smart.md)
 - [ssh](ssh.md)
 - [tmux](tmux.md)
