@@ -18,15 +18,17 @@ const isLineBreak = (char: string) => {
   return char.charCodeAt(0) === 10;
 };
 
-//TODO add tests
 export const encrypt = (text: string, key: string) => {
-  //TODO: check if valid key and text
+  if (!isValidKey(key, key)) throw new Error("Invalid key");
+  if (!isValidText(text)) throw new Error("Invalid text");
+
   return shiftTextByKey(text, key, "encrypt");
 };
 
-//TODO add tests
 export const decrypt = (cipher: string, key: string) => {
-  //TODO: check if valid key and cipher
+  if (!isValidKey(key, key)) throw new Error("Invalid key");
+  if (!isValidText(cipher)) throw new Error("Invalid cipher");
+
   return shiftTextByKey(cipher, key, "decrypt");
 };
 
