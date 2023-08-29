@@ -6,7 +6,7 @@ require 'yaml'
 HOME ||= ENV['HOME']
 SCRIPTS_PATH ||= "#{HOME}/.dotfiles/toolbox/scripts".freeze
 
-infos = YAML.load_file("#{SCRIPTS_PATH}/info.yaml")
+infos = YAML.load_file("#{SCRIPTS_PATH}/_info.yaml")
 
 if File.exist?("#{SCRIPTS_PATH}/info.additional.yaml")
   infos_additional = YAML.load_file("#{SCRIPTS_PATH}/info.additional.yaml")
@@ -20,7 +20,7 @@ end
 
 scripts = Dir.glob("#{SCRIPTS_PATH}/*").filter_map do |file|
   name = File.basename(file)
-  next if ['info.yaml', 'info.additional.yaml', 'run.rb'].include?(name)
+  next if ['_info.yaml', '_info.additional.yaml', '_run.rb'].include?(name)
 
   name
 end

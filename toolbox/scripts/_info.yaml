@@ -1,0 +1,20 @@
+---
+luks-close:
+  help: |-
+    Close LUKS container
+    Usage: luks-close path/to/container
+  params:
+    - Path to the container file
+luks-open:
+  help: |-
+    Open LUKS container
+    Usage: luks-open path/to/container
+  params:
+    - Path to the container file
+setup-asdf:
+  help: Set up asdf and plugins
+weather:
+  help: |-
+    Get the weather forecast
+    Usage: weather [location]
+    Example: weather berlin

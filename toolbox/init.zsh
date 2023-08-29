@@ -11,9 +11,9 @@ then
 	done
 fi
 
-cmds=( $($scripts_path/run.rb --list-short) )
+cmds=( $($scripts_path/_run.rb --list-short) )
 # ${(f)...} --> parameter expansion, split at new lines
-descs=( ${(f)"$($scripts_path/run.rb --list)"} )
+descs=( ${(f)"$($scripts_path/_run.rb --list)"} )
 
 scripts_completion() {
 	#see also https://stackoverflow.com/a/73356136
@@ -22,19 +22,19 @@ scripts_completion() {
 		shift words
 		((CURRENT--))
 		# TODO get custom completions from yaml
-		# by call run.rb with current script name
+		# by call _run.rb with current script name
 		# (which is in $words after the shift)
 		# e.g.
 		# completions:
 		# - show
 		# - serve
 		# - test
-		# completions=( $($scripts_path/run.rb --completions $words) )
+		# completions=( $($scripts_path/_run.rb --completions $words) )
 		# compadd -a completions
 		# Or maybe improve it by putting all available completions into 
 		# a variable to avoid opening the yaml file everytime a completion
 		# is invoked, so sth like
-		# custom_completions=( $($scripts_path/run.rb --completions) )
+		# custom_completions=( $($scripts_path/_run.rb --completions) )
 		# custom_completions should be then sth like a dictionary
 		
 		# if no custom completion exists use the line below for file system completion
@@ -55,7 +55,7 @@ compdef scripts_completion \#
 		args=( $@ )
 	fi
 
-	cmd=$($scripts_path/run.rb $args)
+	cmd=$($scripts_path/_run.rb $args)
 	if [ $? -ne 0 ]
 	then
 		echo "$cmd"

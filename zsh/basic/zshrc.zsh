@@ -49,7 +49,7 @@ zstyle ':vcs_info:*' enable git
 #
 #zstyle ':completion:*' list-colors ${(s.:.)"di=32:ln=35:so=33:pi=33:ex=31:bd=1;34:cd=1;34:su=1;31:sg=1;31:tw=1;32:ow=1;32"}
 #
-#how to color completion via rule instead of using escape codes (see run.rb)
+#how to color completion via rule instead of using escape codes (see _run.rb)
 #zstyle ':completion:*:default' list-colors '=(#b)*(XX *)=32=31' '=*=32'
 #zstyle ":completion:*:default" list-colors ${(s.:.)LS_COLORS} "ma=48;5;153;1"
 #https://zsh.sourceforge.io/Doc/Release/Zsh-Modules.html#Colored-completion-listings
