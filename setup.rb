@@ -220,7 +220,7 @@ def install
   if DF_PROFILES.include?('dev')
     # The dev profile is activated and so the coc plugin is installed
     Logger.log 'Updating coc extensions...', newline: false
-    `echo | vim +CocUpdate +qall > /dev/null 2>&1`
+    `echo | vim +CocUpdateSync +qall > /dev/null 2>&1`
     Logger.log ' Done.'.success
   end
 
