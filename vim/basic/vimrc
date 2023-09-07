@@ -148,8 +148,8 @@ command! CopyFilename let @* = expand("%")
 " Show possible commands after tab when entering command
 set wildmenu
 
-" Always show at least four lines above/below the cursor
-set scrolloff=4
+" Always show at least ten lines above/below the cursor
+set scrolloff=10
 
 function! s:SynStack()
   for synItem in synstack(line("."), col("."))
