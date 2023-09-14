@@ -99,7 +99,6 @@ git config --global alias.rbib "!f() { $setDefaultBranch; currentBranch=\$(git r
 
 git config --global alias.f "fetch"
 git config --global alias.fm "!f() { . ~/.dotfiles/toolbox/scripts/git-fetch-merge; }; f"
-git config --global alias.fma "!f() { . ~/.dotfiles/toolbox/scripts/git-fetch-merge --all; }; f"
 
 git config --global alias.m "merge"
 git config --global alias.ma "merge --abort"
