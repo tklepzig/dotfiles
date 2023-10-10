@@ -4,6 +4,8 @@ let g:vim_markdown_folding_disabled = 1
 
 let g:vimtex_syntax_conceal_disable = 1
 
+set dictionary+=/usr/share/dict/words
+
 function! s:SpellCheck(bang, lang = "en")
   let prefix = ""
   if a:bang
@@ -32,3 +34,10 @@ endfunction
 
 command! -nargs=* -bang Write :call <SID>ToggleWrite(<bang>0, <q-args>)
 
+
+"coc-emoji is triggered when typing ':'
+let g:coc_global_extensions = g:coc_global_extensions + [
+      \'coc-emoji',
+      \'coc-dictionary',
+      \'coc-word',
+      \]
