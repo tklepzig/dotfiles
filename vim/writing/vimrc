@@ -25,10 +25,14 @@ function! s:ToggleWrite(bang, width)
     hi EndOfBuffer ctermbg=NONE
     hi LineNr ctermbg=NONE
     hi SignColumn ctermbg=NONE
+    nunmap <silent> <buffer> j
+    nunmap <silent> <buffer> k
   else
     set wrap linebreak
     colorscheme seoul256
     execute "Goyo " . a:width . " | Limelight"
+    nnoremap <silent> <buffer> j gj
+    nnoremap <silent> <buffer> k gk
   endif
 endfunction
 
