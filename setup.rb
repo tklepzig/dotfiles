@@ -233,10 +233,7 @@ def install
 
   if program_installed? 'kitty'
     add_link_with_override "#{DF_PATH}/kitty/kitty.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
-
-    if DF_THEME == 'lcars-light'
-      add_link_with_override "#{DF_PATH}/kitty/kitty.lcars-light.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
-    end
+    add_link_with_override "#{DF_PATH}/kitty/kitty.theme.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
   end
 
   unless Dir.exist?("#{HOME}/.fzf")

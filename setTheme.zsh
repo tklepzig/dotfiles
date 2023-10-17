@@ -7,6 +7,7 @@ then
 fi
 
 cat $HOME/.dotfiles/themes/colours.$theme.zsh > $HOME/.dotfiles/colours.zsh
+cat $HOME/.dotfiles/themes/kitty.$theme.conf > $HOME/.dotfiles/kitty/kitty.theme.conf
 
 rm -f $HOME/.dotfiles/colours.vim
 while read -r line
