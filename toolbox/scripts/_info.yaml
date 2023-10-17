@@ -18,3 +18,13 @@ weather:
     Get the weather forecast
     Usage: weather [location]
     Example: weather berlin
+set-theme:
+  help: |-
+    Set the console theme
+    Possible values:
+      - borg
+      - blue
+      - lcars
+      - lcars-light
+  params:
+    - Name of the theme

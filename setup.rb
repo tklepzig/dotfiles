@@ -187,7 +187,7 @@ def install
   end
   Logger.log ' Done.'.success
 
-  `#{DF_PATH}/setTheme.zsh`
+  `#{DF_PATH}/toolbox/scripts/set-theme`
   add_link_with_override "#{DF_PATH}/colours.vim", "#{HOME}/.vimrc"
   add_link_with_override "#{DF_PATH}/colours.zsh", "#{HOME}/.zshrc"
   add_link_with_override "#{DF_PATH}/colours.zsh", "#{HOME}/.tmux.conf"
