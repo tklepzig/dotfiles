@@ -17,6 +17,7 @@
   "solargraph.diagnostics": true,
   "solargraph.transport": "stdio",
   "prettier.formatterPriority": 1,
+  "prettier.proseWrap": "always",
   "json.schemas": [
     {
       "fileMatch": ["manifest.json"],
