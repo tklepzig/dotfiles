@@ -19,7 +19,7 @@ then
   source $HOME/.zshrc
 fi
 
-for plugin in nodejs python ruby vim ctop neovim
+for plugin in nodejs python ruby vim ctop neovim wrk
 do
   asdf plugin add $plugin
   asdf install $plugin latest
