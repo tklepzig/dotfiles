@@ -243,7 +243,7 @@ def install
     Logger.log ' Done.'.success
   end
 
-  check_optional_installation 'exa'
+  check_optional_installation 'eza'
   check_optional_installation 'tmux'
   check_optional_installation 'lynx'
 
