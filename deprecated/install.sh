@@ -183,7 +183,7 @@ then
   fi
 fi
 
-checkInstallation exa
+checkInstallation eza
 checkInstallation tmux
 checkInstallation zsh
 checkInstallation lynx
