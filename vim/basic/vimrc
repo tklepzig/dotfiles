@@ -54,7 +54,8 @@ set noerrorbells
 " Disable visual bell
 set t_vb=
 
-set printoptions=paper:letter
+" Not neovim compatible
+"set printoptions=paper:letter
 
 set backupdir=~/.vim/.backup/,/tmp//,.
 set directory=~/.vim/.swp/,/tmp//,.
