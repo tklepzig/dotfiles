@@ -87,7 +87,7 @@ nnoremap <silent> <Leader>w# :call <SID>BigSmallWin()<cr>
 nnoremap <silent> <leader>m :QuickMemo<cr>
 
 
-if !empty($DF_NVIM)
+if !empty($DOTFILES_NVIM)
   tnoremap <Esc> <C-\><C-n>
   tnoremap jj <C-\><C-n>
   nnoremap <leader>$ :terminal<cr>
