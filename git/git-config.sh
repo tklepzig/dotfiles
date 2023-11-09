@@ -66,6 +66,7 @@ git config --global alias.rll "$reflogCommon"
 git config --global alias.r "reset"
 git config --global alias.rh "reset --hard"
 git config --global alias.rs "reset --soft"
+git config --global alias.rs1 "reset --soft HEAD~1"
 
 git config --global alias.a "add --all"
 git config --global alias.ap "add --patch"
