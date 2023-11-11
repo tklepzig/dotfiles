@@ -61,7 +61,7 @@ alias dcl='docker compose logs -f'
 alias dp='docker system prune -f && docker rmi -f $(docker images -q)'
 alias ccp='xclip -selection clipboard'
 
-if [ -n $DOTFILES_NVIM ]
+if [ -n "$DOTFILES_NVIM" ]
 then
     alias vim='test -n "$VIMRUNTIME" && exit || nvim'
 else
