@@ -66,6 +66,12 @@ vnoremap <silent> zj :call JumpToSameIndent('down', 1)<CR>
 nnoremap <silent> zk :call JumpToSameIndent('up', 0)<CR>
 vnoremap <silent> zk :call JumpToSameIndent('up', 1)<CR>
 
+" Jump to closest opening bracket, ignoring any sibling objects
+" e.g. with gp{ in json files with long objects to jump to the start of current object the cursor is in
+nnoremap <silent> gp{ _ya{
+nnoremap <silent> gp[ _ya[
+nnoremap <silent> gp( _ya(
+
 " Coc
 
 " Use <down> and <up> to navigate completion list:
