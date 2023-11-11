@@ -120,9 +120,9 @@ git config --global alias.dummy "commit --allow-empty -m 'dummy commit, contains
 git config --global alias.sw "show --word-diff --format=\"%C(yellow)%h%C(reset) - %C(cyan)(%ar)%C(reset) %B%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%Creset\""
 git config --global alias.swn "show --word-diff --name-status --format=\"%C(yellow)%h%C(reset) - %C(cyan)(%ar)%C(reset) %s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%Creset\""
 
-git config --global alias.st "stash"
+git config --global alias.st "stash -u"
 git config --global alias.sts "stash --staged"
-git config --global alias.stk "stash --keep-index"
+git config --global alias.stk "stash -u --keep-index"
 git config --global alias.stp "stash pop"
 git config --global alias.stl "$stashCommon"
 git config --global alias.sta "stash apply"
