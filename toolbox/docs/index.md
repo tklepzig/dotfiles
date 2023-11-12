@@ -14,6 +14,7 @@
 - [engineering-drawing](engineering-drawing.md)
 - [francais](francais.md)
 - [fs](fs.md)
+- [github](github.md)
 - [git](git.md)
 - [gnome](gnome.md)
 - [gpg](gpg.md)
