@@ -121,7 +121,7 @@ chpwd() {
   gitRoot=$(git rev-parse --show-toplevel 2>/dev/null)
   if [ $? = 0 ]
   then
-    DOTFILES_GIT_DEFAULT_BRANCH=$([ -f "$gitRoot/.git/refs/heads/master" ] && echo master || echo main)
+    export DOTFILES_GIT_DEFAULT_BRANCH=$([ -f "$gitRoot/.git/refs/heads/master" ] && echo master || echo main)
   fi
 }
 
