@@ -62,7 +62,7 @@ set directory=~/.vim/.swp/,/tmp//,.
 set undodir=~/.vim/.undo/,/tmp//,.
 
 if !empty($DOTFILES_NVIM)
-  set undodir=~/.vim/.nvim-undo/,/tmp//,.
+  set undodir=~/.config/nvim/.undo/,/tmp//,.
 endif
 
 " Maintain undo history between sessions
