@@ -61,6 +61,10 @@ set backupdir=~/.vim/.backup/,/tmp//,.
 set directory=~/.vim/.swp/,/tmp//,.
 set undodir=~/.vim/.undo/,/tmp//,.
 
+if !empty($DOTFILES_NVIM)
+  set undodir=~/.vim/.nvim-undo/,/tmp//,.
+endif
+
 " Maintain undo history between sessions
 set undofile
 
