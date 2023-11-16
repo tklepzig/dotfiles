@@ -121,3 +121,6 @@ endfunction
 
 source $HOME/.dotfiles/vim/dev/statusline.vim
 source $HOME/.dotfiles/vim/dev/mappings.vim
+
+" match unsaved indicator with color of statusline for unsaved changes
+execute 'autocmd FileType buffernavigator highlight BufferNavigatorModifiedFile ctermfg=' . accentText . ' ctermbg=NONE' 
