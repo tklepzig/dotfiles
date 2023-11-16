@@ -124,7 +124,7 @@ source $HOME/.dotfiles/vim/dev/mappings.vim
 
 " match buffer navigator colors with current theme
 execute 'autocmd FileType buffernavigator highlight BufferNavigatorModifiedFile ctermfg=' . accentText . ' ctermbg=NONE' 
-execute 'autocmd FileType buffernavigator highlight BufferNavigatorFile ctermfg=' . primaryText . ' ctermbg=NONE' 
+execute 'autocmd FileType buffernavigator highlight BufferNavigatorFile ctermfg=' . secondaryText . ' ctermbg=NONE' 
 
 if dotfilesTheme =~ '-light$'
   autocmd FileType buffernavigator highlight BufferNavigatorDir ctermfg=0 ctermbg=NONE 
