@@ -82,7 +82,7 @@ hi CocUnusedHighlight ctermfg=250
 hi CocMenuSel ctermbg=22
 hi CocSearch ctermfg=184
 
-if dotfilesTheme == "lcars-light"
+if dotfilesTheme =~ '-light$'
   hi CocHighlightText ctermbg=248
 endif
 
@@ -122,5 +122,10 @@ endfunction
 source $HOME/.dotfiles/vim/dev/statusline.vim
 source $HOME/.dotfiles/vim/dev/mappings.vim
 
-" match unsaved indicator with color of statusline for unsaved changes
+" match buffer navigator colors with current theme
 execute 'autocmd FileType buffernavigator highlight BufferNavigatorModifiedFile ctermfg=' . accentText . ' ctermbg=NONE' 
+execute 'autocmd FileType buffernavigator highlight BufferNavigatorFile ctermfg=' . primaryText . ' ctermbg=NONE' 
+
+if dotfilesTheme =~ '-light$'
+  autocmd FileType buffernavigator highlight BufferNavigatorDir ctermfg=0 ctermbg=NONE 
+endif

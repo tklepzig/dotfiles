@@ -116,7 +116,7 @@ hi CursorLine ctermbg=237
 hi CursorLineNR ctermfg=39
 hi CursorColumn ctermbg=238
 
-if dotfilesTheme == "lcars-light"
+if dotfilesTheme =~ '-light$'
   set background=light
   colorscheme PaperColor
   hi CursorLine ctermbg=251
