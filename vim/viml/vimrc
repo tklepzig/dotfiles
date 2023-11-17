@@ -1,4 +1,5 @@
 let g:coc_global_extensions = g:coc_global_extensions + ['coc-vimlsp']
+let g:statuslineMode = "default"
 
 " TODO :so can handle visual selection by itself, writing to tmp file necessary??
 " TODO Add possibility for running vim9 scripts (:vim9 so)
@@ -11,5 +12,15 @@ endfunction
 command! -range SourceSelection let b:winview = winsaveview() | <line1>,<line2>call SourceSelection() | call winrestview(b:winview) | unlet b:winview
 
 command! Themis :VimuxRunCommand expand("$HOME") . "/.vim/vim-plug/vim-themis/bin/themis " . expand("%")
+
+function! ToggleStatusline()
+  if g:statuslineMode == "default"
+    let g:statuslineMode = "syntax"
+    let &statusline = ' %{synIDattr(synID(line("."),col("."),1),"name")} - %{synIDattr(synIDtrans(synID(line("."),col("."),1)),"name")} '
+  else
+    let g:statuslineMode = "default"
+    set statusline=%!StatusLine()
+  endif 
+endfunction
 
 source $HOME/.dotfiles/vim/viml/mappings.vim
