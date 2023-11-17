@@ -196,3 +196,30 @@ function! s:QuickMemo()
   execute('w ' . path . strftime('%Y-%m-%d-%H:%M:%S') . firstChars . '.md')
 endfunction
 command! QuickMemo call <SID>QuickMemo()
+
+
+function! ExcludeSynGroupAbbr(abbr, text, synGroups)
+  " The abbreviation is removed during the expansion, therefore
+  " remove the length of the abbreviation from col to correctly
+  " check later if it is inside a string
+  let col = col(".") - a:abbr->len()
+
+  let synId = synID(line('.'), col, 1)
+  let isInSynGroups = a:synGroups->index(synIDattr(synId, 'name')) >= 0
+
+  if isInSynGroups
+    return a:abbr
+  endif
+
+  " Old logic via string matching
+  "let line = getline(".")
+  "let stringStart = line->match("['`\"]")
+  "let stringEnd = line->match("['`\"]",col + 1)
+
+  "let inString = col >= stringStart && col < stringEnd
+  "if inString
+    "return a:abbr
+  "endif
+
+  return a:text
+endfunction
