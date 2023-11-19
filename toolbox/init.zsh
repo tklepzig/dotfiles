@@ -21,24 +21,16 @@ scripts_completion() {
 	then
 		shift words
 		((CURRENT--))
-		# TODO get custom completions from yaml
-		# by call _run.rb with current script name
-		# (which is in $words after the shift)
-		# e.g.
-		# completions:
-		# - show
-		# - serve
-		# - test
-		# completions=( $($scripts_path/_run.rb --completions $words) )
-		# compadd -a completions
-		# Or maybe improve it by putting all available completions into 
-		# a variable to avoid opening the yaml file everytime a completion
-		# is invoked, so sth like
-		# custom_completions=( $($scripts_path/_run.rb --completions) )
-		# custom_completions should be then sth like a dictionary
-		
-		# if no custom completion exists use the line below for file system completion
-		_normal -p \#
+
+		# After the shift $words contains the current script name
+		completion=( ${(f)"$($scripts_path/_run.rb --completion $words)"} )
+		if [ -n "$completion" ]
+		then
+			_describe -t completion 'commands' completion
+		else
+		# no custom completion exists, use file system completion
+			_normal -p \#
+		fi
 	else
 		#compadd -d descs -a cmds
 		#compadd -a cmds

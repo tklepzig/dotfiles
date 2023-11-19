@@ -20,11 +20,12 @@ weather:
     Example: weather berlin
 set-theme:
   help: |-
-    Set the console theme
-    Possible values:
-      - borg
-      - blue
-      - lcars
-      - lcars-light
+    Set the theme for kitty, tmux and vim
   params:
     - Name of the theme
+  completion:
+    - borg
+    - borg-light
+    - blue
+    - lcars
+    - lcars-light

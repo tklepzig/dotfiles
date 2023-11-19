@@ -42,6 +42,14 @@ if ARGV[0] == '--list-short'
   exit 0
 end
 
+if ARGV[0] == '--completion'
+  script = ARGV[1]
+  if infos[script].respond_to?(:key?) && infos[script].key?('completion')
+    puts infos[script]['completion']
+  end
+  exit 0
+end
+
 script_name = ARGV[0]
 
 unless scripts.include?(script_name)
