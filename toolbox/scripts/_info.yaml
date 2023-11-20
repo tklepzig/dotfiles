@@ -1,4 +1,40 @@
 ---
+battery-monitor:
+  help: |-
+    If battery level is lower than 16, plays an alert noise
+    Needs the alert file ~/.zsh-sounds/battery-alert.wav
+blitz-ortung:
+  help: Opens blitzortung.org in browser
+colours:
+  help: List all possible console colours
+  params:
+    - Number of columns to show (optional, default 4)
+docs:
+  help: Opens toolbox docs in vim
+docs-serve:
+  help: Opens toolbox docs in browser
+git-fetch-all:
+  help: Fetches all repos in current directory
+  params:
+    - max directory depth (optional, default 1)
+git-fetch-merge:
+  help: fetches and merges the current and the default branch (master or main)
+  params:
+    - --all: if given, all branches are updated
+git-github-pr:
+  help: Opens github.com with current branch's PR
+  params:
+    - new: if given, creates a new PR
+git-search:
+  help: The git pickaxe, searches for a string in the whole history
+  params:
+    - The search string
+git-status-all:
+  help: Outputs git status for every repo in current directory
+  params:
+    - max directory depth (optional, default 1)
+inhibit-sleep:
+  help: Stop arch linux from going to sleep
 luks-close:
   help: |-
     Close LUKS container
@@ -11,13 +47,14 @@ luks-open:
     Usage: luks-open path/to/container
   params:
     - Path to the container file
-setup-asdf:
-  help: Set up asdf and plugins
-weather:
+mastermind:
+  help: Just a mastermind game
+notify:
   help: |-
-    Get the weather forecast
-    Usage: weather [location]
-    Example: weather berlin
+    Plays an notify sound, useful for getting notified after long running commands
+    Needs the notify file ~/.zsh-sounds/notify.wav
+npm-tabula-rasa:
+  help: Recursively remove node_modules
 set-theme:
   help: |-
     Set the theme for kitty, tmux and vim
@@ -29,3 +66,14 @@ set-theme:
     - blue
     - lcars
     - lcars-light
+setup-asdf:
+  help: Set up asdf and plugins
+vicy:
+  help: Opens vicy's CLI
+vicy-serve:
+  help: Open vicy in browser
+weather:
+  help: |-
+    Get the weather forecast
+    Usage: weather [location]
+    Example: weather berlin
