@@ -58,7 +58,20 @@ unless scripts.include?(script_name)
 end
 
 if ARGV[1] == '-h'
-  puts(infos[script_name].respond_to?(:key?) && infos[script_name].key?('help') ? infos[script_name]['help'] : "No help for #{script_name}")
+  if infos[script_name].respond_to?(:key?) && infos[script_name].key?('help')
+    help = infos[script_name]['help']
+    puts(help) 
+  else
+    puts("No help for #{script_name}")
+  end
+
+  if infos[script_name].respond_to?(:key?) && infos[script_name].key?('params')
+    params = infos[script_name]['params']
+    puts("\nParams:")
+    puts(params.map{ |param| "- #{param}" }.join("\n"))
+    puts("\n")
+  end
+
   exit 1
 end
 
