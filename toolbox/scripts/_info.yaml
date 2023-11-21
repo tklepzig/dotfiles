@@ -7,59 +7,69 @@ blitz-ortung:
   help: Opens blitzortung.org in browser
 colours:
   help: List all possible console colours
-  params:
-    - Number of columns to show (optional, default 4)
+  args:
+    - name: number of columns
+      optional: true
+      default: 4
 docs:
   help: Opens toolbox docs in vim
 docs-serve:
   help: Opens toolbox docs in browser
 git-fetch-all:
   help: Fetches all repos in current directory
-  params:
-    - max directory depth (optional, default 1)
+  args:
+    - name: directory depth
+      optional: true
+      default: 1
 git-fetch-merge:
-  help: fetches and merges the current and the default branch (master or main)
-  params:
-    - --all: if given, all branches are updated
+  help: |-
+    fetches and merges the current and the default branch (master or main)
+    If --all given, all branches are updated
+  args:
+    - name: --all
+      optional: true
 git-github-pr:
-  help: Opens github.com with current branch's PR
-  params:
-    - new: if given, creates a new PR
+  help: |-
+    Opens github.com with current branch's PR
+    If \"new\" given, creates a new PR
+  args:
+    - name: new
+      optional: true
 git-search:
   help: The git pickaxe, searches for a string in the whole history
-  params:
-    - The search string
+  args:
+    - name: search string
 git-status-all:
   help: Outputs git status for every repo in current directory
-  params:
-    - max directory depth (optional, default 1)
+  args:
+    - name: directory depth
+      optional: true
+      default: 1
 inhibit-sleep:
   help: Stop arch linux from going to sleep
 luks-close:
   help: |-
     Close LUKS container
-    Usage: luks-close path/to/container
-  params:
-    - Path to the container file
+  args:
+    - name: path/to/container
 luks-open:
   help: |-
     Open LUKS container
-    Usage: luks-open path/to/container
-  params:
-    - Path to the container file
+  args:
+    - name: path/to/container
 mastermind:
   help: Just a mastermind game
 notify:
   help: |-
-    Plays an notify sound, useful for getting notified after long running commands
+    Plays an notify sound, e.g. for getting notified after long running cmd
     Needs the notify file ~/.zsh-sounds/notify.wav
 npm-tabula-rasa:
   help: Recursively remove node_modules
 set-theme:
   help: |-
     Set the theme for kitty, tmux and vim
-  params:
-    - Name of the theme
+  args:
+    - name: theme name
   completion:
     - borg
     - borg-light
@@ -75,5 +85,6 @@ vicy-serve:
 weather:
   help: |-
     Get the weather forecast
-    Usage: weather [location]
-    Example: weather berlin
+  args:
+    - name: location
+      optional: true

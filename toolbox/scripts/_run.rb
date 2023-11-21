@@ -25,7 +25,8 @@ scripts = Dir.glob("#{SCRIPTS_PATH}/*").filter_map do |file|
   name
 end
 
-if ARGV[0] == '--list'
+if ARGV[0] == '--details'
+  puts "help:\e[0;32;2mShow help for given command\e[0m"
   scripts.each do |script|
     description = if infos[script].respond_to?(:key?) && infos[script].key?('help')
                     ":\e[0;32;2m#{infos[script]['help'].split("\n")[0]}\e[0m"
@@ -37,17 +38,44 @@ if ARGV[0] == '--list'
   exit 0
 end
 
-if ARGV[0] == '--list-short'
+if ARGV[0] == '--list'
+  puts 'help'
   puts scripts
   exit 0
 end
 
 if ARGV[0] == '--completion'
+  puts scripts if ARGV[1] == 'help'
   script = ARGV[1]
-  if infos[script].respond_to?(:key?) && infos[script].key?('completion')
-    puts infos[script]['completion']
-  end
+  puts infos[script]['completion'] if infos[script].respond_to?(:key?) && infos[script].key?('completion')
   exit 0
+end
+
+if ARGV[0] == 'help'
+  script_name = ARGV[1]
+
+  unless scripts.include?(script_name)
+    puts "Unknown script #{script_name}"
+    exit 1
+  end
+
+  args_help = ''
+  if infos[script_name].respond_to?(:key?) && infos[script_name].key?('args')
+    args = infos[script_name]['args']
+    args_help = args.map do |arg|
+      default = arg['default'] ? " = #{arg['default']}" : ''
+      arg['optional'] ? "[#{arg['name']}#{default}]" : arg['name']
+    end.join(' ')
+  end
+  puts "Usage: #{script_name} #{args_help}"
+
+  if infos[script_name].respond_to?(:key?) && infos[script_name].key?('help')
+    help = infos[script_name]['help']
+    puts ''
+    puts help
+  end
+
+  exit 1
 end
 
 script_name = ARGV[0]
@@ -57,40 +85,21 @@ unless scripts.include?(script_name)
   exit 1
 end
 
-if ARGV[1] == '-h'
-  if infos[script_name].respond_to?(:key?) && infos[script_name].key?('help')
-    help = infos[script_name]['help']
-    puts(help) 
-  else
-    puts("No help for #{script_name}")
-  end
+if infos[script_name].respond_to?(:key?) && infos[script_name].key?('args')
+  args = infos[script_name]['args']
+  cmd_args = ARGV[1..]
 
-  if infos[script_name].respond_to?(:key?) && infos[script_name].key?('params')
-    params = infos[script_name]['params']
-    puts("\nParams:")
-    puts(params.map{ |param| "- #{param}" }.join("\n"))
-    puts("\n")
-  end
-
-  exit 1
-end
-
-if infos[script_name].respond_to?(:key?) && infos[script_name].key?('params')
-  params = infos[script_name]['params']
-  args = ARGV[1..]
-
-  if params.length != args.length
-    puts 'Missing params:'
-    puts params[args.length..]
+  mandatory_args = args.filter { |arg| !arg['optional'] }
+  if cmd_args.length < mandatory_args.length
+    puts 'Error: Missing args:'
+    puts mandatory_args.map { |arg| arg[:name] }[cmd_args.length..]
     exit 1
   end
-end
 
-if ARGV[ARGV.length - 1] == '-n'
-  File.readlines("#{SCRIPTS_PATH}/#{script_name}").drop(1).each do |line|
-    puts line unless line.strip.empty?
+  if cmd_args.length > args.length
+    puts 'Error: Too many args'
+    exit 1
   end
-  exit 1
 end
 
 puts script_name

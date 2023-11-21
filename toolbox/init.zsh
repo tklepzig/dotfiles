@@ -11,9 +11,9 @@ then
 	done
 fi
 
-cmds=( $($scripts_path/_run.rb --list-short) )
+cmds=( $($scripts_path/_run.rb --list) )
 # ${(f)...} --> parameter expansion, split at new lines
-descs=( ${(f)"$($scripts_path/_run.rb --list)"} )
+descs=( ${(f)"$($scripts_path/_run.rb --details)"} )
 
 scripts_completion() {
 	#see also https://stackoverflow.com/a/73356136
