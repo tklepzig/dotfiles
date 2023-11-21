@@ -24,7 +24,7 @@
       "url": "https://json.schemastore.org/chrome-manifest.json"
     }
   ],
-  "coc.source.word.filetypes": ["markdown"],
-  "coc.source.emoji.filetypes": ["markdown"],
-  "coc.source.dictionary.filetypes": ["markdown"]
+  "coc.source.word.filetypes": ["markdown", "gitcommit"],
+  "coc.source.emoji.filetypes": ["markdown", "gitcommit"],
+  "coc.source.dictionary.filetypes": ["markdown", "gitcommit"]
 }
