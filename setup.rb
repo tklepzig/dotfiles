@@ -265,12 +265,22 @@ def install
                     `grep ^$(id -un): /etc/passwd | cut -d : -f 7-`
                   end
 
-  return unless default_shell != `which zsh`
+  if default_shell != `which zsh`
+    Logger.log 'Setting default shell to zsh...', newline: false
+    `chsh -s $(which zsh)`
+    Logger.log ' Done.'.success
+    Logger.log 'Please notice: In order to use the new shell, you have to logout and back in.'.accent
+  end
 
-  Logger.log 'Setting default shell to zsh...', newline: false
-  `chsh -s $(which zsh)`
-  Logger.log ' Done.'.success
-  Logger.log 'Please notice: In order to use the new shell, you have to logout and back in.'.accent
+  post_install_script = "#{HOME}/.df-post-install"
+  if File.exist?(post_install_script) && File.executable?(post_install_script)
+    Logger.log 'Running post install script...'
+    result = `#{post_install_script}`
+    Logger.log result
+    Logger.log 'Done.'.success
+  end
+
+  Logger.log 'Setup done.'.success
 end
 
 def tabula_rasa
