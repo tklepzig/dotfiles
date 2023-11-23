@@ -16,6 +16,7 @@ git config --global core.editor vim
 git config --global color.status always
 git config --global grep.extendedRegexp true
 git config --global help.autoCorrect prompt
+git config --global rerere.enabled true
 
 
 # Try delta (https://dandavison.github.io/delta) as diff viewer
