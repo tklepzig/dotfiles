@@ -89,12 +89,17 @@ alias q='exit'
 alias ..='cd ..'
 alias ly="lynx -cfg $dotfilesDir/lynx.cfg"
 alias ni='npm install'
-alias nu='npm uninstall'
 alias nid='npm install -D'
+alias nu='npm uninstall'
 alias nr='npm run'
 alias nrt='npm run test 2>&1 | grep ●'
 alias niwt="f(){ npm i \$1 && npm i -D @types/\$1; unset -f f }; f"
 alias nmc="find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
+
+alias pni='pnpm install'
+alias pnid='pnpm install -D'
+alias pnu='pnpm uninstall'
+alias pnr='pnpm run'
 
 alias ai="asdf install"
 
