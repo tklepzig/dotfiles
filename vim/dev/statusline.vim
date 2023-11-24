@@ -67,6 +67,10 @@ function! StatusLine()
     let inactiveLine .= '%#Gap# '
     let inactiveLine .= '%#Inactive#'
     let inactiveLine .= ' %l/%L : %v '
+    let inactiveLine .= '%#Gap# '
+    let inactiveLine .= '%#Inactive#'
+    let inactiveLine .= ' 0x%B '
+
     return inactiveLine
   endif
 
@@ -99,6 +103,9 @@ function! StatusLine()
   let line .= '%#Gap# '
   let line .= modeHighlight
   let line .= ' %l/%L : %v '
+  let line .= '%#Gap# '
+  let line .= modeHighlight
+  let line .= ' 0x%B '
 
   if !empty(cocStatus)
     let line .= '%#Gap# '
