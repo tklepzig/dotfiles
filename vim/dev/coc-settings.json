@@ -26,5 +26,8 @@
   ],
   "coc.source.word.filetypes": ["markdown", "gitcommit"],
   "coc.source.emoji.filetypes": ["markdown", "gitcommit"],
-  "coc.source.dictionary.filetypes": ["markdown", "gitcommit"]
+  "coc.source.dictionary.filetypes": ["markdown", "gitcommit"],
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+  ]
 }
