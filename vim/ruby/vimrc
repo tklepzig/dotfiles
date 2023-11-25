@@ -27,12 +27,12 @@ let g:projectionist_heuristics = { ".git/":
 augroup filetype_ruby
     autocmd!
     let rubySynGroups = ["rubyString", "rubyComment"]
-    autocmd FileType ruby iab <buffer> <expr> de ExcludeSynGroupAbbr("de", "do\<cr>end\<esc>O", rubySynGroups)
-    autocmd FileType ruby iab <buffer> <expr> it ExcludeSynGroupAbbr("it", "it 'does' do\<cr>end\<esc>O", rubySynGroups)
-    autocmd FileType ruby iab <buffer> <expr> ctx ExcludeSynGroupAbbr("ctx", "context 'with sth' do\<cr>end\<esc>O", rubySynGroups)
-    autocmd FileType ruby iab <buffer> <expr> def ExcludeSynGroupAbbr("def", "def\<cr>end\<esc>kA", rubySynGroups)
-    autocmd FileType ruby iab <buffer> <expr> class ExcludeSynGroupAbbr("class", "class\<cr>end\<esc>kA", rubySynGroups)
-    autocmd FileType ruby iab <buffer> <expr> if ExcludeSynGroupAbbr("if", "if\<cr>end\<esc>kA", rubySynGroups)
+    autocmd FileType ruby iab <buffer> <expr> de ExcludeSynGroupAbbr("de", "do<cr>end<esc>O", rubySynGroups)
+    autocmd FileType ruby iab <buffer> <expr> it ExcludeSynGroupAbbr("it", "it 'does' do<cr>end<esc>O", rubySynGroups)
+    autocmd FileType ruby iab <buffer> <expr> ctx ExcludeSynGroupAbbr("ctx", "context 'with sth' do<cr>end<esc>O", rubySynGroups)
+    autocmd FileType ruby iab <buffer> <expr> def ExcludeSynGroupAbbr("def", "def<cr>end<esc>kA", rubySynGroups)
+    autocmd FileType ruby iab <buffer> <expr> class ExcludeSynGroupAbbr("class", "class<cr>end<esc>kA", rubySynGroups)
+    autocmd FileType ruby iab <buffer> <expr> if ExcludeSynGroupAbbr("if", "if<cr>end<esc>kA", rubySynGroups)
     autocmd FileType ruby iab <buffer> <expr> pry ExcludeSynGroupAbbr("pry", "require 'pry'; binding.pry", rubySynGroups)
 
 augroup END
