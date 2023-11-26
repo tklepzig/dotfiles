@@ -21,7 +21,8 @@ def write_sections(sections)
   sections.each do |section|
     File.write(INDEX_PATH, "# #{section[:name]}\n", mode: 'a')
     section[:entries].each do |entry|
-      File.write(INDEX_PATH, "- [#{File.basename(entry, '.*')}](#{entry})\n", mode: 'a')
+      link = section[:name] == 'Toolbox' ? entry : File.join(section[:name], entry)
+      File.write(INDEX_PATH, "- [#{File.basename(entry, '.*')}](#{link})\n", mode: 'a')
     end
   end
 end
