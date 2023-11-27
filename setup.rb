@@ -202,6 +202,7 @@ def install
 
   Logger.log 'Initializing toolbox...'
   add_link_with_override "#{DF_PATH}/toolbox/init.zsh", "#{HOME}/.zshrc"
+  `#{DF_PATH}/toolbox/docs/_write-index.rb`
   Logger.log 'Done.'.success
 
   install_profiles
