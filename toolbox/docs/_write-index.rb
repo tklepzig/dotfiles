@@ -12,6 +12,11 @@ def create_section(path, name)
 end
 
 def write_index(sections)
+  if sections.length == 1
+    File.write(INDEX_PATH, "-\n", mode: 'a')
+    return
+  end
+
   sections.each do |section|
     File.write(INDEX_PATH, "- [#{section[:name]}](##{section[:name].downcase})\n", mode: 'a')
   end
