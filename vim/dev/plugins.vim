@@ -22,5 +22,6 @@ Plug 'tpope/vim-abolish'
 Plug 'mracos/mermaid.vim'
 Plug 'markonm/traces.vim'
 Plug 'github/copilot.vim'
+Plug 'madox2/vim-ai'
 "performance problems while scrolling...
 "Plug 'wellle/context.vim'
