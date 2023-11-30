@@ -44,6 +44,12 @@ let NERDTreeQuitOnOpen = 1
 let NERDTreeShowHidden = 1
 let NERDTreeCascadeSingleChildDir = 0
 
+let g:vim_ai_chat = {
+\  "options": {
+\    "model": "gpt-4",
+\  },
+\}
+
 " =============================================================
 " Coc Settings
 " =============================================================
