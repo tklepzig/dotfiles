@@ -72,7 +72,7 @@ alias v='vim'
 alias vs='vim -S'
 
 # Open all files of current branch
-alias vbf="vim \$(g bf)"
+alias vbf="f() { vim \$(g bf \$1) }; f"
 
 # Open all files which are currently changed or created (git diff)
 alias vdf="f(){ git a; files=\$(git ds --name-only); git r; vim \$(echo \"\$files\"); unset -f f }; f"
