@@ -22,12 +22,14 @@ def write_index(sections)
   end
 end
 
+NON_BREAKING_HYPHEN = '‑'
 def write_sections(sections)
   sections.each do |section|
     File.write(INDEX_PATH, "\n# #{section[:name]}\n\n", mode: 'a')
     section[:entries].each do |entry|
       link = section[:name] == 'Toolbox' ? entry : File.join(section[:name], entry)
-      File.write(INDEX_PATH, "- [#{File.basename(entry, '.*')}](#{link})\n", mode: 'a')
+      label = File.basename(entry, '.*').gsub('--', NON_BREAKING_HYPHEN).gsub('-', ' ')
+      File.write(INDEX_PATH, "- [#{label}](#{link})\n", mode: 'a')
     end
   end
 end
