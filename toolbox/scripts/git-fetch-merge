@@ -2,6 +2,7 @@
 
 defaultBranch=$([ -f "$(git rev-parse --show-toplevel)/.git/refs/heads/master" ] && echo master || echo main)
 currentBranch=$(git symbolic-ref HEAD)
+baseBranch=${1:-$defaultBranch}
 
 git fetch
 if [ "$1" = "--all" ]
@@ -12,9 +13,9 @@ then
             git fetch origin +$branch:$branch
         fi
     done
-elif [ $currentBranch != refs/heads/$defaultBranch ]
+elif [ $currentBranch != refs/heads/$baseBranch ]
 then
-    git fetch origin +$defaultBranch:$defaultBranch
+    git fetch origin +$baseBranch:$baseBranch
 fi
 
 git fetch origin $currentBranch
