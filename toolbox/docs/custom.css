@@ -5,10 +5,24 @@
 .container:has(#toolbox) {
   margin: 0 1rem;
   max-width: none;
+
+  .file {
+    border: none;
+  }
+
+  .file-header {
+    display: none;
+  }
+
+  & + .container > .site-footer {
+    display: none;
+  }
 }
 
 .markdown-body:has(#toolbox) {
+  border: none;
   display: grid;
+  padding-top: 0;
   grid-template-columns: auto 1fr;
   column-gap: 3rem;
 
