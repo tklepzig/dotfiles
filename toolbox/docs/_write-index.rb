@@ -17,17 +17,19 @@ def write_index(sections)
     return
   end
 
-  sections.each do |section|
+  sections.drop(1).each do |section|
     File.write(INDEX_PATH, "- [#{section[:name]}](##{section[:name].downcase})\n", mode: 'a')
   end
 end
 
 NON_BREAKING_HYPHEN = '‑'
 def write_sections(sections)
-  sections.each do |section|
-    File.write(INDEX_PATH, "\n# #{section[:name]}\n\n", mode: 'a')
+  sections.each_with_index do |section, index|
+    headline_prefix = index.zero? ? '#' : '##'
+
+    File.write(INDEX_PATH, "\n#{headline_prefix} #{section[:name]}\n\n", mode: 'a')
     section[:entries].each do |entry|
-      link = section[:name] == 'Toolbox' ? entry : File.join(section[:name], entry)
+      link = index.zero? ? entry : File.join(section[:name], entry)
       label = File.basename(entry, '.*').gsub('--', NON_BREAKING_HYPHEN).gsub('-', ' ')
       File.write(INDEX_PATH, "- [#{label}](#{link})\n", mode: 'a')
     end
