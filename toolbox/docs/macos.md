@@ -38,11 +38,19 @@
 
 # Hide Dock completely
 
-    defaults write com.apple.dock autohide-delay -float 1000; killall Dock
+    defaults write com.apple.dock autohide-delay -float 1000 && killall Dock
 
 > Back to defaults:
 >
 >     defaults delete com.apple.Dock autohide-delay && killall Dock
+
+# Enable AppSwitcher (Cmd-Tab) on all screens
+
+    defaults write com.apple.dock appswitcher-all-displays -bool true && killall Dock
+
+> Back to defaults:
+>
+>     defaults write com.apple.dock appswitcher-all-displays -bool false && killall Dock
 
 # Restart Window Manager
 
