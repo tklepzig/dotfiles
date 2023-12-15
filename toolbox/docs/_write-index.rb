@@ -29,8 +29,9 @@ def write_sections(sections)
 
     File.write(INDEX_PATH, "\n#{headline_prefix} #{section[:name]}\n\n", mode: 'a')
     section[:entries].each do |entry|
-      link = index.zero? ? entry : File.join(section[:name], entry)
-      label = File.basename(entry, '.*').gsub('--', NON_BREAKING_HYPHEN).gsub('-', ' ')
+      base = File.basename(entry, '.*')
+      link = index.zero? ? base : File.join(section[:name], base)
+      label = base.gsub('--', NON_BREAKING_HYPHEN).gsub('-', ' ')
       File.write(INDEX_PATH, "- [#{label}](#{link})\n", mode: 'a')
     end
   end

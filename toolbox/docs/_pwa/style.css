@@ -1,0 +1,29 @@
+body {
+  padding: 1rem;
+}
+
+body > article {
+  margin: 1rem auto;
+  max-width: 980px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+  padding: 1rem 2rem;
+}
+
+/*ul:has(li:empty) {*/
+/*display: none;*/
+/*}*/
+
+@media (prefers-color-scheme: dark) {
+  body > article {
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.4);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  body > article {
+    max-width: none;
+    margin: 0;
+    box-shadow: none;
+    padding: 0.5rem 1rem;
+  }
+}
