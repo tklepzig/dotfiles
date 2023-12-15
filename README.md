@@ -20,13 +20,35 @@ The following profiles are available:
 | writing | Distraction free writing   |
 | viml    | VimL/Vimscript Development |
 
-Add these to the environment variable `DOTFILES_PROFILES` space-separated in your `.zshrc`.  
+Add these to the environment variable `DOTFILES_PROFILES` space-separated in
+your `.zshrc`.  
 It must be set before the dotfiles stuff is sourced.  
 For example:
 
     export DOTFILES_PROFILES="dev web"
 
-## asdf setup
+After changing the profiles you have to run `dotfiles-update` again.
 
-    /usr/bin/env zsh -c "$(curl -Ls https://raw.githubusercontent.com/\
-    tklepzig/dotfiles/master/asdf.install.zsh)"
+## Setup asdf
+
+See `# setup-asdf`.
+
+## Themes
+
+See `# set-theme`.
+
+## Using Neovim
+
+Set the environment variable DOTFILES_NVIM.  
+It must be set before the dotfiles stuff is sourced.  
+For example:
+
+    export DOTFILES_NVIM=1
+
+## TODO (WIP)
+
+- overrides usage
+- toolbox scripts, info.yaml, additional.yaml
+- .plugins.custom
+- .local-scripts/
+- .df-post-install
