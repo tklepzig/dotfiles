@@ -174,7 +174,7 @@ set number relativenumber
 set wildoptions=pum
 set shiftround
 
-function! s:QuickMemo()
+function! s:QuickMemo(ext = "md")
   let path = $HOME . '/vim-quick-memo/'
   let filePath = expand("%:t")
 
@@ -193,9 +193,9 @@ function! s:QuickMemo()
     let firstChars = '--' . substitute(firstLine[:29], '/', ' ', 'g')
   endif
 
-  execute('w ' . path . strftime('%Y-%m-%d-%H:%M:%S') . firstChars . '.md')
+  execute('w ' . path . strftime('%Y-%m-%d-%H:%M:%S') . firstChars . '.' . a:ext)
 endfunction
-command! QuickMemo call <SID>QuickMemo()
+command! -nargs=? QuickMemo :call <SID>QuickMemo(<f-args>)
 
 function! s:Wrap(bang)
   let prefix = ""

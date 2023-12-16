@@ -85,6 +85,8 @@ augroup aichat
 
     autocmd FileType aichat xnoremap <buffer> <nowait> <leader>c :AIChat<cr>
     autocmd FileType aichat nnoremap <buffer> <nowait> <leader>c :AIChat<cr>
+
+    autocmd FileType aichat nnoremap <buffer> <nowait> <leader>m :set buftype= \| 0file \| QuickMemo aichat<CR>
 augroup END
 
 " Coc
