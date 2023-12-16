@@ -73,6 +73,20 @@ nnoremap <silent> gp{ _ya{
 nnoremap <silent> gp[ _ya[
 nnoremap <silent> gp( _ya(
 
+augroup aichat
+    autocmd!
+    
+    " edit text with a custom prompt
+    "xnoremap <leader>s :AIEdit fix grammar and spelling<CR>
+    "nnoremap <leader>s :AIEdit fix grammar and spelling<CR>
+    
+    " redo last AI command
+    "nnoremap <leader>r :AIRedo<CR>
+
+    autocmd FileType aichat xnoremap <buffer> <nowait> <leader>c :AIChat<cr>
+    autocmd FileType aichat nnoremap <buffer> <nowait> <leader>c :AIChat<cr>
+augroup END
+
 " Coc
 
 " Use <down> and <up> to navigate completion list:
