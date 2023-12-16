@@ -197,6 +197,16 @@ function! s:QuickMemo()
 endfunction
 command! QuickMemo call <SID>QuickMemo()
 
+function! s:Wrap(bang)
+  let prefix = ""
+  if a:bang
+    let prefix = "no" 
+  endif
+  execute "set " . prefix . "wrap"
+  execute "set " . prefix . "linebreak"
+endfunction
+
+command! -nargs=? -bang Wrap :call <SID>Wrap(<bang>0)
 
 function! ExcludeSynGroupAbbr(abbr, text, synGroups)
   " The abbreviation is removed during the expansion, therefore
