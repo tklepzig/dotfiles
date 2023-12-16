@@ -234,6 +234,6 @@ upstreamIndicator()
 
 if isOS linux
 then
-  # Map caps lock to escape
+  # Map caps lock to escape; To reset it, run: setxkbmap -option ''
   setxkbmap -option caps:escape
 fi
