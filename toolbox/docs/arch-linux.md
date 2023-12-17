@@ -65,7 +65,8 @@ Date and Time
 
     ls /sys/firmware/efi/efivars
 
-If the command shows the directory without error, then the system is booted in UEFI mode, otherwise in BIOS.
+If the command shows the directory without error, then the system is booted in
+UEFI mode, otherwise in BIOS.
 
 ### Create partitions and mount them
 
@@ -216,11 +217,14 @@ Add kernel parameter to `GRUB_CMDLINE_LINUX` in `/etc/default/grub`
 
     cryptdevice=UUID=<UUID of encrypted partition>:cryptroot
 
-Add `keymap` and `encrypt` hook to `HOOKS` in `/etc/mkinitcpio.conf` (Add at the end)
+Add `keymap` and `encrypt` hook to `HOOKS` in `/etc/mkinitcpio.conf` (Add at the
+end)
 
     HOOKS="... keymap encrypt"
 
-> The `keymap` hook must occur **before** the `encrypt` hook. It is necessary to allow non-US keyboard layout, otherwise using a non-US keyboard for entering the passphrase could be a challenge...
+> The `keymap` hook must occur **before** the `encrypt` hook. It is necessary to
+> allow non-US keyboard layout, otherwise using a non-US keyboard for entering
+> the passphrase could be a challenge...
 
 Regenerate initramfs image (ramdisk)
 
@@ -239,7 +243,8 @@ Regenerate initramfs image (ramdisk)
     grub-mkconfig -o /boot/grub/grub.cfg
 
 > - Install os-prober as well if other operating systems should be auto-detected
-> - If you get the following output: `Warning: os-prober will not be executed to detect other bootable partitions`:
+> - If you get the following output:
+>   `Warning: os-prober will not be executed to detect other bootable partitions`:
 >   - Edit `/etc/default/grub` and add/uncomment `GRUB_DISABLE_OS_PROBER=false`
 
 ##### Enable processor-specific microcode updates
@@ -287,7 +292,7 @@ Setup WiFi, Keyboard Layout, etc.
 Additional Software (run as non-privileged user)
 
     sudo pacman -S xclip the_silver_searcher ranger tig fzf lynx xdotool eza peco sshfs pwgen mat2 btop
-    sudo pacman -S nautilus gparted eog gnome-tweaks gdmap texlive-core texlive-latexextra evince xpdf texworks
+    sudo pacman -S nautilus gparted eog gnome-tweaks gdmap texlive-core texlive-latexextra evince xpdf texworks pass
     sudo pacman -S easytag audacity gimp vlc pqiv git-delta jless
     sudo pacman -S networkmanager-vpnc android-tools
 
@@ -339,7 +344,8 @@ Add a keyslot for the keyfile to the LUKS header
 
 ##### Unlocking the root partition at boot
 
-Edit `MODULES` in `/etc/mkinitcpio.conf` and add the usb stick's filesystem (e.g. ext4 or vfat)
+Edit `MODULES` in `/etc/mkinitcpio.conf` and add the usb stick's filesystem
+(e.g. ext4 or vfat)
 
     MODULES=(ext4)
 
@@ -423,7 +429,10 @@ or only inhibit, without starting a program
 
 ##### File /var/cache/pacman/pkg/something.tar.xz is corrupted (invalid or corrupted package (PGP signature)).
 
-That means that the package integrity cannot be checked by its PGP signature. Often the reason is that you may have done the previous update a while ago. In the meantime some keys by Arch developers may have changed, and some new updates are signed with the new (PGP) keys.
+That means that the package integrity cannot be checked by its PGP signature.
+Often the reason is that you may have done the previous update a while ago. In
+the meantime some keys by Arch developers may have changed, and some new updates
+are signed with the new (PGP) keys.
 
 Update the keyring
 
