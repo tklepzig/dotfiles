@@ -87,6 +87,8 @@ alias r='. ranger'
 
 alias q='exit'
 alias ..='cd ..'
+alias ..2='cd ../..'
+alias ..3='cd ../../..'
 alias ly="lynx -cfg $dotfilesDir/lynx.cfg"
 alias ni='npm install'
 alias nid='npm install -D'
