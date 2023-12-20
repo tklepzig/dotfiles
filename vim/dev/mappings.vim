@@ -41,7 +41,7 @@ nnoremap <leader><Tab> :BufferNavigatorToggle<cr>
 " vim-fugitive & gv
 nnoremap <leader>gs :G<CR>
 nnoremap <leader>gd :Gvdiffsplit<CR>
-nnoremap <leader>gb :execute 'Gvdiffsplit! ' . $DOTFILES_GIT_DEFAULT_BRANCH<CR>
+nnoremap <leader>gb :execute 'Gvdiffsplit! ' . $DOTFILES_GIT_DEFAULT_BRANCH . ' \| wincmd p'<CR>
 nnoremap <leader>gl :GV<CR>
 nnoremap <leader>gf :GV!<CR>
 nmap <leader>k <Plug>(GitGutterPrevHunk)
