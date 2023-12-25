@@ -6,6 +6,7 @@
     "ejs": "*",
     "express": "*",
     "markdown-it": "*",
-    "markdown-it-named-headings": "*"
+    "markdown-it-named-headings": "*",
+    "opener": "*"
   }
 }
