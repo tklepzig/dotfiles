@@ -43,6 +43,6 @@ app.get("/:name?", async ({ params }, response) => {
 });
 
 app.listen(PORT, async () => {
-  console.log(`Facts Events service listening at http://localhost:${PORT}`);
+  console.log(`Toolbox Docs available at http://localhost:${PORT}`);
   opener(`http://localhost:${PORT}`);
 });
