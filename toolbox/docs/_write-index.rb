@@ -5,7 +5,7 @@ INDEX_PATH = File.join(__dir__, 'index.md')
 
 def create_section(path, name)
   entries = Dir.glob(File.join(path, '*.md')).filter_map do |file|
-    entry = File.basename(file)
+    entry = File.basename(file, '.*')
     entry
   end
   { name:, entries: }
@@ -29,12 +29,28 @@ def write_sections(sections)
 
     File.write(INDEX_PATH, "\n#{headline_prefix} #{section[:name]}\n\n", mode: 'a')
     section[:entries].each do |entry|
-      base = File.basename(entry, '.*')
-      link = index.zero? ? base : File.join(section[:name], base)
-      label = base.gsub('--', NON_BREAKING_HYPHEN).gsub('-', ' ')
+      link = index.zero? ? entry : File.join(section[:name], entry)
+      label = entry.gsub('--', NON_BREAKING_HYPHEN).gsub('-', ' ')
       File.write(INDEX_PATH, "- [#{label}](#{link})\n", mode: 'a')
     end
   end
+end
+
+def write_cache(sections)
+  # TODO: Use map
+  cache_entries = []
+  sections.each_with_index do |section, index|
+    section[:entries].each do |entry|
+      link = index.zero? ? entry : File.join(section[:name], entry)
+      cache_entries.push("/#{link}")
+    end
+  end
+
+  file_name = File.join(__dir__, '_pwa', 'sw.js')
+  text = File.read(file_name)
+
+  new_contents = text.gsub(/"PLACEHOLDER"/, cache_entries.to_s)
+  File.write(file_name, new_contents)
 end
 
 def init
@@ -55,3 +71,4 @@ end
 sections = init
 write_index sections
 write_sections sections
+write_cache sections

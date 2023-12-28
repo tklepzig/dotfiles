@@ -1,19 +1,18 @@
-var CACHE_NAME = "docs-cache-2019-02-17_3";
-var urlsToCache = [
+const CACHE_NAME = "docs-cache-2023-12-28";
+const baseCache = [
   "/",
   "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs",
   "/github.min.css",
   "/style.css",
   "/sw.js",
-  "/arch-linux",
-  "/android",
-  "/ruby",
 ];
+
+const docsCache = "PLACEHOLDER";
 
 self.addEventListener("install", function (event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function (cache) {
-      return cache.addAll(urlsToCache);
+      return cache.addAll([...baseCache, ...docsCache]);
     })
   );
 });
