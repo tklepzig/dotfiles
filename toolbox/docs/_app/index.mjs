@@ -31,8 +31,10 @@ app.get("/*.css", (request, response) => {
   response.sendFile(relativePath(request.path.replace(/\//g, "")));
 });
 
-app.get("/:name?", async ({ params }, response) => {
-  const file = relativePath(`../${params.name ?? "index"}.md`);
+app.get("/:name*?", async ({ params }, response) => {
+  const file = relativePath(
+    params.name ? `../${params.name}${params[0]}.md` : "../index.md"
+  );
   if (!existsSync(file)) return response.sendStatus(404);
 
   const content = await readFile(file, "utf-8");
