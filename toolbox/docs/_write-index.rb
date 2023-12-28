@@ -37,20 +37,18 @@ def write_sections(sections)
 end
 
 def write_cache(sections)
-  # TODO: Use map
-  cache_entries = []
-  sections.each_with_index do |section, index|
-    section[:entries].each do |entry|
+  cache_entries = sections.each_with_index.flat_map do |section, index|
+    section[:entries].map do |entry|
       link = index.zero? ? entry : File.join(section[:name], entry)
-      cache_entries.push("/#{link}")
+      "/#{link}"
     end
   end
 
-  file_name = File.join(__dir__, '_pwa', 'sw.js')
-  text = File.read(file_name)
+  service_worker = File.join(__dir__, '_app', 'sw.js')
+  content = File.read(service_worker)
 
-  new_contents = text.gsub(/"PLACEHOLDER"/, cache_entries.to_s)
-  File.write(file_name, new_contents)
+  updated_content = content.gsub(/"PLACEHOLDER"/, cache_entries.to_s)
+  File.write(service_worker, updated_content)
 end
 
 def init
