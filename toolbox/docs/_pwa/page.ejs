@@ -20,10 +20,11 @@
     </style>
   </head>
   <body class="markdown-body">
-    <a href="/">Index</a>
-    <article>
-      <%- main %>
-    </article>
+    <header>
+      <a href="/" id="index">&equiv;</a>
+      <!--<button type="button" id="toggle-theme"></button>-->
+    </header>
+    <article><%- main %></article>
     <script type="module">
       import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
       mermaid.initialize({ startOnLoad: false });
