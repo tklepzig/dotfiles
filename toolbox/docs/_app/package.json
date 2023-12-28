@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "minify": "npx --yes minify github.css > github.min.css"
+  },
+  "dependencies": {
+    "ejs": "*",
+    "express": "*",
+    "markdown-it": "*",
+    "markdown-it-named-headings": "*",
+    "opener": "*"
+  }
+}

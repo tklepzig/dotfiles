@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link href="github.min.css" rel="stylesheet" type="text/css" />
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("sw.js");
+        });
+      }
+    </script>
+    <style>
+      .language-mermaid:not([data-processed="true"]) {
+        display: none;
+      }
+    </style>
+  </head>
+  <body class="markdown-body">
+    <header>
+      <a href="/" id="index">&equiv;</a>
+      <!--<button type="button" id="toggle-theme"></button>-->
+    </header>
+    <article><%- main %></article>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({ startOnLoad: false });
+      mermaid.run({
+        querySelector: ".language-mermaid",
+      });
+    </script>
+  </body>
+</html>

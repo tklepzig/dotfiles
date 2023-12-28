@@ -1,0 +1,144 @@
+@media (prefers-color-scheme: light) {
+  :root {
+    --olive: #9c6;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --olive: #562;
+  }
+}
+
+body {
+  padding: 1rem;
+}
+
+body > article {
+  margin: 1rem auto;
+  max-width: 980px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+  padding: 1rem 2rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  body > article {
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.4);
+  }
+}
+
+header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  justify-items: start;
+  align-items: center;
+
+  & > #index {
+    font-size: 2rem;
+    padding: 0 0.5rem;
+    margin-left: -0.5rem;
+    line-height: 1.8rem;
+
+    text-align: center;
+    transition: background-color 0.15s ease-in-out;
+    text-decoration: none;
+    color: var(--color-fg-default);
+  }
+
+  & > #toggle-theme {
+    appearance: none;
+    cursor: pointer;
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 50%;
+    background: var(--color-fg-subtle);
+    border: none;
+    padding: 0.5rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  body > article {
+    max-width: none;
+    margin: 0;
+    box-shadow: none;
+    padding: 0.5rem 1rem;
+  }
+}
+
+body > article:has(#toolbox) {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 3rem;
+
+  &:has(ul:first-of-type > li:empty) {
+    column-gap: 0;
+  }
+
+  & > ul,
+  & > h1,
+  & > h2 {
+    grid-column: 2;
+  }
+
+  & ul:first-of-type {
+    padding: 0;
+    grid-column: 1;
+    grid-row: 2;
+    display: grid;
+    grid-auto-flow: row;
+    align-content: start;
+    row-gap: 1rem;
+
+    > li {
+      margin: 0;
+      list-style-type: none;
+      /*TODO*/
+      filter: drop-shadow(1px 1px 3px rgba(0, 0, 0, 0.2))
+        drop-shadow(0px 0px 2px #9c68) drop-shadow(-2px -2px 1px #9c68);
+
+      > a {
+        padding: 0.5rem 2rem;
+        display: block;
+        font-size: 1.1rem;
+        text-decoration: none;
+        color: var(--color-fg-default);
+        background: var(--color-canvas-default);
+        clip-path: polygon(0.8rem 0, 100% 0, 100% 100%, 0 100%, 0 0.8rem);
+
+        &:hover {
+          background: var(--olive);
+        }
+      }
+    }
+  }
+
+  & ul:not(:first-of-type) {
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+    align-items: start;
+    gap: 1rem;
+
+    > li {
+      margin: 0;
+      list-style-type: none;
+
+      > a {
+        padding: 0.5rem;
+        text-align: center;
+        transition: background-color 0.15s ease-in-out;
+        /*TODO*/
+        box-shadow: 0 0 6px 1px rgba(0, 0, 0, 0.2);
+        display: block;
+        font-size: 1.1rem;
+        text-decoration: none;
+        color: var(--color-fg-default);
+
+        &:hover {
+          background: var(--olive);
+        }
+      }
+    }
+  }
+}
