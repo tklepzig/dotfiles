@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+
+$dotfiles_path/toolbox/docs/_app/index.mjs
+

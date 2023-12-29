@@ -44,7 +44,7 @@ def write_cache(sections)
     end
   end
 
-  service_worker = File.join(__dir__, '_app', 'sw.js')
+  service_worker = File.join(__dir__, '_app', 'public', 'sw.js')
   content = File.read(service_worker)
 
   updated_content = content.gsub(/const docsCache = \[.*\];/, "const docsCache = #{cache_entries};")

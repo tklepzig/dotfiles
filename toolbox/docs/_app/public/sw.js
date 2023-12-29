@@ -5,6 +5,8 @@ const baseCache = [
   "/github.min.css",
   "/style.css",
   "/sw.js",
+  "/manifest.json",
+  "/favicon.ico",
 ];
 
 const docsCache = [];

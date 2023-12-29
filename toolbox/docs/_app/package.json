@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "minify": "npx --yes minify github.css > github.min.css"
+    "minify": "npx --yes minify github.css > public/github.min.css"
   },
   "dependencies": {
     "ejs": "*",

@@ -5,8 +5,11 @@ import { existsSync } from "fs";
 import markdownIt from "markdown-it";
 import namedHeadings from "markdown-it-named-headings";
 import express from "express";
+import { createServer as createHttpServer } from "http";
+import { createServer as createHttpsServer } from "https";
 import { fileURLToPath } from "url";
 import opener from "opener";
+import os from "os";
 
 const relativePath = (file) => fileURLToPath(new URL(file, import.meta.url));
 
@@ -19,18 +22,8 @@ const md = markdownIt({ html: true, linkify: true, typographer: true }).use(
 );
 
 const PORT = process.env.PORT || 3001;
-app.get("/favicon.ico", (_, response) => {
-  //TODO
-  response.sendStatus(200);
-});
-app.get("/sw.js", (_, response) => {
-  response.sendFile(relativePath("sw.js"));
-});
 
-app.get("/*.css", (request, response) => {
-  response.sendFile(relativePath(request.path.replace(/\//g, "")));
-});
-
+app.use(express.static(relativePath("public")));
 app.get("/:name*?", async ({ params }, response) => {
   const file = relativePath(
     params.name ? `../${params.name}${params[0]}.md` : "../index.md"
@@ -44,7 +37,27 @@ app.get("/:name*?", async ({ params }, response) => {
   });
 });
 
-app.listen(PORT, async () => {
-  console.log(`Toolbox Docs available at http://localhost:${PORT}`);
-  opener(`http://localhost:${PORT}`);
-});
+const domain = os.hostname().toLowerCase();
+const keyPath = relativePath(`../../misc/certificates/${domain}.key`);
+const certPath = relativePath(`../../misc/certificates/${domain}.crt`);
+
+if (existsSync(keyPath) && existsSync(certPath)) {
+  const privateKey = await readFile(keyPath, "utf8");
+  const certificate = await readFile(certPath, "utf8");
+
+  const httpsServer = createHttpsServer(
+    { key: privateKey, cert: certificate },
+    app
+  );
+
+  httpsServer.listen(PORT, () => {
+    console.log(`Toolbox Docs available at https://${domain}:${PORT}`);
+    opener(`https://${domain}:${PORT}`);
+  });
+} else {
+  const httpServer = createHttpServer(app);
+  httpServer.listen(PORT, async () => {
+    console.log(`Toolbox Docs available at http://localhost:${PORT}`);
+    opener(`http://localhost:${PORT}`);
+  });
+}
