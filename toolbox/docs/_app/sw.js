@@ -7,7 +7,7 @@ const baseCache = [
   "/sw.js",
 ];
 
-const docsCache = "PLACEHOLDER";
+const docsCache = [];
 
 self.addEventListener("install", function (event) {
   event.waitUntil(
