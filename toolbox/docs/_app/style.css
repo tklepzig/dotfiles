@@ -1,12 +1,16 @@
 @media (prefers-color-scheme: light) {
   :root {
     --olive: #9c6;
+    --olive-subtle: #9c64;
+    --shadow-alpha: 0.2;
   }
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --olive: #562;
+    --olive-subtle: #5624;
+    --shadow-alpha: 0.4;
   }
 }
 
@@ -14,17 +18,22 @@ body {
   padding: 1rem;
 }
 
+.markdown-body {
+  & h1,
+  & h2,
+  & h3,
+  & h4,
+  & h5,
+  & h6 {
+    font-weight: 200;
+  }
+}
+
 body > article {
   margin: 1rem auto;
   max-width: 980px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, var(--shadow-alpha));
   padding: 1rem 2rem;
-}
-
-@media (prefers-color-scheme: dark) {
-  body > article {
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.4);
-  }
 }
 
 header {
@@ -94,8 +103,8 @@ body > article:has(#toolbox) {
       margin: 0;
       list-style-type: none;
       /*TODO*/
-      filter: drop-shadow(1px 1px 3px rgba(0, 0, 0, 0.2))
-        drop-shadow(0px 0px 2px #9c68) drop-shadow(-2px -2px 1px #9c68);
+      filter: drop-shadow(0 0 1px var(--olive))
+        drop-shadow(0 0 3px rgba(0, 0, 0, var(--shadow-alpha)));
 
       > a {
         padding: 0.5rem 2rem;
@@ -104,7 +113,15 @@ body > article:has(#toolbox) {
         text-decoration: none;
         color: var(--color-fg-default);
         background: var(--color-canvas-default);
-        clip-path: polygon(0.8rem 0, 100% 0, 100% 100%, 0 100%, 0 0.8rem);
+        border: 1px solid transparent;
+        clip-path: polygon(
+          0.8rem 0,
+          100% 0,
+          100% calc(100% - 0.8rem),
+          calc(100% - 0.8rem) 100%,
+          0 100%,
+          0 0.8rem
+        );
 
         &:hover {
           background: var(--olive);
@@ -128,8 +145,8 @@ body > article:has(#toolbox) {
         padding: 0.5rem;
         text-align: center;
         transition: background-color 0.15s ease-in-out;
-        /*TODO*/
-        box-shadow: 0 0 6px 1px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 0 6px 1px rgba(0, 0, 0, var(--shadow-alpha));
+        border: 1px solid var(--olive-subtle);
         display: block;
         font-size: 1.1rem;
         text-decoration: none;
