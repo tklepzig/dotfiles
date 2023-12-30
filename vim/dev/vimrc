@@ -58,8 +58,10 @@ let g:vim_ai_chat = {
 set hidden
 
 " Some servers have issues with backup files, see #649
-set nobackup
-set nowritebackup
+" UPDATE: Re-enable backup for avoiding data-loss reasons, let's see whether coc can
+" handle it...
+"set nobackup
+"set nowritebackup
 
 " Better display for messages
 set cmdheight=2

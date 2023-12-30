@@ -57,7 +57,14 @@ set t_vb=
 " Not neovim compatible
 "set printoptions=paper:letter
 
-set backupdir=~/.vim/.backup/,/tmp//,.
+set backupdir=~/.vim/backup//
+set writebackup
+set backup
+au BufWritePre * let &bex = '@' . strftime("%F.%H:%M:%S")
+" TODO
+" Delete backup files older than 7 days
+" find $HOME/.vim/backup -type f -mtime +7 -delete
+
 set directory=~/.vim/.swp/,/tmp//,.
 set undodir=~/.vim/.undo/,/tmp//,.
 
