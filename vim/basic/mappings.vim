@@ -90,5 +90,5 @@ nnoremap <silent> <leader>m :QuickMemo<cr>
 if !empty($DOTFILES_NVIM)
   tnoremap <Esc> <C-\><C-n>
   tnoremap jj <C-\><C-n>
-  nnoremap <leader>$ :terminal<cr>
+  nnoremap <leader>$ :terminal<cr>i
 endif
