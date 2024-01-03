@@ -12,7 +12,8 @@ nnoremap <silent> <Leader>wz :<C-U>execute 'resize ' . (v:count ? v:count : '')<
 nnoremap <silent> <Leader>wZ :<C-U>execute 'vertical resize ' . (v:count ? v:count : '')<cr>
 nnoremap <Leader>w<Tab> :wincmd p<cr>
 nnoremap <Leader>q :bunload<CR>
-nnoremap <leader>Q :mksession!\|:qa<cr>
+nnoremap <leader>W :mksession!\|:qa<cr>
+nnoremap <leader>Q :qa<cr>
 nnoremap <leader>X :qa!<cr>
 "removes all buffers, not really used
 "nnoremap <Leader>Q :%bd\|e#\|bd#<CR>
