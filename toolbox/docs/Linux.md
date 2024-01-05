@@ -1,5 +1,14 @@
 # Linux in General
 
+## Retrieve who is taking up so much space
+
+This will tell you which directory is taking up the most space, then just change
+`/` to point to that dir, and repeat.
+
+    du -h --max=1 -x / 2>/dev/null | sort -h
+
+> Alternatively install ncdu.
+
 ## Too big `/var/log/journal` file
 
 You can diminish the size of the journal by means of these commands:
