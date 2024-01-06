@@ -45,8 +45,13 @@ git-status-all:
     - name: directory depth
       optional: true
       default: 1
-inhibit-sleep:
-  help: Stop arch linux from going to sleep
+inhibit:
+  help: Stop linux from going to sleep or idle
+  args:
+    - name: what to inhibit
+  completion:
+    - suspend
+    - idle
 luks-close:
   help: |-
     Close LUKS container

@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+
+what=${1:-suspend}
+
+[[ "$dotfiles_os" != "linux" ]] && echo "Only works on linux" && exit 1
+echo "Inhibiting $what"
+gnome-session-inhibit --inhibit $what --inhibit-only

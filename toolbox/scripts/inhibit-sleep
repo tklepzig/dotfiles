@@ -1,4 +1,0 @@
-#!/usr/bin/env zsh
-
-[[ "$dotfiles_os" != "linux" ]] && echo "Only works on linux" && exit 1
-gnome-session-inhibit --inhibit suspend --inhibit-only
