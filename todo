@@ -1,5 +1,6 @@
+Improve dark theme (single buttons are not that visible...)
 Icon and Logo for Toolbox
 Better App Theme Color for Toolbox
-Allow setting dark/light theme regardless of system theme
+Allow setting dark/light theme regardless of system theme (https://stackoverflow.com/questions/56300132/how-to-override-css-prefers-color-scheme-setting)
 Optimize for smartphone screen sizes (with this small size the nav at left side is rubbish)
 Add "back to top" button
