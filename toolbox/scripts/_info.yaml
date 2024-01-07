@@ -49,6 +49,8 @@ inhibit:
   help: Stop linux from going to sleep or idle
   args:
     - name: what to inhibit
+      optional: true
+      default: suspend
   completion:
     - suspend
     - idle
