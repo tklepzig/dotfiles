@@ -16,6 +16,7 @@
 
 body {
   padding: 1rem;
+  transition: background-color 0.8s ease-in-out;
 }
 
 .markdown-body {
