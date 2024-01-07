@@ -16,7 +16,7 @@
 
 body {
   padding: 1rem;
-  transition: background-color 0.8s ease-in-out;
+  transition: background-color 0.15s ease-in-out;
 }
 
 .markdown-body {
@@ -113,7 +113,7 @@ body > article:has(#toolbox) {
         font-size: 1.1rem;
         text-decoration: none;
         color: var(--color-fg-default);
-        background: var(--color-canvas-default);
+        background: var(--color-canvas-subtle);
         border: 1px solid transparent;
         clip-path: polygon(
           0.8rem 0,
@@ -152,6 +152,8 @@ body > article:has(#toolbox) {
         font-size: 1.1rem;
         text-decoration: none;
         color: var(--color-fg-default);
+        background: var(--color-canvas-subtle);
+        border-radius: 0.2rem;
 
         &:hover {
           background: var(--olive);
