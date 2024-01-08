@@ -1,4 +1,11 @@
 #!/usr/bin/env zsh
 
+if [[ ! -d node_modules ]]
+then
+	cd $dotfiles_path/toolbox/docs/_app
+	npm i > /dev/null
+	cd -
+fi
+
 $dotfiles_path/toolbox/docs/_app/index.mjs
 
