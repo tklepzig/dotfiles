@@ -82,6 +82,7 @@ git config --global alias.pn "!f() { currentBranch=\$(git rev-parse --abbrev-ref
 git config --global alias.pf "push --force-with-lease"
 
 git config --global alias.c "checkout"
+git config --global alias.cf "!f() { $HOME/.dotfiles/toolbox/scripts/git-checkout-fuzzy; }; f"
 git config --global alias.cb "checkout -b"
 git config --global alias.cm "!f() { $setDefaultBranch; git checkout \$defaultBranch; }; f"
 
@@ -153,3 +154,4 @@ git config --global alias.pro "!f() { . ~/.dotfiles/toolbox/scripts/git-github-p
 #search for regex in all files history
 #git log -G regex [-- path/to/specific file]
 #git log -p -G regex [-- path/to/specific file]
+

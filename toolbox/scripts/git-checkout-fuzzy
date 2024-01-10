@@ -1,0 +1,9 @@
+#!/usr/bin/env zsh
+
+# awk '!seen[$0]++' removes duplicates from the list
+# (e.g. remotes/origin/any-branch and any-branch which has already been checked out locally)
+args=$(git show-ref  | awk '{print $2}' | sed 's#refs/.*/##g' | awk '!seen[$0]++' | fzf)
+git checkout $args
+
+
+
