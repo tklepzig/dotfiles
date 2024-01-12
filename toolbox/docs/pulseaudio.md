@@ -1,7 +1,24 @@
-Set volume manually (which allows setting to a value much higher than 100%, beware any sound distortions!)
+# PulseAudio
 
-    pactl set-sink-volume @DEFAULT_SINK@ 150%
+List pulse sinks (and getting the number for the commands below)
 
-> Get current setting
+    pactl list short sinks
+
+Set volume
+
+    pactl set-sink-volume <sink-number> 85%
+
+Get volume
+
+    pactl get-sink-volume <sink-number>
+
+> Alternatively run
 >
->     pactl get-sink-volume @DEFAULT_SINK@
+>     alsamixer
+
+## Usage with VLC
+
+Specify pulse sink when running cvlc by number from above's output with specific
+volume
+
+    PULSE_SINK=71 cvlc -A pulse --gain [0-8] (eher 1-2) Adiemus.mp3
