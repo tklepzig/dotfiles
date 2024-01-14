@@ -103,6 +103,16 @@ alias pnid='pnpm install -D'
 alias pnu='pnpm uninstall'
 alias pnr='pnpm run'
 
+alias b="bundle"
+alias ba="bundle add"
+alias bo="bundle open"
+alias be="bundle exec"
+alias ber="bundle exec rake"
+alias berdb="bundle exec rake db:create db:migrate"
+alias beru="ENV=test bundle exec rake unit"
+alias beri="ENV=test bundle exec rake integration"
+alias berui="ENV=test bundle exec rake unit integration"
+
 alias ai="asdf install"
 
 if isProgramInstalled pacman

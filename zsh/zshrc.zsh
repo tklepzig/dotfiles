@@ -29,7 +29,7 @@ greyTile=%K{$infoBg}%F{$infoFg}
 warningTile=%K{$criticalBg}%F{$criticalFg}
 reset=%f%k%b
 
-source $dotfilesDir/zsh/basic/alias.zsh
+source $dotfilesDir/zsh/alias.zsh
 
 # Add completions from .zsh/completion
 fpath=($HOME/.zsh/completion $fpath)
@@ -77,6 +77,7 @@ unsetopt auto_cd
 cdpath=(~ ~/development)
 
 # Use vi as the default editor
+# Use vim as the default editor
 export EDITOR=vim
 export VISUAL=vim
 
@@ -115,6 +116,13 @@ fi
 autoload -U down-line-or-beginning-search
 zle -N down-line-or-beginning-search
 bindkey "$ZSH_HISTORY_KEY_DOWN" down-line-or-beginning-search
+
+export ASDF_RUBY_BUILD_VERSION=master
+# Don't do that, some gems don't care about frozen and will crash with this set as default
+#export RUBYOPT=--enable-frozen-string-literal
+
+# In case instaling ruby via asdf fails due to missing header files, try the following
+#export RUBY_CONFIGURE_OPTS="--with-zlib-dir=$(brew --prefix zlib) --with-openssl-dir=$(brew --prefix openssl@3) --with-readline-dir=$(brew --prefix readline) --with-libyaml-dir=$(brew --prefix libyaml)"
 
 # Put the name of the default branch into $DOTFILES_GIT_DEFAULT_BRANCH (either master or main)
 chpwd() {
