@@ -125,6 +125,7 @@ export ASDF_RUBY_BUILD_VERSION=master
 # In case instaling ruby via asdf fails due to missing header files, try the following
 #export RUBY_CONFIGURE_OPTS="--with-zlib-dir=$(brew --prefix zlib) --with-openssl-dir=$(brew --prefix openssl@3) --with-readline-dir=$(brew --prefix readline) --with-libyaml-dir=$(brew --prefix libyaml)"
 
+export BC_ENV_ARGS=$HOME/.bc
 
 if isOS linux
 then

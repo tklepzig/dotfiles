@@ -200,7 +200,13 @@ def install
 
   install_profiles
 
-  add_link_with_override "#{DF_PATH}/zsh/zshrc.zsh", "#{HOME}/.zshrc"
+  add_link_with_override "#{DF_PATH}/zsh/zshrc", "#{HOME}/.zshrc"
+
+  unless File.exist?("#{HOME}/.bc")
+    Logger.log 'Creating config file for bc...', newline: false
+    File.write("#{HOME}/.bc", "scale=2\n")
+    Logger.log 'Done.'.success
+  end
 
   Logger.log 'Initializing toolbox...'
   add_link_with_override "#{DF_PATH}/toolbox/init.zsh", "#{HOME}/.zshrc"
