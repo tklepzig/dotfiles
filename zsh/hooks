@@ -1,0 +1,119 @@
+#!/usr/bin/env zsh
+
+# Put the name of the default branch into $DOTFILES_GIT_DEFAULT_BRANCH (either master or main)
+chpwd() {
+  gitRoot=$(git rev-parse --show-toplevel 2>/dev/null)
+  if [ $? = 0 ]
+  then
+    export DOTFILES_GIT_DEFAULT_BRANCH=$([ -f "$gitRoot/.git/refs/heads/master" ] && echo master || echo main)
+  fi
+}
+
+# Indicate the current mode in the prompt
+function zle-line-init zle-keymap-select {
+    case $KEYMAP in
+        (vicmd) viCmdIndicator="$accentTile NORMAL $reset$nl" ;;
+        (*)     viCmdIndicator="" ;;
+    esac
+    zle reset-prompt
+}
+zle -N zle-line-init
+zle -N zle-keymap-select
+
+# Start timer for evaluating in precmd
+preexec() {
+  if isOS darwin
+  then
+    timer=$(($(print -P %D{%s%6.})/1000))
+  else
+    timer=$(($(date +%s%0N)/1000000))
+  fi
+}
+
+precmd() {
+  lastExitCode=$?
+
+  if [ $timer ]; then
+    if isOS darwin
+    then
+      now=$(($(print -P %D{%s%6.})/1000))
+    else
+      now=$(($(date +%s%0N)/1000000))
+    fi
+
+    elapsed=$(($now-$timer))
+    elapsedHours=$(printf %02d $(($elapsed / 3600000)))
+    elapsedMinutes=$(printf %02d $((($elapsed % 3600000) / 60000)))
+    elapsedSeconds=$(printf %02d $((($elapsed % 60000) / 1000)))
+    elapsedMilliseconds=$(printf %03d $(($elapsed % 1000)))
+    elapsedTime=" ${elapsedHours}:${elapsedMinutes}:${elapsedSeconds}.${elapsedMilliseconds} "
+
+    if [ "$lastExitCode" != 0 ]
+    then
+      lastExitCodeString=" $warningTile $lastExitCode "
+    else
+      lastExitCodeString=""
+    fi
+
+    unset timer
+  fi
+
+  vcs_info
+
+  local repoStatus=$(command git status --porcelain 2> /dev/null | tail -n1)
+  local branchColor="$([[ -n $repoStatus ]] && echo "$accentTile $reset$accent%B " || echo "$primaryTile $reset$primary%B ")"
+  local repoInfoOrUser="$primary%n@%m$reset$nl"
+
+  if [[ -n ${vcs_info_msg_0_} ]]
+  then
+    repoInfoOrUser="$branchColor${vcs_info_msg_0_}$(upstreamIndicator)$reset$nl"
+  fi
+
+  if [ "$EUID" != 0 ]
+  then
+    local prefix=$(echo -e '\u276f')
+  else
+    # special prompt prefix for root
+    local prefix="$warning#"
+  fi
+  #local prefix=$(echo -e '\u261e')
+  local path="%(5~|%-1~/…/%3~|%4~)"
+
+  if [ -n "$VIMRUNTIME" ]
+  then
+    local inVimOrPrefix="${accentTile}vim $prefix$reset "
+  else
+    local inVimOrPrefix="$primary$prefix$reset "
+  fi
+
+  PROMPT="$greyTile\$elapsedTime$reset\$lastExitCodeString$reset$nl$nl$repoInfoOrUser$secondary$path$nl\$viCmdIndicator$inVimOrPrefix"
+}
+
+upstreamIndicator() 
+{
+  if [[ -z "$(git rev-parse --abbrev-ref HEAD 2> /dev/null)" ]]
+  then
+    echo ""
+    return
+  fi
+
+  upstream=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2> /dev/null)
+
+  if [[ -z $upstream ]] then
+    echo " #";
+  else
+    upstream_info=$(git rev-list --left-right --count $upstream...HEAD 2> /dev/null)
+    case "$upstream_info" in
+      "") # no upstream
+        echo "" ;;
+      "0	0") # equal to upstream
+        echo " =" ;;
+      "0	"*) # ahead of upstream
+        echo " >" ;;
+      *"	0") # behind upstream
+        echo " <" ;;
+      *)	    # diverged from upstream
+        echo " <>" ;;
+    esac
+  fi
+}
