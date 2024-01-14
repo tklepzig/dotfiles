@@ -69,6 +69,14 @@ precmd() {
     repoInfoOrUser="$branchColor${vcs_info_msg_0_}$(upstreamIndicator)$reset$nl"
   fi
 
+# TODO
+# if [ "$EUID" != 0 ] (red)#
+# if [ -n "$VIMRUNTIME" ] (accent) vim >
+# if [ -n "$SSH_CLIENT" ] (accent) ssh >
+# if [ -n "$VIRTUAL_ENV" ] (accent) venv >
+# different colors than accent only?
+# instead of new var, "extend" prefix
+
   if [ "$EUID" != 0 ]
   then
     local prefix=$(echo -e '\u276f')
