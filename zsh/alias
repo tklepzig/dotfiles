@@ -88,6 +88,7 @@ alias vcf="f(){ vim \$(git show --pretty='format:' --name-only \"\$1\"); unset -
 alias r='. ranger'
 
 alias q='exit'
+alias cf="cd \$(find * -type d | fzf)"
 alias ..='cd ..'
 alias ..2='cd ../..'
 alias ..3='cd ../../..'
