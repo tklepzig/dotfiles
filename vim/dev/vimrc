@@ -107,6 +107,10 @@ let g:coc_snippet_next = '<tab>'
 
 let g:coc_global_extensions = ['coc-snippets']
 
+" =============================================================
+" End Coc Settings
+" =============================================================
+
 function! JumpToSameIndent(direction, inVisualMode)
   let line = line('.')
 
@@ -137,3 +141,9 @@ execute 'autocmd FileType buffernavigator highlight BufferNavigatorFile ctermfg=
 if dotfilesTheme =~ '-light$'
   autocmd FileType buffernavigator highlight BufferNavigatorDir ctermfg=0 ctermbg=NONE 
 endif
+
+" For whatever reason, vim started to set the filetype for *.html files to sh
+augroup fixHtmlFiletype
+  au!
+  autocmd BufNewFile,BufRead *.html  set ft=html
+augroup END
