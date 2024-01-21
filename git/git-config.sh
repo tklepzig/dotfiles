@@ -98,7 +98,6 @@ git config --global alias.bfc "!f() { $setDefaultBranch; currentBranch=\$(git re
 # List all changed files included in this branch compared to the default branch at the time the branch has been created
 git config --global alias.bf "!f() { $setDefaultBranch; git diff --name-only \$(git merge-base \${1:-\$defaultBranch} HEAD); git ls-files --others --exclude-standard; }; f"
 git config --global alias.bfp "!f() { $setDefaultBranch; git diff -p --word-diff \$(git merge-base \${1:-\$defaultBranch} HEAD); }; f"
-git config --global alias.rbib "!f() { $setDefaultBranch; currentBranch=\$(git rev-parse --abbrev-ref HEAD); git rebase -i \$(git log \${1:-\$defaultBranch}..\${2:-\$currentBranch}  --oneline --pretty=format:'%h' | tail -1)^; }; f"
 
 git config --global alias.f "fetch"
 git config --global alias.fm "!f() { . ~/.dotfiles/toolbox/scripts/git-fetch-merge; }; f"
@@ -114,6 +113,9 @@ git config --global alias.rb "rebase"
 git config --global alias.rbc "rebase --continue"
 git config --global alias.rba "rebase --abort"
 git config --global alias.rbm "!f() { $setDefaultBranch; git rebase \$defaultBranch; }; f"
+git config --global alias.rbi "rebase -i"
+git config --global alias.rbir "rebase -i --root"
+git config --global alias.rbib "!f() { $setDefaultBranch; currentBranch=\$(git rev-parse --abbrev-ref HEAD); git rebase -i \$(git log \${1:-\$defaultBranch}..\${2:-\$currentBranch}  --oneline --pretty=format:'%h' | tail -1)^; }; f"
 
 git config --global alias.undo "!f() { git reset --hard \$1 && git clean -df \$1; }; f"
 
