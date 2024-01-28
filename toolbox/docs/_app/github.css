@@ -1,42 +1,38 @@
 /* based on https://cdn.jsdelivr.net/gh/hyrious/github-markdown-css@main/dist/dark-light.css */
-@media (prefers-color-scheme: light) {
-  :root {
-    color-scheme: light;
-    --color-fg-default: #1f2328;
-    --color-fg-muted: #656d76;
-    --color-fg-subtle: #6e7781;
-    --color-canvas-default: #ffffff;
-    --color-canvas-subtle: #f6f8fa;
-    --color-border-default: #d0d7de;
-    --color-border-muted: hsla(210, 18%, 87%, 1);
-    --color-neutral-muted: rgba(175, 184, 193, 0.2);
-    --color-accent-fg: #0969da;
-    --color-accent-emphasis: #0969da;
-    --color-attention-fg: #9a6700;
-    --color-attention-subtle: #fff8c5;
-    --color-danger-fg: #d1242f;
-    --color-done-fg: #8250df;
-  }
+:root {
+  color-scheme: light;
+  --color-fg-default: #1f2328;
+  --color-fg-muted: #656d76;
+  --color-fg-subtle: #6e7781;
+  --color-canvas-default: #ededed;
+  --color-canvas-subtle: #e1e1e1;
+  --color-border-default: #d0d7de;
+  --color-border-muted: hsla(210, 18%, 87%, 1);
+  --color-neutral-muted: rgba(175, 184, 193, 0.2);
+  --color-accent-fg: #0969da;
+  --color-accent-emphasis: #0969da;
+  --color-attention-fg: #9a6700;
+  --color-attention-subtle: #fff8c5;
+  --color-danger-fg: #d1242f;
+  --color-done-fg: #8250df;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --color-fg-default: #ededed;
-    --color-fg-muted: #7d8590;
-    --color-fg-subtle: #6e7681;
-    --color-canvas-default: #1d1d1d;
-    --color-canvas-subtle: #2d2d2d;
-    --color-border-default: #30363d;
-    --color-border-muted: #363b44;
-    --color-neutral-muted: rgba(110, 118, 129, 0.4);
-    --color-accent-fg: #2f81f7;
-    --color-accent-emphasis: #1f6feb;
-    --color-attention-fg: #d29922;
-    --color-attention-subtle: rgba(187, 128, 9, 0.15);
-    --color-danger-fg: #f85149;
-    --color-done-fg: #a371f7;
-  }
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-fg-default: #ededed;
+  --color-fg-muted: #7d8590;
+  --color-fg-subtle: #6e7681;
+  --color-canvas-default: #1d1d1d;
+  --color-canvas-subtle: #2d2d2d;
+  --color-border-default: #30363d;
+  --color-border-muted: #363b44;
+  --color-neutral-muted: rgba(110, 118, 129, 0.4);
+  --color-accent-fg: #2f81f7;
+  --color-accent-emphasis: #1f6feb;
+  --color-attention-fg: #d29922;
+  --color-attention-subtle: rgba(187, 128, 9, 0.15);
+  --color-danger-fg: #f85149;
+  --color-done-fg: #a371f7;
 }
 
 .markdown-body {

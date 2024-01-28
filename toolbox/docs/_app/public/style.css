@@ -1,17 +1,15 @@
-@media (prefers-color-scheme: light) {
-  :root {
-    --olive: #9c6;
-    --olive-subtle: #9c64;
-    --shadow-alpha: 0.2;
-  }
+:root {
+  --olive: #9c6;
+  --olive-subtle: #9c64;
+  --shadow-alpha: 0.2;
+  --bg-toggle-theme: #1d1d1d;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --olive: #562;
-    --olive-subtle: #5624;
-    --shadow-alpha: 0.4;
-  }
+[data-theme="dark"] {
+  --olive: #562;
+  --olive-subtle: #5624;
+  --shadow-alpha: 0.4;
+  --bg-toggle-theme: #ededed;
 }
 
 body {
@@ -42,6 +40,11 @@ header {
   grid-template-columns: 1fr auto;
   justify-items: start;
   align-items: center;
+  position: sticky;
+  top: 0;
+  background: var(--color-canvas-default);
+  padding: 0.5rem 1rem;
+  margin: 0 -1rem;
 
   & > #index {
     font-size: 2rem;
@@ -58,10 +61,10 @@ header {
   & > #toggle-theme {
     appearance: none;
     cursor: pointer;
-    width: 1.2rem;
-    height: 1.2rem;
+    width: 1rem;
+    height: 1rem;
     border-radius: 50%;
-    background: var(--color-fg-subtle);
+    background: var(--bg-toggle-theme);
     border: none;
     padding: 0.5rem;
   }
@@ -99,6 +102,9 @@ body > article:has(#toolbox) {
     grid-auto-flow: row;
     align-content: start;
     row-gap: 1rem;
+    align-self: start;
+    position: sticky;
+    top: 3rem;
 
     > li {
       margin: 0;

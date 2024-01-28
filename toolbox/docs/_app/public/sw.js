@@ -5,6 +5,7 @@ const baseCache = [
   "/github.min.css",
   "/style.css",
   "/sw.js",
+  "/theme.js",
   "/manifest.json",
   "/favicon.ico",
 ];

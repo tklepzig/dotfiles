@@ -21,6 +21,7 @@
         });
       }
     </script>
+    <script src="/theme.js"></script>
     <style>
       .language-mermaid:not([data-processed="true"]) {
         display: none;
@@ -30,7 +31,7 @@
   <body class="markdown-body">
     <header>
       <a href="/" id="index">&equiv;</a>
-      <!--<button type="button" id="toggle-theme"></button>-->
+      <button type="button" id="toggle-theme" />
     </header>
     <article><%- main %></article>
     <script type="module">
@@ -39,6 +40,7 @@
       mermaid.run({
         querySelector: ".language-mermaid",
       });
+      addToggleThemeListener("#toggle-theme");
     </script>
   </body>
 </html>
