@@ -21,7 +21,8 @@ const md = markdownIt({ html: true, linkify: true, typographer: true }).use(
   namedHeadings
 );
 
-const PORT = process.env.PORT || 3001;
+const port = process.env.PORT || 3001;
+const sslPort = process.env.SSL_PORT || 3002;
 
 app.use(express.static(relativePath("public")));
 app.get("/:name*?", async ({ params }, response) => {
@@ -37,6 +38,11 @@ app.get("/:name*?", async ({ params }, response) => {
   });
 });
 
+createHttpServer(app).listen(port, async () => {
+  console.log(`Toolbox Docs available at http://localhost:${port}`);
+  opener(`http://localhost:${port}`);
+});
+
 const domain = os.hostname().toLowerCase();
 const keyPath = relativePath(`../../misc/certificates/${domain}.key`);
 const certPath = relativePath(`../../misc/certificates/${domain}.crt`);
@@ -45,19 +51,11 @@ if (existsSync(keyPath) && existsSync(certPath)) {
   const privateKey = await readFile(keyPath, "utf8");
   const certificate = await readFile(certPath, "utf8");
 
-  const httpsServer = createHttpsServer(
-    { key: privateKey, cert: certificate },
-    app
+  createHttpsServer({ key: privateKey, cert: certificate }, app).listen(
+    sslPort,
+    () => {
+      console.log(`Toolbox Docs PWA available at https://${domain}:${sslPort}`);
+      opener(`https://${domain}:${sslPort}`);
+    }
   );
-
-  httpsServer.listen(PORT, () => {
-    console.log(`Toolbox Docs available at https://${domain}:${PORT}`);
-    opener(`https://${domain}:${PORT}`);
-  });
-} else {
-  const httpServer = createHttpServer(app);
-  httpServer.listen(PORT, async () => {
-    console.log(`Toolbox Docs available at http://localhost:${PORT}`);
-    opener(`http://localhost:${PORT}`);
-  });
 }
