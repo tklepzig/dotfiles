@@ -12,6 +12,14 @@
   --bg-toggle-theme: #ededed;
 }
 
+html {
+  /* when jumping to headline by id, ensure the headline
+   * has a 3rem offset from top to avoid having it behind
+   * the sticky header
+   */
+  scroll-padding-top: 3rem;
+}
+
 body {
   padding: 1rem;
   transition: background-color 0.15s ease-in-out;
