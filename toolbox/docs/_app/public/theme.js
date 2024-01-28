@@ -18,16 +18,15 @@ const addToggleThemeListener = (selector) => {
       return localStorage.getItem("theme");
     }
 
-    if (!window.matchMedia) {
-      return "light";
-    }
-
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    if (
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+    ) {
       return "dark";
     }
+
+    return "light";
   };
 
-  if (getTheme() == "dark") {
-    document.documentElement.setAttribute("data-theme", "dark");
-  }
+  document.documentElement.setAttribute("data-theme", getTheme());
 })();
