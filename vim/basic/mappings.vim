@@ -67,11 +67,14 @@ nnoremap <leader>+ <C-i>
 " Hint: enter :g/ (short for :g//p) to list all  occurences in the current file
 vnoremap // y/\V<C-r>=escape(@",'/\')<CR><CR>
 
-nnoremap <S-j> 3<C-e>
-vnoremap <S-j> 3<C-e>
+nnoremap M J
+vnoremap M J
 
-nnoremap <S-k> 3<C-y>
-vnoremap <S-k> 3<C-y>
+nnoremap J 3<C-e>
+vnoremap J 3<C-e>
+
+nnoremap K 3<C-y>
+vnoremap K 3<C-y>
 
 " List contents of all registers (that typically contain pasteable text) (from https://superuser.com/a/656954)
 nnoremap <silent> "" :registers 0123456789abcdefghijklmnopqrstuvwxyz<CR>
