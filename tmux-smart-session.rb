@@ -129,5 +129,9 @@ when 's'
   File.write('./sessions.json', tmux_info.to_json)
   puts JSON.pretty_generate(tmux_info)
 when 'r'
+  if ENV['TMUX']
+    puts 'A tmux session is already running, aborting.'
+    exit 1
+  end
   restore(JSON.parse(File.read('./sessions.json')))
 end
