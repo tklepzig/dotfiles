@@ -31,7 +31,9 @@ end
 
 def tmux_sessions
   # Comma, same issue as below...
-  session_list = `tmux list-sessions -F "#\{session_name\},#\{session_attached\}"`.split(/\n/)
+  session_list = `tmux list-sessions -F "#\{session_name\},#\{session_attached\}"`
+                 .split(/\n/)
+
   session_list.map do |session|
     name, attached_clients = session.split(/,/)
     [name, { active: !attached_clients.to_i.zero? }]
@@ -39,7 +41,9 @@ def tmux_sessions
 end
 
 def tmux_windows(session_name)
-  window_list = `tmux list-windows -t "#{session_name}" -F "#\{window_index\} #\{window_active\} #\{window_zoomed_flag\} #\{window_layout\}"`.split(/\n/)
+  window_list = `tmux list-windows -t "#{session_name}" -F "#\{window_index\} #\{window_active\} #\{window_zoomed_flag\} #\{window_layout\}"`
+                .split(/\n/)
+
   window_list.map do |window|
     index, active, zoomed, layout = window.split
     [index, { active: !active.to_i.zero?, zoomed: !zoomed.to_i.zero?, layout: }]
@@ -48,11 +52,12 @@ end
 
 def tmux_panes(session_name, window_index)
   # Maybe using a comma as divider is not the best idea (thinking of filenames and paths with a comma in it)
-  pane_list = `tmux list-panes -t "#{session_name}:#{window_index}" -F "#\{pane_index\},#\{pane_active\},#\{pane_tty\},#\{pane_current_path\}"`.split(/\n/)
+  pane_list = `tmux list-panes -t "#{session_name}:#{window_index}" -F "#\{pane_index\},#\{pane_active\},#\{pane_tty\},#\{pane_current_path\}"`
+              .split(/\n/)
+
   pane_list.map do |pane|
     index, active, tty, path = pane.split(/,/)
-    command = tty_command(tty)
-    [index, { active: !active.to_i.zero?, path:, command: }]
+    [index, { active: !active.to_i.zero?, path:, command: tty_command(tty) }]
   end
 end
 
@@ -65,6 +70,7 @@ def tmux_info
 
       panes = tmux_panes(session_name, window_index).map do |pane|
         pane_index, pane_info = pane
+
         { index: pane_index, **pane_info }
       end
 
@@ -73,34 +79,44 @@ def tmux_info
 
     { name: session_name, **session_info, windows: }
   end
+
   { sessions: }
+end
+
+def restore_panes(session, window)
+  panes = window['panes']
+
+  panes.each_with_index do |pane, index|
+    split_window(session['name'], window['index'], pane['path'], active: pane['active']) unless index.zero?
+
+    window_set_layout(session['name'], window['index'], window['layout'])
+  end
+
+  return unless window['zoomed']
+
+  # zooming can only be done when all panes are created
+  # (imagine zooming a single pane in a window, that makes no sense...)
+  panes.filter { |pane| pane['active'] }.each do |pane|
+    `tmux resize-pane -t "#{session['name']}":#{window['index']}.#{pane['index']} -Z`
+  end
+end
+
+def restore_windows(session)
+  windows = session['windows']
+  windows.each do |window|
+    if session_exists? session['name']
+      add_window(session['name'], window['panes'].first['path'], active: window['active'])
+    else
+      new_session(session['name'], window['panes'].first['path'])
+    end
+
+    restore_panes(session, window)
+  end
 end
 
 def restore(sessions)
   sessions['sessions'].each do |session|
-    windows = session['windows']
-
-    windows.each do |window|
-      if session_exists? session['name']
-        add_window(session['name'], window['panes'].first['path'], active: window['active'])
-      else
-        new_session(session['name'], window['panes'].first['path'])
-      end
-
-      window['panes'].each_with_index do |pane, index|
-        split_window(session['name'], window['index'], pane['path'], active: pane['active']) unless index.zero?
-
-        window_set_layout(session['name'], window['index'], window['layout'])
-      end
-
-      next unless window['zoomed']
-
-      # zooming can only be done when all panes are created
-      # (imagine zooming a single pane in a window, that makes no sense...)
-      window['panes'].filter { |pane| pane['active'] }.each do |pane|
-        `tmux resize-pane -t "#{session['name']}":#{window['index']}.#{pane['index']} -Z`
-      end
-    end
+    restore_windows(session)
   end
 
   `tmux attach -t #{sessions['sessions'].filter { |session| session['active'] }.first['name']}`
