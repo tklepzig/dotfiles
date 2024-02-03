@@ -2,9 +2,8 @@
 
 - Stop command and run it again when restoring
   - When pane command is vim, close with session (what if unsaved changes?)
-  - When pane command is npm/node, send Ctrl-C
-  - Anything else -> do nothing, warn "There are unknown commands still running"
-    etc.
+  - Anything else running? --> Ask
+  - When confirmed, send Ctrl-C
 - Save sessions, windows, panes, layout, active session/window/pane, zoomed or
   not, etc.
 - Restore all the above, rerun cmds (see above), open vims via `vs`
