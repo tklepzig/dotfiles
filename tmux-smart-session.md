@@ -1,11 +1,11 @@
 # ToDo
 
-- Stop command and run it again when restoring
-  - When pane command is vim, close with session (what if unsaved changes?)
-  - Anything else running? --> Ask
-  - When confirmed, send Ctrl-C
-- Close all panes, windows, sessions
-- Restore all the above, rerun cmds (see above), open vims via `vs`
+- Refactor code, remove redundancy (1000 times session, window, pane args...)
+- Add cli switch to skip confirmation of C-c running commands (--no-kill-prompt)
+- Add cli arg for save only w/o close (--save-only)
+- Improve send_keys abstraction (there is one raw call for the special vim
+  handling)
+- Add special handling for ranger?
 
 # Get current session name
 
