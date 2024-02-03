@@ -132,20 +132,31 @@ end
 def start_command(session, window, pane)
   return if pane['command'].nil? || pane['command'].include?($PROGRAM_NAME)
 
-  send_keys(session['name'], window['index'], pane['index'], pane['command'])
+  if pane['command'].include?('vim')
+    send_keys(session['name'], window['index'], pane['index'], 'vs')
+  else
+    send_keys(session['name'], window['index'], pane['index'], pane['command'])
+  end
 end
 
-def kill_command(session, window, pane)
+def stop_command(session, window, pane)
   return if pane['command'].nil? || pane['command'].include?($PROGRAM_NAME)
 
-  send_keys(session['name'], window['index'], pane['index'], 'C-c', no_enter: true)
+  if pane['command'].include?('vim')
+    `tmux send-keys -t "#{session['name']}:#{window['index']}.#{pane['index']}" Escape ':mksession!|:wqa!' Enter`
+    sleep 1
+  else
+    puts "Found still running command: \"#{pane['command']}\", confirm kill? (y/n)"
+    answer = $stdin.gets.chomp
+    send_keys(session['name'], window['index'], pane['index'], 'C-c', no_enter: true) if answer == 'y'
+  end
 end
 
 def close_all(sessions)
   sessions['sessions'].each do |session|
     session['windows'].reverse.each do |window|
       window['panes'].reverse.each do |pane|
-        kill_command(session, window, pane)
+        stop_command(session, window, pane)
         send_keys(session['name'], window['index'], pane['index'], 'exit')
       end
     end
