@@ -18,6 +18,7 @@ html {
    * the sticky header
    */
   scroll-padding-top: 3rem;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
