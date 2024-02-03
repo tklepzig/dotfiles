@@ -1,13 +1,11 @@
-# Idea
+# ToDo
 
 - Stop command and run it again when restoring
   - When pane command is vim, close with session (what if unsaved changes?)
   - Anything else running? --> Ask
   - When confirmed, send Ctrl-C
-- Save sessions, windows, panes, layout, active session/window/pane, zoomed or
-  not, etc.
+- Close all panes, windows, sessions
 - Restore all the above, rerun cmds (see above), open vims via `vs`
-- Maybe also save and restore `pane_search_string`
 
 # Get current session name
 
