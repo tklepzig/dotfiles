@@ -13,8 +13,8 @@ def add_window(session_name, dir, active: false)
   `tmux new-window #{active ? '' : '-d'} -t "#{session_name}:" -n "" -c "#{dir}"`
 end
 
-def new_session(session_name, dir)
-  `tmux new-session -d -s "#{session_name}" -n "" -c "#{dir}"`
+def new_session(session_name)
+  `tmux new-session -d -s "#{session_name}" -n ""`
 end
 
 def split_window(session_name, window_index, dir, active: false)
@@ -23,6 +23,10 @@ end
 
 def window_set_layout(session_name, window_index, layout)
   `tmux select-layout -t "#{session_name}:#{window_index}" "#{layout}"`
+end
+
+def send_keys(session_name, window_index, pane_index, keys, no_enter: false)
+  `tmux send-keys -t "#{session_name}:#{window_index}.#{pane_index}" "#{keys}" #{no_enter ? '' : 'Enter'}`
 end
 
 def tty_command(tty)
@@ -88,7 +92,7 @@ def restore_panes(session, window)
 
   panes.each_with_index do |pane, index|
     split_window(session['name'], window['index'], pane['path'], active: pane['active']) unless index.zero?
-
+    start_command(session, window, pane)
     window_set_layout(session['name'], window['index'], window['layout'])
   end
 
@@ -107,7 +111,10 @@ def restore_windows(session)
     if session_exists? session['name']
       add_window(session['name'], window['panes'].first['path'], active: window['active'])
     else
-      new_session(session['name'], window['panes'].first['path'])
+      new_session(session['name'])
+      # Don't use new-session's -c option to set the initial directory, use cd instead
+      # Reason: new-session's -c option sets the initial directory for all windows, not just the first one
+      send_keys(session['name'], window['index'], 1, "cd '#{window['panes'].first['path']}' && clear")
     end
 
     restore_panes(session, window)
@@ -122,12 +129,36 @@ def restore(sessions)
   `tmux attach -t #{sessions['sessions'].filter { |session| session['active'] }.first['name']}`
 end
 
+def start_command(session, window, pane)
+  return if pane['command'].nil? || pane['command'].include?($PROGRAM_NAME)
+
+  send_keys(session['name'], window['index'], pane['index'], pane['command'])
+end
+
+def kill_command(session, window, pane)
+  return if pane['command'].nil? || pane['command'].include?($PROGRAM_NAME)
+
+  send_keys(session['name'], window['index'], pane['index'], 'C-c', no_enter: true)
+end
+
+def close_all(sessions)
+  sessions['sessions'].each do |session|
+    session['windows'].reverse.each do |window|
+      window['panes'].reverse.each do |pane|
+        kill_command(session, window, pane)
+        send_keys(session['name'], window['index'], pane['index'], 'exit')
+      end
+    end
+  end
+end
+
 action = ARGV[0]
 
 case action
 when 's'
   File.write('./sessions.json', tmux_info.to_json)
-  puts JSON.pretty_generate(tmux_info)
+  # puts JSON.pretty_generate(tmux_info)
+  close_all(JSON.parse(File.read('./sessions.json')))
 when 'r'
   if ENV['TMUX']
     puts 'A tmux session is already running, aborting.'
