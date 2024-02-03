@@ -1,6 +1,12 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'json'
+
+def tty_command(tty)
+  `ps -t #{tty} -H -o args=`.split(/\n/).map(&:strip).at(1)
+end
+
 def tmux_sessions
   `tmux list-sessions -F "#\{session_name\}"`.split(/\n/)
 end
@@ -15,19 +21,20 @@ end
 
 def tmux_panes(session_name, window_index)
   # Maybe using a comma as divider is not the best idea (thinking of filenames and paths with a comma in it)
-  pane_list = `tmux list-panes -t "#{session_name}:#{window_index}" -F "#\{pane_index\},#\{pane_active\},#\{pane_current_path\},#\{pane_current_command\}"`.split(/\n/)
+  pane_list = `tmux list-panes -t "#{session_name}:#{window_index}" -F "#\{pane_index\},#\{pane_active\},#\{pane_tty\},#\{pane_current_path\}"`.split(/\n/)
   pane_list.map do |pane|
-    index, active, path, command = pane.split(/,/)
+    index, active, tty, path = pane.split(/,/)
+    command = tty_command(tty)
     [index, { active: !active.to_i.zero?, path:, command: }]
   end
 end
 
 def tmux_info
-  tmux_sessions.reduce({}) do |sessions_acc, session_name|
-    windows = tmux_windows(session_name).reduce({}) do |windows_acc, window|
+  tmux_sessions.reduce({}) do |sessions_acc, session|
+    windows = tmux_windows(session).reduce({}) do |windows_acc, window|
       window_index, window_info = window
 
-      panes = tmux_panes(session_name, window_index).reduce({}) do |panes_acc, pane|
+      panes = tmux_panes(session, window_index).reduce({}) do |panes_acc, pane|
         pane_index, pane_info = pane
         panes_acc.merge(pane_index => pane_info)
       end
@@ -37,8 +44,26 @@ def tmux_info
                           panes:
                         } })
     end
-    sessions_acc.merge({ session_name => { windows: } })
+    sessions_acc.merge({ session => { windows: } })
   end
 end
 
-pp tmux_info
+def tmux_info_array
+  sessions = tmux_sessions.map do |session|
+    windows = tmux_windows(session).map do |window|
+      window_index, window_info = window
+
+      panes = tmux_panes(session, window_index).map do |pane|
+        pane_index, pane_info = pane
+        { index: pane_index, **pane_info }
+      end
+
+      { index: window_index, **window_info, panes: }
+    end
+
+    { name: session, windows: }
+  end
+  { sessions: }
+end
+
+puts JSON.pretty_generate(tmux_info_array)

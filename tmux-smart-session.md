@@ -24,7 +24,7 @@
 
 # Get pane infos (-t is session_name:window_index)
 
-    tmux list-panes -t "my session:1" -F '#{pane_active} #{pane_index} #{pane_pid} #{pane_current_command}'
+    tmux list-panes -t "my session:1" -F '#{pane_active} #{pane_index} #{pane_tty} #{pane_current_command}'
 
 # Restore window layout
 
@@ -48,3 +48,7 @@
     kill -INT -888
     # Force kill
     kill -9 888
+
+# Get commands in process tree for tty
+
+    ps -t /dev/pts/5 -H -o args=
