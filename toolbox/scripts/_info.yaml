@@ -57,13 +57,11 @@ inhibit:
     - suspend
     - idle
 luks-close:
-  help: |-
-    Close LUKS container
+  help: Close LUKS container
   args:
     - name: path/to/container
 luks-open:
-  help: |-
-    Open LUKS container
+  help: Open LUKS container
   args:
     - name: path/to/container
 mastermind:
@@ -75,8 +73,7 @@ notify:
 npm-tabula-rasa:
   help: Recursively remove node_modules
 set-theme:
-  help: |-
-    Set the theme for kitty, tmux and vim
+  help: Set the theme for kitty, tmux and vim
   args:
     - name: theme name
   completion:
@@ -87,13 +84,25 @@ set-theme:
     - lcars-light
 setup-asdf:
   help: Set up asdf and plugins
+tmux-session:
+  help: Archive or restore tmux session
+  args:
+    - name: Action ( restore | archive )
+    - name: --save-only
+      optional: true
+    - name: --no-kill
+      optional: true
+  completion:
+    - restore
+    - archive
+    - --save-only
+    - --no-kill
 vicy:
   help: Opens vicy's CLI
 vicy-serve:
   help: Open vicy in browser
 weather:
-  help: |-
-    Get the weather forecast
+  help: Get the weather forecast
   args:
     - name: location
       optional: true

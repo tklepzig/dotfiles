@@ -92,7 +92,7 @@ if infos[script_name].respond_to?(:key?) && infos[script_name].key?('args')
   mandatory_args = args.filter { |arg| !arg['optional'] }
   if cmd_args.length < mandatory_args.length
     puts 'Error: Missing args:'
-    puts mandatory_args.map { |arg| arg[:name] }[cmd_args.length..]
+    puts mandatory_args.map { |arg| arg['name'] }[cmd_args.length..]
     exit 1
   end
 
