@@ -84,7 +84,7 @@ set-theme:
     - lcars-light
 setup-asdf:
   help: Set up asdf and plugins
-tmux-session:
+tmux-archive:
   help: Archive or restore tmux session
   args:
     - name: --save-only (only valid when archiving)
