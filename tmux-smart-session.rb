@@ -4,6 +4,9 @@
 require 'English'
 require 'json'
 
+NO_KILL = ARGV.include?('--no-kill')
+SAVE_ONLY = ARGV.include?('--save-only')
+
 def session_exists?(session_name)
   `tmux has-session -t "#{session_name}" 2>/dev/null`
   $CHILD_STATUS == 0
@@ -65,7 +68,7 @@ def tmux_panes(session_name, window_index)
   end
 end
 
-def tmux_info
+def tmux_snapshot
   sessions = tmux_sessions.map do |session|
     session_name, session_info = session
 
@@ -145,15 +148,28 @@ def stop_command(session, window, pane)
   if pane['command'].include?('vim')
     `tmux send-keys -t "#{session['name']}:#{window['index']}.#{pane['index']}" Escape ':mksession!|:wqa!' Enter`
     sleep 1
-  else
-    puts "Found still running command: \"#{pane['command']}\", confirm kill? (y/n)"
-    answer = $stdin.gets.chomp
-    send_keys(session['name'], window['index'], pane['index'], 'C-c', no_enter: true) if answer == 'y'
+    return
   end
+
+  if pane['command'].include?('ranger')
+    `tmux send-keys -t "#{session['name']}:#{window['index']}.#{pane['index']}" :`
+    sleep 0.5
+    `tmux send-keys -t "#{session['name']}:#{window['index']}.#{pane['index']}" 'quit!' Enter`
+    sleep 1
+    return
+  end
+
+  if NO_KILL
+    puts 'Found unknown running commands, aborting...'
+    sleep 5
+    exit 1
+  end
+
+  send_keys(session['name'], window['index'], pane['index'], 'C-c', no_enter: true)
 end
 
-def close_all(sessions)
-  sessions['sessions'].each do |session|
+def close_all(snapshot)
+  snapshot['sessions'].each do |session|
     session['windows'].reverse.each do |window|
       window['panes'].reverse.each do |pane|
         stop_command(session, window, pane)
@@ -166,18 +182,23 @@ end
 action = ARGV[0]
 
 case action
-when 's'
+when 'archive'
   unless ENV['TMUX']
     puts 'Not inside a tmux session, aborting.'
     exit 1
   end
-  File.write('./sessions.json', tmux_info.to_json)
-  # puts JSON.pretty_generate(tmux_info)
-  close_all(JSON.parse(File.read('./sessions.json')))
-when 'r'
+  snapshot = tmux_snapshot
+  File.write("#{ENV['HOME']}/.df-tmux-sessions.json", snapshot.to_json)
+
+  # Transforming the keys to strings to be able to treat the hash the same way as it was read from the file
+  close_all(JSON.parse(snapshot.to_json)) unless SAVE_ONLY
+when 'restore'
   if ENV['TMUX']
     puts 'A tmux session is already running, aborting.'
     exit 1
   end
-  restore(JSON.parse(File.read('./sessions.json')))
+  restore(JSON.parse(File.read("#{ENV['HOME']}/.df-tmux-sessions.json")))
+else
+  puts "Unknown action: #{action}"
+  puts "Usage: #{$PROGRAM_NAME} archive | restore [--no-kill] [--save-only]"
 end

@@ -1,11 +1,8 @@
 # ToDo
 
 - Refactor code, remove redundancy (1000 times session, window, pane args...)
-- Add cli switch to skip confirmation of C-c running commands (--no-kill-prompt)
-- Add cli arg for save only w/o close (--save-only)
 - Improve send_keys abstraction (there is one raw call for the special vim
   handling)
-- Add special handling for ranger?
 
 # Get current session name
 
