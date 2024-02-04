@@ -1,6 +1,7 @@
 # ToDo
 
 - Refactor code, remove redundancy (1000 times session, window, pane args...)
+- Re-assess comma as separator
 - Improve send_keys abstraction (there is one raw call for the special vim
   handling)
 
