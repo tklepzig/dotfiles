@@ -87,14 +87,11 @@ setup-asdf:
 tmux-session:
   help: Archive or restore tmux session
   args:
-    - name: Action ( restore | archive )
-    - name: --save-only
+    - name: --save-only (only valid when archiving)
       optional: true
-    - name: --no-kill
+    - name: --no-kill (only valid when archiving)
       optional: true
   completion:
-    - restore
-    - archive
     - --save-only
     - --no-kill
 vicy:

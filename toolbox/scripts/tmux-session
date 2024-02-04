@@ -179,26 +179,12 @@ def close_all(snapshot)
   end
 end
 
-action = ARGV[0]
-
-case action
-when 'archive'
-  unless ENV['TMUX']
-    puts 'Not inside a tmux session, aborting.'
-    exit 1
-  end
+if ENV['TMUX']
   snapshot = tmux_snapshot
   File.write("#{ENV['HOME']}/.df-tmux-sessions.json", snapshot.to_json)
 
   # Transforming the keys to strings to be able to treat the hash the same way as it was read from the file
   close_all(JSON.parse(snapshot.to_json)) unless SAVE_ONLY
-when 'restore'
-  if ENV['TMUX']
-    puts 'A tmux session is already running, aborting.'
-    exit 1
-  end
-  restore(JSON.parse(File.read("#{ENV['HOME']}/.df-tmux-sessions.json")))
 else
-  puts "Unknown action: #{action}"
-  puts "Usage: #{$PROGRAM_NAME} restore | archive [--no-kill] [--save-only]"
+  restore(JSON.parse(File.read("#{ENV['HOME']}/.df-tmux-sessions.json")))
 end
