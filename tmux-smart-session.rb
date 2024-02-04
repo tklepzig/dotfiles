@@ -167,6 +167,10 @@ action = ARGV[0]
 
 case action
 when 's'
+  unless ENV['TMUX']
+    puts 'Not inside a tmux session, aborting.'
+    exit 1
+  end
   File.write('./sessions.json', tmux_info.to_json)
   # puts JSON.pretty_generate(tmux_info)
   close_all(JSON.parse(File.read('./sessions.json')))
