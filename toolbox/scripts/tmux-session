@@ -200,5 +200,5 @@ when 'restore'
   restore(JSON.parse(File.read("#{ENV['HOME']}/.df-tmux-sessions.json")))
 else
   puts "Unknown action: #{action}"
-  puts "Usage: #{$PROGRAM_NAME} archive | restore [--no-kill] [--save-only]"
+  puts "Usage: #{$PROGRAM_NAME} restore | archive [--no-kill] [--save-only]"
 end
