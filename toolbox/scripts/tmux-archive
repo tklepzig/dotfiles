@@ -7,6 +7,10 @@ require 'json'
 NO_KILL = ARGV.include?('--no-kill')
 SAVE_ONLY = ARGV.include?('--save-only')
 
+def linux?
+  (/linux/ =~ RUBY_PLATFORM) != nil
+end
+
 def session_exists?(session_name)
   `tmux has-session -t "#{session_name}" 2>/dev/null`
   $CHILD_STATUS == 0
@@ -33,7 +37,7 @@ def send_keys(session_name, window_index, pane_index, keys, no_enter: false)
 end
 
 def tty_command(tty)
-  `ps -t #{tty} -H -o args=`.split(/\n/).map(&:strip).at(1)
+  `ps -t #{tty}#{linux? ? ' -H' : ''} -o args=`.split(/\n/).map(&:strip).at(1)
 end
 
 def tmux_sessions
