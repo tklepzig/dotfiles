@@ -59,8 +59,8 @@ vmap <leader>f <Plug>CtrlSFVwordExec
 nnoremap <leader>e :Ranger <CR>
 
 " Jump to next/prev spell check issue
-nnoremap <leader>c ]s
-nnoremap <leader>C [s
+nnoremap <silent> gs ]s
+nnoremap <silent> gS [s
 
 nnoremap <silent> zj :call JumpToSameIndent('down', 0)<CR>
 vnoremap <silent> zj :call JumpToSameIndent('down', 1)<CR>
