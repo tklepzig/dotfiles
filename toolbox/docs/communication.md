@@ -89,3 +89,12 @@
 - "Lieblingswörter"
   - actually
 - Den Blick nicht ständig zwischen Publikum und Präsentation wechseln wenn sich die Slide gar nicht geändert hat
+
+# Coaching Todo
+
+1. Zeigen
+2. Selbst entscheiden, aber mit involvieren
+3. Teilaufgaben delegieren (keine komplette Lösung), Coach muss jederzeit für Fragen verfügbar sein, zeitnahes/synchrones Review
+4. Delegieren ohne Pairing, Feedback Cycle ist länger
+
+Ein Coachee: Profil aufbauen, was ist transportiert, was nicht, wo fehlt Übung, nicht zu optimistisch
