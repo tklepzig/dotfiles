@@ -292,7 +292,7 @@ Setup WiFi, Keyboard Layout, etc.
 Additional Software (run as non-privileged user)
 
     sudo pacman -S xclip the_silver_searcher ranger tig fzf lynx xdotool eza peco sshfs pwgen mat2 btop net-tools
-    sudo pacman -S nautilus gparted eog gnome-tweaks gdmap texlive-core texlive-latexextra evince xpdf texworks pass
+    sudo pacman -S nautilus gparted eog gnome-tweaks gdmap texlive-core texlive-latexextra texlive-binextra evince xpdf texworks pass
     sudo pacman -S easytag audacity gimp vlc pqiv git-delta jless git-filter-repo
     sudo pacman -S networkmanager-vpnc android-tools
 
