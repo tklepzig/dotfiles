@@ -79,6 +79,9 @@ vnoremap K 3<C-y>
 " List contents of all registers (that typically contain pasteable text) (from https://superuser.com/a/656954)
 nnoremap <silent> "" :registers 0123456789abcdefghijklmnopqrstuvwxyz<CR>
 
+" List all custom marks
+nnoremap <silent> '' :marks abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ<CR>
+
 nnoremap <leader>u :UndotreeToggle \| UndotreeFocus<CR>
 
 function! s:BigSmallWin()
