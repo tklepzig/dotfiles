@@ -1,3 +1,7 @@
+TODO: Improve overall docs for gpg multipurpose  
+See also
+https://www.linuxbabe.com/security/a-practical-guide-to-gpg-part-1-generate-your-keypair
+
 # Create key pair
 
 ```
@@ -60,7 +64,8 @@ gpg --delete-secret-key user@example.com
 
 ## Add public key
 
-Import your public key to your git provider (e.g. https://github.com/settings/keys)
+Import your public key to your git provider (e.g.
+https://github.com/settings/keys)
 
 ## Add GPG key
 
@@ -76,7 +81,8 @@ git config commit.gpgsign true
 
 # Cache password for private key
 
-The gpg-agent daemon is used for caching. Add the following line to `~/.gnupg/gpg-agent.conf`
+The gpg-agent daemon is used for caching. Add the following line to
+`~/.gnupg/gpg-agent.conf`
 
 ```
 default-cache-ttl 43200
