@@ -1,0 +1,10 @@
+#!/usr/bin/env zsh
+
+stdin=$(cat -)
+if [[ $(echo $stdin | sed -n '/BEGIN PGP MESSAGE/p;q') ]]
+then
+  echo $stdin | gpg --decrypt -q -r "$1"
+else
+  echo $stdin
+fi
+

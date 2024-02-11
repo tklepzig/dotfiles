@@ -1,0 +1,61 @@
+#!/usr/bin/env zsh
+
+stdin=$(cat -)
+hash=$(echo $stdin | shasum -a 256)
+
+# WIP
+
+# TODO if hash itself has changes, don't do the git show!
+# Here we use both diff methods
+#if [[ $(git diff ".hash/$2.256") ]]
+#then
+#echo $stdin | gpg --encrypt --armor -r "$1"
+#exit 0
+#fi
+
+#if [[ $(git diff --staged ".hash/$2.256") ]]
+#then
+#echo $stdin | gpg --encrypt --armor -r "$1"
+#exit 0
+#fi
+
+# Here we get the hash directly from the history
+master_hash=$(git show master:".hash/$2.256" 2>/dev/null)
+if [[ $? -ne 0 ]]
+then
+  master_hash=""
+fi
+
+# TODO improve this whole if, else mess!
+# TODO For whatever reason, (n)vim creates
+# tmp files (which should go under /tmp)
+# inside of the hash dir, like /hash/tmp/neovim...???
+# --> It is gone when the mkdir -p logic is removed... (Hä??)
+if [[ $hash == $master_hash ]]
+then
+  git show master:"$2" 2>/dev/null
+  if [[ $? -ne 0 ]]
+  then
+    # file is new, doesn't exist in master yet
+
+    if [[ ! -d $(dirname ".hash/$2.256") ]]
+    then
+      mkdir -p $(dirname ".hash/$2.256")
+    fi
+
+    echo $stdin | shasum -a 256 > ".hash/$2.256"
+    echo $stdin | gpg --encrypt --armor -r "$1" 
+  fi
+else
+  if [[ $(echo $stdin | sed -n '/BEGIN PGP MESSAGE/p;q') ]]
+  then
+    echo $stdin
+  else
+    if [[ ! -d $(dirname ".hash/$2.256") ]]
+    then
+      mkdir -p $(dirname ".hash/$2.256")
+    fi
+    echo $stdin | shasum -a 256 > ".hash/$2.256"
+    echo $stdin | gpg --encrypt --armor -r "$1" 
+  fi
+fi
