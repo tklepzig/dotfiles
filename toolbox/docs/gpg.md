@@ -89,3 +89,11 @@ default-cache-ttl 43200
 ```
 
 Now the password is cached for 12 hours.
+
+## Pinentry issues?
+
+- Add `no-tty` to `.gnupg/gpg.conf`
+- Run `brew install pinentry-mac`
+- Add `pinentry-program /opt/homebrew/bin/pinentry-mac` to
+  `.gnupg/gpg-agent.conf`
+- Run `gpgconf --kill gpg-agent` after change the conf file
