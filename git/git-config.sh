@@ -74,6 +74,7 @@ git config --global alias.ap "add --patch"
 git config --global alias.co "commit -m"
 git config --global alias.coa "commit --amend"
 git config --global alias.coe "commit --amend --no-edit"
+git config --global alias.cora "commit --amend --reset-author --no-edit"
 git config --global alias.aco "!f() { git add --all && git commit -m \"\$1\"; }; f"
 git config --global alias.acop "!f() { git add --all && git commit -m \"\$1\" && git push --follow-tags; }; f"
 
