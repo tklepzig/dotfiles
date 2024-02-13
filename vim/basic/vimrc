@@ -182,7 +182,7 @@ set wildoptions=pum
 set shiftround
 
 function! s:QuickMemo(ext = "md")
-  let path = $HOME . '/vim-quick-memo/'
+  let path = get(g:,"quick_memo_path", $HOME . '/vim-quick-memo')
   let filePath = expand("%:t")
 
   if !empty(filePath)
@@ -200,7 +200,7 @@ function! s:QuickMemo(ext = "md")
     let firstChars = '--' . substitute(firstLine[:29], '/', ' ', 'g')
   endif
 
-  execute('w ' . path . strftime('%Y-%m-%d-%H:%M:%S') . firstChars . '.' . a:ext)
+  execute('w ' . path . '/' . strftime('%Y-%m-%d-%H:%M:%S') . firstChars . '.' . a:ext)
 endfunction
 command! -nargs=? QuickMemo :call <SID>QuickMemo(<f-args>)
 
