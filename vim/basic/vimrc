@@ -197,7 +197,9 @@ function! s:QuickMemo(ext = "md")
   let firstChars = ''
   let firstLine = getline(1)
   if !empty(firstLine)
-    let firstChars = '--' . substitute(firstLine[:29], '/', ' ', 'g')
+    let firstCharsSafe = substitute(firstLine[:29], '/', '-', 'g')
+    let firstCharsSafe = substitute(firstCharsSafe, '\#', '\\#', 'g')
+    let firstChars = '--' . firstCharsSafe
   endif
 
   execute('w ' . path . '/' . strftime('%Y-%m-%d-%H:%M:%S') . firstChars . '.' . a:ext)
