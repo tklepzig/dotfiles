@@ -13,7 +13,6 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'dyng/ctrlsf.vim'
 Plug 'Yggdroot/indentLine'
 Plug 'benmills/vimux'
-Plug 'francoiscabrol/ranger.vim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'tklepzig/vim-buffer-navigator'

@@ -55,9 +55,6 @@ nmap <leader>F :CtrlSF<CR>
 nmap <leader>f <Plug>CtrlSFPrompt
 vmap <leader>f <Plug>CtrlSFVwordExec
 
-" ranger
-nnoremap <leader>e :Ranger <CR>
-
 " Jump to next/prev spell check issue
 nnoremap <silent> gs ]s
 nnoremap <silent> gS [s
