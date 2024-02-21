@@ -30,3 +30,7 @@ base from `oldBase` to `newBase`
 
     cd old-repo
     git push https://github.com/new/repo.git +old-branch:new-branch [+old-other:new-other ...]
+
+> When there should be no history at all, create a orphaned branch in the
+> old-repo, see
+> https://git-scm.com/docs/git-checkout#Documentation/git-checkout.txt---orphanltnew-branchgt
