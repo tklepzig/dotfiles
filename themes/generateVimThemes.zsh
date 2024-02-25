@@ -1,5 +1,6 @@
 #!/usr/bin/env zsh
 
+# WIP
 dotfilesDir=$HOME/.dotfiles
 for file in $dotfilesDir/themes/colours.*.zsh
 do
