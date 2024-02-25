@@ -8,57 +8,40 @@ DF_REPO ||= ENV['DOTFILES_REPO'] || 'tklepzig/dotfiles'
 HOME ||= ENV['HOME']
 DF_PROFILES ||= ENV['DOTFILES_PROFILES'] || ''
 DF_THEME ||= ENV['DOTFILES_THEME']
-DF_PATH ||= "#{HOME}/.dotfiles"
+DF_PATH ||= "#{HOME}/.dotfiles".freeze
 
 # https://rubystyle.guide/
 # TODO: symlink my own global config to $HOME/.rubocop.yml
 
-class String
-  def accent
-    colorize "\e[1;34m"
-  end
-
-  def success
-    colorize "\e[0;92m"
-  end
-
-  def error
-    colorize "\e[0;91m"
-  end
-
-  private
-
-  def colorize(color)
-    "#{color}#{self}\e[0m"
-  end
-end
-
 module Logger
   @level = 0
 
-  def self.log(*message_parts, newline: true)
-    message = message_parts.join
+  def self.log(message)
+    prefix = @level.zero? ? "\e[1;34m\u276f " : ''
     message = message.rjust(message.length + 2 * @level)
+    puts "#{prefix}\e[0;34m#{message}\e[0m"
 
-    if newline
-      puts message
-    else
-      print message
+    if block_given?
+      @level += 1
+      yield
+      @level -= 1
+      @level = 0 if @level.negative?
     end
   end
 
-  def self.indent
-    @level += 1
+  def self.success(message)
+    prefix = @level.zero? ? "\e[1;36m\u276f " : ''
+    message = message.rjust(message.length + 2 * @level)
+    puts "#{prefix}\e[0;36m#{message}\e[0m"
   end
 
-  def self.outdent
-    @level -= 1
-    @level = 0 if @level.negative?
+  def self.error(message)
+    prefix = @level.zero? ? "\e[1;31m\u276f " : ''
+    message = message.rjust(message.length + 2 * @level)
+    puts "#{prefix}\e[0;31m#{message}\e[0m"
   end
 
-  def self.reset_indentation
-    @level = 0
-  end
+  def log; end
 end
 
 module OS
@@ -95,37 +78,36 @@ def program_installed?(program)
 end
 
 def check_mandatory_installation(program)
-  Logger.log 'Searching for ', program.accent, '...', newline: false
+  Logger.log "Searching for #{program}" do
+    unless program_installed? program
+      Logger.error 'Not found, aborting'
+      exit(false)
+    end
 
-  unless program_installed? program
-    Logger.log ' Not found, aborting'.error
-    exit(false)
+    path = `which #{program}`
+    Logger.success "Found: #{path.strip}."
   end
-
-  path = `which #{program}`
-  Logger.log " Found: #{path.strip}.".success
 end
 
 def check_optional_installation(program, install_name = program)
-  Logger.log 'Searching for ', program.accent, '...', newline: false
-
-  if program_installed? program
-    Logger.log ' Found.'.success
-    return
+  Logger.log "Searching for #{program}" do
+    if program_installed? program
+      path = `which #{program}`
+      Logger.success "Found: #{path.strip}."
+    else
+      Logger.error "Not Found. (Try \"sudo pacman -S #{install_name}\")"
+    end
   end
-
-  Logger.log " Not Found. (Try \"sudo pacman -S #{install_name}\")".error
 end
 
 def write_link(link, file, command = 'source')
   `grep -q #{link} #{file}`
   return if $CHILD_STATUS.success?
 
-  Logger.log 'Adding link to ', file.accent, '...', newline: false
+  Logger.log "Adding #{link} to #{file}"
   File.open(file, 'a') do |f|
     f.puts "#{command} #{link}"
   end
-  Logger.log ' Done.'.success
 end
 
 def add_link_with_override(link, file, command = 'source')
@@ -151,17 +133,13 @@ end
 
 def install_profiles
   (['basic'] + DF_PROFILES.split(' ')).each do |profile|
-    Logger.log 'Installing Profile ', profile.accent, '...'
-    Logger.indent
+    Logger.log "Installing Profile #{profile}" do
+      link_vim_plugins profile
+      add_link_with_override "#{DF_PATH}/vim/#{profile}/vimrc", "#{HOME}/.vimrc"
 
-    link_vim_plugins profile
-    add_link_with_override "#{DF_PATH}/vim/#{profile}/vimrc", "#{HOME}/.vimrc"
-
-    setup_file = "#{DF_PATH}/vim/#{profile}/install.rb"
-    require setup_file if File.exist?(setup_file)
-
-    Logger.reset_indentation
-    Logger.log 'Done.'.success
+      setup_file = "#{DF_PATH}/vim/#{profile}/install.rb"
+      require setup_file if File.exist?(setup_file)
+    end
   end
 end
 
@@ -169,8 +147,12 @@ def install
   check_mandatory_installation 'git'
   check_mandatory_installation 'zsh'
 
+  check_optional_installation 'eza'
+  check_optional_installation 'tmux'
+  check_optional_installation 'lynx'
+
   if Dir.exist?(DF_PATH)
-    Logger.log "Found existing dotfiles in #{DF_PATH}, updating...", newline: false
+    Logger.log "Found existing dotfiles in #{DF_PATH}, updating"
     Dir.chdir(DF_PATH) do
       # Update repo
       `git fetch --depth=1 > /dev/null 2>&1`
@@ -180,10 +162,9 @@ def install
       `git clean -fx > /dev/null 2>&1`
     end
   else
-    Logger.log "Cloning repo to #{DF_PATH}...", newline: false
+    Logger.log "Cloning repo to #{DF_PATH}"
     `git clone --depth=1 https://github.com/#{DF_REPO}.git #{DF_PATH} > /dev/null 2>&1`
   end
-  Logger.log ' Done.'.success
 
   `#{DF_PATH}/toolbox/scripts/set-theme`
   add_link_with_override "#{DF_PATH}/colours.vim", "#{HOME}/.vimrc"
@@ -203,32 +184,28 @@ def install
   add_link_with_override "#{DF_PATH}/zsh/zshrc", "#{HOME}/.zshrc"
 
   unless File.exist?("#{HOME}/.bc")
-    Logger.log 'Creating config file for bc...', newline: false
+    Logger.log 'Creating config file for bc'
     File.write("#{HOME}/.bc", "scale=2\n")
-    Logger.log 'Done.'.success
   end
 
-  Logger.log 'Initializing toolbox...'
-  add_link_with_override "#{DF_PATH}/toolbox/init.zsh", "#{HOME}/.zshrc"
-  `#{DF_PATH}/toolbox/docs/_write-index.rb`
-  Logger.log 'Done.'.success
+  Logger.log 'Initializing toolbox' do
+    add_link_with_override "#{DF_PATH}/toolbox/init.zsh", "#{HOME}/.zshrc"
+    `#{DF_PATH}/toolbox/docs/_write-index.rb`
+  end
 
-  unless Dir.exist?("#{HOME}/.vim/autoload/plug.vim")
-    Logger.log 'Installing vim-plug...', newline: false
+  unless File.exist?("#{HOME}/.vim/autoload/plug.vim")
+    Logger.log 'Installing vim-plug'
     `curl -fLo #{HOME}/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim>/dev/null 2>&1`
-    Logger.log ' Done.'.success
   end
 
-  Logger.log 'Installing and updating vim plugins...', newline: false
+  Logger.log 'Installing and updating vim plugins'
   # "echo" to suppress the "Please press ENTER to continue...
   `echo | vim +PlugInstall +PlugUpdate +qall > /dev/null 2>&1`
-  Logger.log ' Done.'.success
 
   if DF_PROFILES.include?('dev')
     # The dev profile is activated and so the coc plugin is installed
-    Logger.log 'Updating coc extensions...', newline: false
+    Logger.log 'Updating coc extensions'
     `echo | vim +CocUpdateSync +qall > /dev/null 2>&1`
-    Logger.log ' Done.'.success
   end
 
   if OS.mac?
@@ -244,26 +221,19 @@ def install
   end
 
   unless Dir.exist?("#{HOME}/.fzf")
-    Logger.log 'Installing fzf...', newline: false
+    Logger.log 'Installing fzf'
     `git clone --depth 1 https://github.com/junegunn/fzf.git #{HOME}/.fzf > /dev/null 2>&1`
     `#{HOME}/.fzf/install --all > /dev/null 2>&1`
-    Logger.log ' Done.'.success
   end
 
-  check_optional_installation 'eza'
-  check_optional_installation 'tmux'
-  check_optional_installation 'lynx'
-
-  Logger.log 'Configuring Git...', newline: false
+  Logger.log 'Configuring Git'
   `#{DF_PATH}/git/git-config.sh`
-  Logger.log ' Done.'.success
 
   if program_installed? 'docker'
-    Logger.log 'Installing docker completion...', newline: false
+    Logger.log 'Installing docker completion'
     `mkdir -p #{HOME}/.zsh/completion`
     `curl -L https://raw.githubusercontent.com/docker/cli/master/contrib/completion/zsh/_docker > #{HOME}/.zsh/completion/_docker 2>/dev/null`
     `curl -L https://raw.githubusercontent.com/docker/compose/master/contrib/completion/zsh/_docker-compose > #{HOME}/.zsh/completion/_docker-compose 2>/dev/null`
-    Logger.log ' Done.'.success
   end
 
   default_shell = if OS.mac?
@@ -273,21 +243,23 @@ def install
                   end
 
   if default_shell != `which zsh`
-    Logger.log 'Setting default shell to zsh...', newline: false
-    `chsh -s $(which zsh)`
-    Logger.log ' Done.'.success
-    Logger.log 'Please notice: In order to use the new shell, you have to logout and back in.'.accent
+    Logger.log 'Setting default shell to zsh' do
+      `chsh -s $(which zsh)`
+      Logger.log 'Please notice: In order to use the new shell, you have to logout and back in.'
+    end
   end
 
   post_install_script = "#{HOME}/.df-post-install"
   if File.exist?(post_install_script) && File.executable?(post_install_script)
-    Logger.log 'Running post install script...'
-    result = `#{post_install_script}`
-    Logger.log result
-    Logger.log 'Done.'.success
+    Logger.log 'Running post install script' do
+      result = `#{post_install_script}`
+      result.split(/\n/).each { |line| Logger.log line }
+    end
   end
 
-  Logger.log 'Setup done.'.success
+  Dir.chdir(DF_PATH) do
+    Logger.success "Successfully installed dotfiles version #{`git rev-parse --short HEAD`}"
+  end
 end
 
 def tabula_rasa
