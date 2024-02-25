@@ -19,7 +19,7 @@ git config --global help.autoCorrect prompt
 git config --global rerere.enabled true
 
 
-# Try delta (https://dandavison.github.io/delta) as diff viewer
+# delta stuff (https://dandavison.github.io/delta)
 git config --global core.pager delta
 git config --global diff.colorMoved default
 git config --global merge.conflictstyle diff3

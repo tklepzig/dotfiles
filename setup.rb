@@ -100,11 +100,18 @@ def check_optional_installation(program, install_name = program)
   end
 end
 
+def remove_links(pattern, file)
+  return unless File.exist?(file)
+
+  Logger.log "Removing pattern '#{pattern}' from #{file}"
+  `sed "/#{pattern}/d" #{file} > #{file}.tmp && mv #{file}.tmp #{file}`
+end
+
 def write_link(link, file, command = 'source')
   `grep -q #{link} #{file}`
   return if $CHILD_STATUS.success?
 
-  Logger.log "Adding #{link} to #{file}"
+  Logger.log "Adding '#{link}' to #{file}"
   File.open(file, 'a') do |f|
     f.puts "#{command} #{link}"
   end
@@ -131,9 +138,18 @@ def link_vim_plugins(profile)
 \\"pluginfile/g' #{HOME}/.plugins.vim > #{HOME}/.plugins.vim.tmp && mv #{HOME}/.plugins.vim.tmp #{HOME}/.plugins.vim`
 end
 
+def uninstall_profiles
+  (['basic'] + DF_PROFILES.split(' ')).each do |profile|
+    Logger.log "Removing Vim Profile #{profile}" do
+      uninstall_file = "#{DF_PATH}/vim/#{profile}/uninstall.rb"
+      require uninstall_file if File.exist?(uninstall_file)
+    end
+  end
+end
+
 def install_profiles
   (['basic'] + DF_PROFILES.split(' ')).each do |profile|
-    Logger.log "Installing Profile #{profile}" do
+    Logger.log "Installing Vim Profile #{profile}" do
       link_vim_plugins profile
       add_link_with_override "#{DF_PATH}/vim/#{profile}/vimrc", "#{HOME}/.vimrc"
 
@@ -184,7 +200,7 @@ def install
   add_link_with_override "#{DF_PATH}/zsh/zshrc", "#{HOME}/.zshrc"
 
   unless File.exist?("#{HOME}/.bc")
-    Logger.log 'Creating config file for bc'
+    Logger.log 'Configuring bc'
     File.write("#{HOME}/.bc", "scale=2\n")
   end
 
@@ -227,7 +243,7 @@ def install
   end
 
   Logger.log 'Configuring Git'
-  `#{DF_PATH}/git/git-config.sh`
+  `#{DF_PATH}/git/install`
 
   if program_installed? 'docker'
     Logger.log 'Installing docker completion'
@@ -258,13 +274,54 @@ def install
   end
 
   Dir.chdir(DF_PATH) do
-    Logger.success "Successfully installed dotfiles version #{`git rev-parse --short HEAD`}"
+    Logger.success "Successfully installed dotfiles version #{`git rev-parse --short HEAD`.strip}."
   end
 end
 
-def tabula_rasa
-  # TODO: add here and then remove separate shell script file
+def uninstall
+  remove_links '\.dotfiles', '.zshrc'
+  remove_links '\.fzf', '.zshrc'
+  remove_links "\.dotfiles", '.vimrc'
+  remove_links '.plugins.vim', '.vimrc'
+  remove_links "\.dotfiles", '.tmux.conf'
+  remove_links "\.dotfiles", '.config/kitty/kitty.conf'
+
+  # Remove fzf to ensure that the fzf include is added during install again after all dotfiles zsh includes
+  Logger.log 'Removing fzf'
+  `rm -rf #{HOME}/.fzf`
+
+  Logger.log 'Removing vim-plug and vim plugins'
+  `rm -f #{HOME}/.vim/autoload/plug.vim`
+  `rm -rf #{HOME}/.vim/vim-plug`
+  `rm -f #{HOME}/.plugins.vim`
+
+  uninstall_profiles
+
+  Logger.log 'Removing bc configuration'
+  `rm -f #{HOME}/.bc`
+
+  Logger.log 'Removing git configuration'
+  `#{DF_PATH}/git/uninstall`
+
+  Logger.log 'Removing dotfiles'
+  `rm -rf #{DF_PATH}`
+
+  Logger.success 'Successfully uninstalled dotfiles'
 end
 
-# only run installation if script is invoked directly and not by requiring it
-install if __FILE__ == $PROGRAM_NAME
+def tabula_rasa
+  # TODO
+  # really needed?
+  # remove df env vars
+  # remove .plugins.custom.vim
+  # remove .df-post-install
+  # remove fzf
+  # combine uninstall and removing of undo history, swap files, etc.
+end
+
+if ARGV[0] == '--uninstall'
+  uninstall
+elsif __FILE__ == $PROGRAM_NAME
+  # only run installation if script is invoked directly and not by requiring it
+  install
+end

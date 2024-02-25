@@ -1,0 +1,26 @@
+#!/usr/bin/env zsh
+
+git config --global --unset credential.helper
+git config --global --unset push.default
+git config --global --unset fetch.prune
+git config --global --unset pull.rebase
+git config --global --unset diff.tool
+git config --global --unset merge.tool
+git config --global --unset core.editor
+git config --global --unset color.status
+git config --global --unset grep.extendedRegexp
+git config --global --unset help.autoCorrect
+git config --global --unset rerere.enabled
+
+
+# delta stuff (https://dandavison.github.io/delta)
+git config --global --unset core.pager
+git config --global --unset diff.colorMoved
+git config --global --unset merge.conflictstyle
+git config --global --unset interactive.diffFilter
+git config --global --unset delta.navigate
+git config --global --unset delta.side-by-side
+git config --global --unset delta.line-numbers
+
+git config --global --remove-section alias
+
