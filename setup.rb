@@ -206,7 +206,6 @@ def install
 
   Logger.log 'Initializing toolbox' do
     add_link_with_override "#{DF_PATH}/toolbox/init.zsh", "#{HOME}/.zshrc"
-    `#{DF_PATH}/toolbox/docs/_write-index.rb`
   end
 
   unless File.exist?("#{HOME}/.vim/autoload/plug.vim")
