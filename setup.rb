@@ -9,6 +9,7 @@ HOME ||= ENV['HOME']
 DF_PROFILES ||= ENV['DOTFILES_PROFILES'] || ''
 DF_THEME ||= ENV['DOTFILES_THEME']
 DF_PATH ||= "#{HOME}/.dotfiles".freeze
+DF_LOCAL_PATH ||= "#{HOME}/.dotfiles-local".freeze
 
 # https://rubystyle.guide/
 # TODO: symlink my own global config to $HOME/.rubocop.yml
@@ -21,12 +22,12 @@ module Logger
     message = message.rjust(message.length + 2 * @level)
     puts "#{prefix}\e[0;34m#{message}\e[0m"
 
-    if block_given?
-      @level += 1
-      yield
-      @level -= 1
-      @level = 0 if @level.negative?
-    end
+    return unless block_given?
+
+    @level += 1
+    yield
+    @level -= 1
+    @level = 0 if @level.negative?
   end
 
   def self.success(message)
@@ -52,6 +53,31 @@ module OS
   def self.linux?
     (/linux/ =~ RUBY_PLATFORM) != nil
   end
+end
+
+def migrate_local_dir(old, new)
+  return unless Dir.exist?(old)
+
+  Logger.log "Migrating #{old} to #{new}"
+  `mv #{old} #{new}`
+end
+
+def migrate_local_file(old, new)
+  return unless File.exist?(old)
+
+  Logger.log "Migrating #{old} to #{new}"
+  `mv #{old} #{new}`
+end
+
+def migrate_local_files
+  `mkdir -p #{DF_LOCAL_PATH}`
+
+  migrate_local_file "#{HOME}/.df-post-install", "#{DF_LOCAL_PATH}/post-install"
+  migrate_local_file "#{HOME}/.plugins.custom.vim", "#{DF_LOCAL_PATH}/plugins.vim"
+  migrate_local_file "#{HOME}/.df-tmux-sessions.json", "#{DF_LOCAL_PATH}/tmux-sessions.json"
+  migrate_local_dir "#{HOME}/.local-scripts", "#{DF_LOCAL_PATH}/scripts"
+  # TODO: Add also "#{DF_LOCAL_PATH}/docs"
+  migrate_local_dir "#{HOME}/.zsh-sounds", "#{DF_LOCAL_PATH}/sounds"
 end
 
 def find_override(file_path)
