@@ -135,7 +135,7 @@ def link_vim_plugins(profile)
   end
 
   `sed 's/\\"pluginfile/source $HOME\\/.dotfiles\\/vim\\/#{profile}\\/plugins.vim\\
-\\"pluginfile/g' #{HOME}/.plugins.vim > #{HOME}/.plugins.vim.tmp && mv #{HOME}/.plugins.vim.tmp #{HOME}/.plugins.vim`
+\\"pluginfile/g' #{DF_PATH}/vim/plugins.vim > #{DF_PATH}/vim/plugins.vim.tmp && mv #{DF_PATH}/vim/plugins.vim.tmp #{DF_PATH}/vim/plugins.vim`
 end
 
 def uninstall_profiles
@@ -192,8 +192,7 @@ def install
                "\"Plug 'any/vim-plugin'")
   end
 
-  `cp #{DF_PATH}/vim/plugins.vim #{HOME}/.plugins.vim`
-  add_link_with_override "#{HOME}/.plugins.vim", "#{HOME}/.vimrc"
+  add_link_with_override "#{DF_PATH}/vim/plugins.vim", "#{HOME}/.vimrc"
 
   install_profiles
 
@@ -281,7 +280,6 @@ def uninstall
   remove_links '\.dotfiles', '.zshrc'
   remove_links '\.fzf', '.zshrc'
   remove_links "\.dotfiles", '.vimrc'
-  remove_links '.plugins.vim', '.vimrc'
   remove_links "\.dotfiles", '.tmux.conf'
   remove_links "\.dotfiles", '.config/kitty/kitty.conf'
 
@@ -292,7 +290,6 @@ def uninstall
   Logger.log 'Removing vim-plug and vim plugins'
   `rm -f #{HOME}/.vim/autoload/plug.vim`
   `rm -rf #{HOME}/.vim/vim-plug`
-  `rm -f #{HOME}/.plugins.vim`
 
   uninstall_profiles
 
