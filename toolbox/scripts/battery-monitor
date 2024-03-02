@@ -10,7 +10,7 @@ player = if OS.mac?
          end
 exit(false) unless program_installed? player.split(/\s/).first
 
-sound_path = "#{HOME}/.zsh-sounds/battery-alert.wav"
+sound_path = "#{DF_LOCAL_PATH}/sounds/battery-alert.wav"
 exit(false) unless File.exist? sound_path
 
 loop do

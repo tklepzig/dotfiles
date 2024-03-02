@@ -41,8 +41,6 @@ module Logger
     message = message.rjust(message.length + 2 * @level)
     puts "#{prefix}\e[0;31m#{message}\e[0m"
   end
-
-  def log; end
 end
 
 module OS
@@ -69,9 +67,7 @@ def migrate_local_file(old, new)
   `mv #{old} #{new}`
 end
 
-def migrate_local_files
-  `mkdir -p #{DF_LOCAL_PATH}`
-
+def migrate_local_entries
   migrate_local_file "#{HOME}/.df-post-install", "#{DF_LOCAL_PATH}/post-install"
   migrate_local_file "#{HOME}/.plugins.custom.vim", "#{DF_LOCAL_PATH}/plugins.vim"
   migrate_local_file "#{HOME}/.df-tmux-sessions.json", "#{DF_LOCAL_PATH}/tmux-sessions.json"
@@ -208,13 +204,16 @@ def install
     `git clone --depth=1 https://github.com/#{DF_REPO}.git #{DF_PATH} > /dev/null 2>&1`
   end
 
+  `mkdir -p #{DF_LOCAL_PATH}`
+  migrate_local_entries
+
   `#{DF_PATH}/toolbox/scripts/set-theme`
   add_link_with_override "#{DF_PATH}/colours.vim", "#{HOME}/.vimrc"
   add_link_with_override "#{DF_PATH}/colours.zsh", "#{HOME}/.zshrc"
   add_link_with_override "#{DF_PATH}/colours.zsh", "#{HOME}/.tmux.conf"
 
-  unless File.exist?("#{HOME}/.plugins.custom.vim")
-    File.write("#{HOME}/.plugins.custom.vim",
+  unless File.exist?("#{DF_LOCAL_PATH}/plugins.vim")
+    File.write("#{DF_LOCAL_PATH}/plugins.vim",
                "\"Plug 'any/vim-plugin'")
   end
 
@@ -289,7 +288,7 @@ def install
     end
   end
 
-  post_install_script = "#{HOME}/.df-post-install"
+  post_install_script = "#{DF_LOCAL_PATH}/post-install"
   if File.exist?(post_install_script) && File.executable?(post_install_script)
     Logger.log 'Running post install script' do
       result = `#{post_install_script}`

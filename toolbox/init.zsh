@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 scripts_path="$HOME/.dotfiles/toolbox/scripts"
-local_scripts_path="$HOME/.local-scripts"
+local_scripts_path="$HOME/.dotfiles-local/scripts"
 
 if [ -d "$local_scripts_path" ]
 then

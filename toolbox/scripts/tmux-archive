@@ -185,10 +185,10 @@ end
 
 if ENV['TMUX']
   snapshot = tmux_snapshot
-  File.write("#{ENV['HOME']}/.df-tmux-sessions.json", snapshot.to_json)
+  File.write("#{ENV['HOME']}/.dotfiles-local/tmux-sessions.json", snapshot.to_json)
 
   # Transforming the keys to strings to be able to treat the hash the same way as it was read from the file
   close_all(JSON.parse(snapshot.to_json)) unless SAVE_ONLY
 else
-  restore(JSON.parse(File.read("#{ENV['HOME']}/.df-tmux-sessions.json")))
+  restore(JSON.parse(File.read("#{ENV['HOME']}/.dotfiles-local/tmux-sessions.json")))
 end

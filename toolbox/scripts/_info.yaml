@@ -2,7 +2,7 @@
 battery-monitor:
   help: |-
     If battery level is lower than 16, plays an alert noise
-    Needs the alert file ~/.zsh-sounds/battery-alert.wav
+    Needs the alert file ~/.dotfiles-local/sounds/battery-alert.wav
 blitz-ortung:
   help: Opens blitzortung.org in browser
 colours:
@@ -69,7 +69,7 @@ mastermind:
 notify:
   help: |-
     Plays an notify sound, e.g. for getting notified after long running cmd
-    Needs the notify file ~/.zsh-sounds/notify.wav
+    Needs the notify file ~/.dotfiles-local/sounds/notify.wav
 npm-tabula-rasa:
   help: Recursively remove node_modules
 set-theme:

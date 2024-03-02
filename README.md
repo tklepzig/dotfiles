@@ -50,5 +50,5 @@ For example:
 - overrides usage
 - toolbox scripts, info.yaml, additional.yaml
 - .plugins.custom
-- .local-scripts/
-- .df-post-install
+- .dotfiles-local/scripts/
+- .dotfiles-local/post-install

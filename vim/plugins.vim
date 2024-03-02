@@ -1,4 +1,4 @@
 call plug#begin('~/.vim/vim-plug')
 "pluginfile
-source $HOME/.plugins.custom.vim
+source $HOME/.dotfiles-local/plugins.vim
 call plug#end()
