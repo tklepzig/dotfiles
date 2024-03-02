@@ -56,14 +56,14 @@ end
 def migrate_local_dir(old, new)
   return unless Dir.exist?(old)
 
-  Logger.log "Migrating #{old} to #{new}"
+  Logger.log "Migrating '#{old}' to '#{new}'"
   `mv #{old} #{new}`
 end
 
 def migrate_local_file(old, new)
   return unless File.exist?(old)
 
-  Logger.log "Migrating #{old} to #{new}"
+  Logger.log "Migrating '#{old}' to '#{new}'"
   `mv #{old} #{new}`
 end
 
@@ -328,16 +328,6 @@ def uninstall
   `rm -rf #{DF_PATH}`
 
   Logger.success 'Successfully uninstalled dotfiles'
-end
-
-def tabula_rasa
-  # TODO
-  # really needed?
-  # remove df env vars
-  # remove .plugins.custom.vim
-  # remove .df-post-install
-  # remove fzf
-  # combine uninstall and removing of undo history, swap files, etc.
 end
 
 if ARGV[0] == '--uninstall'
