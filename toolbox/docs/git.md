@@ -34,3 +34,11 @@ base from `oldBase` to `newBase`
 > When there should be no history at all, create a orphaned branch in the
 > old-repo, see
 > https://git-scm.com/docs/git-checkout#Documentation/git-checkout.txt---orphanltnew-branchgt
+
+## Ignore files/dirs when doing git log
+
+    git log -- ':!path/to/ignore' ':!path/to/ignore2'
+
+For example when using `g lp` and ignoring changes in `package-lock.json`
+
+    g lp -- ':!package-lock.json'
