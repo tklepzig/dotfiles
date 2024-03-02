@@ -15,6 +15,12 @@ docs:
   help: Opens toolbox docs in vim
 docs-serve:
   help: Opens toolbox docs in browser
+generate-password:
+  help: Generate a random password, using letters, numbers and special chars
+  args:
+    - name: length
+      optional: true
+      default: 16
 git-checkout-fuzzy:
   help: Use git checkout with fzf's fuzzy search
 git-fetch-all:
