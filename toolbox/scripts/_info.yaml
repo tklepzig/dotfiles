@@ -62,6 +62,8 @@ inhibit:
   completion:
     - suspend
     - idle
+list-ports:
+  help: List all open ports
 luks-close:
   help: Close LUKS container
   args:
