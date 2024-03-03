@@ -20,7 +20,7 @@ end
 
 scripts = Dir.glob("#{SCRIPTS_PATH}/*").filter_map do |file|
   name = File.basename(file)
-  next if ['_info.yaml', '_info.additional.yaml', '_run.rb'].include?(name)
+  next if ['_info.yaml', 'info.additional.yaml', 'info.local.yaml', '_run.rb'].include?(name)
 
   name
 end

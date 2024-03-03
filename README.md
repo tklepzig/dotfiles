@@ -51,4 +51,5 @@ For example:
 - toolbox scripts, info.yaml, additional.yaml
 - .plugins.custom
 - .dotfiles-local/scripts/
+- .dotfiles-local/scripts/info.local.yaml
 - .dotfiles-local/post-install
