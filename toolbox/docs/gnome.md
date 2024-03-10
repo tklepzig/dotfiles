@@ -14,3 +14,7 @@ It is generally not advisable to edit the `.desktop` file located in
 # Fix non-working dark mode
 
 Install `xdg-desktop-portal` and `xdg-desktop-portal-gnome`.
+
+# Add listener for notifications
+
+    dbus-monitor "interface='org.freedesktop.Notifications'"
