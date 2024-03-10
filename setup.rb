@@ -3,6 +3,7 @@
 
 # neeeded for $CHILD_STATUS and $PROGRAM_NAME
 require 'English'
+require 'yaml'
 
 DF_REPO ||= ENV['DOTFILES_REPO'] || 'tklepzig/dotfiles'
 HOME ||= ENV['HOME']
@@ -181,6 +182,47 @@ def install_profiles
   end
 end
 
+def add_toolbox_includes
+  toolbox_includes = "#{DF_LOCAL_PATH}/toolbox-include.yaml"
+  return unless File.exist?(toolbox_includes)
+
+  Logger.log 'Processing includes'
+  YAML.load_file(toolbox_includes).each do |raw_path|
+    path = File.expand_path(raw_path, DF_LOCAL_PATH)
+    next unless Dir.exist?(path)
+
+    Logger.log raw_path do
+      if Dir.exist?(File.join(path, '.git'))
+        Logger.log 'Found git repo, updating'
+        `cd "#{path}" && git fetch && git merge > /dev/null`
+      end
+
+      if Dir.exist?(File.join(path, 'docs'))
+        Logger.log 'Linking docs'
+        Dir.glob(File.join(path, 'docs', '*')) do |file|
+          `ln -sf "#{file}" "#{DF_PATH}/toolbox/docs"`
+        end
+      end
+
+      if Dir.exist?(File.join(path, 'scripts'))
+        Logger.log 'Linking scripts'
+        Dir.glob(File.join(path, 'scripts', '*')) do |file|
+          next if ['_info.yaml'].include?(File.basename(file))
+
+          `ln -sf "#{file}" "#{DF_PATH}/toolbox/scripts"`
+        end
+      end
+
+      next unless File.exist?(File.join(path, 'scripts', '_info.yaml'))
+
+      Logger.log 'Merging _info.yaml'
+      infos = YAML.load_file("#{DF_PATH}/toolbox/scripts/_info.yaml")
+      infos_include = YAML.load_file(File.join(path, 'scripts', '_info.yaml'))
+      File.write("#{DF_PATH}/toolbox/scripts/_info.yaml", infos.merge(infos_include).to_yaml)
+    end
+  end
+end
+
 def install
   check_mandatory_installation 'git'
   check_mandatory_installation 'zsh'
@@ -230,6 +272,7 @@ def install
 
   Logger.log 'Initializing toolbox' do
     add_link_with_override "#{DF_PATH}/toolbox/init.zsh", "#{HOME}/.zshrc"
+    add_toolbox_includes
   end
 
   unless File.exist?("#{HOME}/.vim/autoload/plug.vim")

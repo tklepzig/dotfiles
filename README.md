@@ -49,7 +49,6 @@ For example:
 
 - overrides usage
 - toolbox scripts, info.yaml, additional.yaml
-- .plugins.custom
-- .dotfiles-local/scripts/
-- .dotfiles-local/scripts/info.local.yaml
+- toolbox includes
+- .dotfiles-local/plugins.vim
 - .dotfiles-local/post-install

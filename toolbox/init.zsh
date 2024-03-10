@@ -1,15 +1,6 @@
 #!/usr/bin/env zsh
 
 scripts_path="$HOME/.dotfiles/toolbox/scripts"
-local_scripts_path="$HOME/.dotfiles-local/scripts"
-
-if [ -d "$local_scripts_path" ]
-then
-	for file in "$local_scripts_path"/*
-	do
-		ln -sf "$file" "$scripts_path"
-	done
-fi
 
 cmds=( $($scripts_path/_run.rb --list) )
 # ${(f)...} --> parameter expansion, split at new lines
