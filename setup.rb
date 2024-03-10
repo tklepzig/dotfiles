@@ -72,15 +72,15 @@ def migrate_local_entries
   migrate_local_file "#{HOME}/.plugins.custom.vim", "#{DF_LOCAL_PATH}/plugins.vim"
   migrate_local_file "#{HOME}/.df-tmux-sessions.json", "#{DF_LOCAL_PATH}/tmux-sessions.json"
   migrate_local_dir "#{HOME}/.local-scripts", "#{DF_LOCAL_PATH}/scripts"
-  # TODO: Add also "#{DF_LOCAL_PATH}/docs"
   migrate_local_dir "#{HOME}/.zsh-sounds", "#{DF_LOCAL_PATH}/sounds"
+  migrate_local_dir "#{HOME}/vim-quick-memo", "#{DF_LOCAL_PATH}/quick-memo"
 end
 
 def find_override(file_path)
   return "#{file_path}.override" if File.exist?("#{file_path}.override")
 
   override_before_extension = file_path.gsub(/(.*)(\..+)$/, '\1.override\2')
-  return override_before_extension if File.exist?(override_before_extension)
+  override_before_extension if File.exist?(override_before_extension)
 end
 
 def merge(base_path, override_path)

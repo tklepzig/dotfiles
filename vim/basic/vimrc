@@ -182,7 +182,7 @@ set wildoptions=pum
 set shiftround
 
 function! s:QuickMemo(ext = "md")
-  let path = get(g:,"quick_memo_path", $HOME . '/vim-quick-memo')
+  let path = get(g:,"quick_memo_path", $HOME . '/.dotfiles-local/quick-memo')
   let filePath = expand("%:t")
 
   if !empty(filePath)
