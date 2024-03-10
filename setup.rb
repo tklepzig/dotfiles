@@ -182,6 +182,33 @@ def install_profiles
   end
 end
 
+def link_docs(path)
+  return unless Dir.exist?(File.join(path, 'docs'))
+
+  Logger.log 'Linking docs'
+  Dir.glob(File.join(path, 'docs', '*')) do |file|
+    `ln -sf "#{file}" "#{DF_PATH}/toolbox/docs"`
+  end
+end
+
+def link_scripts(path)
+  if Dir.exist?(File.join(path, 'scripts'))
+    Logger.log 'Linking scripts'
+    Dir.glob(File.join(path, 'scripts', '*')) do |file|
+      next if ['_info.yaml'].include?(File.basename(file))
+
+      `ln -sf "#{file}" "#{DF_PATH}/toolbox/scripts"`
+    end
+  end
+
+  return unless File.exist?(File.join(path, 'scripts', '_info.yaml'))
+
+  Logger.log 'Merging _info.yaml'
+  infos = YAML.load_file("#{DF_PATH}/toolbox/scripts/_info.yaml")
+  infos_include = YAML.load_file(File.join(path, 'scripts', '_info.yaml'))
+  File.write("#{DF_PATH}/toolbox/scripts/_info.yaml", infos.merge(infos_include).to_yaml)
+end
+
 def add_toolbox_includes
   toolbox_includes = "#{DF_LOCAL_PATH}/toolbox-include.yaml"
   return unless File.exist?(toolbox_includes)
@@ -197,28 +224,8 @@ def add_toolbox_includes
         `cd "#{path}" && git fetch && git merge > /dev/null`
       end
 
-      if Dir.exist?(File.join(path, 'docs'))
-        Logger.log 'Linking docs'
-        Dir.glob(File.join(path, 'docs', '*')) do |file|
-          `ln -sf "#{file}" "#{DF_PATH}/toolbox/docs"`
-        end
-      end
-
-      if Dir.exist?(File.join(path, 'scripts'))
-        Logger.log 'Linking scripts'
-        Dir.glob(File.join(path, 'scripts', '*')) do |file|
-          next if ['_info.yaml'].include?(File.basename(file))
-
-          `ln -sf "#{file}" "#{DF_PATH}/toolbox/scripts"`
-        end
-      end
-
-      next unless File.exist?(File.join(path, 'scripts', '_info.yaml'))
-
-      Logger.log 'Merging _info.yaml'
-      infos = YAML.load_file("#{DF_PATH}/toolbox/scripts/_info.yaml")
-      infos_include = YAML.load_file(File.join(path, 'scripts', '_info.yaml'))
-      File.write("#{DF_PATH}/toolbox/scripts/_info.yaml", infos.merge(infos_include).to_yaml)
+      link_docs(path)
+      link_scripts(path)
     end
   end
 end
