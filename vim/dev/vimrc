@@ -145,3 +145,14 @@ augroup fixHtmlFiletype
   au!
   autocmd BufNewFile,BufRead *.html  set ft=html
 augroup END
+
+"Copilot Chat Stuff
+lua << EOF
+local copilot_chat = require("CopilotChat")
+copilot_chat.setup({
+  build = function()
+    vim.notify("Please update the remote plugins by running ':UpdateRemotePlugins', then restart Neovim.")
+  end,
+  event = "VeryLazy",
+})
+EOF
