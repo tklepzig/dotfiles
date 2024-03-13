@@ -114,8 +114,7 @@ command! -range ExecuteSelection <line1>,<line2>call <SID>ExecuteSelection()
 
 source $HOME/.dotfiles/vim/basic/mappings.vim
 
-"colorscheme codedark
-colorscheme vscode
+colorscheme codedark
 
 " Use nicer highlight colors
 hi Search ctermfg=black ctermbg=228
@@ -126,8 +125,8 @@ hi CursorColumn ctermbg=238
 
 if dotfilesTheme =~ '-light$'
   set background=light
-  "colorscheme PaperColor
-  "hi CursorLine ctermbg=251
+  colorscheme PaperColor
+  hi CursorLine ctermbg=251
 endif
 
 augroup BgHighlight
