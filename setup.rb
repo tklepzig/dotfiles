@@ -221,7 +221,7 @@ def add_toolbox_includes
     Logger.log raw_path do
       if Dir.exist?(File.join(path, '.git'))
         Logger.log 'Found git repo, updating'
-        `cd "#{path}" && git fetch && git merge > /dev/null`
+        `cd "#{path}" && git fetch > /dev/null && git merge > /dev/null`
       end
 
       link_docs(path)
