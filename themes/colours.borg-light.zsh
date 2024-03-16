@@ -1,4 +1,3 @@
-
 primaryFg=7
 primaryBg=22
 primaryText=22

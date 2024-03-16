@@ -85,10 +85,11 @@ set-theme:
   args:
     - name: theme name
   completion:
+    - blue-green
+    - blue-orange
     - borg
     - borg-light
-    - blue-orange
-    - blue-green
+    - kyoshi
     - lcars
     - lcars-light
 setup-asdf:
