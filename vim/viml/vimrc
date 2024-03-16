@@ -1,4 +1,4 @@
-let g:coc_global_extensions = g:coc_global_extensions + ['coc-vimlsp']
+let g:coc_global_extensions = g:coc_global_extensions + ['coc-vimlsp', 'coc-sumneko-lua']
 let g:statuslineMode = "default"
 
 " TODO :so can handle visual selection by itself, writing to tmp file necessary??

@@ -29,5 +29,6 @@
   "coc.source.dictionary.filetypes": ["markdown", "gitcommit"],
   "tailwindCSS.experimental.classRegex": [
     ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
-  ]
+  ],
+  "sumneko-lua.enableNvimLuaDev": true
 }
