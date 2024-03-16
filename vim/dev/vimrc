@@ -158,5 +158,8 @@ copilot_chat.setup({
     vim.notify("Please update the remote plugins by running ':UpdateRemotePlugins', then restart Neovim.")
   end,
   event = "VeryLazy",
+  mappings = {
+    complete = "<C-x>"
+  }
 })
 EOF
