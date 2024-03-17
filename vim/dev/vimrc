@@ -156,7 +156,9 @@ copilot_chat.setup({
   end,
   event = "VeryLazy",
   mappings = {
-    complete = "<C-x>"
+    complete = "<C-x>",
+    reset = "<leader>cr",
+    accept_diff = "<leader>ca"
   }
 })
 EOF
