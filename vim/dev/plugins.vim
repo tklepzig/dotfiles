@@ -24,5 +24,5 @@ Plug 'github/copilot.vim'
 Plug 'madox2/vim-ai'
 "performance problems while scrolling...
 "Plug 'wellle/context.vim'
-Plug 'CopilotC-Nvim/CopilotChat.nvim'
-Plug 'nvim-lua/plenary.nvim'
+Plug 'CopilotC-Nvim/CopilotChat.nvim', !empty($DOTFILES_NVIM) && has('nvim') ? {} : { 'on': [] }
+Plug 'nvim-lua/plenary.nvim', !empty($DOTFILES_NVIM) && has('nvim') ? {} : { 'on': [] }
