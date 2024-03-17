@@ -76,10 +76,14 @@ unsetopt auto_cd
 
 cdpath=(~ ~/development)
 
-# Use vi as the default editor
-# Use vim as the default editor
-export EDITOR=vim
-export VISUAL=vim
+if [ -n "$DOTFILES_NVIM" ]
+then
+  export EDITOR=nvim
+  export VISUAL=nvim
+else
+  export EDITOR=vim
+  export VISUAL=vim
+fi
 
 export SPROMPT="$warningTile $reset Correct $warning%R$reset to $primary%r$reset? (nyae)$reset"
 
