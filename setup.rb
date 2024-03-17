@@ -246,7 +246,8 @@ def install
       # Remove tracked changes
       `git reset --hard origin/master > /dev/null 2>&1`
       # Remove ignored changes
-      `git clean -fx > /dev/null 2>&1`
+      # Do not remove ignored changes, e.g. to keep generated certificates
+      # `git clean -fx > /dev/null 2>&1`
     end
   else
     Logger.log "Cloning repo to #{DF_PATH}"
