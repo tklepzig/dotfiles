@@ -250,17 +250,20 @@ def install
       # `git clean -fx > /dev/null 2>&1`
     end
   else
-    Logger.log "Cloning repo to #{DF_PATH}"
+    Logger.log "Cloning repo from #{DF_REPO} to #{DF_PATH}"
     `git clone --depth=1 https://github.com/#{DF_REPO}.git #{DF_PATH} > /dev/null 2>&1`
   end
 
   `mkdir -p #{DF_LOCAL_PATH}`
   migrate_local_entries
 
+  Logger.log "Using theme #{ENV['DOTFILES_THEME']}" if ENV['DOTFILES_THEME']
   `#{DF_PATH}/toolbox/scripts/set-theme`
   add_link_with_override "#{DF_PATH}/colours.vim", "#{HOME}/.vimrc"
   add_link_with_override "#{DF_PATH}/colours.zsh", "#{HOME}/.zshrc"
   add_link_with_override "#{DF_PATH}/colours.zsh", "#{HOME}/.tmux.conf"
+
+  Logger.log 'Configuring for neovim' if ENV['DOTFILES_NVIM']
 
   unless File.exist?("#{DF_LOCAL_PATH}/plugins.vim")
     File.write("#{DF_LOCAL_PATH}/plugins.vim",
