@@ -152,16 +152,16 @@ endif
 
 if !empty($DOTFILES_NVIM) && has('nvim')
   "Copilot Chat Stuff
-  lua << EOF
-  local copilot_chat = require("CopilotChat")
-  copilot_chat.setup({
-    build = function()
-      vim.notify("Please update the remote plugins by running ':UpdateRemotePlugins', then restart Neovim.")
-    end,
-    event = "VeryLazy",
-    mappings = {
-      complete = "<C-x>"
-    }
-  })
-  EOF
+lua << EOF
+local copilot_chat = require("CopilotChat")
+copilot_chat.setup({
+  build = function()
+    vim.notify("Please update the remote plugins by running ':UpdateRemotePlugins', then restart Neovim.")
+  end,
+  event = "VeryLazy",
+  mappings = {
+    complete = "<C-x>"
+  }
+})
+EOF
 endif
