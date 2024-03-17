@@ -146,10 +146,6 @@ augroup fixHtmlFiletype
   autocmd BufNewFile,BufRead *.html  set ft=html
 augroup END
 
-if !empty($DOTFILES_NVIM) && !has('nvim')
-  echo "Warning: Running vanilla vim instead of neovim"
-endif
-
 if !empty($DOTFILES_NVIM) && has('nvim')
   "Copilot Chat Stuff
 lua << EOF

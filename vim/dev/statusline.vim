@@ -14,8 +14,13 @@ function! CurrentBufferTabLine()
 
   let path = (!empty(bufpath) && bufpath != ".") ? "%#Secondary# " . bufpath . " %#Gap# " : ""
   let name = (&modified ? "%#Accent# " : "%#Primary# ") . bufname . " %#Gap# "
+  let isnvim = ""
 
-  return '%#Primary# %#Gap# ' . path . name . '%#Primary#'
+  if !empty($DOTFILES_NVIM) && has('nvim')
+    let isnvim = " %#Gap# " . "%#Primary# " . "nvim "
+  endif
+
+  return '%#Primary# %#Gap# ' . path . name . '%#Primary#%=' . isnvim
 endfunction
 set showtabline=2
 set tabline=%!CurrentBufferTabLine()
