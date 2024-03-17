@@ -68,7 +68,7 @@ au BufWritePre * let &bex = '@' . strftime("%F.%H:%M:%S")
 set directory=~/.vim/.swp/,/tmp//,.
 set undodir=~/.vim/.undo/,/tmp//,.
 
-if !empty($DOTFILES_NVIM)
+if !empty($DOTFILES_NVIM) && has('nvim')
   set undodir=~/.config/nvim/.undo/
 endif
 

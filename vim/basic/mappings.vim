@@ -92,7 +92,7 @@ nnoremap <silent> <Leader>w# :call <SID>BigSmallWin()<cr>
 nnoremap <silent> <leader>m :QuickMemo<cr>
 
 
-if !empty($DOTFILES_NVIM)
+if !empty($DOTFILES_NVIM) && has('nvim')
   tnoremap <Esc> <C-\><C-n>
   tnoremap jj <C-\><C-n>
   nnoremap <leader>$ :terminal<cr>i
