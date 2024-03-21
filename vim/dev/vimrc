@@ -162,4 +162,7 @@ copilot_chat.setup({
   }
 })
 EOF
+
+command! -range CC CopilotChat
+command! -range CT CopilotTests
 endif
