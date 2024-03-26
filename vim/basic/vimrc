@@ -125,7 +125,7 @@ hi CursorColumn ctermbg=238
 
 if dotfilesTheme =~ '-light$'
   set background=light
-  colorscheme PaperColor
+  colorscheme onehalflight
   hi CursorLine ctermbg=251
 endif
 
