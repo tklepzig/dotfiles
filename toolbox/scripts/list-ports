@@ -7,3 +7,4 @@ sudo lsof -i -P | grep LISTEN
 #
 # sudo ss -plunt
 # See also https://stackoverflow.com/questions/49381124/what-are-the-differences-between-lsof-and-netstat-on-linux
+# ps -p [PID] -o args
