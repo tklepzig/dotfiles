@@ -37,3 +37,8 @@ Import it on the Pi
 Autostart container
 
     docker run --restart always -d -p <port-of-host>:<port-inside-container> myProject
+
+Check if image exists
+
+    docker manifest inspect <registry>/<repository>[:tag]
+    # e.g. docker manifest inspect my-region.amazonaws.com/docker/library/node:20.12-alpine
