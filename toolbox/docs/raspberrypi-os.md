@@ -50,3 +50,11 @@ show the same screen on hdmi and vncclient
     echo "-------------------------------------------"
     echo "GPU => $(/opt/vc/bin/vcgencmd measure_temp)"
     echo "CPU => $((cpu/1000))'C"
+
+## Issues installing ruby via asdf
+
+Install
+
+    libyaml-dev
+    libtool
+    libffi-dev
