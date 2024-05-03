@@ -6,6 +6,7 @@ require 'English'
 require 'yaml'
 
 DF_REPO ||= ENV['DOTFILES_REPO'] || 'tklepzig/dotfiles'
+DF_BRANCH ||= ENV['DOTFILES_BRANCH'] || nil
 HOME ||= ENV['HOME']
 DF_PROFILES ||= ENV['DOTFILES_PROFILES'] || ''
 DF_THEME ||= ENV['DOTFILES_THEME']
@@ -241,17 +242,29 @@ def install
   if Dir.exist?(DF_PATH)
     Logger.log "Found existing dotfiles in #{DF_PATH}, updating"
     Dir.chdir(DF_PATH) do
+      # Set the branch if it is defined
+      `git remote set-branches origin #{DF_BRANCH}` if DF_BRANCH
+
       # Update repo
       `git fetch --depth=1 > /dev/null 2>&1`
+
       # Remove tracked changes
-      `git reset --hard origin/master > /dev/null 2>&1`
+      `git reset --hard origin/#{DF_BRANCH || 'master'} > /dev/null 2>&1`
+
+      # Checkout branch if it is defined
+      if DF_BRANCH
+        Logger.success "Switching to branch #{DF_BRANCH}"
+        `git checkout --quiet #{DF_BRANCH}`
+      end
+
       # Remove ignored changes
       # Do not remove ignored changes, e.g. to keep generated certificates
       # `git clean -fx > /dev/null 2>&1`
     end
   else
     Logger.log "Cloning repo from #{DF_REPO} to #{DF_PATH}"
-    `git clone --depth=1 https://github.com/#{DF_REPO}.git #{DF_PATH} > /dev/null 2>&1`
+    Logger.success "Switching to branch #{DF_BRANCH}" if DF_BRANCH
+    `git clone --quiet --depth=1#{DF_BRANCH ? " -b #{DF_BRANCH}" : ''} https://github.com/#{DF_REPO}.git #{DF_PATH}`
   end
 
   `mkdir -p #{DF_LOCAL_PATH}`
