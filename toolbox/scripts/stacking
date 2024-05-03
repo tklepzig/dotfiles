@@ -1,0 +1,62 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'yaml'
+
+MERGE_QUEUE_PATH = File.join(Dir.pwd, 'merge-queue.yaml')
+
+# NOTES
+# Update n stacked branches to new master: git rebase --update-refs master
+# See also https://adamj.eu/tech/2022/10/15/how-to-rebase-stacked-git-branches/
+# Use rebase strategy to avoid conflict resolution if a branch earlier
+# in the stack has been updated and push forced (vermutlich -X ours)
+
+command = ARGV[0]
+
+def branch
+  new_branch = ARGV[1]
+  `git checkout -b #{new_branch}`
+  File.write(MERGE_QUEUE_PATH, [*merge_queue, new_branch].to_yaml)
+end
+
+def pr
+  current_branch = `git branch --show-current`.strip
+  `git push --set-upstream origin #{current_branch}`
+  `gh pr create --web --base #{parent_branch(current_branch)}`
+end
+
+def sync
+  # without fetching and rebasing main for the moment
+  current_branch = `git branch --show-current`.strip
+
+  # drop 2 or 1? (then no rebase for the 1st branch, only a pf)
+  merge_queue.drop(2).each do |branch|
+    `git checkout #{branch}`
+    `git rebase #{parent_branch(branch)}`
+    `git push --force-with-lease`
+  end
+
+  `git checkout #{current_branch}`
+end
+
+def merge_queue
+  # TODO: cache file, avoid heavy IO
+  return ['main'] unless File.exist?(MERGE_QUEUE_PATH)
+
+  YAML.load_file(MERGE_QUEUE_PATH)
+end
+
+def parent_branch(branch_name)
+  branch_index = merge_queue.index(branch_name)
+  raise 'Branch not found' unless branch_index
+
+  return merge_queue.at(branch_index - 1) if branch_index.positive?
+
+  'main'
+end
+
+begin
+  send(command)
+rescue NoMethodError
+  puts 'Unknown command'
+end
