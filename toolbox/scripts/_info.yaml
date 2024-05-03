@@ -95,6 +95,15 @@ set-theme:
     - lcars-light
 setup-asdf:
   help: Set up asdf and plugins
+stacked:
+  help: Using stacked branches in git
+  completion:
+    - branch
+    - pr
+    - sync
+    - update
+    - c
+    - open
 tmux-archive:
   help: Archive or restore tmux session
   args:

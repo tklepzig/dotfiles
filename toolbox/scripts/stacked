@@ -1,0 +1,107 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'yaml'
+
+module OS
+  def self.mac?
+    (/darwin/ =~ RUBY_PLATFORM) != nil
+  end
+
+  def self.linux?
+    (/linux/ =~ RUBY_PLATFORM) != nil
+  end
+end
+
+MERGE_QUEUE_PATH = File.join(Dir.pwd, 'merge-queue.yaml')
+
+# WIP
+
+# NOTES
+# Update n stacked branches to new master: git rebase --update-refs master
+# See also https://adamj.eu/tech/2022/10/15/how-to-rebase-stacked-git-branches/
+# Use rebase strategy to avoid conflict resolution if a branch earlier
+# in the stack has been updated and push forced (vermutlich -X ours)
+# Add shortcut to checkout branch by number, prev, next, etc.
+# Update yaml when franch from the beginning of the stack are merged into master
+# Using ours in the middle of conflict resolution: git checkout --ours file/path (geht auch für alles ohne specific file?)
+# ! Vor update immer erst sync aufrufen
+# When doing update make sure to fetch-merge/rebase all stacked branches as well
+# in case you're pairing with someone and any of the stacked branches got some updates
+
+command = ARGV[0]
+
+def branch
+  new_branch = ARGV[1]
+  `git checkout -b #{new_branch}`
+  File.write(MERGE_QUEUE_PATH, [*merge_queue, new_branch].to_yaml)
+end
+
+def pr
+  current_branch = `git branch --show-current`.strip
+  `git push --set-upstream origin #{current_branch}`
+  `gh pr create --web --base #{parent_branch(current_branch)}`
+end
+
+def sync
+  current_branch = `git branch --show-current`.strip
+
+  `git checkout #{merge_queue.last}`
+
+  merge_queue.drop(2).each do |branch|
+    `git checkout #{branch}`
+    `git rebase #{parent_branch(branch)} -X ours`
+  end
+
+  `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
+  `git checkout #{current_branch}`
+end
+
+def update
+  # TODO: run sync first
+  `git checkout #{merge_queue.at(0)}`
+  `git fetch origin #{merge_queue.at(0)}`
+  `git merge --ff-only`
+
+  `git checkout #{merge_queue.last}`
+  `git rebase --update-refs #{merge_queue.at(0)}` # -X ours?
+  `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
+end
+
+def c
+  # TODO: add support for prev, next, relative index
+  queue_index = ARGV[1]
+  `git checkout #{merge_queue.drop(1).at(queue_index.to_i)}`
+end
+
+def open
+  cmd = OS.linux? ? 'xdg-open' : 'open'
+  remote = `git remote get-url origin`.strip
+  org_and_repo = remote[/:(.*)\.git/, 1]
+
+  merge_queue.drop(1).each do |branch|
+    `#{cmd} https://github.com/#{org_and_repo}/pull/#{branch}`
+  end
+end
+
+def merge_queue
+  # TODO: cache file, avoid heavy IO
+  return ['main'] unless File.exist?(MERGE_QUEUE_PATH)
+
+  YAML.load_file(MERGE_QUEUE_PATH)
+end
+
+def parent_branch(branch_name)
+  branch_index = merge_queue.index(branch_name)
+  raise 'Branch not found' unless branch_index
+
+  return merge_queue.at(branch_index - 1) if branch_index.positive?
+
+  'main'
+end
+
+begin
+  send(command)
+rescue NoMethodError
+  puts 'Unknown command'
+end
