@@ -10,6 +10,12 @@ MERGE_QUEUE_PATH = File.join(Dir.pwd, 'merge-queue.yaml')
 # See also https://adamj.eu/tech/2022/10/15/how-to-rebase-stacked-git-branches/
 # Use rebase strategy to avoid conflict resolution if a branch earlier
 # in the stack has been updated and push forced (vermutlich -X ours)
+# Add shortcut to checkout branch by number, prev, next, etc.
+# Update yaml when franch from the beginning of the stack are merged into master
+# Using ours in the middle of conflict resolution: git checkout --ours file/path (geht auch für alles ohne specific file?)
+# ! Vor update immer erst sync aufrufen
+# When doing update make sure to fetch-merge/rebase all stacked branches as well
+# in case you're pairing with someone and any of the stacked branches got some updates
 
 command = ARGV[0]
 
@@ -26,17 +32,28 @@ def pr
 end
 
 def sync
-  # without fetching and rebasing main for the moment
   current_branch = `git branch --show-current`.strip
 
-  # drop 2 or 1? (then no rebase for the 1st branch, only a pf)
-  merge_queue.drop(2).each do |branch|
-    `git checkout #{branch}`
-    `git rebase #{parent_branch(branch)}`
-    `git push --force-with-lease`
-  end
+  `git checkout #{merge_queue.last}`
+  `git rebase --update-refs #{merge_queue.at(1)} -X ours`
+  `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
 
   `git checkout #{current_branch}`
+end
+
+def update
+  `git checkout #{merge_queue.at(0)}`
+  `git fetch origin #{merge_queue.at(0)}`
+  `git merge --ff-only`
+
+  `git checkout #{merge_queue.last}`
+  `git rebase --update-refs #{merge_queue.at(0)} -X ours`
+  `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
+end
+
+def c
+  queue_index = ARGV[1]
+  `git checkout #{merge_queue.drop(1).at(queue_index.to_i)}`
 end
 
 def merge_queue
