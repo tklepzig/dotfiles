@@ -35,8 +35,16 @@ def sync
   current_branch = `git branch --show-current`.strip
 
   `git checkout #{merge_queue.last}`
-  `git rebase --update-refs #{merge_queue.at(1)} -X ours`
-  `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
+
+  # when there is no need to ebase the current branch, update-refs does not rebase the other ones, so back to loop
+  # `git rebase --update-refs #{merge_queue.at(1)} -X ours`
+  # `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
+  # TODO
+  # merge_queue.at(1).each do |branch|
+  # `git checkout #{branch}`
+  # `git rebase #{parent_branch(branch)}`
+  # `git push --force-with-lease`
+  # end
 
   `git checkout #{current_branch}`
 end
