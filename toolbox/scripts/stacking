@@ -36,26 +36,23 @@ def sync
 
   `git checkout #{merge_queue.last}`
 
-  # when there is no need to ebase the current branch, update-refs does not rebase the other ones, so back to loop
-  # `git rebase --update-refs #{merge_queue.at(1)} -X ours`
-  # `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
-  # TODO
-  # merge_queue.at(1).each do |branch|
-  # `git checkout #{branch}`
-  # `git rebase #{parent_branch(branch)}`
-  # `git push --force-with-lease`
-  # end
+  merge_queue.at(2).each do |branch|
+    `git checkout #{branch}`
+    `git rebase #{parent_branch(branch)}` # -X ours?
+  end
 
+  `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
   `git checkout #{current_branch}`
 end
 
 def update
+  # TODO: run sync first
   `git checkout #{merge_queue.at(0)}`
   `git fetch origin #{merge_queue.at(0)}`
   `git merge --ff-only`
 
   `git checkout #{merge_queue.last}`
-  `git rebase --update-refs #{merge_queue.at(0)} -X ours`
+  `git rebase --update-refs #{merge_queue.at(0)}` # -X ours?
   `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
 end
 
