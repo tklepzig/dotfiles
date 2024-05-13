@@ -18,6 +18,10 @@ git config --global grep.extendedRegexp true
 git config --global help.autoCorrect prompt
 git config --global rerere.enabled true
 
+# Global ignore file, e.g. for system specific ignores
+touch ~/.gitignore
+git config --global core.excludesfile ~/.gitignore
+
 
 # delta stuff (https://dandavison.github.io/delta)
 git config --global core.pager delta
