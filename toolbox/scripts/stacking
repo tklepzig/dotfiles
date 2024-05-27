@@ -3,6 +3,16 @@
 
 require 'yaml'
 
+module OS
+  def self.mac?
+    (/darwin/ =~ RUBY_PLATFORM) != nil
+  end
+
+  def self.linux?
+    (/linux/ =~ RUBY_PLATFORM) != nil
+  end
+end
+
 MERGE_QUEUE_PATH = File.join(Dir.pwd, 'merge-queue.yaml')
 
 # NOTES
@@ -36,9 +46,9 @@ def sync
 
   `git checkout #{merge_queue.last}`
 
-  merge_queue.at(2).each do |branch|
+  merge_queue.drop(2).each do |branch|
     `git checkout #{branch}`
-    `git rebase #{parent_branch(branch)}` # -X ours?
+    `git rebase #{parent_branch(branch)} -X ours`
   end
 
   `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
@@ -59,6 +69,16 @@ end
 def c
   queue_index = ARGV[1]
   `git checkout #{merge_queue.drop(1).at(queue_index.to_i)}`
+end
+
+def open
+  cmd = OS.linux? ? 'xdg-open' : 'open'
+  remote = `git remote get-url origin`.strip
+  org_and_repo = remote[/:(.*)\.git/, 1]
+
+  merge_queue.drop(1).each do |branch|
+    `#{cmd} https://github.com/#{org_and_repo}/pull/#{branch}`
+  end
 end
 
 def merge_queue
