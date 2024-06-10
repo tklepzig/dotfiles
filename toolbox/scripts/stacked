@@ -67,6 +67,7 @@ def update
 end
 
 def c
+  # TODO: add support for prev, next, relative index
   queue_index = ARGV[1]
   `git checkout #{merge_queue.drop(1).at(queue_index.to_i)}`
 end
