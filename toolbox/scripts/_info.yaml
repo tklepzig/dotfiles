@@ -90,6 +90,7 @@ set-theme:
     - borg
     - borg-light
     - kyoshi
+    - pw
     - lcars
     - lcars-light
 setup-asdf:
