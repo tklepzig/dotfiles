@@ -64,6 +64,7 @@ git config --global alias.rll "$reflogCommon"
 git config --global alias.r "reset"
 git config --global alias.rh "reset --hard"
 git config --global alias.rs "reset --soft"
+git config --global alias.rsb "!f() { $setDefaultBranch; currentBranch=\$(git rev-parse --abbrev-ref HEAD); git reset --soft \$(git log \${1:-\$defaultBranch}..\${2:-\$currentBranch}  --oneline --pretty=format:'%h' | tail -1)^; }; f"
 git config --global alias.rs1 "reset --soft HEAD~1"
 
 git config --global alias.a "add --all"
