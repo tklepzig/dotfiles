@@ -48,6 +48,8 @@ let g:vim_ai_chat = {
 \  },
 \}
 
+let g:context_filetype_blacklist = ["nerdtree", "buffernavigator"]
+
 " =============================================================
 " Coc Settings
 " =============================================================
