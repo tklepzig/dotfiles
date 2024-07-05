@@ -34,6 +34,7 @@ augroup filetype_ruby
     autocmd FileType ruby iab <buffer> <expr> class ExcludeSynGroupAbbr("class", "class<cr>end<esc>kA", rubySynGroups)
     autocmd FileType ruby iab <buffer> <expr> if ExcludeSynGroupAbbr("if", "if<cr>end<esc>kA", rubySynGroups)
     autocmd FileType ruby iab <buffer> <expr> pry ExcludeSynGroupAbbr("pry", "require 'pry'; binding.pry", rubySynGroups)
+    autocmd FileType ruby iab <buffer> <expr> irb ExcludeSynGroupAbbr("irb", "binding.irb", rubySynGroups)
 
 augroup END
 
