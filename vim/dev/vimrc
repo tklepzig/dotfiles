@@ -50,6 +50,7 @@ let g:vim_ai_chat = {
 \}
 
 let g:context_filetype_blacklist = ["nerdtree", "buffernavigator"]
+let g:context_highlight_tag = '<hide>'
 
 " =============================================================
 " Coc Settings
