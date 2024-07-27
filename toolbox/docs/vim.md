@@ -166,3 +166,5 @@ with it with the result:
 set textwidth gq :ce, :le, :re
 
 :redir @a :command :redir END
+
+:args, :argdo, e.g. %s/repl/ace/g
