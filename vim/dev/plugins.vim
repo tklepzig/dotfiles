@@ -25,3 +25,4 @@ Plug 'madox2/vim-ai'
 Plug 'wellle/context.vim'
 Plug 'CopilotC-Nvim/CopilotChat.nvim', !empty($DOTFILES_NVIM) && has('nvim') ? { 'tag': 'v2.0.0' } : { 'tag': 'v2.0.0', 'on': [] }
 Plug 'nvim-lua/plenary.nvim', !empty($DOTFILES_NVIM) && has('nvim') ? {} : { 'on': [] }
+Plug 'samoshkin/vim-mergetool'
