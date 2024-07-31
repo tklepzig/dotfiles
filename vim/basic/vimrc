@@ -116,6 +116,13 @@ source $HOME/.dotfiles/vim/basic/mappings.vim
 
 colorscheme codedark
 
+if !empty($DOTFILES_NVIM) && has('nvim')
+  " Disable termguicolors which is enabeld by default in neovim 0.10.0 to
+  " avoid awkward colors bc currently only termcolors are set, no gui colors
+  " See also https://neovim.io/doc/user/news-0.10.html
+  set notermguicolors
+endif
+
 " Use nicer highlight colors
 hi Search ctermfg=black ctermbg=228
 set cursorline
