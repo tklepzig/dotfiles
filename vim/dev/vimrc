@@ -56,6 +56,9 @@ let g:context_enabled = 0
 
 let g:mergetool_layout = 'b,mr'
 
+" to avoid the error message "E605: Exception not caught: Tmux command failed with message:not in a mode^@" when the target pane is scrolled
+let g:VimuxResetSequence = "C-c"
+
 " =============================================================
 " Coc Settings
 " =============================================================
