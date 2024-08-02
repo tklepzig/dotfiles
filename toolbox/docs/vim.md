@@ -163,7 +163,7 @@ with it with the result:
 
 ## TODO
 
-set textwidth gq :ce, :le, :re
+set textwidth gq :ce, :le, :ri
 
 :redir @a :command :redir END
 
