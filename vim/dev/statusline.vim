@@ -4,6 +4,10 @@ execute 'highlight Gap ctermfg=NONE ctermbg=NONE'
 execute 'highlight Secondary ctermfg='.secondaryFg.' ctermbg='.secondaryBg
 execute 'highlight Error ctermfg='.criticalFg.' ctermbg='.criticalBg
 execute 'highlight Inactive ctermfg='.infoFg.' ctermbg='.infoBg
+execute 'highlight Line ctermfg=244 ctermbg=NONE'
+execute 'highlight WinSeparator ctermfg=244 ctermbg=NONE'
+
+set fillchars+=stl:\―,stlnc:\―
 
 function! CurrentBufferTabLine()
   let bufpath = expand("%:~:.:h")
@@ -64,8 +68,9 @@ function! StatusLine()
     let inactiveLine .= '%#Inactive# '
     let inactiveLine .= bufname.' '
     let inactiveLine .= '%#Gap# '
+    let inactiveLine .= '%#Line# '
     let inactiveLine .= '%='
-    let inactiveLine .= '        '
+    let inactiveLine .= '%#Gap# '
     let inactiveLine .= bufFiletype.' '.(bufReadonly ? '%r ' : '')
     let inactiveLine .= '%#Inactive#'
     let inactiveLine .= ' %p%% '
@@ -101,7 +106,9 @@ function! StatusLine()
   let line .= '%#Gap# '
   let line .= modeHighlight.modeName
   let line .= '%#Gap# '
+  let line .= '%#Line# '
   let line .= '%='
+  let line .= '%#Gap# '
   let line .= &filetype.' '.(&readonly ? '%r ' : '')
   let line .= modeHighlight
   let line .= ' %p%% '
