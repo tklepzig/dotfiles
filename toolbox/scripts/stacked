@@ -43,6 +43,7 @@ def pr
   `gh pr create --web --base #{parent_branch(current_branch)}`
 end
 
+# sync untereinander
 def sync
   current_branch = `git branch --show-current`.strip
 
@@ -57,7 +58,10 @@ def sync
   `git checkout #{current_branch}`
 end
 
+# update to newest base (main/master)
 def update
+  current_branch = `git branch --show-current`.strip
+
   # TODO: run sync first
   `git checkout #{merge_queue.at(0)}`
   `git fetch origin #{merge_queue.at(0)}`
@@ -66,6 +70,8 @@ def update
   `git checkout #{merge_queue.last}`
   `git rebase --update-refs #{merge_queue.at(0)}` # -X ours?
   `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
+
+  `git checkout #{current_branch}`
 end
 
 def c
