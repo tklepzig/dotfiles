@@ -75,9 +75,20 @@ def update
 end
 
 def c
-  # TODO: add support for prev, next, relative index
-  queue_index = ARGV[1]
-  `git checkout #{merge_queue.drop(1).at(queue_index.to_i)}`
+  queue_without_base = merge_queue.drop(1)
+  param = if ARGV[1] == 'prev'
+            '-1'
+          else
+            ARGV[1] == 'next' ? '+1' : ARGV[1]
+          end
+
+  if param.start_with?(/\+|-/)
+    current_branch = `git branch --show-current`.strip
+    current_branch_index = queue_without_base.find_index(current_branch)
+    `git checkout #{queue_without_base.at(current_branch_index + param.to_i)}`
+  else
+    `git checkout #{queue_without_base.at(param.to_i)}`
+  end
 end
 
 def open
