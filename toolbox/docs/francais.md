@@ -6,3 +6,4 @@
 - trois cent seize
 - Restaurant : une personne, nicht un
 - Jus de fraise -> s in jus ist stumm
+- Je m'en fiche -> I don't care
