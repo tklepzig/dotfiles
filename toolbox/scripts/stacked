@@ -51,7 +51,7 @@ def sync
 
   merge_queue.drop(2).each do |branch|
     `git checkout #{branch}`
-    `git rebase #{parent_branch(branch)} -X ours`
+    `git rebase #{parent_branch(branch)} -X ours --autostash`
   end
 
   `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
@@ -68,7 +68,7 @@ def update
   `git merge --ff-only`
 
   `git checkout #{merge_queue.last}`
-  `git rebase --update-refs #{merge_queue.at(0)}` # -X ours?
+  `git rebase --update-refs #{merge_queue.at(0)} --autostash` # -X ours?
   `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
 
   `git checkout #{current_branch}`
