@@ -326,6 +326,8 @@ def install
     add_link_with_override "#{DF_PATH}/kitty/kitty.theme.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
   end
 
+  `ln -sf #{DF_PATH}/amethyst.yml #{HOME}/.amethyst.yml` if OS.mac?
+
   unless Dir.exist?("#{HOME}/.fzf")
     Logger.log 'Installing fzf'
     `git clone --depth 1 https://github.com/junegunn/fzf.git #{HOME}/.fzf > /dev/null 2>&1`
