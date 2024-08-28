@@ -324,6 +324,9 @@ def install
   if program_installed? 'kitty'
     add_link_with_override "#{DF_PATH}/kitty/kitty.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
     add_link_with_override "#{DF_PATH}/kitty/kitty.theme.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
+
+    # Open kitty in fullscreen mode, the macos way
+  #`ln -sf #{DF_PATH}/kitty/macos-launch-services-cmdline #{HOME}/.config/kitty/macos-launch-services-cmdline` if OS.mac?
   end
 
   `ln -sf #{DF_PATH}/amethyst.yml #{HOME}/.amethyst.yml` if OS.mac?
