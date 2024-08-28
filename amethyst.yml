@@ -37,14 +37,14 @@ layouts:
 mod1:
   - option
   # - shift
-  # - control
+  - control
   # - command
 
 # Second mod (default option + shift + control).
 mod2:
   - option
   - shift
-  # - control
+  - control
   # - command
 
 # Commands:
