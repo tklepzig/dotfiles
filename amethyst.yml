@@ -19,7 +19,7 @@ layouts:
   - fullscreen
   # - tall-right
   - wide
-  # - two-pane
+  - two-pane
   # - middle-wide
   # - 3column-left
   # - middle-wide # The legacy name of "3column-middle"
@@ -27,7 +27,7 @@ layouts:
   # - 4column-left
   # - 4column-right
   - column
-  # - row
+  - row
   - floating
   # - widescreen-tall
   # - widescreen-tall-right
@@ -213,9 +213,9 @@ display-current-layout:
   key: i
 
 # Turn on or off tiling entirely.
-toggle-tiling:
-  mod: mod1
-  key: t
+#toggle-tiling:
+#mod: mod1
+#key: t
 
 # Rerun the current layout's algorithm.
 reevaluate-windows:
