@@ -81,6 +81,10 @@ bindsym $mod+k focus down
 bindsym $mod+l focus up
 bindsym $mod+odiaeresis focus right
 
+# Mimic Alt-Tab behaviour (a bit...)
+bindsym Mod1+Tab focus left
+bindsym Mod1+Shift+Tab focus right
+
 # alternatively, you can use the cursor keys:
 bindsym $mod+Left focus left
 bindsym $mod+Down focus down
@@ -205,6 +209,7 @@ bar {
         # Source Code Pro is the default monospace font of GNOME
         font pango:Source Code Pro 16
         status_command i3status
+        position top
 }
 
 # Enable tap to click for touchpad
