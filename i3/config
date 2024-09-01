@@ -38,6 +38,8 @@ exec --no-startup-id nm-applet
 
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status
+# make sure to set signal=10 in i3blocks config
+#set $refresh_i3blocks pkill -SIGRTMIN+10 i3blocks
 
 # They allow ridiculous volume levels, could damage your speakers!
 #bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
