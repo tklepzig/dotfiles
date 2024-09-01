@@ -32,3 +32,7 @@ Clear Cache for all non-installed packages
 Clear Cache completely
 
     sudo pacman -Scc
+
+List locally installed packages
+
+    sudo pacman -Qm
