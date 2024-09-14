@@ -331,6 +331,13 @@ def install
 
   if program_installed? 'i3'
     add_link_with_override "#{DF_PATH}/i3/config", "#{HOME}/.config/i3/config", 'include'
+
+    # For the moment, symlink both i3blocks and i3status since it is not yet decided which one to use
+    `ln -sf #{DF_PATH}/i3/i3blocks.config #{HOME}/.config/i3blocks/config`
+    `ln -sf #{DF_PATH}/i3/i3status.config #{HOME}/.config/i3status/config`
+
+    # i3blocks blocklet scripts
+    `ln -sf #{DF_PATH}/i3/volume #{HOME}/.config/i3blocks/volume`
   end
 
   `ln -sf #{DF_PATH}/amethyst.yml #{HOME}/.amethyst.yml` if OS.mac?

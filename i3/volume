@@ -1,0 +1,11 @@
+#/bin/bash
+
+value=$(awk -F"[][]" '/Left:/ { print $2 }' <(amixer sget Master))
+mute=$(pactl get-sink-mute @DEFAULT_SINK@ | awk '/Mute/ { print $2 }')
+
+if [ "$mute" = "yes" ]; then
+  echo "$value (Muted)"
+else
+  echo "$value"
+fi
+
