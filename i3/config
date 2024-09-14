@@ -99,10 +99,6 @@ bindsym $mod+j focus down
 bindsym $mod+k focus up
 bindsym $mod+l focus right
 
-# Mimic Alt-Tab behaviour (a bit...)
-bindsym Mod1+Tab focus left
-bindsym Mod1+Shift+Tab focus right
-
 # alternatively, you can use the cursor keys:
 bindsym $mod+Left focus left
 bindsym $mod+Down focus down
