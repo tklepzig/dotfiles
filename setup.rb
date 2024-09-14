@@ -329,6 +329,10 @@ def install
   #`ln -sf #{DF_PATH}/kitty/macos-launch-services-cmdline #{HOME}/.config/kitty/macos-launch-services-cmdline` if OS.mac?
   end
 
+  if program_installed? 'i3'
+    add_link_with_override "#{DF_PATH}/i3/config", "#{HOME}/.config/i3/config", 'include'
+  end
+
   `ln -sf #{DF_PATH}/amethyst.yml #{HOME}/.amethyst.yml` if OS.mac?
 
   unless Dir.exist?("#{HOME}/.fzf")

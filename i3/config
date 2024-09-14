@@ -30,17 +30,24 @@ exec --no-startup-id dex --autostart --environment i3
 
 # xss-lock grabs a logind suspend inhibit lock and will use i3lock to lock the
 # screen before suspend. Use loginctl lock-session to lock your screen.
-exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
+#exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 
 # NetworkManager is the most popular way to manage wireless networks on Linux,
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
 
-# Use pactl to adjust volume in PulseAudio.
+
+# Enable tap to click for touchpad
+exec xinput set-prop "Elan Touchpad" "libinput Tapping Enabled" 1
+
+exec_always "setxkbmap -layout de"
+exec_always "xrandr --output eDP-1 --mode 1368x768"
+
 set $refresh_i3status killall -SIGUSR1 i3status
 # make sure to set signal=10 in i3blocks config
 #set $refresh_i3blocks pkill -SIGRTMIN+10 i3blocks
 
+# Use pactl to adjust volume in PulseAudio.
 # They allow ridiculous volume levels, could damage your speakers!
 #bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
 #bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
@@ -76,10 +83,10 @@ bindsym $mod+d exec "rofi -modi drun,run -show drun -font 'Cantarell 18'"
 # bindcode $mod+40 exec --no-startup-id i3-dmenu-desktop
 
 # change focus
-bindsym $mod+j focus left
-bindsym $mod+k focus down
-bindsym $mod+l focus up
-bindsym $mod+odiaeresis focus right
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
 
 # Mimic Alt-Tab behaviour (a bit...)
 bindsym Mod1+Tab focus left
@@ -92,10 +99,10 @@ bindsym $mod+Up focus up
 bindsym $mod+Right focus right
 
 # move focused window
-bindsym $mod+Shift+j move left
-bindsym $mod+Shift+k move down
-bindsym $mod+Shift+l move up
-bindsym $mod+Shift+odiaeresis move right
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
 
 # alternatively, you can use the cursor keys:
 bindsym $mod+Shift+Left move left
@@ -104,7 +111,7 @@ bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
 # split in horizontal orientation
-bindsym $mod+h split h
+bindsym $mod+s split h
 
 # split in vertical orientation
 bindsym $mod+v split v
@@ -113,8 +120,8 @@ bindsym $mod+v split v
 bindsym $mod+f fullscreen toggle
 
 # change container layout (stacked, tabbed, toggle split)
-bindsym $mod+s layout stacking
-bindsym $mod+w layout tabbed
+bindsym $mod+w layout stacking
+bindsym $mod+t layout tabbed
 bindsym $mod+e layout toggle split
 
 # toggle tiling / floating
@@ -166,8 +173,8 @@ bindsym $mod+Shift+8 move container to workspace number $ws8
 bindsym $mod+Shift+9 move container to workspace number $ws9
 bindsym $mod+Shift+0 move container to workspace number $ws10
 
-bindsym Control+Left workspace next
-bindsym Control+Right workspace prev
+bindsym Control+Right workspace next
+bindsym Control+Left workspace prev
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -211,8 +218,3 @@ bar {
         status_command i3status
         position top
 }
-
-# Enable tap to click for touchpad
-exec xinput set-prop "Elan Touchpad" "libinput Tapping Enabled" 1
-
-exec "setxkbmap -layout de"
