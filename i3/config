@@ -36,9 +36,8 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork -k -c 061
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
 
-# WIP Bluetooth applet, needs notification daemon, e.g. dunst
-#exec --no-startup-id blueman-applet # needs blueman package
-
+# Bluetooth Manager Tray Icon
+exec --no-startup-id blueman-applet # shows notifications via dunst
 
 # Enable tap to click for touchpad
 exec --no-startup-id xinput set-prop "Elan Touchpad" "libinput Tapping Enabled" 1
@@ -203,7 +202,7 @@ mode "$mode_exit" {
   bindsym s exec systemctl suspend; mode "default"
   bindsym r exec systemctl reboot; mode "default"
   bindsym h exec systemctl shutdown; mode "default"
-  bindsym k exec i3lock; mode "default"
+  bindsym k exec i3lock --nofork -k -c 06131e; mode "default"
   bindsym Escape mode "default"
   bindsym Return mode "default"
 }
