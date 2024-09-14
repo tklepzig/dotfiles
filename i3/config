@@ -15,7 +15,7 @@ set $mod Mod4
 # is used in the bar {} block below.
 
 # Cantarell is the default font of GNOME
-font pango:Cantarell 18
+font pango:Cantarell 12
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
@@ -232,7 +232,7 @@ bindsym $mod+r mode "resize"
 # finds out, if available)
 bar {
         # Source Code Pro is the default monospace font of GNOME
-        font pango:Source Code Pro 16
+        font pango:Source Code Pro 14
         status_command i3status
         position top
 }
