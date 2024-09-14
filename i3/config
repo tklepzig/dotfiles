@@ -38,10 +38,9 @@ exec --no-startup-id nm-applet
 
 
 # Enable tap to click for touchpad
-exec xinput set-prop "Elan Touchpad" "libinput Tapping Enabled" 1
+exec --no-startup-id xinput set-prop "Elan Touchpad" "libinput Tapping Enabled" 1
 
-exec_always "setxkbmap -layout de"
-exec_always "xrandr --output eDP-1 --mode 1368x768"
+exec_always --no-startup-id setxkbmap -layout de
 
 set $refresh_i3status killall -SIGUSR1 i3status
 # make sure to set signal=10 in i3blocks config
