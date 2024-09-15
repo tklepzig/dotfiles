@@ -1,0 +1,33 @@
+#!/usr/bin/env zsh
+
+{
+    read -r state
+    read -r value
+} <<< "$(source $HOME/.dotfiles/tmux/battery.linux.zsh)"
+
+if [[ -z $value ]]
+then
+    echo "No battery"
+    exit
+fi
+
+if [[ "$state" = "charging" ]]
+then
+    echo "<span color='green'>$value%</span>"
+elif [[ $value -lt 16 ]]
+then
+    if [[ "$(($(date '+%s') % 2))" = "1" ]]
+    then
+        echo "<span background='red' color='white' weight='bold'> $value% </span>"
+    else
+        echo "<span color='white' weight='bold'> $value% </span>"
+    fi
+elif [[ $value -lt 31 ]]
+then
+    echo "<span color='yellow' weight='bold'>$value%</span>"
+else
+    echo "$value%"
+fi
+
+
+

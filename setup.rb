@@ -338,6 +338,7 @@ def install
 
     # i3blocks blocklet scripts
     `ln -sf #{DF_PATH}/i3/volume #{HOME}/.config/i3blocks/volume`
+    `ln -sf #{DF_PATH}/i3/battery #{HOME}/.config/i3blocks/battery`
   end
 
   `ln -sf #{DF_PATH}/amethyst.yml #{HOME}/.amethyst.yml` if OS.mac?
