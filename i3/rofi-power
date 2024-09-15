@@ -1,0 +1,61 @@
+#!/usr/bin/env zsh
+
+echo -e "\0no-custom\x1ftrue"
+echo -e "\0markup-rows\x1ftrue"
+
+lock="Lock"
+suspend="Suspend"
+logout="Logout"
+reboot="Reboot"
+shutdown="Shutdown"
+
+confirmPrompt="\0prompt\x1fPlease confirm"
+confirmPrefix="Yes, "
+cancel="Cancel"
+
+if [[ $# -eq 0 ]]
+then
+    echo -e "\0prompt\x1fPower"
+    echo "$lock"
+    echo "$suspend"
+    echo "$logout"
+    echo "$reboot"
+    echo "$shutdown"
+    exit 0
+fi
+
+if [[ "$1" == "$lock" ]]
+then
+    loginctl lock-session
+elif [[ "$1" == "$suspend" ]]
+then
+    systemctl suspend
+elif [[ "$1" == "$logout" ]]
+then
+    echo -e "$confirmPrompt"
+    echo "$confirmPrefix$logout"
+    echo "$cancel"
+    exit 0
+elif [[ "$1" == "$confirmPrefix$logout" ]]
+then
+    i3-msg exit
+elif [[ "$1" == "$reboot" ]]
+then
+    echo -e "$confirmPrompt"
+    echo "$confirmPrefix$reboot"
+    echo "$cancel"
+    exit 0
+elif [[ "$1" == "$confirmPrefix$reboot" ]]
+then
+    systemctl reboot
+elif [[ "$1" == "$shutdown" ]]
+then
+    echo -e "$confirmPrompt"
+    echo "$confirmPrefix$shutdown"
+    echo "$cancel"
+    exit 0
+elif [[ "$1" == "$confirmPrefix$shutdown" ]]
+then
+    systemctl poweroff
+fi
+
