@@ -423,8 +423,16 @@ or only inhibit, without starting a program
 
 ### Upgrade System
 
+First, upgrade arch and all packages
+
     sudo pacman -Syu
-    yay -Syu
+
+> If the mirror list is out of date, you can force the refesh of the db by using
+> two y's, so -Syy From time to time, the mirrors list itself should be updated,
+> see https://archlinux.org/mirrorlist/
+
+Afterwards, upgrade the AUR packages by doing a `git pull` and `makepkg -si` in
+the respective repositories.
 
 #### Troubleshooting
 
