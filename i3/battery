@@ -13,18 +13,18 @@ fi
 
 if [[ "$state" = "charging" ]]
 then
-    echo "<span color='green'>$value%</span>"
+    echo "<span color='#22be5e'>$value%</span>"
 elif [[ $value -lt 16 ]]
 then
     if [[ "$(($(date '+%s') % 2))" = "1" ]]
     then
-        echo "<span background='red' color='white' weight='bold'> $value% </span>"
+        echo "<span background='#b92500' color='white' weight='bold'> $value% </span>"
     else
-        echo "<span color='white' weight='bold'> $value% </span>"
+        echo "<span weight='bold'> $value% </span>"
     fi
 elif [[ $value -lt 31 ]]
 then
-    echo "<span color='yellow' weight='bold'>$value%</span>"
+    echo "<span color='#f8e90d' weight='bold'>$value%</span>"
 else
     echo "$value%"
 fi

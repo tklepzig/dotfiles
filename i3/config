@@ -239,7 +239,7 @@ bindsym $mod+r mode "resize"
 # finds out, if available)
 bar {
         # Source Code Pro is the default monospace font of GNOME
-        font pango:Source Code Pro 14
+        font pango:Cantarell 14
         #status_command i3status
         status_command i3blocks
         position top
