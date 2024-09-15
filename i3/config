@@ -180,10 +180,13 @@ bindsym $mod+Shift+8 move container to workspace number $ws8
 bindsym $mod+Shift+9 move container to workspace number $ws9
 bindsym $mod+Shift+0 move container to workspace number $ws10
 
-bindsym Control+Right workspace next
-bindsym Control+Shift+Right move container to workspace next
-bindsym Control+Left workspace prev
-bindsym Control+Shift+Left move container to workspace prev
+
+# Disable Ctrl+Arrow for desktop switching since it is inferring with the word navigation
+# Additionally, when using mutliple monitors, using direction keys to switch desktops is not very useful
+#bindsym Control+Right workspace next
+#bindsym Control+Shift+Right move container to workspace next
+#bindsym Control+Left workspace prev
+#bindsym Control+Shift+Left move container to workspace prev
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
