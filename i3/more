@@ -1,0 +1,4 @@
+volume=$($HOME/.dotfiles/i3/volume)
+brightness=$(echo $((10**2 * $(brightnessctl g)/$(brightnessctl m)))%)
+
+echo "Volume: $volume | Brightness: $brightness"
