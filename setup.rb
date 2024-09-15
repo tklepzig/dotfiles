@@ -326,7 +326,7 @@ def install
     add_link_with_override "#{DF_PATH}/kitty/kitty.theme.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
 
     # Open kitty in fullscreen mode, the macos way
-  #`ln -sf #{DF_PATH}/kitty/macos-launch-services-cmdline #{HOME}/.config/kitty/macos-launch-services-cmdline` if OS.mac?
+    # `ln -sf #{DF_PATH}/kitty/macos-launch-services-cmdline #{HOME}/.config/kitty/macos-launch-services-cmdline` if OS.mac?
   end
 
   if program_installed? 'i3'
@@ -335,10 +335,6 @@ def install
     # For the moment, symlink both i3blocks and i3status since it is not yet decided which one to use
     `ln -sf #{DF_PATH}/i3/i3blocks.config #{HOME}/.config/i3blocks/config`
     `ln -sf #{DF_PATH}/i3/i3status.config #{HOME}/.config/i3status/config`
-
-    # i3blocks blocklet scripts
-    `ln -sf #{DF_PATH}/i3/volume #{HOME}/.config/i3blocks/volume`
-    `ln -sf #{DF_PATH}/i3/battery #{HOME}/.config/i3blocks/battery`
   end
 
   `ln -sf #{DF_PATH}/amethyst.yml #{HOME}/.amethyst.yml` if OS.mac?
