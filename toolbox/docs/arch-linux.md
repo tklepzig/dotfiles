@@ -304,16 +304,26 @@ Additional Software (run as non-privileged user)
     git checkout "$(git describe --abbrev=0 --tags)"
     cd -
 
-    git clone https://aur.archlinux.org/yay-git.git
-    cd yay-git
-    makepkg -si
-    cd -
+AUR Packages
 
-    yay -S google-chrome seafile-client winff tllocalmgr-git
+    google-chrome
+    seafile-client
+    winff
+    gdmap
 
-> Upgrade with yay:
->
->     yay -Syu
+Prerequisites
+
+    pacman -S base-devel
+
+For each desired aur package, run
+
+    git clone https://aur.archlinux.org/package_name.git
+    cd package_name
+    makepkg -sic
+    git clean -dfx
+
+> For updating AUR packages, do a `git pull` and then the commands as above  
+> See also https://wiki.archlinux.org/title/Arch_User_Repository
 
 Gnome Settings
 
