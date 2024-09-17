@@ -295,7 +295,6 @@ Additional Software (run as non-privileged user)
     sudo pacman -S nautilus gparted eog gnome-tweaks gdmap texlive-core texlive-latexextra texlive-binextra evince xpdf texworks pass
     sudo pacman -S easytag audacity gimp vlc pqiv git-delta jless git-filter-repo
     sudo pacman -S networkmanager-vpnc android-tools smartmontools
-    sudo pacman -S dmenu i3-dmenu-desktop rofi i3blocks i3lock i3status i3-wm brightnessctl dex network-manager-applet xss-lock feh playerctl dunst blueman arandr
 
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/JetBrains/JetBrainsMono/master/install_manual.sh)"
 
