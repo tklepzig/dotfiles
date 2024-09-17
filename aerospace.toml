@@ -84,7 +84,7 @@ alt-shift-0 = 'move-node-to-workspace 10'
 alt-shift-c = 'reload-config'
 
 alt-r = 'mode resize'
-alt-x = 'mode passthrough'
+alt-x = 'mode x'
 
 [mode.resize.binding]
 h = 'resize width -50'
@@ -97,6 +97,6 @@ esc = 'mode main'
 
 
 # A mode to just pass keys through to type brackets, @, etc.
-[mode.passthrough.binding]
+[mode.x.binding]
 alt-x = 'mode main'
 esc = 'mode main'
