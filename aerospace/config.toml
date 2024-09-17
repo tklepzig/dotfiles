@@ -1,5 +1,4 @@
 # Config for aerospace: https://github.com/nikitabobko/AeroSpace
-# Install via: brew install --cask nikitabobko/tap/aerospace
 # Reference: https://github.com/i3/i3/blob/next/etc/config
 
 # i3 doesn't have "normalizations" feature that why we disable them here.
@@ -19,7 +18,7 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 [mode.main.binding]
 # See: https://nikitabobko.github.io/AeroSpace/goodness#open-a-new-window-with-applescript
-alt-enter = "exec-and-forget osascript $HOME/.dotfiles/kitty.scpt"
+alt-enter = "exec-and-forget osascript $HOME/.dotfiles/aerospace/kitty.scpt"
 
 alt-h = 'focus left'
 alt-j = 'focus down'

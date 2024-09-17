@@ -337,8 +337,7 @@ def install
     `ln -sf #{DF_PATH}/i3/i3status.config #{HOME}/.config/i3status/config`
   end
 
-  `ln -sf #{DF_PATH}/amethyst.yml #{HOME}/.amethyst.yml` if OS.mac?
-  `ln -sf #{DF_PATH}/aerospace.toml #{HOME}/.aerospace.toml` if OS.mac?
+  `ln -sf #{DF_PATH}/aerospace/config.toml #{HOME}/.aerospace.toml` if OS.mac?
 
   unless Dir.exist?("#{HOME}/.fzf")
     Logger.log 'Installing fzf'
