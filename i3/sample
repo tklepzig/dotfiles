@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+echo "full_text"
+echo "short"
+# color
+echo "#ffffff"
+# background 
+echo "#000000"
+# Mark as urgent
+#exit 33

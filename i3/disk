@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+
+df -hl / | tail -1 | awk '
+/\/.*/ {
+	free=$4
+  gsub(/G$/, "", free)
+
+  print free " GB"
+  print free " GB"
+
+	if (free < 10) {
+		print "#f8e90d"
+	}
+}
+'
