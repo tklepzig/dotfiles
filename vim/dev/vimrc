@@ -56,8 +56,12 @@ let g:context_enabled = 0
 
 let g:mergetool_layout = 'b,mr'
 
+" Disable this fix dince it has to side effects: It cancels commands and when
+" opening a pane bc there is not yet one open, it does not run a proper zsh
+" but a basic sh
+" Actual fix: See https://github.com/preservim/vimux/issues/230
 " to avoid the error message "E605: Exception not caught: Tmux command failed with message:not in a mode^@" when the target pane is scrolled
-let g:VimuxResetSequence = "C-c"
+"let g:VimuxResetSequence = "C-c"
 
 " =============================================================
 " Coc Settings
