@@ -8,13 +8,14 @@ descs=( ${(f)"$($scripts_path/_run.rb --details)"} )
 
 scripts_completion() {
 	#see also https://stackoverflow.com/a/73356136
-	if [[ $CURRENT == 3 ]]
+	if [[ $CURRENT > 2 ]]
 	then
 		shift words
 		((CURRENT--))
 
 		# After the shift $words contains the current script name
 		completion=( ${(f)"$($scripts_path/_run.rb --completion $words)"} )
+		# TODO Allow completion per arg position, so a completion for the first arg, another one for the second arg, ...
 		if [ -n "$completion" ]
 		then
 			_describe -t completion 'commands' completion
