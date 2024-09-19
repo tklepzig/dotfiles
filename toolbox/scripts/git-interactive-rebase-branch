@@ -1,0 +1,6 @@
+#!/usr/bin/env zsh
+
+defaultBranch=$([ -f "$(git rev-parse --show-toplevel)/.git/refs/heads/master" ] && echo master || echo main)
+currentBranch=$(git rev-parse --abbrev-ref HEAD)
+
+git rebase -i $(git log ${1:-$defaultBranch}..${2:-$currentBranch}  --oneline --pretty=format:'%h' | tail -1)^

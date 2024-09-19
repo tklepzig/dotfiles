@@ -113,7 +113,9 @@ git config --global alias.rba "rebase --abort"
 git config --global alias.rbm "!f() { $setDefaultBranch; git rebase \$defaultBranch; }; f"
 git config --global alias.rbi "rebase -i"
 git config --global alias.rbir "rebase -i --root"
-git config --global alias.rbib "!f() { $setDefaultBranch; currentBranch=\$(git rev-parse --abbrev-ref HEAD); git rebase -i \$(git log \${1:-\$defaultBranch}..\${2:-\$currentBranch}  --oneline --pretty=format:'%h' | tail -1)^; }; f"
+#git config --global alias.rbib "!f() { $setDefaultBranch; currentBranch=\$(git rev-parse --abbrev-ref HEAD); git rebase -i \$(git log \${1:-\$defaultBranch}..\${2:-\$currentBranch}  --oneline --pretty=format:'%h' | tail -1)^; }; f"
+#Use script version
+git config --global alias.rbib "!f() { . ~/.dotfiles/toolbox/scripts/git-interactive-rebase-branch \$1 \$2; }; f"
 git config --global alias.bcb "!f() { git rebase --onto \$2 \$1; }; f"
 
 git config --global alias.undo "!f() { git reset --hard \$1 && git clean -df \$1; }; f"
