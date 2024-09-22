@@ -5,14 +5,10 @@ volume_low=
 volume_off=
 volume_muted=
 
-value=$(awk -F"[][]" '
-/Left:/ {
-  volume=$2
-  gsub(/%$/, "", volume)
-  print volume
-}
-' <(amixer get Master))
-mute=$(pactl get-sink-mute @DEFAULT_SINK@ | awk '/Mute/ { print $2 }')
+{
+    read -r value
+    read -r mute
+} <<< "$(source $HOME/.dotfiles/i3/get-volume)"
 
 if [ "$mute" = "yes" ]
 then

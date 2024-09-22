@@ -1,0 +1,13 @@
+#!/usr/bin/env zsh
+
+value=$(awk -F"[][]" '
+/Left:/ {
+  volume=$2
+  gsub(/%$/, "", volume)
+  print volume
+}
+' <(amixer get Master))
+mute=$(pactl get-sink-mute @DEFAULT_SINK@ | awk '/Mute/ { print $2 }')
+
+echo "$value"
+echo "$mute"
