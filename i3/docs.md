@@ -1,1 +1,2 @@
 - https://vivien.github.io/i3blocks
+- "Restart" dunst which reloads the config: killall dunst;notify-send dummy

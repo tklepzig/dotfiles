@@ -49,7 +49,7 @@ exec_always --no-startup-id feh --bg-fill $HOME/wallpaper/$(ls $HOME/wallpaper |
 
 #set $refresh_i3bar killall -SIGUSR1 i3status
 # For i3blocks:
-set $refresh_i3bar pkill -SIGRTMIN+10 i3blocks # make sure to set signal=10 in i3blocks config
+#set $refresh_i3bar pkill -SIGRTMIN+10 i3blocks # make sure to set signal=10 in i3blocks config
 
 # Use pactl to adjust volume in PulseAudio.
 # They allow ridiculous volume levels, could damage your speakers!
@@ -61,8 +61,8 @@ bindsym XF86AudioLowerVolume exec --no-startup-id $HOME/.dotfiles/i3/set-volume 
 bindsym XF86AudioMute exec --no-startup-id $HOME/.dotfiles/i3/set-volume toggle-mute
 bindsym XF86AudioMicMute exec --no-startup-id $HOME/.dotfiles/i3/set-volume toggle-mic-mute
 
-bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl s 5%- && $refresh_i3bar
-bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl s +5% && $refresh_i3bar
+bindsym XF86MonBrightnessDown exec --no-startup-id $HOME/.dotfiles/i3/set-brightness down
+bindsym XF86MonBrightnessUp exec --no-startup-id $HOME/.dotfiles/i3/set-brightness up
 
 bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause
 bindsym XF86AudioPause exec --no-startup-id playerctl play-pause

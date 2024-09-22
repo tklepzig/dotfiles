@@ -332,9 +332,9 @@ def install
   if program_installed? 'i3'
     add_link_with_override "#{DF_PATH}/i3/config", "#{HOME}/.config/i3/config", 'include'
 
-    # For the moment, symlink both i3blocks and i3status since it is not yet decided which one to use
     `ln -sf #{DF_PATH}/i3/i3blocks.config #{HOME}/.config/i3blocks/config`
-    `ln -sf #{DF_PATH}/i3/i3status.config #{HOME}/.config/i3status/config`
+    #`ln -sf #{DF_PATH}/i3/i3status.config #{HOME}/.config/i3status/config`
+    `ln -sf #{DF_PATH}/i3/dunst.config #{HOME}/.config/dunst/dunstrc`
   end
 
   `ln -sf #{DF_PATH}/aerospace/config.toml #{HOME}/.aerospace.toml` if OS.mac?

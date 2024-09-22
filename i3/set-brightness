@@ -1,0 +1,13 @@
+#!/usr/bin/env zsh
+
+if [[ $1 = "up" ]]
+then
+  brightnessctl s +5%
+elif [[ $1 = "down" ]]
+then
+  brightnessctl s 5%-
+fi
+
+brightness=$((10**2 * $(brightnessctl g)/$(brightnessctl m)))
+
+dunstify "Brightness" -u low -i display-brightness-symbolic -h string:x-dunst-stack-tag:tkdf-brightness-set -h int:value:$brightness
