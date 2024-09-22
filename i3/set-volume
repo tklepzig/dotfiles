@@ -1,0 +1,20 @@
+#!/usr/bin/env zsh
+
+if [[ $1 = "up" ]]
+then
+  amixer -q -D pulse sset Master 5%+
+elif [[ $1 = "down" ]]
+then
+  amixer -q -D pulse sset Master 5%-
+elif [[ $1 = "toggle-mute" ]]
+then
+  pactl set-sink-mute @DEFAULT_SINK@ toggle
+elif [[ $1 = "toggle-mic-mute" ]]
+then
+  pactl set-source-mute @DEFAULT_SOURCE@ toggle
+fi
+
+pkill -SIGRTMIN+10 i3blocks
+
+# Play the volume changed sound
+canberra-gtk-play -i audio-volume-change -d "changeVolume"

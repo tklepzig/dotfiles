@@ -56,11 +56,10 @@ set $refresh_i3bar pkill -SIGRTMIN+10 i3blocks # make sure to set signal=10 in i
 #bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3bar
 #bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3bar
 # --> Using amixer instead
-bindsym XF86AudioRaiseVolume exec --no-startup-id amixer -q -D pulse sset Master 5%+ && $refresh_i3bar
-bindsym XF86AudioLowerVolume exec --no-startup-id amixer -q -D pulse sset Master 5%- && $refresh_i3bar
-
-bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3bar
-bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3bar
+bindsym XF86AudioRaiseVolume exec --no-startup-id $HOME/.dotfiles/i3/set-volume up
+bindsym XF86AudioLowerVolume exec --no-startup-id $HOME/.dotfiles/i3/set-volume down
+bindsym XF86AudioMute exec --no-startup-id $HOME/.dotfiles/i3/set-volume toggle-mute
+bindsym XF86AudioMicMute exec --no-startup-id $HOME/.dotfiles/i3/set-volume toggle-mic-mute
 
 bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl s 5%- && $refresh_i3bar
 bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl s +5% && $refresh_i3bar
