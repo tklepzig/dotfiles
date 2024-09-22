@@ -11,23 +11,35 @@ then
     exit
 fi
 
+empty_battery="\uf244"
+low_battery="\uf243"
+medium_battery="\uf242"
+high_battery="\uf241"
+full_battery="\uf240"
+on_ac="\uf1e6"
+
 if [[ "$state" = "charging" ]]
 then
-    echo "<span color='#22be5e'>$value%</span>"
-elif [[ $value -lt 16 ]]
+    echo "<span color='#22be5e'>$on_ac $value%</span>"
+elif [[ $value -lt 10 ]]
 then
+    dunstify -i battery-empty-symbolic -h string:x-dunst-stack-tag:tkdf-battery-critical -u critical "Battery critical" "Battery is at $value%"
+
     if [[ "$(($(date '+%s') % 2))" = "1" ]]
     then
-        echo "<span background='#b92500' color='white' weight='bold'> $value% </span>"
+        echo "<span background='#b92500' color='white' weight='bold'> $empty_battery $value% </span>"
     else
-        echo "<span weight='bold'> $value% </span>"
+        echo "<span weight='bold'> $empty_battery $value% </span>"
     fi
 elif [[ $value -lt 31 ]]
 then
-    echo "<span color='#f8e90d' weight='bold'>$value%</span>"
+    echo "<span color='#f8e90d' weight='bold'>$low_battery $value%</span>"
+elif [[ $value -lt 50 ]]
+then
+    echo "$medium_battery $value%"
+elif [[ $value -lt 76 ]]
+then
+    echo "$high_battery $value%"
 else
-    echo "$value%"
+    echo "$full_battery $value%"
 fi
-
-
-

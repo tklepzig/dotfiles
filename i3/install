@@ -1,4 +1,4 @@
 #!/usr/bin/env zsh
 
-sudo pacman -S i3-wm dmenu i3-dmenu-desktop rofi i3blocks i3lock i3status brightnessctl dex network-manager-applet xss-lock feh playerctl dunst blueman arandr
+sudo pacman -S i3-wm dmenu i3-dmenu-desktop rofi i3blocks i3lock i3status brightnessctl dex network-manager-applet xss-lock feh playerctl dunst blueman arandr ttf-font-awesome
 
