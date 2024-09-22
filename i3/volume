@@ -1,11 +1,29 @@
-#/bin/bash
+#!/usr/bin/env zsh
 
-value=$(awk -F"[][]" '/Left:/ { print $2 }' <(amixer sget Master))
+volume_high=
+volume_low=
+volume_off=
+volume_muted=
+
+value=$(awk -F"[][]" '
+/Left:/ {
+  volume=$2
+  gsub(/%$/, "", volume)
+  print volume
+}
+' <(amixer get Master))
 mute=$(pactl get-sink-mute @DEFAULT_SINK@ | awk '/Mute/ { print $2 }')
 
-if [ "$mute" = "yes" ]; then
-  echo "$value (Muted)"
+if [ "$mute" = "yes" ]
+then
+  echo "$volume_muted"
+elif [[ $value -eq 0 ]]
+then
+  echo "$volume_off $value%"
+elif [[ $value -lt 50 ]]
+then
+  echo "$volume_low $value%"
 else
-  echo "$value"
+  echo "$volume_high $value%"
 fi
 

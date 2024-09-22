@@ -1,0 +1,1 @@
+- https://vivien.github.io/i3blocks
