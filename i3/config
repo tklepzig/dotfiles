@@ -79,6 +79,9 @@ tiling_drag modifier titlebar
 # start a terminal
 bindsym $mod+Return exec i3-sensible-terminal
 
+# open a new chrome window
+bindsym $mod+Shift+Return exec google-chrome-stable
+
 # kill focused window
 bindsym $mod+Shift+q kill
 
