@@ -83,6 +83,7 @@ alt-shift-right = 'move-node-to-workspace next'
 alt-shift-left = 'move-node-to-workspace prev'
 
 alt-shift-c = 'reload-config'
+alt-shift-r = 'flatten-workspace-tree'
 
 alt-r = 'mode resize'
 alt-x = 'mode x'
