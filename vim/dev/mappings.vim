@@ -32,10 +32,25 @@ nnoremap <leader>vZ :VimuxZoomRunner<cr>:VimuxInspectRunner<cr>
 
 nnoremap <leader><Tab> :BufferNavigatorToggle<cr>
 
-"" Go to last active tab
-"au TabLeave * let g:lasttab = tabpagenr()
-"nnoremap <silent> <leader><Tab> :exe "tabn ".g:lasttab<cr>
-"vnoremap <silent> <leader><Tab> :exe "tabn ".g:lasttab<cr>
+" --- tab handling ---
+" built-in mappings:
+"   Go to next tab: gt
+"   Go to previous tab: gT
+"   Go to last accessed tab: g<Tab>
+"
+" additional ones:
+nnoremap <leader>wt :tab split<cr>
+nnoremap <leader>wQ :tabclose<cr>
+
+nnoremap <leader>w1 1gt
+nnoremap <leader>w2 2gt
+nnoremap <leader>w3 3gt
+nnoremap <leader>w4 4gt
+nnoremap <leader>w5 5gt
+nnoremap <leader>w6 6gt
+nnoremap <leader>w7 7gt
+nnoremap <leader>w8 8gt
+nnoremap <leader>w9 9gt
 
 
 " vim-fugitive & gv

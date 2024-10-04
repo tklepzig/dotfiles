@@ -9,7 +9,7 @@ execute 'highlight WinSeparator ctermfg=244 ctermbg=NONE'
 
 set fillchars+=stl:\―,stlnc:\―
 
-function! CurrentBufferTabLine()
+function! TabLineCurrentBuffer()
   let bufpath = expand("%:~:.:h")
   let bufname = expand("%:t")
   if empty(bufname)
@@ -18,16 +18,49 @@ function! CurrentBufferTabLine()
 
   let path = (!empty(bufpath) && bufpath != ".") ? "%#Secondary# " . bufpath . " %#Gap# " : ""
   let name = (&modified ? "%#Accent# " : "%#Primary# ") . bufname . " %#Gap# "
-  let isnvim = ""
 
-  if !empty($DOTFILES_NVIM) && has('nvim')
-    let isnvim = " %#Gap# " . "%#Primary# " . "nvim "
+  return path . name
+endfunction
+
+function TabLineTabs()
+  if tabpagenr('$') <= 1
+    return ''
   endif
 
-  return '%#Primary# %#Gap# ' . path . name . '%#Primary#%=' . isnvim
+  let tabs = ''
+  for i in range(tabpagenr('$'))
+    let tabnr = i + 1
+
+    " set the tab page number (for mouse clicks)
+    let tabs .= '%' . tabnr . 'T'
+
+    let tabs .= '%#Gap# '
+
+    if tabnr == tabpagenr()
+      let tabs .= '%#Accent# '
+    else
+      let tabs .= '%#Primary# '
+    endif
+
+    let buflist = tabpagebuflist(tabnr)
+    let winnr = tabpagewinnr(tabnr)
+    let tabs .=  tabnr . ' '
+  endfor
+
+  " after the last tab reset tab page nr
+  let tabs .= '%T'
+
+  return tabs . '%#Gap# %#Primary# '
 endfunction
+
+function! TabLine()
+  let currentBuffer = TabLineCurrentBuffer()
+  let tabs = TabLineTabs()
+  return '%#Primary# %#Gap# ' . currentBuffer . '%#Primary#%=' . tabs
+endfunction
+
 set showtabline=2
-set tabline=%!CurrentBufferTabLine()
+set tabline=%!TabLine()
 
 function! CocStatus()
   if !exists(':CocCommand')
@@ -49,7 +82,7 @@ function! CocStatus()
 endfunction
 
 function! StatusLine()
-	let isActive = g:statusline_winid == win_getid()
+  let isActive = g:statusline_winid == win_getid()
 
   if (!isActive)
     let bufnr = get(getwininfo(g:statusline_winid)[0], 'bufnr')

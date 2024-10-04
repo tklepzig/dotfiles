@@ -32,16 +32,6 @@ map Y y$
 nnoremap <silent> <leader>! :ExecuteSelection<cr>
 vnoremap <silent> <leader>! :ExecuteSelection<cr>
 
-nnoremap <leader>w1 :1wincmd w<cr>
-nnoremap <leader>w2 :2wincmd w<cr>
-nnoremap <leader>w3 :3wincmd w<cr>
-nnoremap <leader>w4 :4wincmd w<cr>
-nnoremap <leader>w5 :5wincmd w<cr>
-nnoremap <leader>w6 :6wincmd w<cr>
-nnoremap <leader>w7 :7wincmd w<cr>
-nnoremap <leader>w8 :8wincmd w<cr>
-nnoremap <leader>w9 :9wincmd w<cr>
-
 " no arrow keys in edit mode
 inoremap <Left> <nop>
 inoremap <Right> <nop>
