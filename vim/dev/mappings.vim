@@ -39,9 +39,14 @@ nnoremap <leader><Tab> :BufferNavigatorToggle<cr>
 "   Go to last accessed tab: g<Tab>
 "
 " additional ones:
+"
+" not yet clear which mapping works best in daily usage
 nnoremap <leader>wt :tab split<cr>
+nnoremap gn :tab split<cr>
+
 nnoremap <leader>wQ :tabclose<cr>
 
+" not yet clear which mapping works best in daily usage
 nnoremap <leader>w1 1gt
 nnoremap <leader>w2 2gt
 nnoremap <leader>w3 3gt
@@ -51,6 +56,15 @@ nnoremap <leader>w6 6gt
 nnoremap <leader>w7 7gt
 nnoremap <leader>w8 8gt
 nnoremap <leader>w9 9gt
+nnoremap g1 1gt
+nnoremap g2 2gt
+nnoremap g3 3gt
+nnoremap g4 4gt
+nnoremap g5 5gt
+nnoremap g6 6gt
+nnoremap g7 7gt
+nnoremap g8 8gt
+nnoremap g9 9gt
 
 
 " vim-fugitive & gv
