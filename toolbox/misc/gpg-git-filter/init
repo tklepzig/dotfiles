@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
 
 git config filter.encrypt.required true
-git config filter.encrypt.clean "$HOME/.dotfiles/toolbox/misc/gpg-git-filter/clean $1 '%f'"
+git config filter.encrypt.clean "$HOME/.dotfiles/toolbox/misc/gpg-git-filter/clean $1"
 git config filter.encrypt.smudge "$HOME/.dotfiles/toolbox/misc/gpg-git-filter/smudge $1"

@@ -1,7 +1,8 @@
-    git clone --no-checkout <repo-url>
-    ./init <gpg-key-id>
-    git checkout
+Usage:
 
-Add .gitattributes file with correct config, e.g.
+    ./clone <repo-url> <gpg-key-id>
 
+Ensure the necessary filetypes are correctly configured in `.gitattributes`:
+
+    # encrypt markdown files
     *.md filter=encrypt
