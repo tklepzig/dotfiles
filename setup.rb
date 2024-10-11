@@ -242,6 +242,8 @@ def install
   if Dir.exist?(DF_PATH)
     Logger.log "Found existing dotfiles in #{DF_PATH}, updating"
     Dir.chdir(DF_PATH) do
+      current_hash = `git rev-parse --short HEAD`.strip
+
       # Set the branch if it is defined
       `git remote set-branches origin #{DF_BRANCH}` if DF_BRANCH
 
@@ -257,6 +259,8 @@ def install
         `git checkout --quiet #{DF_BRANCH}`
       end
 
+      Logger.success "Updated dotfiles from #{current_hash} to #{`git rev-parse --short HEAD`.strip}."
+
       # Remove ignored changes
       # Do not remove ignored changes, e.g. to keep generated certificates
       # `git clean -fx > /dev/null 2>&1`
@@ -265,6 +269,10 @@ def install
     Logger.log "Cloning repo from #{DF_REPO} to #{DF_PATH}"
     Logger.success "Switching to branch #{DF_BRANCH}" if DF_BRANCH
     `git clone --quiet --depth=1#{DF_BRANCH ? " -b #{DF_BRANCH}" : ''} https://github.com/#{DF_REPO}.git #{DF_PATH}`
+
+    Dir.chdir(DF_PATH) do
+      Logger.success "Installed dotfiles at #{`git rev-parse --short HEAD`.strip}."
+    end
   end
 
   `mkdir -p #{DF_LOCAL_PATH}`
@@ -333,7 +341,7 @@ def install
     add_link_with_override "#{DF_PATH}/i3/config", "#{HOME}/.config/i3/config", 'include'
 
     `ln -sf #{DF_PATH}/i3/i3blocks.config #{HOME}/.config/i3blocks/config`
-    #`ln -sf #{DF_PATH}/i3/i3status.config #{HOME}/.config/i3status/config`
+    # `ln -sf #{DF_PATH}/i3/i3status.config #{HOME}/.config/i3status/config`
     `ln -sf #{DF_PATH}/i3/dunst.config #{HOME}/.config/dunst/dunstrc`
   end
 
@@ -376,9 +384,7 @@ def install
     end
   end
 
-  Dir.chdir(DF_PATH) do
-    Logger.success "Successfully installed dotfiles version #{`git rev-parse --short HEAD`.strip}."
-  end
+  Logger.success 'Setup done.'
 end
 
 def uninstall
