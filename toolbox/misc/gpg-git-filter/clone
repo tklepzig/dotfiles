@@ -1,6 +1,0 @@
-#!/usr/bin/env zsh
-
-git clone --no-checkout $1
-cd "$(basename $1 .git)"
-$HOME/.dotfiles/toolbox/misc/gpg-git-filter/init $2
-git checkout
