@@ -59,7 +59,7 @@ if ARGV[0] == 'help'
     args = infos[script_name]['args']
     args_help = args.map do |arg|
       default = arg['default'] ? " = #{arg['default']}" : ''
-      arg['optional'] ? "[#{arg['name']}#{default}]" : arg['name']
+      arg['optional'] ? "[#{arg['name']}#{default}]" : "<#{arg['name']}>"
     end.join(' ')
   end
   puts "Usage: #{script_name} #{args_help}"
