@@ -111,6 +111,7 @@ setup-asdf:
 stacked:
   help: Using stacked branches in git
   completion:
+    - init
     - branch
     - pr
     - sync

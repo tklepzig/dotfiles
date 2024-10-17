@@ -101,6 +101,11 @@ def open
   end
 end
 
+def init
+  current_branch = `git branch --show-current`.strip
+  File.write(MERGE_QUEUE_PATH, ['main', current_branch].to_yaml)
+end
+
 def merge_queue
   # TODO: cache file, avoid heavy IO
   return ['main'] unless File.exist?(MERGE_QUEUE_PATH)
