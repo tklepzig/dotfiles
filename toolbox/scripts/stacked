@@ -47,11 +47,17 @@ end
 def sync
   current_branch = `git branch --show-current`.strip
 
+  strategy = if ARGV[1] == '-f'
+               ' -X ours'
+             else
+               ''
+             end
+
   `git checkout #{merge_queue.last}`
 
   merge_queue.drop(2).each do |branch|
     `git checkout #{branch}`
-    `git rebase #{parent_branch(branch)} -X ours --autostash`
+    `git rebase #{parent_branch(branch)}#{strategy} --autostash`
   end
 
   `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
