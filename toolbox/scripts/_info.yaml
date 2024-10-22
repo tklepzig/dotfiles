@@ -116,6 +116,7 @@ stacked:
     - pr
     - sync
     - update
+    - delete
     - c
     - open
 tmux-archive:

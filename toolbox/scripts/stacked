@@ -80,6 +80,21 @@ def update
   `git checkout #{current_branch}`
 end
 
+def delete
+  updated_merge_queue = merge_queue.drop(1).dup
+
+  if ARGV[1].nil?
+    current_branch = `git branch --show-current`.strip
+    updated_merge_queue.delete(current_branch)
+    puts "Deleted #{current_branch}"
+  else
+    updated_merge_queue.delete_at(ARGV[1].to_i)
+    puts "Deleted #{merge_queue.drop(1).at(ARGV[1].to_i)}"
+  end
+
+  File.write(MERGE_QUEUE_PATH, ['main', *updated_merge_queue].to_yaml)
+end
+
 def c
   queue_without_base = merge_queue.drop(1)
   param = if ARGV[1] == 'prev'
