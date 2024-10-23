@@ -161,6 +161,11 @@ augroup fixHtmlFiletype
   autocmd BufNewFile,BufRead *.html  set ft=html
 augroup END
 
+augroup filetype_gitcommit
+    autocmd!
+    autocmd FileType gitcommit iab <buffer> <expr> wip "wip [skip ci]"
+augroup END
+
 if !empty($DOTFILES_NVIM) && has('nvim')
   "Copilot Chat Stuff
 lua << EOF
