@@ -12,6 +12,9 @@
 * [Search and Replace](#search-and-replace)
     * [Use any character as delimiter](#use-any-character-as-delimiter)
 * [Calculations](#calculations)
+* [Current Maps and Built-Ins](#current-maps-and-built-ins)
+    * [Mappings](#mappings)
+    * [Built-Ins](#built-ins)
 * [TODO](#todo)
 
 <!-- vim-markdown-toc -->
@@ -160,6 +163,30 @@ To pipe the lines that are currently selected in visual mode to bc and replace
 with it with the result:
 
     !bc
+
+## Current Maps and Built-Ins
+
+### Mappings
+
+List mappings
+
+    :map
+
+To get it searchable, put it into a register (here `a`):
+
+    :redir @a
+    :map
+    :redir END
+
+Paste the content of the register in the current buffer:
+
+    "ap
+
+### Built-Ins
+
+List all built-in mappings
+
+    :help index
 
 ## TODO
 
