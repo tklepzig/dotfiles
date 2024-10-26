@@ -45,6 +45,7 @@ nnoremap <leader>wt :$tab split<cr>
 nnoremap gn :$tab split<cr>
 
 nnoremap <leader>wQ :tabclose<cr>
+nnoremap gc :tabclose<cr>
 
 " not yet clear which mapping works best in daily usage
 nnoremap <leader>w1 1gt
@@ -66,6 +67,10 @@ nnoremap g7 7gt
 nnoremap g8 8gt
 nnoremap g9 9gt
 
+" diff buffers directly in place
+nnoremap <expr> <leader>wd &diff? ':windo diffoff<CR>' : ':windo diffthis<CR>'
+
+nmap <expr> <S-Left> &diff? '<Plug>(MergetoolDiffExchangeLeft)' : '<S-Left>'
 
 " vim-fugitive & gv
 nnoremap <leader>gs :G<CR>
