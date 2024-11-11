@@ -155,6 +155,8 @@ if dotfilesTheme =~ '-light$'
   autocmd FileType buffernavigator highlight BufferNavigatorDir ctermfg=0 ctermbg=NONE 
 endif
 
+highlight NormalFloat ctermbg=236
+
 " For whatever reason, vim started to set the filetype for *.html files to sh
 augroup fixHtmlFiletype
   au!
