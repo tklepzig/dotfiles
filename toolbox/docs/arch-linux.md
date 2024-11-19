@@ -28,6 +28,7 @@
     * [Troubleshooting](#troubleshooting)
         * [File /var/cache/pacman/pkg/something.tar.xz is corrupted (invalid or corrupted package (PGP signature)).](#file-varcachepacmanpkgsomethingtarxz-is-corrupted-invalid-or-corrupted-package-pgp-signature)
 * [Bluetooth Troubleshooting](#bluetooth-troubleshooting)
+* [TODO (WIP)](#todo-wip)
 * [References](#references)
 
 <!-- vim-markdown-toc -->
@@ -471,6 +472,13 @@ Remove any possible bluetooth device blocks
 Restart bluetooth via bluetoothctl
 
     echo -e 'show\npower off\npower on\nquit' | bluetoothctl
+
+### TODO (WIP)
+
+Get battery status of all connected devices (notebook battery, mouse, keyboard,
+headphones, etc.)
+
+    upower --dump
 
 ### References
 
