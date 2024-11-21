@@ -14,7 +14,8 @@ start-at-login = true
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 [workspace-to-monitor-force-assignment]
-9 = 'secondary'
+8 = 'Built-in'
+9 = 'AirPlay'
 
 [mode.main.binding]
 # See: https://nikitabobko.github.io/AeroSpace/goodness#open-a-new-window-with-applescript
