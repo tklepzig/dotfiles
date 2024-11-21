@@ -1,5 +1,15 @@
 # Linux in General
 
+## Redirection Shorthand
+
+Redirect directly stdout and stderr to whatever, e.g. `/dev/null`
+
+    &>/dev/null
+
+> instead of
+>
+>     >/dev/null 2>&1
+
 ## Retrieve who is taking up so much space
 
 This will tell you which directory is taking up the most space, then just change
