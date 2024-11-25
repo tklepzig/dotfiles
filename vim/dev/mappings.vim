@@ -44,6 +44,8 @@ nnoremap <leader><Tab> :BufferNavigatorToggle<cr>
 nnoremap <leader>wt :$tab split<cr>
 nnoremap gn :$tab split<cr>
 
+nnoremap <Tab> gt
+
 nnoremap <leader>wQ :tabclose<cr>
 nnoremap gc :tabclose<cr>
 
