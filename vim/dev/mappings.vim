@@ -41,13 +41,13 @@ nnoremap <leader><Tab> :BufferNavigatorToggle<cr>
 " additional ones:
 "
 " not yet clear which mapping works best in daily usage
-nnoremap <leader>wt :$tab split<cr>
-nnoremap gn :$tab split<cr>
+nnoremap <silent> <leader>wt :$tab split<cr>
+nnoremap <silent> gn :$tab split<cr>
 
-nnoremap <Tab> :tabNext<cr>
+nnoremap <silent> <Tab> :tabNext<cr>
 
-nnoremap <leader>wQ :tabclose<cr>
-nnoremap gc :tabclose<cr>
+nnoremap <silent> <leader>wQ :tabclose<cr>
+nnoremap <silent> gc :tabclose<cr>
 
 " not yet clear which mapping works best in daily usage
 nnoremap <leader>w1 1gt
