@@ -36,6 +36,8 @@ generate-password:
       default: 16
 git-checkout-fuzzy:
   help: Use git checkout with fzf's fuzzy search
+git-clone-cd:
+  help: Clone a repository and cd into it
 git-fetch-all:
   help: Fetches all repos in current directory
   args:

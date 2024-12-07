@@ -49,6 +49,8 @@ fi
 
 alias git='LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 git'
 alias g='git'
+gcln() { source $HOME/.dotfiles/toolbox/scripts/git-clone-cd $1 }
+
 alias ghs='gh status'
 alias s='# stacked'
 alias c='clear'
