@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'English'
 require 'yaml'
 
 module OS
@@ -10,6 +11,12 @@ module OS
 
   def self.linux?
     (/linux/ =~ RUBY_PLATFORM) != nil
+  end
+end
+
+class RebaseError < StandardError
+  def initialize(branch)
+    super("Rebase failed for #{branch}")
   end
 end
 
@@ -58,10 +65,13 @@ def sync
   merge_queue.drop(2).each do |branch|
     `git checkout #{branch}`
     `git rebase #{parent_branch(branch)}#{strategy} --autostash`
+    raise RebaseError, branch unless $CHILD_STATUS.success?
   end
 
   `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
   `git checkout #{current_branch}`
+rescue RebaseError => e
+  puts "\e[0;31m#{e.message}, aborting\e[0m"
 end
 
 # update to newest base (main/master)
@@ -75,9 +85,12 @@ def update
 
   `git checkout #{merge_queue.last}`
   `git rebase --update-refs #{merge_queue.at(0)} --autostash` # -X ours?
-  `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
+  raise RebaseError, merge_queue.at(0) unless $CHILD_STATUS.success?
 
+  `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
   `git checkout #{current_branch}`
+rescue RebaseError => e
+  puts "\e[0;31m#{e.message}, aborting\e[0m"
 end
 
 def delete
