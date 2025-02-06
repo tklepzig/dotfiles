@@ -122,6 +122,7 @@ augroup aichat
     autocmd FileType aichat nnoremap <buffer> <nowait> <leader>m :set buftype= \| 0file \| QuickMemo aichat<CR>
 augroup END
 
+nmap <leader>gr <Plug>(MergetoolToggle)
 nmap <leader>gmt <Plug>(MergetoolToggle)
 nmap <leader>gmr :MergetoolPreferRemote<cr>
 nmap <leader>gml :MergetoolPreferLocal<cr>
@@ -131,6 +132,9 @@ nmap <expr> <S-Left> &diff? '<Plug>(MergetoolDiffExchangeLeft)' : '<S-Left>'
 nmap <expr> <S-Right> &diff? '<Plug>(MergetoolDiffExchangeRight)' : '<S-Right>'
 nmap <expr> <S-Down> &diff? '<Plug>(MergetoolDiffExchangeDown)' : '<S-Down>'
 nmap <expr> <S-Up> &diff? '<Plug>(MergetoolDiffExchangeUp)' : '<S-Up>'
+
+nnoremap cx <Plug>(conflict-marker-next-hunk)
+nnoremap cX <Plug>(conflict-marker-prev-hunk)
 
 " Coc
 

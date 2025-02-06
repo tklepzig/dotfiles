@@ -168,6 +168,13 @@ augroup filetype_gitcommit
     autocmd FileType gitcommit iab <buffer> <expr> wip "wip [skip ci]"
 augroup END
 
+" Config for rhysd/conflict-marker.vim
+let g:conflict_marker_highlight_group = ''
+highlight ConflictMarkerOurs ctermbg=23
+highlight ConflictMarkerTheirs ctermbg=58
+highlight ConflictMarkerCommonAncestorsHunk ctermbg=237
+
+
 if !empty($DOTFILES_NVIM) && has('nvim')
   "Copilot Chat Stuff
 lua << EOF
