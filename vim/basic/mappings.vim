@@ -26,6 +26,12 @@ vmap L $
 vnoremap <silent> P "0p
 nnoremap <leader>$ :shell<cr>
 
+" easier execution of macros
+nmap <BS> @
+nmap <BS><BS> @@
+vmap <BS> @
+vmap <BS><BS> @@
+
 " see :help Y
 map Y y$
 
