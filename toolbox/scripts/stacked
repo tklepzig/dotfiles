@@ -4,6 +4,35 @@
 require 'English'
 require 'yaml'
 
+module Logger
+  @level = 0
+
+  def self.log(message)
+    prefix = @level.zero? ? "\e[1;34m\u276f " : ''
+    message = message.rjust(message.length + 2 * @level)
+    puts "#{prefix}\e[0;34m#{message}\e[0m"
+
+    return unless block_given?
+
+    @level += 1
+    yield
+    @level -= 1
+    @level = 0 if @level.negative?
+  end
+
+  def self.success(message)
+    prefix = @level.zero? ? "\e[1;36m\u276f " : ''
+    message = message.rjust(message.length + 2 * @level)
+    puts "#{prefix}\e[0;36m#{message}\e[0m"
+  end
+
+  def self.error(message)
+    prefix = @level.zero? ? "\e[1;31m\u276f " : ''
+    message = message.rjust(message.length + 2 * @level)
+    puts "#{prefix}\e[0;31m#{message}\e[0m"
+  end
+end
+
 module OS
   def self.mac?
     (/darwin/ =~ RUBY_PLATFORM) != nil
@@ -17,6 +46,18 @@ end
 class RebaseError < StandardError
   def initialize(branch)
     super("Rebase failed for #{branch}")
+  end
+end
+
+class FastForwardError < StandardError
+  def initialize(branch)
+    super("Fast-forward merge failed for #{branch}")
+  end
+end
+
+class CheckoutError < StandardError
+  def initialize(branch)
+    super("Checkout failed for #{branch}")
   end
 end
 
@@ -52,45 +93,60 @@ end
 
 # sync untereinander
 def sync
-  current_branch = `git branch --show-current`.strip
+  Logger.log 'Syncing stack' do
+    current_branch = `git branch --show-current`.strip
 
-  strategy = if ARGV[1] == '-f'
-               ' -X ours'
-             else
-               ''
-             end
+    strategy = if ARGV[1] == '-f'
+                 ' -X ours'
+               else
+                 ''
+               end
 
-  `git checkout #{merge_queue.last}`
+    `git checkout #{merge_queue.last}`
 
-  merge_queue.drop(2).each do |branch|
-    `git checkout #{branch}`
-    `git rebase #{parent_branch(branch)}#{strategy} --autostash`
-    raise RebaseError, branch unless $CHILD_STATUS.success?
+    merge_queue.drop(2).each do |branch|
+      `git checkout #{branch}`
+      raise CheckoutError, branch unless $CHILD_STATUS.success?
+
+      `git rebase #{parent_branch(branch)}#{strategy} --autostash`
+      raise RebaseError, branch unless $CHILD_STATUS.success?
+    end
+
+    `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
+    `git checkout #{current_branch}`
+
+    Logger.success 'Done.'
   end
-
-  `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
-  `git checkout #{current_branch}`
-rescue RebaseError => e
-  puts "\e[0;31m#{e.message}, aborting\e[0m"
+rescue StandardError => e
+  Logger.error "#{e.message}, aborting"
 end
 
 # update to newest base (main/master)
 def update
-  current_branch = `git branch --show-current`.strip
+  Logger.log 'Updating base branch' do
+    `git checkout #{merge_queue.at(0)}`
+    raise CheckoutError, merge_queue.at(0) unless $CHILD_STATUS.success?
 
-  # TODO: run sync first
-  `git checkout #{merge_queue.at(0)}`
-  `git fetch origin #{merge_queue.at(0)}`
-  `git merge --ff-only`
+    `git fetch origin #{merge_queue.at(0)}`
+    `git merge --ff-only`
+    raise FastForwardError, merge_queue.at(0) unless $CHILD_STATUS.success?
 
-  `git checkout #{merge_queue.last}`
-  `git rebase --update-refs #{merge_queue.at(0)} --autostash` # -X ours?
-  raise RebaseError, merge_queue.at(0) unless $CHILD_STATUS.success?
+    Logger.success 'Done.'
+  end
 
-  `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
-  `git checkout #{current_branch}`
-rescue RebaseError => e
-  puts "\e[0;31m#{e.message}, aborting\e[0m"
+  sync
+
+  # Not needed when running sync, but
+  # kept for doc reasons how rebase with --update-refs works
+  #
+  # `git checkout #{merge_queue.last}`
+  # `git rebase --update-refs #{merge_queue.at(0)} --autostash` # -X ours?
+  # raise RebaseError, merge_queue.at(0) unless $CHILD_STATUS.success?
+
+  # `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
+  # `git checkout #{current_branch}`
+rescue StandardError => e
+  Logger.error "#{e.message}, aborting"
 end
 
 def delete
