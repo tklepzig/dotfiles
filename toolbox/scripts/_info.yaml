@@ -113,14 +113,15 @@ setup-asdf:
 stacked:
   help: Using stacked branches in git
   completion:
-    - init
     - branch
+    - c
+    - delete
+    - init
+    - open
+    - parent
     - pr
     - sync
     - update
-    - delete
-    - c
-    - open
 tmux-archive:
   help: Archive or restore tmux session
   args:

@@ -125,6 +125,18 @@ def c
   end
 end
 
+def parent
+  current_branch = `git branch --show-current`.strip
+  current_branch_index = merge_queue.find_index(current_branch)
+
+  if current_branch_index.zero?
+    puts "\e[0;31mAlready at the beginning of the stack, aborting\e[0m"
+    return
+  end
+
+  puts merge_queue.at(current_branch_index - 1)
+end
+
 def open
   cmd = OS.linux? ? 'xdg-open' : 'open'
   remote = `git remote get-url origin`.strip
