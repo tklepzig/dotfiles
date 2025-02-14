@@ -98,17 +98,23 @@ def sync(start_index: 1)
     `git checkout #{merge_queue.last}`
     raise CheckoutError, merge_queue.last unless $CHILD_STATUS.success?
 
-    `git rebase #{merge_queue.at(start_index)} --update-refs --autostash`
-    raise RebaseError, merge_queue.at(start_index) unless $CHILD_STATUS.success?
+    # git rebase --update-refs is only possible when updating always the base branch of the stack, not for anyone in the middle, see below
+    # Scenario: 4 branches, A, B, C, D
+    # If C has been updated and the following is run:
+    # git checkout D
+    # git rebase A --update-refs is run
+    # --> nothing happens, because D is already on top of A, any updated branch in-between is ignored
+    #
+    # `git rebase #{merge_queue.at(start_index)} --update-refs --autostash`
+    # raise RebaseError, merge_queue.at(start_index) unless $CHILD_STATUS.success?
 
-    # Old approach by rebasing each branch on top of the previous one in a loop
-    # merge_queue.drop(2).each do |branch|
-    # `git checkout #{branch}`
-    # raise CheckoutError, branch unless $CHILD_STATUS.success?
+    merge_queue.drop(start_index + 1).each do |branch|
+      `git checkout #{branch}`
+      raise CheckoutError, branch unless $CHILD_STATUS.success?
 
-    # `git rebase #{parent_branch(branch)} --autostash`
-    # raise RebaseError, branch unless $CHILD_STATUS.success?
-    # end
+      `git rebase #{parent_branch(branch)} --autostash`
+      raise RebaseError, parent_branch(branch) unless $CHILD_STATUS.success?
+    end
 
     `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
     `git checkout #{current_branch}`
@@ -221,7 +227,7 @@ def merge_queue
   # TODO: cache file, avoid heavy IO
   return ['main'] unless File.exist?(MERGE_QUEUE_PATH)
 
-  YAML.load_file(MERGE_QUEUE_PATH)
+  YAML.load_file(MERGE_QUEUE_PATH).compact
 end
 
 def parent_branch(branch_name)
