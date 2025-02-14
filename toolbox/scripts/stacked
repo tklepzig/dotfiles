@@ -91,26 +91,24 @@ def pr
   `gh pr create --web --base #{parent_branch(current_branch)}`
 end
 
-# sync untereinander
-def sync
+def sync(start_index: 1)
   Logger.log 'Syncing stack' do
     current_branch = `git branch --show-current`.strip
 
-    strategy = if ARGV[1] == '-f'
-                 ' -X ours'
-               else
-                 ''
-               end
-
     `git checkout #{merge_queue.last}`
+    raise CheckoutError, merge_queue.last unless $CHILD_STATUS.success?
 
-    merge_queue.drop(2).each do |branch|
-      `git checkout #{branch}`
-      raise CheckoutError, branch unless $CHILD_STATUS.success?
+    `git rebase #{merge_queue.at(start_index)} --update-refs --autostash`
+    raise RebaseError, merge_queue.at(start_index) unless $CHILD_STATUS.success?
 
-      `git rebase #{parent_branch(branch)}#{strategy} --autostash`
-      raise RebaseError, branch unless $CHILD_STATUS.success?
-    end
+    # Old approach by rebasing each branch on top of the previous one in a loop
+    # merge_queue.drop(2).each do |branch|
+    # `git checkout #{branch}`
+    # raise CheckoutError, branch unless $CHILD_STATUS.success?
+
+    # `git rebase #{parent_branch(branch)} --autostash`
+    # raise RebaseError, branch unless $CHILD_STATUS.success?
+    # end
 
     `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
     `git checkout #{current_branch}`
@@ -124,6 +122,8 @@ end
 # update to newest base (main/master)
 def update
   Logger.log 'Updating base branch' do
+    current_branch = `git branch --show-current`.strip
+
     `git checkout #{merge_queue.at(0)}`
     raise CheckoutError, merge_queue.at(0) unless $CHILD_STATUS.success?
 
@@ -131,10 +131,12 @@ def update
     `git merge --ff-only`
     raise FastForwardError, merge_queue.at(0) unless $CHILD_STATUS.success?
 
+    `git checkout #{current_branch}`
+
     Logger.success 'Done.'
   end
 
-  sync
+  sync start_index: 0
 
   # Not needed when running sync, but
   # kept for doc reasons how rebase with --update-refs works
@@ -155,16 +157,22 @@ def delete
   if ARGV[1].nil?
     current_branch = `git branch --show-current`.strip
     updated_merge_queue.delete(current_branch)
-    puts "Deleted #{current_branch}"
+    Logger.success "Deleted #{current_branch}"
   else
     updated_merge_queue.delete_at(ARGV[1].to_i)
-    puts "Deleted #{merge_queue.drop(1).at(ARGV[1].to_i)}"
+    Logger.success "Deleted #{merge_queue.drop(1).at(ARGV[1].to_i)}"
   end
 
   File.write(MERGE_QUEUE_PATH, ['main', *updated_merge_queue].to_yaml)
 end
 
 def c
+  # TODO: Improve w/ shorthands:
+  # - -> -1
+  # + -> +1
+  # -2 -3, ...
+  # +2 +3, ...
+  # 0, 1, 2, ...
   queue_without_base = merge_queue.drop(1)
   param = if ARGV[1] == 'prev'
             '-1'
@@ -181,12 +189,13 @@ def c
   end
 end
 
+# TODO: Reuse parent_branch method
 def parent
   current_branch = `git branch --show-current`.strip
   current_branch_index = merge_queue.find_index(current_branch)
 
   if current_branch_index.zero?
-    puts "\e[0;31mAlready at the beginning of the stack, aborting\e[0m"
+    Logger.error 'Already at the beginning of the stack, aborting'
     return
   end
 
@@ -225,7 +234,13 @@ def parent_branch(branch_name)
 end
 
 begin
+  # Improve this, avoid send?
+  # if command.start_with?(/\+|-/)
+  # ARGV[1] = command
+  # command = 'c'
+  # end
+
   send(command)
 rescue NoMethodError
-  puts 'Unknown command'
+  Logger.error 'Unknown command'
 end
