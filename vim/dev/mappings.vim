@@ -14,10 +14,8 @@ nnoremap <silent> <leader>n :call NERDTreeSmartToggle()<CR>
 
 nnoremap <Leader>/ :History/<CR>
 nnoremap <Leader>: :History:<CR>
-nnoremap <Leader>o :Files<CR>
-nnoremap <Leader>of :Files<CR>
-nnoremap <Leader>og :GFiles?<CR>
-nnoremap <Leader>ol :Lines<CR>
+nnoremap <Leader>o :Outline<CR>
+nnoremap <Leader>G :GFiles?<CR>
 nnoremap <Leader>b :Buffers<CR>
 nnoremap <Leader>p :GFiles<CR>
 nnoremap <Leader>P :History<CR>

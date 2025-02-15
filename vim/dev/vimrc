@@ -144,6 +144,7 @@ function! JumpToSameIndent(direction, inVisualMode)
   endif
 endfunction
 
+source $HOME/.dotfiles/vim/dev/outline.vim
 source $HOME/.dotfiles/vim/dev/statusline.vim
 source $HOME/.dotfiles/vim/dev/mappings.vim
 
