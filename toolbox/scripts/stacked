@@ -180,6 +180,14 @@ def c
   # +2 +3, ...
   # 0, 1, 2, ...
   queue_without_base = merge_queue.drop(1)
+
+  if ARGV[1].nil?
+    branches_list = queue_without_base.map { |x| "\"#{x}\"" }.join(' ')
+    branch = `items=(#{branches_list}); printf "%s\n" "${items[@]}" | fzf`
+    `git checkout #{branch}`
+    return
+  end
+
   param = if ARGV[1] == 'prev'
             '-1'
           else
