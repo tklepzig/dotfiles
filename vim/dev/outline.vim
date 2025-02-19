@@ -1,8 +1,12 @@
-function! s:QueryForFiletype()
+function! s:QueryForCurrentBuffer()
   if &filetype =~ 'typescript'
     return '^describe | ^it '
   elseif &filetype =~ 'ruby'
-    return '^describe | ^it | ^context '
+    if expand('%:t') =~ 'spec'
+      return '^describe | ^it | ^context '
+    else
+      return '^module | ^class | ^def '
+    endif
   endif
 endfunction
 
@@ -16,7 +20,7 @@ function! s:BufferLines()
 endfunction
 
 function! s:Outline()
-  let query = s:QueryForFiletype()
+  let query = s:QueryForCurrentBuffer()
   let options = [ '--nth=2..', '--no-sort', '--tac', '--extended', '--ansi', '-q', query]
   call fzf#run(fzf#wrap({
         \ 'source': s:BufferLines(),
