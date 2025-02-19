@@ -124,6 +124,12 @@ let g:coc_global_extensions = ['coc-snippets']
 " End Coc Settings
 " =============================================================
 
+function! OpenRangerForCurrentFile()
+  let bufferFilePath = expand('%') 
+  VimuxRunCommand "ranger --selectfile='" . bufferFilePath . "'"
+  VimuxZoomRunner
+endfunction
+
 function! JumpToSameIndent(direction, inVisualMode)
   let line = line('.')
 

@@ -28,6 +28,8 @@ nnoremap <leader>vi :VimuxInspectRunner<cr>
 nnoremap <leader>vz :VimuxZoomRunner<cr>
 nnoremap <leader>vZ :VimuxZoomRunner<cr>:VimuxInspectRunner<cr>
 
+nnoremap <silent> <leader>e :call OpenRangerForCurrentFile()<CR>
+
 nnoremap <leader><Tab> :BufferNavigatorToggle<cr>
 
 " --- tab handling ---
