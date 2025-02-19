@@ -120,8 +120,10 @@ stacked:
     - open
     - parent
     - pr
+    - push
     - sync
     - update
+    - update_change_base
 tmux-archive:
   help: Archive or restore tmux session
   args:

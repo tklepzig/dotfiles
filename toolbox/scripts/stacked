@@ -95,9 +95,6 @@ def sync(start_index: 1)
   Logger.log 'Syncing stack' do
     current_branch = `git branch --show-current`.strip
 
-    `git checkout #{merge_queue.last}`
-    raise CheckoutError, merge_queue.last unless $CHILD_STATUS.success?
-
     # git rebase --update-refs is only possible when updating always the base branch of the stack, not for anyone in the middle, see below
     # Scenario: 4 branches, A, B, C, D
     # If C has been updated and the following is run:
@@ -105,6 +102,8 @@ def sync(start_index: 1)
     # git rebase A --update-refs is run
     # --> nothing happens, because D is already on top of A, any updated branch in-between is ignored
     #
+    # `git checkout #{merge_queue.last}`
+    # raise CheckoutError, merge_queue.last unless $CHILD_STATUS.success?
     # `git rebase #{merge_queue.at(start_index)} --update-refs --autostash`
     # raise RebaseError, merge_queue.at(start_index) unless $CHILD_STATUS.success?
 
@@ -116,10 +115,10 @@ def sync(start_index: 1)
       raise RebaseError, parent_branch(branch) unless $CHILD_STATUS.success?
     end
 
-    `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
-    `git checkout #{current_branch}`
+    # `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
 
-    Logger.success 'Done.'
+    `git checkout #{current_branch}`
+    Logger.success 'Done. Inspect result via log and if everything is fine, run: s push'
   end
 rescue StandardError => e
   Logger.error "#{e.message}, aborting"
@@ -143,18 +142,60 @@ def update
   end
 
   sync start_index: 0
-
-  # Not needed when running sync, but
-  # kept for doc reasons how rebase with --update-refs works
-  #
-  # `git checkout #{merge_queue.last}`
-  # `git rebase --update-refs #{merge_queue.at(0)} --autostash` # -X ours?
-  # raise RebaseError, merge_queue.at(0) unless $CHILD_STATUS.success?
-
-  # `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
-  # `git checkout #{current_branch}`
 rescue StandardError => e
   Logger.error "#{e.message}, aborting"
+end
+
+# Experimental, using git rebase --onto to update the base branch and sync the stack
+def update_change_base
+  Logger.log 'Fetching base branch' do
+    `git fetch origin #{merge_queue.at(0)}`
+    Logger.success 'Done.'
+  end
+
+  Logger.log 'Syncing stack using rebase --onto' do
+    current_branch = `git branch --show-current`.strip
+
+    base = merge_queue.at(0)
+    `git checkout #{merge_queue.at(1)}`
+    `git rebase --onto origin/#{base} #{base} --autostash`
+
+    merge_queue.drop(2).each do |branch|
+      `git checkout #{branch}`
+      raise CheckoutError, branch unless $CHILD_STATUS.success?
+
+      `git rebase --onto #{parent_branch(branch)} origin/#{parent_branch(branch)} --autostash`
+      raise RebaseError, parent_branch(branch) unless $CHILD_STATUS.success?
+    end
+
+    # `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
+
+    `git checkout #{current_branch}`
+    Logger.success 'Done. Inspect result via log and if everything is fine, run: s push'
+  end
+
+  Logger.log 'Updating base branch' do
+    current_branch = `git branch --show-current`.strip
+
+    `git checkout #{merge_queue.at(0)}`
+    raise CheckoutError, merge_queue.at(0) unless $CHILD_STATUS.success?
+
+    `git merge --ff-only`
+    raise FastForwardError, merge_queue.at(0) unless $CHILD_STATUS.success?
+
+    `git checkout #{current_branch}`
+
+    Logger.success 'Done.'
+  end
+rescue StandardError => e
+  Logger.error "#{e.message}, aborting"
+end
+
+def push
+  Logger.log 'Pushing stack' do
+    `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
+    Logger.success 'Done.'
+  end
 end
 
 def delete
