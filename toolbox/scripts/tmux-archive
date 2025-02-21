@@ -4,8 +4,7 @@
 require 'English'
 require 'json'
 
-NO_KILL = ARGV.include?('--no-kill')
-SAVE_ONLY = ARGV.include?('--save-only')
+CLOSE_ALL = ARGV.include?('--close-all')
 
 def linux?
   (/linux/ =~ RUBY_PLATFORM) != nil
@@ -16,12 +15,16 @@ def session_exists?(session_name)
   $CHILD_STATUS == 0
 end
 
+def session_filename(session_name:, window_index:, pane_index:)
+  "#{ENV['HOME']}/.dotfiles-local/vim-sessions/#{session_name}-#{window_index}-#{pane_index}.vim"
+end
+
 def add_window(session_name, name, dir, active: false)
   `tmux new-window #{active ? '' : '-d'} -t "#{session_name}:" -n "#{name}" -c "#{dir}"`
 end
 
-def new_session(session_name)
-  `tmux new-session -d -s "#{session_name}" -n ""`
+def new_session(session_name, window_name)
+  `tmux new-session -d -s "#{session_name}" -n "#{window_name}"`
 end
 
 def split_window(session_name, window_index, dir, active: false)
@@ -37,7 +40,7 @@ def send_keys(session_name, window_index, pane_index, keys, no_enter: false)
 end
 
 def tty_command(tty)
-  `ps -t #{tty}#{linux? ? ' -H' : ''} -o args=`.split(/\n/).map(&:strip).at(1)
+  `ps -t #{tty}#{linux? ? ' -H' : ''} -o args=`.split(/\n/).map(&:strip).filter { |cmd| cmd != '-zsh' }.first
 end
 
 def tmux_sessions
@@ -82,6 +85,8 @@ def tmux_snapshot
       panes = tmux_panes(session_name, window_index).map do |pane|
         pane_index, pane_info = pane
 
+        save_vim_session(session_name:, window_index:, pane_index:) if pane_info[:command]&.include?('vim')
+
         { index: pane_index, **pane_info }
       end
 
@@ -99,7 +104,7 @@ def restore_panes(session, window)
 
   panes.each_with_index do |pane, index|
     split_window(session['name'], window['index'], pane['path'], active: pane['active']) unless index.zero?
-    start_command(session, window, pane)
+    restore_vim_session(session_name: session['name'], window_index: window['index'], pane_index: pane['index']) if pane['command']&.include?('vim')
     window_set_layout(session['name'], window['index'], window['layout'])
   end
 
@@ -118,7 +123,7 @@ def restore_windows(session)
     if session_exists? session['name']
       add_window(session['name'], window['name'], window['panes'].first['path'], active: window['active'])
     else
-      new_session(session['name'])
+      new_session(session['name'], window['name'])
       # Don't use new-session's -c option to set the initial directory, use cd instead
       # Reason: new-session's -c option sets the initial directory for all windows, not just the first one
       send_keys(session['name'], window['index'], 1, "cd '#{window['panes'].first['path']}' && clear")
@@ -136,59 +141,58 @@ def restore(sessions)
   `tmux attach -t #{sessions['sessions'].filter { |session| session['active'] }.first['name']}`
 end
 
-def start_command(session, window, pane)
-  return if pane['command'].nil? || pane['command'].include?($PROGRAM_NAME)
-
-  if pane['command'].include?('vim')
-    send_keys(session['name'], window['index'], pane['index'], 'vs')
-  else
-    send_keys(session['name'], window['index'], pane['index'], pane['command'])
-  end
+def restore_vim_session(session_name:, window_index:, pane_index:)
+  send_keys(session_name, window_index, pane_index, "vim -S #{session_filename(session_name:, window_index:, pane_index:)}")
 end
 
-def stop_command(session, window, pane)
-  return if pane['command'].nil? || pane['command'].include?($PROGRAM_NAME)
-
-  if pane['command'].include?('vim')
-    `tmux send-keys -t "#{session['name']}:#{window['index']}.#{pane['index']}" Escape ':mksession!|:wqa!' Enter`
-    sleep 1
-    return
-  end
-
-  if pane['command'].include?('ranger')
-    `tmux send-keys -t "#{session['name']}:#{window['index']}.#{pane['index']}" :`
-    sleep 0.5
-    `tmux send-keys -t "#{session['name']}:#{window['index']}.#{pane['index']}" 'quit!' Enter`
-    sleep 1
-    return
-  end
-
-  if NO_KILL
-    puts 'Found unknown running commands, aborting...'
-    sleep 5
-    exit 1
-  end
-
-  send_keys(session['name'], window['index'], pane['index'], 'C-c', no_enter: true)
+def save_vim_session(session_name:, window_index:, pane_index:)
+  `tmux send-keys -t "#{session_name}:#{window_index}.#{pane_index}" Escape`
+  sleep 0.5
+  `tmux send-keys -t "#{session_name}:#{window_index}.#{pane_index}" ':mksession! #{session_filename(session_name:, window_index:, pane_index:)} | :call histdel("cmd", -1)' Enter`
 end
 
-def close_all(snapshot)
+def close_vim(session, window, pane)
+  `tmux send-keys -t "#{session['name']}:#{window['index']}.#{pane['index']}" ':wqa!' Enter`
+  sleep 1
+end
+
+def check_for_running_processes(snapshot)
   snapshot['sessions'].each do |session|
     session['windows'].reverse.each do |window|
       window['panes'].reverse.each do |pane|
-        stop_command(session, window, pane)
+        next if pane['command'].nil?
+        next if pane['command'].include?($PROGRAM_NAME)
+        next if pane['command'].include?('vim')
+
+        puts "Found running process '#{pane['command']}', aborting..."
+        exit 1
+      end
+    end
+  end
+end
+
+def close_all(snapshot)
+  check_for_running_processes(snapshot)
+
+  snapshot['sessions'].each do |session|
+    session['windows'].reverse.each do |window|
+      window['panes'].reverse.each do |pane|
+        close_vim(session, window, pane)
         send_keys(session['name'], window['index'], pane['index'], 'exit')
+        sleep 0.5
       end
     end
   end
 end
 
 if ENV['TMUX']
+  `mkdir -p #{ENV['HOME']}/.dotfiles-local/vim-sessions`
+
   snapshot = tmux_snapshot
-  File.write("#{ENV['HOME']}/.dotfiles-local/tmux-sessions.json", snapshot.to_json)
+  File.write("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot.json", snapshot.to_json)
 
   # Transforming the keys to strings to be able to treat the hash the same way as it was read from the file
-  close_all(JSON.parse(snapshot.to_json)) unless SAVE_ONLY
+  close_all(JSON.parse(snapshot.to_json)) if CLOSE_ALL
 else
-  restore(JSON.parse(File.read("#{ENV['HOME']}/.dotfiles-local/tmux-sessions.json")))
+  restore(JSON.parse(File.read("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot.json")))
 end
