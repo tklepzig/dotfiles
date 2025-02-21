@@ -16,8 +16,8 @@ def session_exists?(session_name)
   $CHILD_STATUS == 0
 end
 
-def add_window(session_name, dir, active: false)
-  `tmux new-window #{active ? '' : '-d'} -t "#{session_name}:" -n "" -c "#{dir}"`
+def add_window(session_name, name, dir, active: false)
+  `tmux new-window #{active ? '' : '-d'} -t "#{session_name}:" -n "#{name}" -c "#{dir}"`
 end
 
 def new_session(session_name)
@@ -52,12 +52,12 @@ def tmux_sessions
 end
 
 def tmux_windows(session_name)
-  window_list = `tmux list-windows -t "#{session_name}" -F "#\{window_index\} #\{window_active\} #\{window_zoomed_flag\} #\{window_layout\}"`
+  window_list = `tmux list-windows -t "#{session_name}" -F "#\{window_index\};;#\{window_name\};;#\{window_active\};;#\{window_zoomed_flag\};;#\{window_layout\}"`
                 .split(/\n/)
 
   window_list.map do |window|
-    index, active, zoomed, layout = window.split
-    [index, { active: !active.to_i.zero?, zoomed: !zoomed.to_i.zero?, layout: }]
+    index, name, active, zoomed, layout = window.split(';;')
+    [index, { name:, active: !active.to_i.zero?, zoomed: !zoomed.to_i.zero?, layout: }]
   end
 end
 
@@ -116,7 +116,7 @@ def restore_windows(session)
   windows = session['windows']
   windows.each do |window|
     if session_exists? session['name']
-      add_window(session['name'], window['panes'].first['path'], active: window['active'])
+      add_window(session['name'], window['name'], window['panes'].first['path'], active: window['active'])
     else
       new_session(session['name'])
       # Don't use new-session's -c option to set the initial directory, use cd instead
