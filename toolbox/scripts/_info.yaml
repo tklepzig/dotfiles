@@ -124,16 +124,15 @@ stacked:
     - sync
     - update
     - update_change_base
-tmux-archive:
-  help: Archive or restore tmux session
+tmux-snapshot:
+  help: |-
+    When run inside tmux, it will save a snapshot of all tmux sessions. If --close-all is given, all sessions will be closed.
+    When run outside tmux, it will restore the last saved snapshot.
   args:
-    - name: --save-only (only valid when archiving)
-      optional: true
-    - name: --no-kill (only valid when archiving)
+    - name: --close-all
       optional: true
   completion:
-    - --save-only
-    - --no-kill
+    - --close-all
 vicy:
   help: Opens vicy's CLI
 vicy-serve:
