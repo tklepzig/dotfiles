@@ -4,6 +4,16 @@
 require 'English'
 require 'yaml'
 
+# Why not using git rebase --update-refs:
+# git rebase --update-refs is only possible when updating always the base branch of the stack, not for anyone in the middle, see below
+# Scenario: 4 branches, A, B, C, D
+# If C has been updated and the following is run:
+# git checkout D
+# git rebase A --update-refs is run
+# --> nothing happens, because D is already on top of A, any updated branch in-between is ignored
+
+USE_ONTO = true
+
 module Logger
   @level = 0
 
@@ -62,218 +72,7 @@ class CheckoutError < StandardError
 end
 
 MERGE_QUEUE_PATH = File.join(Dir.pwd, 'merge-queue.yaml')
-
-# WIP
-
-# NOTES
-# Update n stacked branches to new master: git rebase --update-refs master
-# See also https://adamj.eu/tech/2022/10/15/how-to-rebase-stacked-git-branches/
-# Use rebase strategy to avoid conflict resolution if a branch earlier
-# in the stack has been updated and push forced (vermutlich -X ours)
-# Add shortcut to checkout branch by number, prev, next, etc.
-# Update yaml when franch from the beginning of the stack are merged into master
-# Using ours in the middle of conflict resolution: git checkout --ours file/path (geht auch für alles ohne specific file?)
-# ! Vor update immer erst sync aufrufen
-# When doing update make sure to fetch-merge/rebase all stacked branches as well
-# in case you're pairing with someone and any of the stacked branches got some updates
-
-command = ARGV[0]
-
-def branch
-  new_branch = ARGV[1]
-  `git checkout -b #{new_branch}`
-  File.write(MERGE_QUEUE_PATH, [*merge_queue, new_branch].to_yaml)
-end
-
-def pr
-  current_branch = `git branch --show-current`.strip
-  `git push --set-upstream origin #{current_branch}`
-  `gh pr create --web --base #{parent_branch(current_branch)}`
-end
-
-def sync(start_index: 1)
-  Logger.log 'Syncing stack' do
-    current_branch = `git branch --show-current`.strip
-
-    # git rebase --update-refs is only possible when updating always the base branch of the stack, not for anyone in the middle, see below
-    # Scenario: 4 branches, A, B, C, D
-    # If C has been updated and the following is run:
-    # git checkout D
-    # git rebase A --update-refs is run
-    # --> nothing happens, because D is already on top of A, any updated branch in-between is ignored
-    #
-    # `git checkout #{merge_queue.last}`
-    # raise CheckoutError, merge_queue.last unless $CHILD_STATUS.success?
-    # `git rebase #{merge_queue.at(start_index)} --update-refs --autostash`
-    # raise RebaseError, merge_queue.at(start_index) unless $CHILD_STATUS.success?
-
-    merge_queue.drop(start_index + 1).each do |branch|
-      `git checkout #{branch}`
-      raise CheckoutError, branch unless $CHILD_STATUS.success?
-
-      `git rebase #{parent_branch(branch)} --autostash`
-      raise RebaseError, parent_branch(branch) unless $CHILD_STATUS.success?
-    end
-
-    # `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
-
-    `git checkout #{current_branch}`
-    Logger.success 'Done. Inspect result via log and if everything is fine, run: s push'
-  end
-rescue StandardError => e
-  Logger.error "#{e.message}, aborting"
-end
-
-# update to newest base (main/master)
-def update
-  Logger.log 'Updating base branch' do
-    current_branch = `git branch --show-current`.strip
-
-    `git checkout #{merge_queue.at(0)}`
-    raise CheckoutError, merge_queue.at(0) unless $CHILD_STATUS.success?
-
-    `git fetch origin #{merge_queue.at(0)}`
-    `git merge --ff-only`
-    raise FastForwardError, merge_queue.at(0) unless $CHILD_STATUS.success?
-
-    `git checkout #{current_branch}`
-
-    Logger.success 'Done.'
-  end
-
-  sync start_index: 0
-rescue StandardError => e
-  Logger.error "#{e.message}, aborting"
-end
-
-# Experimental, using git rebase --onto to update the base branch and sync the stack
-def update_change_base
-  Logger.log 'Fetching base branch' do
-    `git fetch origin #{merge_queue.at(0)}`
-    Logger.success 'Done.'
-  end
-
-  Logger.log 'Syncing stack using rebase --onto' do
-    current_branch = `git branch --show-current`.strip
-
-    base = merge_queue.at(0)
-    `git checkout #{merge_queue.at(1)}`
-    `git rebase --onto origin/#{base} #{base} --autostash`
-
-    merge_queue.drop(2).each do |branch|
-      `git checkout #{branch}`
-      raise CheckoutError, branch unless $CHILD_STATUS.success?
-
-      `git rebase --onto #{parent_branch(branch)} origin/#{parent_branch(branch)} --autostash`
-      raise RebaseError, parent_branch(branch) unless $CHILD_STATUS.success?
-    end
-
-    # `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
-
-    `git checkout #{current_branch}`
-    Logger.success 'Done. Inspect result via log and if everything is fine, run: s push'
-  end
-
-  Logger.log 'Updating base branch' do
-    current_branch = `git branch --show-current`.strip
-
-    `git checkout #{merge_queue.at(0)}`
-    raise CheckoutError, merge_queue.at(0) unless $CHILD_STATUS.success?
-
-    `git merge --ff-only`
-    raise FastForwardError, merge_queue.at(0) unless $CHILD_STATUS.success?
-
-    `git checkout #{current_branch}`
-
-    Logger.success 'Done.'
-  end
-rescue StandardError => e
-  Logger.error "#{e.message}, aborting"
-end
-
-def push
-  Logger.log 'Pushing stack' do
-    `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
-    Logger.success 'Done.'
-  end
-end
-
-def delete
-  updated_merge_queue = merge_queue.drop(1).dup
-
-  if ARGV[1].nil?
-    current_branch = `git branch --show-current`.strip
-    updated_merge_queue.delete(current_branch)
-    Logger.success "Deleted #{current_branch}"
-  else
-    updated_merge_queue.delete_at(ARGV[1].to_i)
-    Logger.success "Deleted #{merge_queue.drop(1).at(ARGV[1].to_i)}"
-  end
-
-  File.write(MERGE_QUEUE_PATH, ['main', *updated_merge_queue].to_yaml)
-end
-
-def c
-  # TODO: Improve w/ shorthands:
-  # - -> -1
-  # + -> +1
-  # -2 -3, ...
-  # +2 +3, ...
-  # 0, 1, 2, ...
-  queue_without_base = merge_queue.drop(1)
-
-  if ARGV[1].nil?
-    branches_list = queue_without_base.map { |x| "\"#{x}\"" }.join(' ')
-    branch = `items=(#{branches_list}); printf "%s\n" "${items[@]}" | fzf`
-    `git checkout #{branch}`
-    return
-  end
-
-  param = if ARGV[1] == 'prev'
-            '-1'
-          else
-            ARGV[1] == 'next' ? '+1' : ARGV[1]
-          end
-
-  if param.start_with?(/\+|-/)
-    current_branch = `git branch --show-current`.strip
-    current_branch_index = queue_without_base.find_index(current_branch)
-    `git checkout #{queue_without_base.at(current_branch_index + param.to_i)}`
-  else
-    `git checkout #{queue_without_base.at(param.to_i)}`
-  end
-end
-
-# TODO: Reuse parent_branch method
-def parent
-  current_branch = `git branch --show-current`.strip
-  current_branch_index = merge_queue.find_index(current_branch)
-
-  if current_branch_index.zero?
-    Logger.error 'Already at the beginning of the stack, aborting'
-    return
-  end
-
-  puts merge_queue.at(current_branch_index - 1)
-end
-
-def open
-  cmd = OS.linux? ? 'xdg-open' : 'open'
-  remote = `git remote get-url origin`.strip
-  org_and_repo = remote[/:(.*)\.git/, 1]
-
-  merge_queue.drop(1).each do |branch|
-    `#{cmd} https://github.com/#{org_and_repo}/pull/#{branch}`
-  end
-end
-
-def init
-  current_branch = `git branch --show-current`.strip
-  File.write(MERGE_QUEUE_PATH, ['main', current_branch].to_yaml)
-end
-
 def merge_queue
-  # TODO: cache file, avoid heavy IO
   return ['main'] unless File.exist?(MERGE_QUEUE_PATH)
 
   YAML.load_file(MERGE_QUEUE_PATH).compact
@@ -288,14 +87,148 @@ def parent_branch(branch_name)
   'main'
 end
 
-begin
-  # Improve this, avoid send?
-  # if command.start_with?(/\+|-/)
-  # ARGV[1] = command
-  # command = 'c'
-  # end
-
-  send(command)
-rescue NoMethodError
-  Logger.error 'Unknown command'
+def keep_current_branch
+  current_branch = `git branch --show-current`.strip
+  yield
+  `git checkout #{current_branch}`
 end
+
+def sync
+  Logger.log 'Syncing stack' do
+    keep_current_branch do
+      merge_queue.drop(2).each do |branch|
+        `git checkout #{branch}`
+        raise CheckoutError, branch unless $CHILD_STATUS.success?
+
+        if USE_ONTO
+          `git rebase origin/#{parent_branch(branch)} --onto #{parent_branch(branch)} --autostash`
+        else
+          `git rebase #{parent_branch(branch)} --autostash`
+        end
+
+        raise RebaseError, parent_branch(branch) unless $CHILD_STATUS.success?
+      end
+
+      # TODO: Ensure writing a log to a file which contains the refs of all branches before pushing it
+      # `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
+
+      Logger.success 'Done.'
+    end
+  end
+rescue StandardError => e
+  Logger.error "#{e.message}, aborting"
+end
+
+def update
+  Logger.log 'Rebasing stack to updated base branch' do
+    keep_current_branch do
+      base = merge_queue.at(0)
+      `git fetch origin #{base}`
+
+      if USE_ONTO
+        first_branch = merge_queue.at(1)
+        `git checkout #{first_branch}`
+        raise CheckoutError, first_branch unless $CHILD_STATUS.success?
+
+        `git rebase #{base} --onto origin/#{base} --autostash`
+        raise RebaseError, first_branch unless $CHILD_STATUS.success?
+      end
+
+      `git checkout #{base}`
+      raise CheckoutError, base unless $CHILD_STATUS.success?
+
+      `git merge --ff-only`
+      raise FastForwardError, base unless $CHILD_STATUS.success?
+
+      Logger.success 'Done.'
+    end
+  end
+
+  sync
+rescue StandardError => e
+  Logger.error "#{e.message}, aborting"
+end
+
+# Implement better and smart deletion
+# def delete
+# updated_merge_queue = merge_queue.drop(1).dup
+
+# if ARGV[1].nil?
+# current_branch = `git branch --show-current`.strip
+# updated_merge_queue.delete(current_branch)
+# Logger.success "Deleted #{current_branch}"
+# else
+# updated_merge_queue.delete_at(ARGV[1].to_i)
+# Logger.success "Deleted #{merge_queue.drop(1).at(ARGV[1].to_i)}"
+# end
+
+# File.write(MERGE_QUEUE_PATH, ['main', *updated_merge_queue].to_yaml)
+# end
+
+def init
+  current_branch = `git branch --show-current`.strip
+  File.write(MERGE_QUEUE_PATH, ['main', current_branch].to_yaml)
+end
+
+def branch(name)
+  `git checkout -b #{name}`
+  File.write(MERGE_QUEUE_PATH, [*merge_queue, name].to_yaml)
+end
+
+def pr
+  current_branch = `git branch --show-current`.strip
+  `git push --set-upstream origin #{current_branch}`
+  `gh pr create --web --base #{parent_branch(current_branch)}`
+end
+
+# index: absolute number (1, 2) or relative number (-1, +2)
+# if ommitted, a fuzzy search via fzf is started
+def checkout(index = nil)
+  queue_without_base = merge_queue.drop(1)
+
+  if index.nil?
+    branches_list = queue_without_base.map { |x| "\"#{x}\"" }.join(' ')
+    branch = `items=(#{branches_list}); printf "%s\n" "${items[@]}" | fzf`
+    `git checkout #{branch}`
+    return
+  end
+
+  if index.start_with?(/\+|-/)
+    current_branch = `git branch --show-current`.strip
+    current_branch_index = queue_without_base.find_index(current_branch)
+    `git checkout #{queue_without_base.at(current_branch_index + index.to_i)}`
+  else
+    `git checkout #{queue_without_base.at(index.to_i)}`
+  end
+end
+
+def parent
+  current_branch = `git branch --show-current`.strip
+  puts parent_branch(current_branch)
+end
+
+def open
+  cmd = OS.linux? ? 'xdg-open' : 'open'
+  remote = `git remote get-url origin`.strip
+  org_and_repo = remote[/:(.*)\.git/, 1]
+
+  merge_queue.drop(1).each do |branch|
+    `#{cmd} https://github.com/#{org_and_repo}/pull/#{branch}`
+  end
+end
+
+def run
+  command = ARGV[0]
+
+  if %w[init branch pr parent open update sync].include?(command)
+    send(command, *ARGV[1..])
+  elsif command == '-'
+    checkout('-1')
+  elsif command == '+'
+    checkout('+1')
+  else
+    checkout(ARGV[0])
+  end
+end
+
+run

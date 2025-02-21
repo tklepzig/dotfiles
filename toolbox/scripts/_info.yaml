@@ -114,16 +114,12 @@ stacked:
   help: Using stacked branches in git
   completion:
     - branch
-    - c
-    - delete
     - init
     - open
     - parent
     - pr
-    - push
     - sync
     - update
-    - update_change_base
 tmux-snapshot:
   help: |-
     When run inside tmux, it will save a snapshot of all tmux sessions. If --close-all is given, all sessions will be closed.
