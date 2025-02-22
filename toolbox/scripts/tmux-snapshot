@@ -104,7 +104,13 @@ def restore_panes(session, window)
 
   panes.each_with_index do |pane, index|
     split_window(session['name'], window['index'], pane['path'], active: pane['active']) unless index.zero?
-    restore_vim_session(session_name: session['name'], window_index: window['index'], pane_index: pane['index']) if pane['command']&.include?('vim')
+
+    if pane['command']&.include?('vim')
+      restore_vim_session(session_name: session['name'], window_index: window['index'], pane_index: pane['index'])
+    elsif !pane['command'].nil?
+      send_keys(session['name'], window['index'], pane['index'], "print -s '#{pane['command']}' && clear")
+    end
+
     window_set_layout(session['name'], window['index'], window['layout'])
   end
 
