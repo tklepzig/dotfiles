@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'date'
 require 'English'
 require 'yaml'
 
@@ -21,6 +22,7 @@ module Logger
     prefix = @level.zero? ? "\e[1;34m\u276f " : ''
     message = message.rjust(message.length + 2 * @level)
     puts "#{prefix}\e[0;34m#{message}\e[0m"
+    write_log_file(message)
 
     return unless block_given?
 
@@ -34,12 +36,21 @@ module Logger
     prefix = @level.zero? ? "\e[1;36m\u276f " : ''
     message = message.rjust(message.length + 2 * @level)
     puts "#{prefix}\e[0;36m#{message}\e[0m"
+    write_log_file(message)
   end
 
   def self.error(message)
     prefix = @level.zero? ? "\e[1;31m\u276f " : ''
     message = message.rjust(message.length + 2 * @level)
     puts "#{prefix}\e[0;31m#{message}\e[0m"
+    write_log_file(`Error: #{message}`)
+  end
+
+  def write_log_file(message)
+    current_datetime = DateTime.now.iso8601
+    current_dir = Dir.pwd.split('/').last
+    path = "#{ENV['HOME']}/.dotfiles-local/stacked-#{current_dir}.log"
+    File.open(path, 'a') { |f| f.puts "#{current_datetime} -- #{message}" }
   end
 end
 
