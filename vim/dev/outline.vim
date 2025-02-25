@@ -7,6 +7,10 @@ function! s:QueryForCurrentBuffer()
     else
       return '^module | ^class | ^def '
     endif
+  elseif &filetype =~ 'markdown'
+      return '^# '
+  else
+      return ''
   endif
 endfunction
 
