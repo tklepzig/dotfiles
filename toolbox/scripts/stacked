@@ -101,6 +101,10 @@ def sync
         raise CheckoutError, branch unless $CHILD_STATUS.success?
 
         if USE_ONTO
+          # works only if the parent branch is not already pushed bc then local and remote (origin) are pointing to the same commit
+          # possible solution: Retrieve old base in another way then relying on origin/parent_branch:
+          # The following is a PoC to get the current base of the branch
+          # git show $(git log parent_branch(branch)^..branch  --oneline --pretty=format:'%h' | tail -1)^ --pretty=format:'%h' --no-patch
           `git rebase origin/#{parent_branch(branch)} --onto #{parent_branch(branch)} --autostash`
         else
           `git rebase #{parent_branch(branch)} --autostash`
