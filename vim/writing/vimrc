@@ -2,6 +2,14 @@
 let g:vim_markdown_toc_autofit = 1
 let g:vim_markdown_folding_disabled = 1
 
+" Customize highlight of markdown headlines depending on current theme
+execute 'highlight htmlH1 ctermfg='.accentText
+execute 'highlight htmlH2 ctermfg='.primaryText
+execute 'highlight htmlH3 ctermfg='.secondaryText
+execute 'highlight htmlH4 ctermfg='.secondaryText
+execute 'highlight htmlH5 ctermfg='.secondaryText
+execute 'highlight htmlH6 ctermfg='.secondaryText
+
 let g:vimtex_syntax_conceal_disable = 1
 
 set dictionary+=/usr/share/dict/words
