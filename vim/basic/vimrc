@@ -194,6 +194,9 @@ function! s:QuickMemo(ext = "md")
 
   if !empty(filePath)
     w
+    # if path is git repo
+    # commit -am "Update <file name>" and push
+    # if any git operation fails, echo an error message
     return
   endif
 
@@ -210,6 +213,9 @@ function! s:QuickMemo(ext = "md")
   endif
 
   execute('w ' . path . '/' . strftime('%Y-%m-%d-%H:%M:%S') . firstChars . '.' . a:ext)
+  # if path is git repo
+  # add untracked file, commit -m "Add QuickMemo filename from above (variable)" and push
+  # if any git operation fails, echo an error message
 endfunction
 command! -nargs=? QuickMemo :call <SID>QuickMemo(<f-args>)
 
