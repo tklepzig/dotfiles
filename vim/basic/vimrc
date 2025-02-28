@@ -113,6 +113,7 @@ endfunction
 command! -range ExecuteSelection <line1>,<line2>call <SID>ExecuteSelection()
 
 source $HOME/.dotfiles/vim/basic/mappings.vim
+source $HOME/.dotfiles/vim/basic/quick-memo.vim
 
 colorscheme codedark
 
@@ -187,31 +188,6 @@ set number relativenumber
 
 set wildoptions=pum
 set shiftround
-
-function! s:QuickMemo(ext = "md")
-  let path = get(g:,"quick_memo_path", $HOME . '/.dotfiles-local/quick-memo')
-  let filePath = expand("%:t")
-
-  if !empty(filePath)
-    w
-    return
-  endif
-
-  if !isdirectory(path)
-    call mkdir(path)
-  endif
-
-  let firstChars = ''
-  let firstLine = getline(1)
-  if !empty(firstLine)
-    let firstCharsSafe = substitute(firstLine[:29], '/', '-', 'g')
-    let firstCharsSafe = substitute(firstCharsSafe, '\#', '\\#', 'g')
-    let firstChars = '--' . firstCharsSafe
-  endif
-
-  execute('w ' . path . '/' . strftime('%Y-%m-%d-%H:%M:%S') . firstChars . '.' . a:ext)
-endfunction
-command! -nargs=? QuickMemo :call <SID>QuickMemo(<f-args>)
 
 function! s:Wrap(bang)
   let prefix = ""

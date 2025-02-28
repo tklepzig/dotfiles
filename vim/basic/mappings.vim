@@ -86,6 +86,7 @@ endfunction
 nnoremap <silent> <Leader>w# :call <SID>BigSmallWin()<cr>
 
 nnoremap <silent> <leader>m :QuickMemo<cr>
+nnoremap <silent> <leader>M :QuickMemo git<cr>
 
 
 if !empty($DOTFILES_NVIM) && has('nvim')
