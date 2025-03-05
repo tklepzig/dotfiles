@@ -94,6 +94,26 @@ def keep_current_branch
 end
 
 def sync
+  Logger.log 'Syncing stack (Make sure running this cmd on the branch which got an update)' do
+    keep_current_branch do
+      current_branch = `git branch --show-current`.strip
+      `git checkout #{merge_queue.last}`
+      raise CheckoutError, merge_queue.last unless $CHILD_STATUS.success?
+
+      `git rebase #{current_branch} --update-refs --autostash`
+      raise RebaseError, current_branch unless $CHILD_STATUS.success?
+
+      # TODO: Ensure writing a log to a file which contains the refs of all branches before pushing it
+      # `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
+
+      Logger.success 'Done.'
+    end
+  end
+rescue StandardError => e
+  Logger.error "#{e.message}, aborting"
+end
+
+def sync_old
   Logger.log 'Syncing stack' do
     keep_current_branch do
       merge_queue.drop(2).each do |branch|
@@ -126,8 +146,8 @@ rescue StandardError => e
 end
 
 def update
-  Logger.log 'Rebasing stack to updated base branch' do
-    keep_current_branch do
+  keep_current_branch do
+    Logger.log 'Rebasing stack to updated base branch' do
       base = merge_queue.at(0)
       `git fetch origin #{base}`
 
@@ -146,11 +166,11 @@ def update
       `git merge --ff-only`
       raise FastForwardError, base unless $CHILD_STATUS.success?
 
+      sync
+
       Logger.success 'Done.'
     end
   end
-
-  sync
 rescue StandardError => e
   Logger.error "#{e.message}, aborting"
 end
