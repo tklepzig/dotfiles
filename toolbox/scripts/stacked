@@ -73,7 +73,10 @@ end
 
 MERGE_QUEUE_PATH = File.join(Dir.pwd, 'merge-queue.yaml')
 def merge_queue
-  return ['main'] unless File.exist?(MERGE_QUEUE_PATH)
+  if !File.exist?(MERGE_QUEUE_PATH)
+    Logger.error 'Merge queue not found, run "stacked init" first'
+    exit 1
+  end
 
   YAML.load_file(MERGE_QUEUE_PATH).compact
 end
@@ -193,7 +196,9 @@ end
 
 def init
   current_branch = `git branch --show-current`.strip
-  File.write(MERGE_QUEUE_PATH, ['main', current_branch].to_yaml)
+  queue = ["main"]
+  queue.push(current_branch) if current_branch != "main"
+  File.write(MERGE_QUEUE_PATH, queue.to_yaml)
 end
 
 def branch(name)
