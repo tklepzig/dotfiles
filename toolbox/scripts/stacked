@@ -187,10 +187,11 @@ def update
   keep_current_branch do
     Logger.log 'Rebasing stack to updated base branch' do
       base = merge_queue.at(0)
+      first_branch = merge_queue.at(1)
+
       `git fetch origin #{base}`
 
       if USE_ONTO
-        first_branch = merge_queue.at(1)
         `git checkout #{first_branch}`
         raise CheckoutError, first_branch unless $CHILD_STATUS.success?
 
@@ -208,6 +209,9 @@ def update
 
       `git merge --ff-only`
       raise FastForwardError, base unless $CHILD_STATUS.success?
+
+      `git checkout #{first_branch}`
+      raise CheckoutError, base unless $CHILD_STATUS.success?
 
       sync
 
