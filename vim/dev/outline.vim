@@ -1,6 +1,10 @@
 function! s:QueryForCurrentBuffer()
   if &filetype =~ 'typescript'
-    return '^describe | ^it '
+    if expand('%:t') =~ 'spec'
+      return '^test.describe( | ^test( '
+    else
+      return '^describe | ^it '
+    endif
   elseif &filetype =~ 'ruby'
     if expand('%:t') =~ 'spec'
       return '^describe | ^it | ^context '
