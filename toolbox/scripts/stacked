@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'date'
 require 'English'
 require 'yaml'
 
@@ -14,6 +15,12 @@ require 'yaml'
 
 USE_ONTO = true
 
+class String
+  def accent
+    "\e[0;94m#{self}\e[0;34m"
+  end
+end
+
 module Logger
   @level = 0
 
@@ -21,6 +28,7 @@ module Logger
     prefix = @level.zero? ? "\e[1;34m\u276f " : ''
     message = message.rjust(message.length + 2 * @level)
     puts "#{prefix}\e[0;34m#{message}\e[0m"
+    write_log_file(message)
 
     return unless block_given?
 
@@ -34,12 +42,26 @@ module Logger
     prefix = @level.zero? ? "\e[1;36m\u276f " : ''
     message = message.rjust(message.length + 2 * @level)
     puts "#{prefix}\e[0;36m#{message}\e[0m"
+    write_log_file(message)
   end
 
   def self.error(message)
     prefix = @level.zero? ? "\e[1;31m\u276f " : ''
     message = message.rjust(message.length + 2 * @level)
     puts "#{prefix}\e[0;31m#{message}\e[0m"
+    write_log_file(`Error: #{message}`)
+  end
+
+  def self.init
+    `mkdir -p #{ENV['HOME']}/.dotfiles-local/stacked-log`
+
+    current_dir = Dir.pwd.split('/').last
+    @log_path = "#{ENV['HOME']}/.dotfiles-local/stacked-log/#{current_dir}.log"
+  end
+
+  def self.write_log_file(message)
+    current_datetime = DateTime.now.iso8601
+    File.open(@log_path, 'a') { |f| f.puts "#{current_datetime} #{message.gsub(/\e\[.*?m/, '')}" }
   end
 end
 
@@ -73,7 +95,7 @@ end
 
 MERGE_QUEUE_PATH = File.join(Dir.pwd, 'merge-queue.yaml')
 def merge_queue
-  if !File.exist?(MERGE_QUEUE_PATH)
+  unless File.exist?(MERGE_QUEUE_PATH)
     Logger.error 'Merge queue not found, run "stacked init" first'
     exit 1
   end
@@ -103,11 +125,24 @@ def sync
       `git checkout #{merge_queue.last}`
       raise CheckoutError, merge_queue.last unless $CHILD_STATUS.success?
 
+      old_refs = merge_queue.drop(1).map do |branch|
+        `git rev-parse --short #{branch}`.strip
+      end
+
       `git rebase #{current_branch} --update-refs --autostash`
       raise RebaseError, current_branch unless $CHILD_STATUS.success?
 
-      # TODO: Ensure writing a log to a file which contains the refs of all branches before pushing it
-      # `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
+      new_refs = merge_queue.drop(1).map do |branch|
+        `git rev-parse --short #{branch}`.strip
+      end
+
+      merge_queue.drop(1).each_with_index do |branch, index|
+        next if old_refs[index] == new_refs[index]
+
+        Logger.log "Updated #{branch} from #{old_refs[index].accent} to #{new_refs[index].accent}"
+      end
+
+      `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
 
       Logger.success 'Done.'
     end
@@ -159,8 +194,13 @@ def update
         `git checkout #{first_branch}`
         raise CheckoutError, first_branch unless $CHILD_STATUS.success?
 
+        old_ref = `git rev-parse --short #{first_branch}`.strip
+
         `git rebase #{base} --onto origin/#{base} --autostash`
         raise RebaseError, first_branch unless $CHILD_STATUS.success?
+
+        new_ref = `git rev-parse --short #{first_branch}`.strip
+        Logger.log "Updated #{first_branch} from #{old_ref.accent} to #{new_ref.accent}"
       end
 
       `git checkout #{base}`
@@ -196,8 +236,8 @@ end
 
 def init
   current_branch = `git branch --show-current`.strip
-  queue = ["main"]
-  queue.push(current_branch) if current_branch != "main"
+  queue = ['main']
+  queue.push(current_branch) if current_branch != 'main'
   File.write(MERGE_QUEUE_PATH, queue.to_yaml)
 end
 
@@ -262,4 +302,5 @@ def run
   end
 end
 
+Logger.init
 run
