@@ -116,6 +116,7 @@ stacked:
     - branch
     - edit
     - init
+    - last
     - open
     - parent
     - pr

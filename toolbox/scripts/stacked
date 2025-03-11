@@ -213,6 +213,11 @@ def checkout(index = nil)
     return
   end
 
+  if index == 'last'
+    `git checkout #{queue_without_base.last}`
+    return
+  end
+
   if index.start_with?(/\+|-/)
     current_branch = `git branch --show-current`.strip
     current_branch_index = queue_without_base.find_index(current_branch)
