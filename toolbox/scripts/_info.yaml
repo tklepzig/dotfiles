@@ -114,6 +114,7 @@ stacked:
   help: Using stacked branches in git
   completion:
     - branch
+    - edit
     - init
     - open
     - parent

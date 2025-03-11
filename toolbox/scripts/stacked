@@ -237,10 +237,14 @@ def open
   end
 end
 
+def edit
+  system(ENV['EDITOR'], MERGE_QUEUE_PATH)
+end
+
 def run
   command = ARGV[0]
 
-  if %w[init branch pr parent open update sync].include?(command)
+  if %w[init branch pr parent open edit update sync].include?(command)
     send(command, *ARGV[1..])
   elsif command == '-'
     checkout('-1')
