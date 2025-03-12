@@ -108,6 +108,10 @@ def keep_current_branch
   `git checkout #{current_branch}`
 end
 
+def stack_refs(start_index)
+  merge_queue.drop(start_index).map { |branch| [branch, `git rev-parse --short #{branch}`.strip] }
+end
+
 # Why "(Make sure running this cmd on the branch which got an update)":
 # git rebase --update-refs is only possible when updating always the base branch of the stack, not for anyone in the middle, see below
 # Scenario: 4 branches, A, B, C, D
@@ -119,23 +123,27 @@ def sync
   Logger.log 'Syncing stack (Make sure running this cmd on the branch which got an update)' do
     keep_current_branch do
       current_branch = `git branch --show-current`.strip
+      stack_start = merge_queue.index(current_branch)
+
       `git checkout #{merge_queue.last}`
       raise CheckoutError, merge_queue.last unless $CHILD_STATUS.success?
 
-      old_refs = merge_queue.drop(1).map { |branch| `git rev-parse --short #{branch}`.strip }
+      Logger.log 'Old refs' do
+        stack_refs(stack_start + 1).each do |(branch, ref)|
+          Logger.log "#{branch}: #{ref.accent}"
+        end
+      end
 
       `git rebase #{current_branch} --update-refs --autostash`
       raise RebaseError, current_branch unless $CHILD_STATUS.success?
 
-      new_refs = merge_queue.drop(1).map { |branch| `git rev-parse --short #{branch}`.strip }
-
-      merge_queue.drop(1).each_with_index do |branch, index|
-        next if old_refs[index] == new_refs[index]
-
-        Logger.log "Updated #{branch} from #{old_refs[index].accent} to #{new_refs[index].accent}"
+      Logger.log 'New refs' do
+        stack_refs(stack_start + 1).each do |(branch, ref)|
+          Logger.log "#{branch}: #{ref.accent}"
+        end
       end
 
-      `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')}`
+      Logger.log `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')} 2>&1`
 
       Logger.success 'Done.'
     end
@@ -156,13 +164,12 @@ def update
       `git checkout #{first_branch}`
       raise CheckoutError, first_branch unless $CHILD_STATUS.success?
 
-      old_ref = `git rev-parse --short #{first_branch}`.strip
+      Logger.log "Old ref of #{first_branch}: #{`git rev-parse --short #{first_branch}`.accent}"
 
       `git rebase #{base} --onto origin/#{base} --autostash`
       raise RebaseError, first_branch unless $CHILD_STATUS.success?
 
-      new_ref = `git rev-parse --short #{first_branch}`.strip
-      Logger.log "Updated #{first_branch} from #{old_ref.accent} to #{new_ref.accent}"
+      Logger.log "New ref of #{first_branch}: #{`git rev-parse --short #{first_branch}`.strip.accent}"
       # --
 
       `git checkout #{base}`
