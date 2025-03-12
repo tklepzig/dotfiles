@@ -9,6 +9,10 @@ class String
   def accent
     "\e[0;94m#{self}\e[0;34m"
   end
+
+  def is_integer?
+    to_i.to_s == self
+  end
 end
 
 module Logger
@@ -39,7 +43,7 @@ module Logger
     prefix = @level.zero? ? "\e[1;31m\u276f " : ''
     message = message.rjust(message.length + 2 * @level)
     puts "#{prefix}\e[0;31m#{message}\e[0m"
-    write_log_file(`Error: #{message}`)
+    write_log_file("Error: #{message}")
   end
 
   def self.init
@@ -208,7 +212,7 @@ def pr
   `gh pr create --web --base #{parent_branch(current_branch)}`
 end
 
-# index: absolute number (1, 2) or relative number (-1, +2)
+# index: absolute number (1, 2) or relative number (-1, +2) or the word 'last'
 # if ommitted, a fuzzy search via fzf is started
 def checkout(index = nil)
   queue_without_base = merge_queue.drop(1)
@@ -223,6 +227,11 @@ def checkout(index = nil)
   if index == 'last'
     `git checkout #{queue_without_base.last}`
     return
+  end
+
+  unless index.is_integer?
+    Logger.error 'Invalid index'
+    exit 1
   end
 
   if index.start_with?(/\+|-/)
