@@ -44,8 +44,8 @@ exec --no-startup-id xinput set-prop "Elan Touchpad" "libinput Tapping Enabled" 
 
 exec_always --no-startup-id setxkbmap -layout de
 
-# Set wallpaper to first image in wallpaper folder
-exec_always --no-startup-id feh --bg-fill $HOME/wallpaper/$(ls $HOME/wallpaper | head -1)
+# Set wallpaper to first image in wallpaper folder for both screens (if there is only one, it does not matter)
+exec_always --no-startup-id feh --bg-fill $HOME/wallpaper/$(ls $HOME/wallpaper | head -1) --bg-fill $HOME/wallpaper/$(ls $HOME/wallpaper | head -1)
 
 #set $refresh_i3bar killall -SIGUSR1 i3status
 # For i3blocks:
