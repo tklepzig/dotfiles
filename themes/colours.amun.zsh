@@ -1,4 +1,4 @@
-primaryFg=248
+primaryFg=251
 primaryBg=17
 primaryText=26
 secondaryFg=7
