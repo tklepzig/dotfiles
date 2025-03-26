@@ -71,7 +71,8 @@ def tmux_panes(session_name, window_index)
 
   pane_list.map do |pane|
     index, active, tty, path = pane.split(/,/)
-    [index, { active: !active.to_i.zero?, path:, command: tty_command(tty) }]
+    history = `tmux capture-pane -t "#{session_name}:#{window_index}.#{index}" -p -S -`.gsub(/\n+/, "\n")
+    [index, { active: !active.to_i.zero?, path:, command: tty_command(tty), history: }]
   end
 end
 
