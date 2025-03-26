@@ -183,7 +183,7 @@ def close_all(snapshot)
   snapshot['sessions'].each do |session|
     session['windows'].reverse.each do |window|
       window['panes'].reverse.each do |pane|
-        close_vim(session, window, pane)
+        close_vim(session, window, pane) if pane['command']&.include?('vim')
         send_keys(session['name'], window['index'], pane['index'], 'exit')
         sleep 0.5
       end
