@@ -5,6 +5,7 @@ require 'English'
 require 'json'
 
 CLOSE_ALL = ARGV.include?('--close-all')
+PRINT_PANE_CONTENT = ARGV.include?('-p')
 
 def linux?
   (/linux/ =~ RUBY_PLATFORM) != nil
@@ -71,7 +72,7 @@ def tmux_panes(session_name, window_index)
 
   pane_list.map do |pane|
     index, active, tty, path = pane.split(/,/)
-    content = `tmux capture-pane -t "#{session_name}:#{window_index}.#{index}" -p -S -`.gsub(/\n+/, "\n")
+    content = `tmux capture-pane -t "#{session_name}:#{window_index}.#{index}" -peTJ -S -`
     [index, { active: !active.to_i.zero?, path:, command: tty_command(tty), content: }]
   end
 end
@@ -192,7 +193,22 @@ def close_all(snapshot)
   end
 end
 
+if PRINT_PANE_CONTENT
+  current_session = `tmux display-message -p '#S'`.strip
+  current_window = `tmux display-message -p '#I'`.strip
+  current_pane = `tmux display-message -p '#P'`.strip
+
+  snapshot = JSON.parse(File.read("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot.json"))
+  puts snapshot['sessions'].find { |session| session['name'] == current_session }['windows'].find { |window| window['index'] == current_window }['panes'].find { |pane| pane['index'] == current_pane }['content']
+  exit
+end
+
 if ENV['TMUX']
+  if File.exist?("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot.json")
+    puts 'Existing snapshot found, overwrite it? (y/n)'
+    exit 1 unless gets.chomp == 'y'
+  end
+
   `mkdir -p #{ENV['HOME']}/.dotfiles-local/vim-sessions`
 
   snapshot = tmux_snapshot
