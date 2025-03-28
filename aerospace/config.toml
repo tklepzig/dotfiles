@@ -78,7 +78,7 @@ alt-shift-c = 'reload-config'
 alt-shift-r = 'flatten-workspace-tree'
 
 alt-r = 'mode resize'
-alt-x = 'mode x'
+#alt-x = 'mode x'
 
 [mode.resize.binding]
 h = 'resize width -50'
@@ -91,6 +91,6 @@ esc = 'mode main'
 
 
 # A mode to just pass keys through to type brackets, @, etc.
-[mode.x.binding]
-alt-x = 'mode main'
-esc = 'mode main'
+#[mode.x.binding]
+#alt-x = 'mode main'
+#esc = 'mode main'
