@@ -125,13 +125,16 @@ stacked:
     - update
 tmux-snapshot:
   help: |-
-    When run inside tmux, it will save a snapshot of all tmux sessions. If --close-all is given, all sessions will be closed.
+    When run inside tmux, it will save a snapshot of all tmux sessions. If --close-all is given, all sessions will be closed. If -p is given, it will print the content from the snapshot for the current pane if existing.
     When run outside tmux, it will restore the last saved snapshot.
   args:
     - name: --close-all
       optional: true
+    - name: -p
+      optional: true
   completion:
     - --close-all
+    - -p
 vicy:
   help: Opens vicy's CLI
 vicy-serve:
