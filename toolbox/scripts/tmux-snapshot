@@ -206,7 +206,7 @@ end
 if ENV['TMUX']
   if File.exist?("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot.json")
     puts 'Existing snapshot found, overwrite it? (y/n)'
-    exit 1 unless gets.chomp == 'y'
+    exit 1 unless $stdin.gets.chomp == 'y'
   end
 
   `mkdir -p #{ENV['HOME']}/.dotfiles-local/vim-sessions`
