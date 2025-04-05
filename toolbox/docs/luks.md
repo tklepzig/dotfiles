@@ -27,3 +27,16 @@ Unmount container
 Close container
 
     sudo cryptsetup close encrypted
+
+Add passphrase
+
+    cryptsetup luksAddKey container/device
+
+Add keyfile
+
+    cryptsetup luksAddKey container/device /path/to/keyfile
+
+> Create keyfile by using e.g. dd
+>
+>     dd bs=512 count=4 if=/dev/random of=/path/to/keyfile iflag=fullblock
+>     chmod 600 /path/to/keyfile
