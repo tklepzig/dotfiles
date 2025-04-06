@@ -1,2 +1,0 @@
-let g:coc_global_extensions = g:coc_global_extensions + ['coc-python']
-source $HOME/.dotfiles/vim/python/mappings.vim
