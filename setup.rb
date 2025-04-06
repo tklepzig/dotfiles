@@ -315,7 +315,7 @@ def install(variant = DF_VARIANT)
   end
 
   Logger.log 'Initializing toolbox' do
-    # TODO: Only when in full mode
+    # TODO: Only when in full mode?
     add_link_with_override "#{DF_PATH}/toolbox/init.zsh", "#{HOME}/.zshrc"
     add_toolbox_includes
   end
