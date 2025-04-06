@@ -3,3 +3,5 @@
 
 `rm -f #{HOME}/.vim/coc-settings.json`
 `rm -f #{HOME}/.config/nvim/coc-settings.json`
+`rm -rf #{HOME}/.config/solargraph`
+

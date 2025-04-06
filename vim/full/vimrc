@@ -118,7 +118,28 @@ command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organize
 
 let g:coc_snippet_next = '<tab>'
 
-let g:coc_global_extensions = ['coc-snippets']
+"coc-emoji is triggered when typing ':'
+let g:coc_global_extensions = [
+      \'coc-snippets',
+      \'coc-json',
+      \'coc-tsserver',
+      \'coc-prettier',
+      \'coc-eslint',
+      \'coc-css',
+      \'coc-styled-components',
+      \'https://github.com/andys8/vscode-jest-snippets',
+      \'https://github.com/akamud/vscode-javascript-snippet-pack',
+      \'@yaegassy/coc-tailwindcss3',
+      \'coc-emmet',
+      \'coc-python',
+      \'coc-emoji',
+      \'coc-dictionary',
+      \'coc-word',
+      \'coc-vimlsp',
+      \'coc-sumneko-lua',
+      \'coc-solargraph',
+      \'coc-db',
+      \]
 
 " =============================================================
 " End Coc Settings
@@ -150,9 +171,9 @@ function! JumpToSameIndent(direction, inVisualMode)
   endif
 endfunction
 
-source $HOME/.dotfiles/vim/dev/outline.vim
-source $HOME/.dotfiles/vim/dev/statusline.vim
-source $HOME/.dotfiles/vim/dev/mappings.vim
+source $HOME/.dotfiles/vim/full/outline.vim
+source $HOME/.dotfiles/vim/full/statusline.vim
+source $HOME/.dotfiles/vim/full/mappings.vim
 
 let g:BufferNavigatorMapKeys = 0
 
@@ -177,11 +198,143 @@ augroup filetype_gitcommit
     autocmd FileType gitcommit iab <buffer> <expr> wip "wip [skip ci]"
 augroup END
 
-" Config for rhysd/conflict-marker.vim
+" rhysd/conflict-marker.vim
 let g:conflict_marker_highlight_group = ''
 highlight ConflictMarkerOurs ctermbg=23
 highlight ConflictMarkerTheirs ctermbg=58
 highlight ConflictMarkerCommonAncestorsHunk ctermbg=237
+
+
+let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.tsx, *.jsx'
+let test#strategy = "vimux"
+let g:test#echo_command = 0
+
+autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
+autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx
+
+" Enable TOC window auto-fit
+let g:vim_markdown_toc_autofit = 1
+let g:vim_markdown_folding_disabled = 1
+
+" Customize highlight of markdown headlines depending on current theme
+execute 'highlight htmlH1 ctermfg='.accentText
+execute 'highlight htmlH2 ctermfg='.primaryText
+execute 'highlight htmlH3 ctermfg='.secondaryText
+execute 'highlight htmlH4 ctermfg='.secondaryText
+execute 'highlight htmlH5 ctermfg='.secondaryText
+execute 'highlight htmlH6 ctermfg='.secondaryText
+
+let g:vimtex_syntax_conceal_disable = 1
+
+set dictionary+=/usr/share/dict/words
+
+function! s:SpellCheck(bang, lang = "en")
+  let prefix = ""
+  if a:bang
+    let prefix = "no" 
+  endif
+  execute "setlocal " . prefix . "spell spelllang=" . a:lang
+endfunction
+
+command! -nargs=? -bang SpellCheck :call <SID>SpellCheck(<bang>0, <f-args>)
+
+function! s:ToggleWrite(bang, width)
+  if a:bang
+    Goyo! | Limelight!
+    set nowrap nolinebreak
+    colorscheme codedark
+    hi Normal ctermbg=NONE
+    hi EndOfBuffer ctermbg=NONE
+    hi LineNr ctermbg=NONE
+    hi SignColumn ctermbg=NONE
+    nunmap <silent> <buffer> j
+    nunmap <silent> <buffer> k
+  else
+    set wrap linebreak
+    colorscheme seoul256
+    execute "Goyo " . a:width . " | Limelight"
+    nnoremap <silent> <buffer> j gj
+    nnoremap <silent> <buffer> k gk
+  endif
+endfunction
+
+command! -nargs=* -bang Write :call <SID>ToggleWrite(<bang>0, <q-args>)
+
+
+let g:statuslineMode = "default"
+
+" TODO :so can handle visual selection by itself, writing to tmp file necessary??
+" TODO Add possibility for running vim9 scripts (:vim9 so)
+function! SourceSelection() range
+  let tmpFile = tempname()
+  call writefile(getline(a:firstline, a:lastline), l:tmpFile)
+  execute "source " . l:tmpFile
+  call delete(l:tmpFile)
+endfunction
+command! -range SourceSelection let b:winview = winsaveview() | <line1>,<line2>call SourceSelection() | call winrestview(b:winview) | unlet b:winview
+
+command! Themis :VimuxRunCommand expand("$HOME") . "/.vim/vim-plug/vim-themis/bin/themis " . expand("%")
+
+function! ToggleStatusline()
+  if g:statuslineMode == "default"
+    let g:statuslineMode = "syntax"
+    let &statusline = ' %{synIDattr(synID(line("."),col("."),1),"name")} - %{synIDattr(synIDtrans(synID(line("."),col("."),1)),"name")} '
+  else
+    let g:statuslineMode = "default"
+    set statusline=%!StatusLine()
+  endif 
+endfunction
+
+
+function! s:AlternateSafe()
+  try
+    A
+  catch /^Vim\%((\a\+)\)\=:E345:/
+    let path = matchstr(v:exception, '.*"\zs.*\ze".*')
+    execute 'e ' . path
+  endtry
+endfunction
+
+command! AlternateSafe :call <SID>AlternateSafe()
+
+let g:projectionist_heuristics = { ".git/":
+      \ { "lib/web/*_controller.rb": { "alternate": [ "spec/web/{}_request_spec.rb", 
+      \                                               "spec/web/{}_get_request_spec.rb", 
+      \                                               "spec/web/{}_post_request_spec.rb", 
+      \                                               "spec/web/{}_patch_request_spec.rb", 
+      \                                               "spec/web/{}_delete_request_spec.rb"] }, 
+      \   "spec/web/*_get_request_spec.rb": { "alternate": "lib/web/{}_controller.rb" },
+      \   "spec/web/*_post_request_spec.rb": { "alternate": "lib/web/{}_controller.rb" },
+      \   "spec/web/*_patch_request_spec.rb": { "alternate": "lib/web/{}_controller.rb" },
+      \   "spec/web/*_delete_request_spec.rb": { "alternate": "lib/web/{}_controller.rb" },
+      \   "spec/web/*_request_spec.rb": { "alternate": "lib/web/{}_controller.rb" }}
+      \ }
+
+augroup filetype_ruby
+    autocmd!
+    let rubySynGroups = ["rubyString", "rubyComment"]
+    autocmd FileType ruby iab <buffer> <expr> de ExcludeSynGroupAbbr("de", "do<cr>end<esc>O", rubySynGroups)
+    autocmd FileType ruby iab <buffer> <expr> it ExcludeSynGroupAbbr("it", "it 'does' do<cr>end<esc>O", rubySynGroups)
+    autocmd FileType ruby iab <buffer> <expr> ctx ExcludeSynGroupAbbr("ctx", "context 'with sth' do<cr>end<esc>O", rubySynGroups)
+    autocmd FileType ruby iab <buffer> <expr> def ExcludeSynGroupAbbr("def", "def<cr>end<esc>kA", rubySynGroups)
+    autocmd FileType ruby iab <buffer> <expr> class ExcludeSynGroupAbbr("class", "class<cr>end<esc>kA", rubySynGroups)
+    autocmd FileType ruby iab <buffer> <expr> if ExcludeSynGroupAbbr("if", "if<cr>end<esc>kA", rubySynGroups)
+    autocmd FileType ruby iab <buffer> <expr> pry ExcludeSynGroupAbbr("pry", "require 'pry'; binding.pry", rubySynGroups)
+    autocmd FileType ruby iab <buffer> <expr> irb ExcludeSynGroupAbbr("irb", "binding.irb", rubySynGroups)
+
+augroup END
+
+augroup skeletons_ruby
+  autocmd BufNewFile,BufReadPost *_spec\.rb if getline(1,'$') == [''] | 0r $HOME/.dotfiles/vim/full/skeletons/spec.rb | endif
+  autocmd BufNewFile,BufReadPost *.rb if getline(1,'$') == [''] | 0r $HOME/.dotfiles/vim/full/skeletons/ruby.rb | endif
+augroup END
+
+let g:BufferNavigatorWidth = 50
+let g:BufferNavigatorHighlightRules = [
+      \["rubySpecDir", "dir", "spec", "NONE", "106", "NONE", "green"],
+      \["rubySpecFile", "file", ".*_spec\.rb", "NONE", "154", "NONE", "green"],
+      \]
+
 
 
 if !empty($DOTFILES_NVIM) && has('nvim')

@@ -8,7 +8,7 @@ require 'yaml'
 DF_REPO ||= ENV['DOTFILES_REPO'] || 'tklepzig/dotfiles'
 DF_BRANCH ||= ENV['DOTFILES_BRANCH'] || nil
 HOME ||= ENV['HOME']
-DF_PROFILES ||= ENV['DOTFILES_PROFILES'] || ''
+DF_VARIANT ||= ENV['DOTFILES_VARIANT'] || 'full'
 DF_THEME ||= ENV['DOTFILES_THEME']
 DF_PATH ||= "#{HOME}/.dotfiles".freeze
 DF_LOCAL_PATH ||= "#{HOME}/.dotfiles-local".freeze
@@ -152,34 +152,36 @@ def add_link_with_override(link, file, command = 'source')
   write_link(override, file, command)
 end
 
-def link_vim_plugins(profile)
-  if File.exist?("#{DF_PATH}/vim/#{profile}/plugins.override.vim")
-    merge("#{DF_PATH}/vim/#{profile}/plugins.vim",
-          "#{DF_PATH}/vim/#{profile}/plugins.override.vim")
+def link_vim_plugins(variant)
+  if File.exist?("#{DF_PATH}/vim/#{variant}/plugins.override.vim")
+    merge("#{DF_PATH}/vim/#{variant}/plugins.vim",
+          "#{DF_PATH}/vim/#{variant}/plugins.override.vim")
   end
 
-  `sed 's/\\"pluginfile/source $HOME\\/.dotfiles\\/vim\\/#{profile}\\/plugins.vim\\
+  `sed 's/\\"pluginfile/source $HOME\\/.dotfiles\\/vim\\/#{variant}\\/plugins.vim\\
 \\"pluginfile/g' #{DF_PATH}/vim/plugins.vim > #{DF_PATH}/vim/plugins.vim.tmp && mv #{DF_PATH}/vim/plugins.vim.tmp #{DF_PATH}/vim/plugins.vim`
 end
 
-def uninstall_profiles
-  (['basic'] + DF_PROFILES.split(' ')).each do |profile|
-    Logger.log "Removing Vim Profile #{profile}" do
-      uninstall_file = "#{DF_PATH}/vim/#{profile}/uninstall.rb"
-      require uninstall_file if File.exist?(uninstall_file)
-    end
+def cleanup_vim
+  Logger.log 'Cleanup vim' do
+    require "#{DF_PATH}/vim/basic/uninstall.rb"
+    return unless DF_VARIANT == 'full'
+
+    require "#{DF_PATH}/vim/full/uninstall.rb"
   end
 end
 
-def install_profiles
-  (['basic'] + DF_PROFILES.split(' ')).each do |profile|
-    Logger.log "Installing Vim Profile #{profile}" do
-      link_vim_plugins profile
-      add_link_with_override "#{DF_PATH}/vim/#{profile}/vimrc", "#{HOME}/.vimrc"
+def setup_vim(variant)
+  Logger.log "Setup#{variant == 'basic' ? ' basic' : ''} vim" do
+    link_vim_plugins 'basic'
+    add_link_with_override "#{DF_PATH}/vim/basic/vimrc", "#{HOME}/.vimrc"
+    require "#{DF_PATH}/vim/basic/install.rb"
 
-      setup_file = "#{DF_PATH}/vim/#{profile}/install.rb"
-      require setup_file if File.exist?(setup_file)
-    end
+    return unless variant == 'full'
+
+    link_vim_plugins 'full'
+    add_link_with_override "#{DF_PATH}/vim/full/vimrc", "#{HOME}/.vimrc"
+    require "#{DF_PATH}/vim/full/install.rb"
   end
 end
 
@@ -231,7 +233,7 @@ def add_toolbox_includes
   end
 end
 
-def install
+def install(variant = DF_VARIANT)
   check_mandatory_installation 'git'
   check_mandatory_installation 'zsh'
 
@@ -275,6 +277,12 @@ def install
     end
   end
 
+  # Update chosen variant in .zshrc
+  `sed "/DOTFILES_VARIANT/d" #{HOME}/.zshrc > #{HOME}/.zshrc.tmp && mv #{HOME}/.zshrc.tmp #{HOME}/.zshrc`
+  File.open("#{HOME}/.zshrc", 'a') do |f|
+    f.puts "export DOTFILES_VARIANT='#{variant}'"
+  end
+
   `mkdir -p #{DF_LOCAL_PATH}`
   migrate_local_entries
 
@@ -293,7 +301,7 @@ def install
 
   add_link_with_override "#{DF_PATH}/vim/plugins.vim", "#{HOME}/.vimrc"
 
-  install_profiles
+  setup_vim(variant)
 
   add_link_with_override "#{DF_PATH}/zsh/zshrc", "#{HOME}/.zshrc"
 
@@ -302,7 +310,12 @@ def install
     File.write("#{HOME}/.bc", "scale=2\n")
   end
 
+  Logger.log 'Configuring default gems' do
+    `ln -sf #{DF_PATH}/default-gems #{HOME}/.default-gems`
+  end
+
   Logger.log 'Initializing toolbox' do
+    # TODO: Only when in full mode
     add_link_with_override "#{DF_PATH}/toolbox/init.zsh", "#{HOME}/.zshrc"
     add_toolbox_includes
   end
@@ -316,8 +329,8 @@ def install
   # "echo" to suppress the "Please press ENTER to continue...
   `echo | vim +PlugInstall +PlugUpdate +qall > /dev/null 2>&1`
 
-  if DF_PROFILES.include?('dev')
-    # The dev profile is activated and so the coc plugin is installed
+  if variant == 'full'
+    # The coc plugin is installed
     Logger.log 'Updating coc extensions'
     `echo | vim +CocUpdateSync +qall > /dev/null 2>&1`
   end
@@ -402,10 +415,13 @@ def uninstall
   `rm -f #{HOME}/.vim/autoload/plug.vim`
   `rm -rf #{HOME}/.vim/vim-plug`
 
-  uninstall_profiles
+  cleanup_vim
 
   Logger.log 'Removing bc configuration'
   `rm -f #{HOME}/.bc`
+
+  Logger.log 'Removing default gems configuration'
+  `rm -f #{HOME}/.default-gems`
 
   Logger.log 'Removing git configuration'
   `#{DF_PATH}/git/uninstall`
@@ -420,5 +436,5 @@ if ARGV[0] == '--uninstall'
   uninstall
 elsif __FILE__ == $PROGRAM_NAME
   # only run installation if script is invoked directly and not by requiring it
-  install
+  ARGV[0] == '--basic' ? install('basic') : install
 end
