@@ -31,10 +31,21 @@ Plug 'rhysd/conflict-marker.vim'
 Plug 'HerringtonDarkholme/yats.vim'
 Plug 'alvan/vim-closetag'
 Plug 'janko/vim-test'
+Plug 'thinca/vim-themis'
+
+" markdown & Co
 Plug 'junegunn/goyo.vim'
 Plug 'junegunn/seoul256.vim'
 Plug 'junegunn/limelight.vim'
 Plug 'plasticboy/vim-markdown'
 Plug 'mzlogin/vim-markdown-toc'
 Plug 'lervag/vimtex'
-Plug 'thinca/vim-themis'
+
+" ruby
+Plug 'vim-ruby/vim-ruby'
+Plug 'tpope/vim-rails'
+Plug 'tpope/vim-bundler'
+Plug 'tpope/vim-rake'
+Plug 'tpope/vim-projectionist'
+Plug 'tpope/vim-dadbod'
+Plug 'kristijanhusak/vim-dadbod-ui'

@@ -159,6 +159,12 @@ augroup vimspec
     autocmd FileType vimspec nnoremap <buffer> <nowait> <leader>t :Themis<cr>
 augroup END
 
+
+augroup ruby
+    autocmd!
+    autocmd FileType ruby nnoremap <buffer> <leader>2 :AlternateSafe<cr>
+augroup END
+
 " Coc
 
 " Use <down> and <up> to navigate completion list:

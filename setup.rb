@@ -307,6 +307,10 @@ def install
     File.write("#{HOME}/.bc", "scale=2\n")
   end
 
+  Logger.log 'Configuring default gems' do
+    `ln -sf #{DF_PATH}/default-gems #{HOME}/.default-gems`
+  end
+
   Logger.log 'Initializing toolbox' do
     # TODO: Only when in full mode
     add_link_with_override "#{DF_PATH}/toolbox/init.zsh", "#{HOME}/.zshrc"
@@ -412,6 +416,9 @@ def uninstall
 
   Logger.log 'Removing bc configuration'
   `rm -f #{HOME}/.bc`
+
+  Logger.log 'Removing default gems configuration'
+  `rm -f #{HOME}/.default-gems`
 
   Logger.log 'Removing git configuration'
   `#{DF_PATH}/git/uninstall`
