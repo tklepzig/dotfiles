@@ -171,16 +171,13 @@ def cleanup_vim
   end
 end
 
-def setup_vim
-  Logger.log 'Setup vim' do
+def setup_vim(variant)
+  Logger.log "Setup#{variant == 'basic' ? ' basic' : ''} vim" do
     link_vim_plugins 'basic'
     add_link_with_override "#{DF_PATH}/vim/basic/vimrc", "#{HOME}/.vimrc"
     require "#{DF_PATH}/vim/basic/install.rb"
 
-    if DF_VARIANT == 'basic'
-      Logger.log 'Using only basic variant'
-      return
-    end
+    return unless variant == 'full'
 
     link_vim_plugins 'full'
     add_link_with_override "#{DF_PATH}/vim/full/vimrc", "#{HOME}/.vimrc"
@@ -236,7 +233,7 @@ def add_toolbox_includes
   end
 end
 
-def install
+def install(variant = DF_VARIANT)
   check_mandatory_installation 'git'
   check_mandatory_installation 'zsh'
 
@@ -280,6 +277,12 @@ def install
     end
   end
 
+  # Update chosen variant in .zshrc
+  `sed "/DOTFILES_VARIANT/d" #{HOME}/.zshrc > #{HOME}/.zshrc.tmp && mv #{HOME}/.zshrc.tmp #{HOME}/.zshrc`
+  File.open("#{HOME}/.zshrc", 'a') do |f|
+    f.puts "export DOTFILES_VARIANT='#{variant}'"
+  end
+
   `mkdir -p #{DF_LOCAL_PATH}`
   migrate_local_entries
 
@@ -298,7 +301,7 @@ def install
 
   add_link_with_override "#{DF_PATH}/vim/plugins.vim", "#{HOME}/.vimrc"
 
-  setup_vim
+  setup_vim(variant)
 
   add_link_with_override "#{DF_PATH}/zsh/zshrc", "#{HOME}/.zshrc"
 
@@ -326,7 +329,7 @@ def install
   # "echo" to suppress the "Please press ENTER to continue...
   `echo | vim +PlugInstall +PlugUpdate +qall > /dev/null 2>&1`
 
-  if DF_VARIANT == 'full'
+  if variant == 'full'
     # The coc plugin is installed
     Logger.log 'Updating coc extensions'
     `echo | vim +CocUpdateSync +qall > /dev/null 2>&1`
@@ -433,5 +436,5 @@ if ARGV[0] == '--uninstall'
   uninstall
 elsif __FILE__ == $PROGRAM_NAME
   # only run installation if script is invoked directly and not by requiring it
-  install
+  ARGV[0] == '--basic' ? install('basic') : install
 end
