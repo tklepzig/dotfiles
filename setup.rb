@@ -233,6 +233,7 @@ def add_toolbox_includes
   end
 end
 
+# TODO: clean up, split into smaller chunks, don't do all of this for basic variant
 def install(variant = DF_VARIANT)
   check_mandatory_installation 'git'
   check_mandatory_installation 'zsh'
@@ -288,10 +289,12 @@ def install(variant = DF_VARIANT)
 
   Logger.log "Using theme #{ENV['DOTFILES_THEME']}" if ENV['DOTFILES_THEME']
   `#{DF_PATH}/toolbox/scripts/set-theme`
+
   add_link_with_override "#{DF_PATH}/colours.vim", "#{HOME}/.vimrc"
   add_link_with_override "#{DF_PATH}/colours.zsh", "#{HOME}/.zshrc"
   add_link_with_override "#{DF_PATH}/colours.zsh", "#{HOME}/.tmux.conf"
 
+  # TODO: part of vim setup, move into one block
   Logger.log 'Configuring for neovim' if ENV['DOTFILES_NVIM']
 
   unless File.exist?("#{DF_LOCAL_PATH}/plugins.vim")
@@ -303,6 +306,7 @@ def install(variant = DF_VARIANT)
 
   setup_vim(variant)
 
+  # TODO: move before vim setup
   add_link_with_override "#{DF_PATH}/zsh/zshrc", "#{HOME}/.zshrc"
 
   unless File.exist?("#{HOME}/.bc")
@@ -320,6 +324,7 @@ def install(variant = DF_VARIANT)
     add_toolbox_includes
   end
 
+  # TODO: part of vim setup
   unless File.exist?("#{HOME}/.vim/autoload/plug.vim")
     Logger.log 'Installing vim-plug'
     `curl -fLo #{HOME}/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim>/dev/null 2>&1`
@@ -335,6 +340,7 @@ def install(variant = DF_VARIANT)
     `echo | vim +CocUpdateSync +qall > /dev/null 2>&1`
   end
 
+  # TODO: move up into one block of "linking"
   if OS.mac?
     add_link_with_override "#{DF_PATH}/tmux/vars.osx.conf", "#{HOME}/.tmux.conf"
   else
