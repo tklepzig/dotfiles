@@ -1,10 +1,23 @@
 # GPG
 
 TODO: Improve overall docs for gpg multipurpose  
-See also
-https://www.linuxbabe.com/security/a-practical-guide-to-gpg-part-1-generate-your-keypair
-and  
-https://gock.net/blog/2020/gpg-cheat-sheet
+See
+
+- https://www.linuxbabe.com/security/a-practical-guide-to-gpg-part-1-generate-your-keypair
+- https://tutonics.com/articles/gpg-encryption-guide-part-1/
+- https://medium.com/code-oil/comprehensive-yet-simple-guide-for-gpg-key-subkey-encryption-signing-verification-other-common-c28fd868cbe7
+- https://gock.net/blog/2020/gpg-cheat-sheet
+- https://incenp.org/notes/2015/using-an-offline-gnupg-master-key.html
+- https://alexcabal.com/creating-the-perfect-gpg-keypair
+
+TODO
+
+- Sensible order
+- howto trust
+- renew expiration for subkeys (--edit-key, select via "key n", "expire",
+  "save")
+- howto set key flags (S, E, A, C, etc.) to primary key and subkeys --
+- --faked-system-time
 
 ## Create key pair
 
