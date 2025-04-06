@@ -1,2 +1,0 @@
-Plug 'thinca/vim-themis'
-

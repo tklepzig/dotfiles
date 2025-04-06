@@ -150,6 +150,15 @@ nnoremap <leader>tz :VimuxZoomRunner<CR>
 "http://blog.jamesnewton.com/setting-up-coc-nvim-for-ruby-development
 " https://blog.carbonfive.com/2011/10/17/vim-text-objects-the-definitive-guide/
 
+nnoremap <silent> <leader>dr :%SourceSelection<cr>
+vnoremap <silent> <leader>dr :SourceSelection<cr>
+nnoremap <silent> <leader>ds :call ToggleStatusline()<cr>
+
+augroup vimspec
+    autocmd!
+    autocmd FileType vimspec nnoremap <buffer> <nowait> <leader>t :Themis<cr>
+augroup END
+
 " Coc
 
 " Use <down> and <up> to navigate completion list:

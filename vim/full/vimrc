@@ -135,6 +135,8 @@ let g:coc_global_extensions = [
       \'coc-emoji',
       \'coc-dictionary',
       \'coc-word',
+      \'coc-vimlsp',
+      \'coc-sumneko-lua',
       \]
 
 " =============================================================
@@ -255,6 +257,32 @@ function! s:ToggleWrite(bang, width)
 endfunction
 
 command! -nargs=* -bang Write :call <SID>ToggleWrite(<bang>0, <q-args>)
+
+
+let g:statuslineMode = "default"
+
+" TODO :so can handle visual selection by itself, writing to tmp file necessary??
+" TODO Add possibility for running vim9 scripts (:vim9 so)
+function! SourceSelection() range
+  let tmpFile = tempname()
+  call writefile(getline(a:firstline, a:lastline), l:tmpFile)
+  execute "source " . l:tmpFile
+  call delete(l:tmpFile)
+endfunction
+command! -range SourceSelection let b:winview = winsaveview() | <line1>,<line2>call SourceSelection() | call winrestview(b:winview) | unlet b:winview
+
+command! Themis :VimuxRunCommand expand("$HOME") . "/.vim/vim-plug/vim-themis/bin/themis " . expand("%")
+
+function! ToggleStatusline()
+  if g:statuslineMode == "default"
+    let g:statuslineMode = "syntax"
+    let &statusline = ' %{synIDattr(synID(line("."),col("."),1),"name")} - %{synIDattr(synIDtrans(synID(line("."),col("."),1)),"name")} '
+  else
+    let g:statuslineMode = "default"
+    set statusline=%!StatusLine()
+  endif 
+endfunction
+
 
 
 if !empty($DOTFILES_NVIM) && has('nvim')

@@ -37,4 +37,4 @@ Plug 'junegunn/limelight.vim'
 Plug 'plasticboy/vim-markdown'
 Plug 'mzlogin/vim-markdown-toc'
 Plug 'lervag/vimtex'
-
+Plug 'thinca/vim-themis'
