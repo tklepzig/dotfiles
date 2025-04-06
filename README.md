@@ -4,13 +4,15 @@ My dotfiles.
 
 ## Installation
 
+### Full version
+
     /usr/bin/env ruby -e "$(curl -Ls https://raw.githubusercontent.com/\
     tklepzig/dotfiles/master/setup.rb)"
 
-## Variants
+### Basic version
 
-There are two variants available: `basic` and `full`. The default is `full`.
-Pass `--basic` to the setup script to use the `basic` variant.
+    /usr/bin/env ruby -e "$(curl -Ls https://raw.githubusercontent.com/\
+    tklepzig/dotfiles/master/setup.rb)" -- --basic
 
 ## Setup asdf
 
