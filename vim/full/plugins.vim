@@ -28,3 +28,6 @@ Plug 'CopilotC-Nvim/CopilotChat.nvim', !empty($DOTFILES_NVIM) && has('nvim') ? {
 Plug 'nvim-lua/plenary.nvim', !empty($DOTFILES_NVIM) && has('nvim') ? {} : { 'on': [] }
 Plug 'samoshkin/vim-mergetool'
 Plug 'rhysd/conflict-marker.vim'
+Plug 'HerringtonDarkholme/yats.vim'
+Plug 'alvan/vim-closetag'
+Plug 'janko/vim-test'
