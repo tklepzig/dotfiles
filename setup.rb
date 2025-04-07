@@ -331,13 +331,16 @@ def install(variant = DF_VARIANT)
   end
 
   Logger.log 'Installing and updating vim plugins'
+  # We can't rely on aliases since the subshell from ruby spawns a sh and has no idea about zsh aliases
+  vim_binary = ENV['DOTFILES_NVIM'] ? 'nvim' : 'vim'
+
   # "echo" to suppress the "Please press ENTER to continue...
-  `echo | vim +PlugInstall +PlugUpdate +qall > /dev/null 2>&1`
+  `echo | #{vim_binary} +PlugInstall +PlugUpdate +qall > /dev/null 2>&1`
 
   if variant == 'full'
     # The coc plugin is installed
     Logger.log 'Updating coc extensions'
-    `echo | vim +CocUpdateSync +qall > /dev/null 2>&1`
+    `echo | #{vim_binary} +CocUpdateSync +qall > /dev/null 2>&1`
   end
 
   # TODO: move up into one block of "linking"
