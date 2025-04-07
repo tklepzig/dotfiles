@@ -66,9 +66,9 @@ alias ccp='xclip -selection clipboard'
 
 if [ -n "$DOTFILES_NVIM" ]
 then
-    alias vim='test -n "$VIMRUNTIME" && exit || nvim'
+    alias vim='nvim'
 else
-    alias vim='test -n "$VIMRUNTIME" && exit || vim'
+    alias vim='vim'
 fi
 
 alias v='vim'
