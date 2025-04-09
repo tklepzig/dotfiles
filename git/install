@@ -130,6 +130,8 @@ git config --global alias.stk "stash -u --keep-index"
 git config --global alias.stp "stash pop"
 git config --global alias.stl "$stashCommon"
 git config --global alias.sta "stash apply"
+# apply stash and in case of a conflict, use the version from the stash (staf == stash apply force)
+git config --global alias.staf "cherry-pick -n -m1 -Xtheirs stash"
 git config --global alias.stsw "stash show --word-diff-regex=."
 
 git config --global alias.t "tag"
