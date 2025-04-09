@@ -5,5 +5,20 @@ if [[ $(echo $stdin | sed -n '/BEGIN PGP MESSAGE/p;q') ]]
 then
   echo $stdin
 else
-  echo $stdin | gpg --encrypt --armor -r "$1" 
+  hash=$(echo $stdin | shasum -a 256)
+  hash2=$(git show master:"$2" | gpg --decrypt -q -r "$1" | shasum -a 256)
+
+  if [[ $? -ne 0 ]]
+  then
+    # file is new, doesn't exist in master yet
+    echo $stdin | gpg --encrypt --armor -r "$1" 
+    return
+  fi
+
+  if [[ $hash == $hash2 ]]
+  then
+    echo "$(git show master:"$2")"
+  else
+    echo $stdin | gpg --encrypt --armor -r "$1" 
+  fi
 fi
