@@ -10,7 +10,7 @@ class String
     "\e[0;94m#{self}\e[0;34m"
   end
 
-  def is_integer?
+  def integer?
     to_i.to_s == self
   end
 end
@@ -180,7 +180,11 @@ def update
       raise CheckoutError, base unless $CHILD_STATUS.success?
 
       `git merge --ff-only`
-      raise FastForwardError, base unless $CHILD_STATUS.success?
+      unless $CHILD_STATUS.success?
+        Logger.log "Fast-Forward of #{base} not possible, falling back to rebase..."
+        `git rebase`
+        raise RebaseError, base unless $CHILD_STATUS.success?
+      end
 
       `git checkout #{first_branch}`
       raise CheckoutError, base unless $CHILD_STATUS.success?
@@ -229,7 +233,7 @@ def checkout(index = nil)
     return
   end
 
-  unless index.is_integer?
+  unless index.integer?
     Logger.error 'Invalid index'
     exit 1
   end
