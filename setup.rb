@@ -441,9 +441,39 @@ def uninstall
   Logger.success 'Successfully uninstalled dotfiles'
 end
 
+def setup_vim2
+  Logger.log 'Setup vim' do
+    Logger.log 'Using basic/full variant'
+    Logger.log '...'
+  end
+end
+
+def setup_tmux
+  Logger.log 'Setup tmux' do
+    Logger.log '...'
+  end
+end
+
+def setup_repo
+  Logger.log 'Setup repo' do
+    Logger.log 'Clone, fetch, etc.'
+  end
+end
+
+def setup_kitty
+  Logger.log 'Setup kitty' do
+    Logger.log '...'
+  end
+end
+
 if ARGV[0] == '--uninstall'
   uninstall
 elsif __FILE__ == $PROGRAM_NAME
   # only run installation if script is invoked directly and not by requiring it
-  ARGV[0] == '--basic' ? install('basic') : install
+  # ARGV[0] == '--basic' ? install('basic') : install
+
+  setup_repo
+  setup_vim2
+  setup_tmux if program_installed? 'tmux'
+  setup_kitty if program_installed? 'kitty'
 end
