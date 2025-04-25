@@ -233,7 +233,7 @@ def checkout(index = nil)
     return
   end
 
-  unless index.integer?
+  if !index.start_with?(/\+|-/) && !index.integer?
     Logger.error 'Invalid index'
     exit 1
   end
