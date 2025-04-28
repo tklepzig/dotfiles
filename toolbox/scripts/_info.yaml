@@ -112,10 +112,11 @@ set-theme:
 setup-asdf:
   help: Set up asdf and plugins
 stacked:
-  help: Using stacked branches in git
+  help: Using stacked branches in git, see `stacked help`
   completion:
     - branch
     - edit
+    - help
     - init
     - last
     - open

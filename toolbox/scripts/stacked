@@ -284,10 +284,24 @@ def edit
   system(ENV['EDITOR'], MERGE_QUEUE_PATH)
 end
 
+def help
+  puts 'init - Initialize stacked in this directory'
+  puts 'branch - Create a new branch at the top of this stack'
+  puts 'pr - Create a GitHub PR for the stack'
+  puts 'parent - Print the parent of the current branch in this stack'
+  puts '[-, +, -<number>, +<number>] - Checkout a branch relative to the current one in the stack'
+  puts '[last, <number>] - Checkout a branch in the stack'
+  puts 'open - Open the GitHub PR for the current branch in your browser'
+  puts 'edit - Edit the merge-queues.yaml file in your system editor'
+  puts 'update - Update local stack if remote has changed'
+  puts 'sync - Sync local stack changes to remote'
+  puts 'help - Print this help information'
+end
+
 def run
   command = ARGV[0]
 
-  if %w[init branch pr parent open edit update sync].include?(command)
+  if %w[init branch pr parent open edit update sync help].include?(command)
     send(command, *ARGV[1..])
   elsif command == '-'
     checkout('-1')
