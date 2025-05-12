@@ -1,0 +1,9 @@
+#!/usr/bin/env zsh
+
+for plugin in awscli jq
+do
+  asdf plugin add $plugin
+  asdf install $plugin latest
+  asdf global $plugin latest
+done
+
