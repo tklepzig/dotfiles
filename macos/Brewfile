@@ -45,6 +45,7 @@ cask 'gpg-suite'
 cask 'visual-studio-code'
 cask 'bluesnooze'
 cask 'pixelsnap'
+cask 'keybase'
 #cask 'amethyst'
 cask 'nikitabobko/tap/aerospace'
 
