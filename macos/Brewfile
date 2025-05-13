@@ -1,4 +1,5 @@
 brew 'git'
+brew 'go'
 cask 'kitty'
 cask 'google-chrome'
 
@@ -43,8 +44,10 @@ cask 'tunnelblick'
 cask 'gpg-suite'
 cask 'visual-studio-code'
 cask 'bluesnooze'
+cask 'pixelsnap'
 #cask 'amethyst'
 cask 'nikitabobko/tap/aerospace'
+
 brew 'gpg'
 brew 'gpg2'
 brew 'pinentry-mac'
