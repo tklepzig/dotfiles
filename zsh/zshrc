@@ -139,3 +139,5 @@ then
 fi
 
 source $dotfilesDir/zsh/hooks
+
+source $dotfilesDir/zsh/expiration-check
