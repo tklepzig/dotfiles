@@ -172,6 +172,7 @@ function! JumpToSameIndent(direction, inVisualMode)
 endfunction
 
 source $HOME/.dotfiles/vim/full/outline.vim
+source $HOME/.dotfiles/vim/full/markdown-navigator.vim
 source $HOME/.dotfiles/vim/full/statusline.vim
 source $HOME/.dotfiles/vim/full/mappings.vim
 
@@ -223,6 +224,15 @@ execute 'highlight htmlH3 ctermfg='.secondaryText
 execute 'highlight htmlH4 ctermfg='.secondaryText
 execute 'highlight htmlH5 ctermfg='.secondaryText
 execute 'highlight htmlH6 ctermfg='.secondaryText
+
+" And one more for our markdown navigator plugin to make it independent of the
+" vim-markdown plugin
+execute 'highlight MarkdownNavigatorH1 ctermfg='.accentText
+execute 'highlight MarkdownNavigatorH2 ctermfg='.primaryText
+execute 'highlight MarkdownNavigatorH3 ctermfg='.secondaryText
+execute 'highlight MarkdownNavigatorH4 ctermfg='.secondaryText
+execute 'highlight MarkdownNavigatorH5 ctermfg='.secondaryText
+execute 'highlight MarkdownNavigatorH6 ctermfg='.secondaryText
 
 let g:vimtex_syntax_conceal_disable = 1
 
