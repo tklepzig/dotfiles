@@ -1,33 +1,20 @@
 #!/usr/bin/env zsh
 
-key_count=$(gpg -k | wc -l)
+key_tuples=$(gpg --list-secret-keys --with-colons | awk -F: '
+$1 == "sec" { expiration = $7 }
+$1 == "uid" { print $10";"expiration }')
 
-if (( key_count == 0 )); then
-  return 0 2> /dev/null || exit 0
-fi
-
-expirations=$(gpg --list-keys --with-colons | grep ^pub: | cut -d':' -f7)
-uids=$(gpg --list-keys --with-colons | grep ^uid: | cut -d':' -f10)
-index=1
-
-# ${(f)...} --> parameter expansion flag to split the string at newlines
-# See https://zsh.sourceforge.io/Doc/Release/Expansion.html#Parameter-Expansion-Flags
-for expiration in "${(f)expirations}"; do
+while IFS=$';' read -r uid expiration; do
+  # Skip empty expiration dates
   if [[ -z $expiration ]]; then
-    break
+    continue
   fi
 
-  uid=${${(f)uids}[$index]}
-  index=$((index + 1))
   diff=$((expiration - $(date +%s)))
-  #expiration_date=$(date -d "@$expiration" +%Y-%m-%d)
-  expiration_date=$(date -d "@$expiration" --iso-8601)
-
   if (( diff < 0 )); then
-    echo "$uid expired: $expiration_date"
-    echo "$uid has been expired for $(( -diff / 86400 )) days"
+    echo "$uid expired $(( -diff / 86400 )) days ago"
   elif (( diff < 2592000 )); then
-    echo "$uid expires in less than 30 days: $expiration_date"
     echo "$uid expires in $(( diff / 86400 )) days"
   fi
-done
+done <<< "$key_tuples"
+
