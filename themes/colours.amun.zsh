@@ -1,6 +1,6 @@
 primaryFg=251
 primaryBg=17
-primaryText=26
+primaryText=32
 secondaryFg=7
 secondaryBg=23
 secondaryText=37
