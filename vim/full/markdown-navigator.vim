@@ -4,6 +4,7 @@ let s:optionWindowWidth = ['MarkdownNavigatorWidth', 40]
 
 let s:bufferName = "markdown-navigator"
 let s:headingLineMapping = {}
+let s:currentRootHeading = [-1, 0]
 
 let s:documentBufferNr = -1
 let s:documentWinId = -1
@@ -61,9 +62,21 @@ function! s:PrintLines(documentLineNr)
   setlocal noreadonly modifiable
 
   let selectedLineNr = line(".")
+  call deletebufline("%", 1, "$")
+  let [rootLineNr, rootLevel] = s:currentRootHeading
 
   let curLine = 1
   for [lineNr, level, title] in s:BuildHeadings()
+    if rootLineNr != -1
+      if lineNr < rootLineNr
+        continue
+      elseif lineNr > rootLineNr && level < rootLevel
+        continue
+      elseif lineNr > rootLineNr && level == rootLevel
+        break
+      endif 
+    endif 
+
     call setline(curLine, repeat('  ', level - 1) . title)
     let s:headingLineMapping[curLine] = lineNr
 
@@ -132,6 +145,7 @@ function! s:Toggle()
       " The navigator window is the active window, switch to it instead of
       " closing it
       call win_gotoid(s:navigatorWinId)
+      call s:PrintLines(0)
     else
       call s:Close()
     endif
@@ -152,26 +166,13 @@ endfunction
 
 function! s:ChangeRootHeading()
   let currentLineNr = line(".")
-  let newRootHeadingIndent = indent(currentLineNr)
+  let s:currentRootHeading = [s:headingLineMapping[currentLineNr], (indent(currentLineNr) / 2) + 1]
+  call s:PrintLines(0)
+endfunction
 
-  setlocal noreadonly modifiable
-  let deletedLinesAboveCount = currentLineNr - 1 
- 
-  " Delete all lines above
-  call deletebufline("%", 1, deletedLinesAboveCount)
-
-  " Delete all lines below which are not children of the new root heading
-  " and update the heading line mapping by shifting its entries via
-  " re-assignment
-  for lineNr in range(1, line("$"))
-    let s:headingLineMapping[lineNr] = s:headingLineMapping[lineNr + deletedLinesAboveCount]
-
-    if lineNr > 1 && indent(lineNr) <= newRootHeadingIndent
-      call deletebufline("%", lineNr, "$")
-      break
-    endif
-  endfor
-  setlocal readonly nomodifiable
+function! s:ResetRootHeading()
+  let s:currentRootHeading = [-1, 0]
+  call s:PrintLines(0)
 endfunction
 
 command! MarkdownNavigatorOpen :call <SID>Open()
@@ -187,6 +188,7 @@ augroup MarkdownNavigator
   autocmd FileType markdownnavigator noremap <script> <silent> <nowait> <buffer> q    :call <SID>Close()<CR>
   autocmd FileType markdownnavigator noremap <script> <silent> <nowait> <buffer> z    :call <SID>ToggleZoom()<CR>
   autocmd FileType markdownnavigator noremap <script> <silent> <nowait> <buffer> r    :call <SID>PrintLines(0)<CR>
+  autocmd FileType markdownnavigator noremap <script> <silent> <nowait> <buffer> R    :call <SID>ResetRootHeading()<CR>
   autocmd FileType markdownnavigator noremap <script> <silent> <nowait> <buffer> c    :call <SID>ChangeRootHeading()<CR>
 
   if get(g:, s:optionMapKeys[0], s:optionMapKeys[1])
