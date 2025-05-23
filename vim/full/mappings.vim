@@ -173,11 +173,11 @@ inoremap <silent><expr> <Down>
 inoremap <expr><Up> coc#pum#visible() ? coc#pum#prev(1) : "\<Up>"
 
 " Map <tab> for trigger completion, completion confirm, snippet expand and jump
-inoremap <silent><expr> <TAB>
+inoremap <silent><expr> <Tab>
       \ coc#pum#visible() ? coc#_select_confirm() :
       \ coc#expandableOrJumpable() ?
       \ "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
+      \ <SID>check_back_space() ? "\<Tab>" :
       \ coc#refresh()
 
 function! s:check_back_space() abort
@@ -262,3 +262,8 @@ nmap <silent> <leader>.  <Plug>(coc-fix-current)
 "" Resume latest coc list
 "nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
+
+" Since single <tab> is used for coc completion, use double <tab> to accept
+" copilot suggestions
+imap <silent><script><expr> <Tab><Tab> copilot#Accept("\<CR>")
+let g:copilot_no_tab_map = v:true
