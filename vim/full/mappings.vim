@@ -173,11 +173,11 @@ inoremap <silent><expr> <Down>
 inoremap <expr><Up> coc#pum#visible() ? coc#pum#prev(1) : "\<Up>"
 
 " Map <tab> for trigger completion, completion confirm, snippet expand and jump
-inoremap <silent><expr> <TAB>
+inoremap <silent><expr> <S-TAB>
       \ coc#pum#visible() ? coc#_select_confirm() :
       \ coc#expandableOrJumpable() ?
       \ "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
+      \ <SID>check_back_space() ? "\<S-TAB>" :
       \ coc#refresh()
 
 function! s:check_back_space() abort
