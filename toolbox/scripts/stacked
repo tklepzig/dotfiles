@@ -107,17 +107,20 @@ def parent_branch(branch_name)
 end
 
 def check_pending_operation
-  `git rev-parse --verify CHERRY_PICK_HEAD &>/dev/null`
-  raise 'Cherry-Pick in progress' if $CHILD_STATUS.success?
+  git_dir = `git rev-parse --git-dir`.strip
+  raise 'Rebase in progress' if Dir.exist?("#{git_dir}/rebase-merge") || Dir.exist?("#{git_dir}/rebase-apply")
 
-  `git rev-parse --verify MERGE_HEAD &>/dev/null`
-  raise 'Merge in progress' if $CHILD_STATUS.success?
+  # `git rev-parse --verify CHERRY_PICK_HEAD &>/dev/null`
+  # raise 'Cherry-Pick in progress' if $CHILD_STATUS.success?
 
-  `git rev-parse --verify REVERT_HEAD &>/dev/null`
-  raise 'Revert in progress' if $CHILD_STATUS.success?
+  # `git rev-parse --verify MERGE_HEAD &>/dev/null`
+  # raise 'Merge in progress' if $CHILD_STATUS.success?
 
-  `git rev-parse --verify REBASE_HEAD &>/dev/null`
-  raise 'Rebase in progress' if $CHILD_STATUS.success?
+  # `git rev-parse --verify REVERT_HEAD &>/dev/null`
+  # raise 'Revert in progress' if $CHILD_STATUS.success?
+
+  # `git rev-parse --verify REBASE_HEAD &>/dev/null`
+  # raise 'Rebase in progress' if $CHILD_STATUS.success?
 end
 
 def keep_current_branch
