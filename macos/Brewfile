@@ -52,6 +52,7 @@ cask 'nikitabobko/tap/aerospace'
 brew 'gpg'
 brew 'gpg2'
 brew 'pinentry-mac'
+brew 'watch'
 
 # To mitigate error "An error occurred while installing sequel_pg (1.17.2), and Bundler cannot continue." when running `bundle install`
 brew 'postgresql'
