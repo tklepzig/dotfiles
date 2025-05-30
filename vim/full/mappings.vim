@@ -173,11 +173,19 @@ inoremap <silent><expr> <Down>
 inoremap <expr><Up> coc#pum#visible() ? coc#pum#prev(1) : "\<Up>"
 
 " Map <tab> for trigger completion, completion confirm, snippet expand and jump
-inoremap <silent><expr> <Tab>
+inoremap <silent><expr> <TAB>
       \ coc#pum#visible() ? coc#_select_confirm() :
       \ coc#expandableOrJumpable() ?
       \ "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-      \ <SID>check_back_space() ? "\<Tab>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+
+" Map <shift-tab> additionally to avoid conflicts with copilot
+inoremap <silent><expr> <S-TAB>
+      \ coc#pum#visible() ? coc#_select_confirm() :
+      \ coc#expandableOrJumpable() ?
+      \ "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+      \ <SID>check_back_space() ? "\<S-TAB>" :
       \ coc#refresh()
 
 function! s:check_back_space() abort
@@ -265,5 +273,7 @@ nmap <silent> <leader>.  <Plug>(coc-fix-current)
 
 " Since single <tab> is used for coc completion, use double <tab> to accept
 " copilot suggestions
-imap <silent><script><expr> <Tab><Tab> copilot#Accept("\<CR>")
-let g:copilot_no_tab_map = v:true
+"Not needed anymore, since tab is used for all again but Shift-Tab
+"additionally added for coc completion
+"imap <silent><script><expr> <Tab><Tab> copilot#Accept("\<CR>")
+"let g:copilot_no_tab_map = v:true
