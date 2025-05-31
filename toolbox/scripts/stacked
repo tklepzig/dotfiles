@@ -107,6 +107,7 @@ def parent_branch(branch_name)
 end
 
 def check_pending_operation
+  # see also https://stackoverflow.com/questions/3921409/how-to-know-if-there-is-a-git-rebase-in-progress
   git_dir = `git rev-parse --git-dir`.strip
   raise 'Rebase in progress' if Dir.exist?("#{git_dir}/rebase-merge") || Dir.exist?("#{git_dir}/rebase-apply")
 
