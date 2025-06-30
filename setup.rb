@@ -359,6 +359,11 @@ def install(variant = DF_VARIANT)
     # `ln -sf #{DF_PATH}/kitty/macos-launch-services-cmdline #{HOME}/.config/kitty/macos-launch-services-cmdline` if OS.mac?
   end
 
+  if program_installed? 'ranger'
+    `mkdir -p #{HOME}/.config/ranger`
+    `ln -sf #{DF_PATH}/ranger/rc.conf #{HOME}/.config/ranger/rc.conf`
+  end
+
   if program_installed? 'i3'
     add_link_with_override "#{DF_PATH}/i3/config", "#{HOME}/.config/i3/config", 'include'
 
