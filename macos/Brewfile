@@ -1,61 +1,63 @@
-brew 'git'
-brew 'go'
-cask 'kitty'
-cask 'google-chrome'
+tap "jstkdng/programs"
+tap "nikitabobko/tap"
 
-brew 'wget'
-brew 'wemux'
-brew 'websocat'
-brew 'btop'
-brew 'lynx'
-brew 'ddgr'
-brew 'eza'
-brew 'pqiv'
-brew 'ranger'
-brew 'the_silver_searcher'
-brew 'tig'
-brew 'tmux'
-brew 'bat'
+brew "bat"
+brew "btop"
+brew "ddgr"
+brew "eza"
+brew "git"
+brew "git-delta"
+brew "go"
+brew "jless"
+brew "lynx"
 brew 'pam-reattach'
-brew 'jless'
-brew 'git-delta'
-brew 'ripgrep'
-
-cask 'gimp'
-cask 'insomnia'
-cask 'licecap'
-cask 'raycast'
-cask 'vnc-viewer'
-cask 'ultimaker-cura'
-cask 'seafile-client'
-cask 'audacity'
-cask 'vlc'
-cask 'iterm2'
-cask 'ffmpeg'
-
-brew 'bruno'
-brew 'ripgrep'
-
-cask 'docker'
-cask 'browserstacklocal'
-cask 'slack'
-cask 'discord'
-cask 'tunnelblick'
-cask 'gpg-suite'
-cask 'visual-studio-code'
-cask 'bluesnooze'
-cask 'pixelsnap'
-cask 'keybase'
-#cask 'amethyst'
-cask 'nikitabobko/tap/aerospace'
-
+brew "pinentry-mac"
+brew "pqiv"
+brew "ranger"
+brew "ripgrep"
+brew "the_silver_searcher"
+brew "tig"
+brew 'tmux'
+brew "watch"
+brew "websocat"
+brew "wemux"
+brew "wget"
+brew "jstkdng/programs/ueberzugpp"
 brew 'gpg'
 brew 'gpg2'
-brew 'pinentry-mac'
-brew 'watch'
-brew 'jstkdng/programs/ueberzugpp'
 
 # To mitigate error "An error occurred while installing sequel_pg (1.17.2), and Bundler cannot continue." when running `bundle install`
-brew 'postgresql'
-brew 'libpq'
+#brew 'postgresql'
+#brew 'libpq'
+
+cask "aerospace"
+cask "audacity"
+cask "bluesnooze"
+cask "bruno"
+cask "discord"
+cask "docker-desktop"
+# Not found?!
+#cask 'ffmpeg'
+cask "gimp"
+# Normally installed via downloaded app package
+#cask 'google-chrome'
+cask "gpg-suite"
+cask "insomnia"
+cask "iterm2"
+cask "keybase"
+cask "kitty"
+cask "licecap"
+cask "pixelsnap"
+cask "raycast"
+cask "seafile-client"
+cask "slack"
+cask "tunnelblick"
+cask "ultimaker-cura"
+cask "visual-studio-code"
+cask "vlc"
+cask "vnc-viewer"
+
+# Deprecated
+#cask 'browserstacklocal'
+#cask 'amethyst'
 
