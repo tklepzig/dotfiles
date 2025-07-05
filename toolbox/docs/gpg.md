@@ -164,6 +164,16 @@ https://github.com/settings/keys)
 
     git config commit.gpgsign true
 
+## Sign via SSH key
+
+    ssh-keygen -t ed25519 -C 'my signing key'
+
+    cat ~/.ssh/id_ed25519.pub
+    # add to your git server as a signing key...
+
+    git config --global gpg.format ssh
+    git config --global user.signingkey ~/.ssh/id_ed25519.pub
+
 ## Cache password for private key
 
 The gpg-agent daemon is used for caching. Add the following line to
