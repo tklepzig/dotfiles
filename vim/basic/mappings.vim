@@ -76,6 +76,37 @@ nnoremap <silent> "" :registers 0123456789abcdefghijklmnopqrstuvwxyz<CR>
 " List all custom marks
 nnoremap <silent> '' :marks abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ<CR>
 
+" List only custom global marks
+nnoremap <silent> ,, :marks ABCDEFGHIJKLMNOPQRSTUVWXYZ<CR>
+
+" Easier jumping to global marks
+nnoremap <silent> ,a `A
+nnoremap <silent> ,b `B
+nnoremap <silent> ,c `C
+nnoremap <silent> ,d `D
+nnoremap <silent> ,e `E
+nnoremap <silent> ,f `F
+nnoremap <silent> ,g `G
+nnoremap <silent> ,h `H
+nnoremap <silent> ,i `I
+nnoremap <silent> ,j `J
+nnoremap <silent> ,k `K
+nnoremap <silent> ,l `L
+nnoremap <silent> ,m `M
+nnoremap <silent> ,n `N
+nnoremap <silent> ,o `O
+nnoremap <silent> ,p `P
+nnoremap <silent> ,q `Q
+nnoremap <silent> ,r `R
+nnoremap <silent> ,s `S
+nnoremap <silent> ,t `T
+nnoremap <silent> ,u `U
+nnoremap <silent> ,v `V
+nnoremap <silent> ,w `W
+nnoremap <silent> ,x `X
+nnoremap <silent> ,y `Y
+nnoremap <silent> ,z `Z
+
 nnoremap <leader>u :UndotreeToggle \| UndotreeFocus<CR>
 
 function! s:BigSmallWin()
