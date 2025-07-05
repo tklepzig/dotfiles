@@ -122,6 +122,15 @@ alias berui="ENV=test bundle exec rake unit integration"
 
 alias ai="asdf install"
 
+alias gpgc="gpg --full-gen-key"
+alias gpgl="gpg --list-keys --with-subkey-fingerprints --keyid-format=short"
+alias gpgls="gpg --list-secret-keys --with-subkey-fingerprints --keyid-format=short"
+gpge() {
+    gpg --armor --export $1 > $1.pub
+    gpg --armor --export-secret-keys $1 > $1.key
+    gpg --output $1.rev --gen-revoke $1
+}
+
 if isProgramInstalled pacman
 then
     alias pm='sudo pacman'
