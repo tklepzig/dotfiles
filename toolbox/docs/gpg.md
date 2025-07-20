@@ -19,6 +19,15 @@ TODO
 - howto set key flags (S, E, A, C, etc.) to primary key and subkeys --
 - --faked-system-time
 
+        gpg --list-packets <encryped_file>
+        gpg --import master.pub master.key
+        gpg-connect-agent "DELETE_KEY --force <id>" /bye
+        # Add a subkey to a master key
+        gpg --quick-add-key <master_key_id>
+        gpg --quick-add-key <master_key_id> - - seconds=50
+        # Delete a subkey from a master key, notice the exclamation mark at the end
+        gpg --delete-secret-and-public-keys --batch --yes <sub_key_id>!
+
 ## Create key pair
 
     gpg --full-gen-key
