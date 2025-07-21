@@ -122,10 +122,17 @@ alias berui="ENV=test bundle exec rake unit integration"
 
 alias ai="asdf install"
 
-alias gpc="gpg --full-gen-key"
-alias gpl="gpg --list-keys --with-subkey-fingerprints --keyid-format=short"
-alias gpls="gpg --list-secret-keys --with-subkey-fingerprints --keyid-format=short"
-gpe() {
+alias gpg-create="gpg --full-gen-key"
+gpg-list() {
+    echo "----------- GPG Public Keys -----------"
+    gpg --list-keys --with-subkey-fingerprints --keyid-format=short
+
+    echo ""
+    echo "----------- GPG Secret Keys -----------"
+    gpg --list-secret-keys --with-subkey-fingerprints --keyid-format=short
+}
+
+gpg-export() {
     gpg --armor --export $1 > $1.pub
     gpg --armor --export-secret-keys $1 > $1.key
     gpg --output $1.rev --gen-revoke $1
