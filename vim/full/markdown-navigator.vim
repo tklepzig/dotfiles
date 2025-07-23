@@ -154,11 +154,13 @@ function! s:Toggle()
   endif
 endfunction
 
-function! s:ToggleZoom()
+function! s:ToggleZoom(mode)
   let winWidth = get(g:,s:optionWindowWidth[0], s:optionWindowWidth[1])
 
   if winwidth(0) > winWidth
-  execute "vertical resize " . winWidth
+    execute "vertical resize " . winWidth
+  elseif a:mode == "double"
+    execute "vertical resize " . winWidth * 2
   else
     vertical resize
   endif
@@ -186,7 +188,8 @@ augroup MarkdownNavigator
   autocmd FileType markdownnavigator noremap <script> <silent> <nowait> <buffer> o    :call <SID>SelectHeading("switch")<CR>
   autocmd FileType markdownnavigator noremap <script> <silent> <nowait> <buffer> p    :call <SID>SelectHeading("preview")<CR>
   autocmd FileType markdownnavigator noremap <script> <silent> <nowait> <buffer> q    :call <SID>Close()<CR>
-  autocmd FileType markdownnavigator noremap <script> <silent> <nowait> <buffer> z    :call <SID>ToggleZoom()<CR>
+  autocmd FileType markdownnavigator noremap <script> <silent> <nowait> <buffer> z    :call <SID>ToggleZoom("double")<CR>
+  autocmd FileType markdownnavigator noremap <script> <silent> <nowait> <buffer> Z    :call <SID>ToggleZoom("full")<CR>
   autocmd FileType markdownnavigator noremap <script> <silent> <nowait> <buffer> r    :call <SID>PrintLines(0)<CR>
   autocmd FileType markdownnavigator noremap <script> <silent> <nowait> <buffer> R    :call <SID>ResetRootHeading()<CR>
   autocmd FileType markdownnavigator noremap <script> <silent> <nowait> <buffer> c    :call <SID>ChangeRootHeading()<CR>
