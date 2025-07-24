@@ -138,6 +138,13 @@ gge() {
     gpg --output $1.rev --gen-revoke $1
 }
 
+ggx() {
+    # $1: Fingerprint
+    # $2: Expiration time (e.g. 1y, 2w, 3d, 1m)
+    gpg --quick-set-expire $1 $2
+    gpg --quick-set-expire $1 $2 '*'
+}
+
 if isProgramInstalled pacman
 then
     alias pm='sudo pacman'
