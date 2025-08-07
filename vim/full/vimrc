@@ -347,6 +347,9 @@ let g:BufferNavigatorHighlightRules = [
 
 
 let g:copilot_settings = #{selectedCompletionModel: 'gpt-4o-copilot'}
+let g:copilot_filetypes = {
+      \ 'gitcommit': v:true,
+      \ }
 
 if !empty($DOTFILES_NVIM) && has('nvim')
   "Copilot Chat Stuff
