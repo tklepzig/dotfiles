@@ -17,8 +17,11 @@ let g:ctrlsf_backend = 'rg'
 " Disable preview window (for e.g. :GFiles)
 let g:fzf_preview_window = ''
 
-let g:NERDCustomDelimiters = { 'javascript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' } }
-let g:NERDCustomDelimiters = { 'typescript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' } }
+let g:NERDCustomDelimiters = {
+      \ 'javascript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' },
+      \ 'typescript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' },
+      \ 'css': { 'left': '/*', 'right': '*/' }
+      \ }
 let g:NERDTreeWinSize=50
 
 " NERDTree File highlighting
