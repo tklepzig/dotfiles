@@ -13,7 +13,8 @@ while IFS=$';' read -r uid expiration; do
   diff=$((expiration - $(date +%s)))
   if (( diff < 0 )); then
     echo "$uid expired $(( -diff / 86400 )) days ago"
-  elif (( diff < 2592000 )); then
+  elif (( diff < 432000 )); then
+    # Expires in less than 5 days
     echo "$uid expires in $(( diff / 86400 )) days"
   fi
 done <<< "$key_tuples"
