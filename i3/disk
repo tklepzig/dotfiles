@@ -8,7 +8,7 @@ df -hl / | tail -1 | awk '
   print free " GB"
   print free " GB"
 
-	if (free < 10) {
+	if ($free < 10) {
 		print "#f8e90d"
 	}
 }
