@@ -37,6 +37,7 @@ cask "bluesnooze"
 cask "bruno"
 cask "discord"
 cask "docker-desktop"
+cask "duckduckgo"
 # Not found?!
 #cask 'ffmpeg'
 cask "gimp"
