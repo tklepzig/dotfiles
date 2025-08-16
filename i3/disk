@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 
+# free + 0: Make sure free is treated as a number
 df -hl / | tail -1 | awk '
 /\/.*/ {
 	free=$4
@@ -8,7 +9,7 @@ df -hl / | tail -1 | awk '
   print free " GB"
   print free " GB"
 
-	if ($free < 10) {
+	if ((free + 0) < 10) {
 		print "#f8e90d"
 	}
 }
