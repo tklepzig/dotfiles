@@ -23,6 +23,7 @@
     * [Using iwctl instead of `networkmanager` and `wpa_supplicant`](#using-iwctl-instead-of-networkmanager-and-wpa_supplicant)
     * [Boot into BIOS/UEFI](#boot-into-biosuefi)
     * [Systemd Timers](#systemd-timers)
+    * [Disable Beep](#disable-beep)
     * [Prevent going to sleep while running a program](#prevent-going-to-sleep-while-running-a-program)
 * [Upgrade System](#upgrade-system)
     * [Troubleshooting](#troubleshooting)
@@ -417,6 +418,15 @@ Instead of installing `networkmanager` and `wpa_supplicant`:
     TODO
 
 > https://wiki.archlinux.de/title/Systemd/Timers
+
+#### Disable Beep
+
+Create file `/etc/modprobe.d/nobeep.conf` with the following content:
+
+    blacklist pcspkr
+    blacklist snd_pcsp
+
+> See https://wiki.archlinux.org/title/PC_speaker#Disable_PC_Speaker
 
 #### Prevent going to sleep while running a program
 
