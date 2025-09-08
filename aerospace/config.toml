@@ -61,8 +61,8 @@ alt-4 = 'workspace 4'
 alt-5 = 'workspace 5'
 alt-6 = 'workspace 6'
 
-alt-right = 'workspace next'
-alt-left = 'workspace prev'
+#alt-right = 'workspace next'
+#alt-left = 'workspace prev'
 
 alt-shift-1 = 'move-node-to-workspace 1'
 alt-shift-2 = 'move-node-to-workspace 2'
