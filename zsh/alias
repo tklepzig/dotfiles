@@ -145,6 +145,7 @@ ggi() {
 }
 
 ggx() {
+    echo "Warning: Only works for not yet expired keys and subkeys!"
     # $1: Fingerprint
     # $2: Expiration time (e.g. 1y, 2w, 3d, 1m)
     gpg --quick-set-expire $1 $2

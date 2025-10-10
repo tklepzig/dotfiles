@@ -12,6 +12,7 @@ See
 
 TODO
 
+- quick-set-expire only works for not yet expired keys and subkeys!
 - Sensible order
 - howto trust
 - renew expiration for subkeys (--edit-key, select via "key n", "expire",
