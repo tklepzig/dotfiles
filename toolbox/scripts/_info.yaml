@@ -106,9 +106,10 @@ set-theme:
     - borg
     - borg-light
     - kyoshi
-    - pw
     - lcars
     - lcars-light
+    - pw
+    - red
 setup-asdf:
   help: Set up asdf and plugins
 stacked:
