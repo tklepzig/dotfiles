@@ -17,7 +17,7 @@ then
     color="#[fg=$primaryFg,bg=$primaryBg]"
 elif [[ $value -lt 16 ]]
 then
-    if [[ "$(($(date '+%s') % 3))" = "1" ]]
+    if [[ "$(($(date '+%s') % 2))" = "1" ]]
     then
         color="#[fg=$criticalBg,bg=terminal,bold]"
     else
