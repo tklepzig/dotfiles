@@ -26,6 +26,9 @@ Plug 'github/copilot.vim'
 Plug 'wellle/context.vim'
 Plug 'CopilotC-Nvim/CopilotChat.nvim', !empty($DOTFILES_NVIM) && has('nvim') ? {} : { 'on': [] }
 Plug 'nvim-lua/plenary.nvim', !empty($DOTFILES_NVIM) && has('nvim') ? {} : { 'on': [] }
+Plug 'nvim-treesitter/nvim-treesitter', !empty($DOTFILES_NVIM) && has('nvim') ? {} : { 'on': [] }
+Plug 'ravitemer/mcphub.nvim', !empty($DOTFILES_NVIM) && has('nvim') ? {} : { 'on': [] }
+Plug 'olimorris/codecompanion.nvim', !empty($DOTFILES_NVIM) && has('nvim') ? {} : { 'on': [] }
 Plug 'samoshkin/vim-mergetool'
 Plug 'rhysd/conflict-marker.vim'
 Plug 'HerringtonDarkholme/yats.vim'
