@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'json'
+
+output = `gh api -i --cache 120s notifications`
+
+poll_interval = output.lines.find { |line| line.start_with?('X-Poll-Interval:') }.split(':').last.strip.to_i
+rate_limit_remaining = output.lines.find { |line| line.start_with?('X-Ratelimit-Remaining:') }.split(':').last.strip.to_i
+pp rate_limit_remaining
+pp poll_interval
+
+json = output.split("\r\n").last
+notifications = JSON.parse(json)
+
+reason_mention_items = notifications.select { |item| item['reason'] == 'mention' }
+pr_items = notifications.select { |item| item['subject']['type'] == 'PullRequest' }
+issue_items = notifications.select { |item| item['subject']['type'] == 'Issue' }
+
+puts "#{pr_items.length} #{reason_mention_items.length} #{issue_items.length}"
+
+reason_mention_items.each do |item|
+  puts "- [#{item['repository']['full_name']}] #{item['subject']['type']}, #{item['reason']}: #{item['subject']['title']}"
+end
+
+pr_items.each do |item|
+  puts "- [#{item['repository']['full_name']}] #{item['subject']['type']}, #{item['reason']}: #{item['subject']['title']}"
+end
+
+issue_items.each do |item|
+  puts "- [#{item['repository']['full_name']}] #{item['subject']['type']}, #{item['reason']}: #{item['subject']['title']}"
+end
