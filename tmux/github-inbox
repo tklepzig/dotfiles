@@ -3,30 +3,30 @@
 
 require 'json'
 
-output = `gh api -i --cache 120s notifications`
+primary_bg = ENV['primaryBg']
+primary_fg = ENV['primaryFg']
+cache_time = 60
 
-poll_interval = output.lines.find { |line| line.start_with?('X-Poll-Interval:') }.split(':').last.strip.to_i
-rate_limit_remaining = output.lines.find { |line| line.start_with?('X-Ratelimit-Remaining:') }.split(':').last.strip.to_i
-pp rate_limit_remaining
-pp poll_interval
+output = `gh api -i --cache #{cache_time}s notifications`
+
+# rate_limit_remaining = output.lines.find { |line| line.start_with?('X-Ratelimit-Remaining:') }.split(':').last.strip.to_i
+# pp rate_limit_remaining
+
+# Export in some way to use that for the next run as cache_time
+# poll_interval = output.lines.find { |line| line.start_with?('X-Poll-Interval:') }.split(':').last.strip.to_i
 
 json = output.split("\r\n").last
 notifications = JSON.parse(json)
 
-reason_mention_items = notifications.select { |item| item['reason'] == 'mention' }
-pr_items = notifications.select { |item| item['subject']['type'] == 'PullRequest' }
-issue_items = notifications.select { |item| item['subject']['type'] == 'Issue' }
+mentions = notifications.select { |item| item['reason'] == 'mention' }.length
+prs = notifications.select { |item| item['subject']['type'] == 'PullRequest' }.length
 
-puts "#{pr_items.length} #{reason_mention_items.length} #{issue_items.length}"
-
-reason_mention_items.each do |item|
-  puts "- [#{item['repository']['full_name']}] #{item['subject']['type']}, #{item['reason']}: #{item['subject']['title']}"
+if ARGV[1] == 'tile'
+  puts "#[fg=#{primary_fg},bg=#{primary_bg}] #{prs} | #{mentions}"
+  exit 0
 end
 
-pr_items.each do |item|
-  puts "- [#{item['repository']['full_name']}] #{item['subject']['type']}, #{item['reason']}: #{item['subject']['title']}"
-end
-
-issue_items.each do |item|
+# TODO: sort and/or group them?
+notifications.each do |item|
   puts "- [#{item['repository']['full_name']}] #{item['subject']['type']}, #{item['reason']}: #{item['subject']['title']}"
 end
