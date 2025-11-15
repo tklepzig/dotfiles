@@ -14,6 +14,7 @@ if ! grep -q 'export PATH="$HOME/.asdf:$PATH"' $HOME/.zshrc
 then
   echo 'export PATH="$HOME/.asdf:$PATH"' >> $HOME/.zshrc;
   mkdir -p "$HOME/.asdf/completions"
+  source $HOME/.zshrc
   asdf completion zsh > "$HOME/.asdf/completions/_asdf"
   echo 'fpath=($HOME/.asdf/completions $fpath)' >> $HOME/.zshrc;
 fi
