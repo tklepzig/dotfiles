@@ -1,5 +1,15 @@
 # Linux in General
 
+## Useful and up-to-date Commands
+
+- grep (replaces egrep/fgrep)
+- dig (replaces nslookup)
+- ss (replaces netstat)
+- ip (replaces ifconfig)
+- iw (replaces iwconfig)
+- rsync & sftp (replaces scp)
+- nftables (replaces iptables)
+
 ## Redirection Shorthand
 
 Redirect directly stdout and stderr to whatever, e.g. `/dev/null`
