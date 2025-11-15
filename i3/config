@@ -39,8 +39,11 @@ exec --no-startup-id nm-applet
 # Bluetooth Manager Tray Icon
 exec --no-startup-id blueman-applet # shows notifications via dunst
 
+# Start compositor for transparency and fading effects
+exec --no-startup-id picom -b --no-fading-openclose --fade-in-step=1 --fade-out-step=1 --fade-delta=0
+
 # Enable tap to click for touchpad
-exec --no-startup-id xinput set-prop "Elan Touchpad" "libinput Tapping Enabled" 1
+exec_always --no-startup-id xinput set-prop "Elan Touchpad" "libinput Tapping Enabled" 1
 
 exec_always --no-startup-id setxkbmap -layout de
 
