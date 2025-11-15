@@ -3,8 +3,8 @@
 
 require 'json'
 
-primary_bg = ENV['primaryBg']
-primary_fg = ENV['primaryFg']
+secondary_bg = ENV['secondaryBg']
+secondary_fg = ENV['secondaryFg']
 cache_time = 60
 
 output = `gh api -i --cache #{cache_time}s notifications`
@@ -22,11 +22,13 @@ mentions = notifications.select { |item| item['reason'] == 'mention' }.length
 prs = notifications.select { |item| item['subject']['type'] == 'PullRequest' }.length
 
 if ARGV[0] == 'tile'
-  puts "#[fg=#{primary_fg},bg=#{primary_bg}] #{prs} | #{mentions}"
+  puts "#[fg=#{secondary_fg},bg=#{secondary_bg}] #{prs} | #{mentions} #[default] "
   exit 0
 end
 
+# TODO: Add more colors
 # TODO: sort and/or group them?
+# TODO: CLose only on 'q' and allow navigation with j/k and opening the links
 notifications.each do |item|
-  puts "- [#{item['repository']['full_name']}] #{item['subject']['type']}, #{item['reason']}: #{item['subject']['title']}"
+  puts "- [\e[0;34m#{item['repository']['full_name']}\e[0m] #{item['subject']['type']}, #{item['reason']}: #{item['subject']['title']}"
 end
