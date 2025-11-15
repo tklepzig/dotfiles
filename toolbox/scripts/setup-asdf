@@ -13,6 +13,7 @@ make
 if ! grep -q 'export PATH="$HOME/.asdf:$PATH"' $HOME/.zshrc
 then
   echo 'export PATH="$HOME/.asdf:$PATH"' >> $HOME/.zshrc;
+  echo 'export PATH="$HOME/.asdf/shims:$PATH"' >> $HOME/.zshrc;
   mkdir -p "$HOME/.asdf/completions"
   source $HOME/.zshrc
   asdf completion zsh > "$HOME/.asdf/completions/_asdf"
