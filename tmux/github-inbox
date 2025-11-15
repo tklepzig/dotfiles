@@ -21,7 +21,7 @@ notifications = JSON.parse(json)
 mentions = notifications.select { |item| item['reason'] == 'mention' }.length
 prs = notifications.select { |item| item['subject']['type'] == 'PullRequest' }.length
 
-if ARGV[1] == 'tile'
+if ARGV[0] == 'tile'
   puts "#[fg=#{primary_fg},bg=#{primary_bg}] #{prs} | #{mentions}"
   exit 0
 end
