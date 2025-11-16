@@ -24,7 +24,7 @@ mentions = notifications.select { |item| item['reason'] == 'mention' }.length
 prs = notifications.select { |item| item['subject']['type'] == 'PullRequest' }.length
 
 if ARGV[0] == 'tile'
-  puts "#[fg=#{secondary_fg},bg=#{secondary_bg}] #{prs} | #{mentions} #[default] "
+  puts "#[fg=#{secondary_fg},bg=#{secondary_bg}] #{prs.zero? ? '-' : prs}/#{mentions.zero? ? '-' : mentions} #[default] "
   exit 0
 end
 
