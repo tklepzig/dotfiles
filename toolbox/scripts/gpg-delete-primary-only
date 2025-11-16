@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+
+gpg-connect-agent "DELETE_KEY --force $1" /bye

@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+
+gpg --delete-secret-and-public-keys --batch --yes $1!

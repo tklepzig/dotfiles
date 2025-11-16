@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+
+gpg --import $1.pub $1.key

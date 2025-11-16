@@ -124,54 +124,6 @@ alias berui="ENV=test bundle exec rake unit integration"
 
 alias ai="asdf install"
 
-alias ggc="gpg --full-gen-key"
-ggl() {
-    echo "----------- GPG Public Keys -----------"
-    gpg --list-keys --with-subkey-fingerprints --keyid-format=short
-
-    echo ""
-    echo "----------- GPG Secret Keys -----------"
-    gpg --list-secret-keys --with-subkey-fingerprints --keyid-format=short
-}
-
-gge() {
-    gpg --armor --export $1 > $1.pub
-    gpg --armor --export-secret-keys $1 > $1.key
-    gpg --output $1.rev --gen-revoke $1
-}
-
-ggi() {
-    gpg --import $1.pub $1.key
-}
-
-ggx() {
-    echo "Warning: Only works for not yet expired keys and subkeys!"
-    # $1: Fingerprint
-    # $2: Expiration time (e.g. 1y, 2w, 3d, 1m)
-    gpg --quick-set-expire $1 $2
-    gpg --quick-set-expire $1 $2 '*'
-}
-
-gg-delete-primary-only() {
-    gpg-connect-agent "DELETE_KEY --force $1" /bye
-}
-
-gg-add-subkey() {
-    # $1: Master Key ID
-    gpg --quick-add-key $1
-    
-    # With expiration time of 50 seconds
-    #gpg --quick-add-key $1 - - seconds=50
-    
-    # With expiration time of 2 weeks
-    #gpg --quick-add-key $1 - - 2w
-}
-
-gg-delete-subkey() {
-    # $1: Subkey ID
-    gpg --delete-secret-and-public-keys --batch --yes $1!
-}
-
 if isProgramInstalled pacman
 then
     alias pm='sudo pacman'

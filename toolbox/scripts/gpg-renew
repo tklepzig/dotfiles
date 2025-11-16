@@ -1,0 +1,12 @@
+#!/usr/bin/env zsh
+
+echo "Warning: Only works for not yet expired keys and subkeys!"
+gpg --quick-set-expire $1 $2
+gpg --quick-set-expire $1 $2 '*'
+
+# To manually set expiration of already expired keys/subkeys, use:
+# Enter edit mode for key: "gpg --edit-key $1"
+# Select expired subkey via "key <num>"
+# Change expiration via "expire <expiration time>"
+# Close edit mode via "save"
+

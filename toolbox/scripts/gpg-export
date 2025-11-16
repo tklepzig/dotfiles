@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+
+gpg --armor --export $1 > $1.pub
+gpg --armor --export-secret-keys $1 > $1.key
+gpg --output $1.rev --gen-revoke $1

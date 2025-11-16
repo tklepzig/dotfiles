@@ -68,6 +68,35 @@ git-status-all:
     - name: directory depth
       optional: true
       default: 1
+gpg-add-subkey:
+  help: Add a new subkey to an existing GPG key
+  args:
+    - name: key id
+gpg-create:
+  help: Create a new GPG keypair
+gpg-delete-primary-only:
+  help: Delete only the primary key from a GPG key
+  args:
+    - name: key id
+gpg-delete-subkey:
+  help: Delete a subkey from a GPG keyring
+  args:
+    - name: subkey id
+gpg-export:
+  help: Export a GPG key to a file
+  args:
+    - name: key id
+gpg-import:
+  help: Import a GPG key from a file
+  args:
+    - name: file name w/o extension (probably the key id)
+gpg-list:
+  help: List all GPG keys in the keyring
+gpg-renew:
+  help: Extend the expiration date of a GPG key
+  args:
+    - name: fingerprint
+    - name: "new expiry (possible units for value N: seconds=N, Nd, Nw, Nm, Ny)"
 inhibit:
   help: Stop linux from going to sleep or idle
   args:

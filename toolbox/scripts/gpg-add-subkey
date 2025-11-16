@@ -1,0 +1,9 @@
+#!/usr/bin/env zsh
+
+gpg --quick-add-key $1
+
+# With expiration time of 50 seconds
+#gpg --quick-add-key $1 - - seconds=50
+
+# With expiration time of 2 weeks
+#gpg --quick-add-key $1 - - 2w

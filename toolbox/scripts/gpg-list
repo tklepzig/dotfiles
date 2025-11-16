@@ -1,0 +1,8 @@
+#!/usr/bin/env zsh
+
+echo "----------- GPG Public Keys -----------"
+gpg --list-keys --with-subkey-fingerprints --keyid-format=short
+
+echo ""
+echo "----------- GPG Secret Keys -----------"
+gpg --list-secret-keys --with-subkey-fingerprints --keyid-format=short
