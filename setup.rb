@@ -367,9 +367,17 @@ def install(variant = DF_VARIANT)
   if program_installed? 'i3'
     add_link_with_override "#{DF_PATH}/i3/config", "#{HOME}/.config/i3/config", 'include'
 
+    `mkdir -p #{HOME}/.config/i3blocks`
     `ln -sf #{DF_PATH}/i3/i3blocks.config #{HOME}/.config/i3blocks/config`
+
+    # `mkdir -p #{HOME}/.config/i3status`
     # `ln -sf #{DF_PATH}/i3/i3status.config #{HOME}/.config/i3status/config`
+
+    `mkdir -p #{HOME}/.config/dunst`
     `ln -sf #{DF_PATH}/i3/dunst.config #{HOME}/.config/dunst/dunstrc`
+
+    `mkdir -p #{HOME}/.config/picom`
+    `ln -sf #{DF_PATH}/i3/picom.config #{HOME}/.config/picom/picom.conf`
   end
 
   `ln -sf #{DF_PATH}/aerospace/config.toml #{HOME}/.aerospace.toml` if OS.mac?

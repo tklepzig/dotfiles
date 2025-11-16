@@ -21,8 +21,8 @@ font pango:Cantarell 12
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
 #font pango:DejaVu Sans Mono 8
 
-# Start XDG autostart .desktop files using dex. See also
-# https://wiki.archlinux.org/index.php/XDG_Autostart
+# Start XDG autostart .desktop files using dex (e.g. under /etc/xdg/autostart).
+# See also https://wiki.archlinux.org/index.php/XDG_Autostart
 exec --no-startup-id dex --autostart --environment i3
 
 # The combination of xss-lock, nm-applet and pactl is a popular choice, so
@@ -38,9 +38,6 @@ exec --no-startup-id nm-applet
 
 # Bluetooth Manager Tray Icon
 exec --no-startup-id blueman-applet # shows notifications via dunst
-
-# Start compositor for transparency and fading effects
-exec --no-startup-id picom -b --no-fading-openclose --fade-in-step=1 --fade-out-step=1 --fade-delta=0
 
 # Enable tap to click for touchpad
 exec_always --no-startup-id xinput set-prop "Elan Touchpad" "libinput Tapping Enabled" 1
