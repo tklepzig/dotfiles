@@ -37,14 +37,14 @@
 
 <!-- vim-markdown-toc -->
 
-### Remarks before beginning
+## Remarks before beginning
 
 - Think about using lightdm instead of gdm (i3 compatibility, less resource
   usage)
   - Install `lightdm` and `lightdm-gtk-greeter` instead of gdm packages
   - Enable `lightdm` service instead of gdm
 
-### Setup live system
+## Setup live system
 
 Keyboard layout
 
@@ -73,14 +73,14 @@ Date and Time
     timedatectl set-ntp true
     timedatectl set-timezone Europe/Berlin
 
-### BIOS or UEFI?
+## BIOS or UEFI?
 
     ls /sys/firmware/efi/efivars
 
 If the command shows the directory without error, then the system is booted in
 UEFI mode, otherwise in BIOS.
 
-### Create partitions and mount them
+## Create partitions and mount them
 
     cfdisk
 
@@ -88,7 +88,7 @@ UEFI mode, otherwise in BIOS.
 >
 >     cat /proc/meminfo
 
-#### Without encryption
+### Without encryption
 
 Create
 
@@ -119,7 +119,7 @@ Mount
           mount /dev/sda1 /mnt/efi
       swapon /dev/sda2
 
-#### With encrypted root partition
+### With encrypted root partition
 
 Create
 
@@ -176,11 +176,11 @@ Mount
         mount /dev/sda2 /mnt/boot
         swapon /dev/sda3
 
-### Package Installation
+## Package Installation
 
     pacstrap /mnt base base-devel linux linux-firmware ntfs-3g kitty git gvim zsh tmux terminus-font man-db man-pages texinfo networkmanager wpa_supplicant xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts gnome-keyring
 
-### System Setup
+## System Setup
 
 Generate fstab
 
@@ -216,9 +216,9 @@ Root Password
 
     passwd
 
-#### Boot Loader
+### Boot Loader
 
-##### With Encryption
+#### With Encryption
 
 Do the following after `pacman -S grub` and before `grub-install`:
 
@@ -243,13 +243,13 @@ Regenerate initramfs image (ramdisk)
 
     mkinitcpio -p linux
 
-##### BIOS
+#### BIOS
 
     pacman -S grub
     grub-install --recheck /dev/sda
     grub-mkconfig -o /boot/grub/grub.cfg
 
-##### UEFI
+#### UEFI
 
     pacman -S grub efibootmgr
     grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB
@@ -260,7 +260,7 @@ Regenerate initramfs image (ramdisk)
 >   `Warning: os-prober will not be executed to detect other bootable partitions`:
 >   - Edit `/etc/default/grub` and add/uncomment `GRUB_DISABLE_OS_PROBER=false`
 
-##### Enable processor-specific microcode updates
+#### Enable processor-specific microcode updates
 
 Depending on the processor, install the suitable package
 
@@ -277,7 +277,7 @@ Recreate grub config
 
     grub-mkconfig -o /boot/grub/grub.cfg
 
-### Post-Installation
+## Post-Installation
 
 Enable and start systemd services
 
@@ -343,9 +343,9 @@ Gnome Settings
     gsettings set org.gnome.desktop.interface enable-hot-corners false
     gsettings set org.gnome.shell.app-switcher current-workspace-only true
 
-### Additional stuff
+## Additional stuff
 
-#### Add keyfile in addition to passphrase to decrypt root partition
+### Add keyfile in addition to passphrase to decrypt root partition
 
 Recommended: Format usb stick with ext4
 
@@ -365,7 +365,7 @@ Add a keyslot for the keyfile to the LUKS header
 >
 >     cryptsetup open /dev/sda[3/4] cryptroot --key-file /media/usbstick/mykeyfile
 
-##### Unlocking the root partition at boot
+#### Unlocking the root partition at boot
 
 Edit `MODULES` in `/etc/mkinitcpio.conf` and add the usb stick's filesystem
 (e.g. ext4 or vfat)
@@ -384,7 +384,7 @@ Recreate grub config
 
     grub-mkconfig -o /boot/grub/grub.cfg
 
-#### GRUB Hidden Menu
+### GRUB Hidden Menu
 
     vim /etc/default/grub
         GRUB_TIMEOUT=0
@@ -399,7 +399,7 @@ Recreate grub config
 > - BIOS: Hold down Shift while GRUB is loading
 > - UEFI: Press Esc several times while GRUB is loading
 
-#### How to power off properly
+### How to power off properly
 
 One of these:
 
@@ -407,7 +407,7 @@ One of these:
     $ halt -p
     $ shutdown -h now
 
-#### Using iwctl instead of `networkmanager` and `wpa_supplicant`
+### Using iwctl instead of `networkmanager` and `wpa_supplicant`
 
 Instead of installing `networkmanager` and `wpa_supplicant`:
 
@@ -419,17 +419,17 @@ Instead of installing `networkmanager` and `wpa_supplicant`:
 
     systemctl enable --now iwd
 
-#### Boot into BIOS/UEFI
+### Boot into BIOS/UEFI
 
     systemctl reboot --firmware-setup
 
-#### Systemd Timers
+### Systemd Timers
 
     TODO
 
 > https://wiki.archlinux.de/title/Systemd/Timers
 
-#### Disable Beep
+### Disable Beep
 
 Create file `/etc/modprobe.d/nobeep.conf` with the following content:
 
@@ -438,7 +438,7 @@ Create file `/etc/modprobe.d/nobeep.conf` with the following content:
 
 > See https://wiki.archlinux.org/title/PC_speaker#Disable_PC_Speaker
 
-#### Prevent going to sleep while running a program
+### Prevent going to sleep while running a program
 
 Useful e.g. when playing audio/video and avoid going to suspend while playing
 
@@ -452,7 +452,7 @@ or only inhibit, without starting a program
 
     gnome-session-inhibit --inhibit suspend --inhibit-only
 
-### Upgrade System
+## Upgrade System
 
 First, upgrade arch and all packages
 
@@ -466,13 +466,13 @@ First, upgrade arch and all packages
 Afterwards, upgrade the AUR packages by doing a `git pull` and `makepkg -si` in
 the respective repositories.
 
-#### Troubleshooting
+### Troubleshooting
 
-##### Read the news
+#### Read the news
 
 Checkout https://archlinux.org/news/ for any solutions to known issues.
 
-##### File /var/cache/pacman/pkg/something.tar.xz is corrupted (invalid or corrupted package (PGP signature)).
+#### File /var/cache/pacman/pkg/something.tar.xz is corrupted (invalid or corrupted package (PGP signature)).
 
 That means that the package integrity cannot be checked by its PGP signature.
 Often the reason is that you may have done the previous update a while ago. In
@@ -483,7 +483,7 @@ Update the keyring
 
     sudo pacman -Sy archlinux-keyring
 
-##### Restore all packages to a specific date
+#### Restore all packages to a specific date
 
 Edit `/etc/pacman.conf` and replace the `Include` for the desired mirrors (e.g.
 `core`, `extra` and `multilib`) with a specific `Server` (best by commenting out
@@ -501,7 +501,7 @@ Then update the package database and force a downgrade:
 > See also
 > https://wiki.archlinux.org/title/Arch_Linux_Archive#How_to_restore_all_packages_to_a_specific_date
 
-### Bluetooth Troubleshooting
+## Bluetooth Troubleshooting
 
 Reload bluetooth controller
 
@@ -516,14 +516,14 @@ Restart bluetooth via bluetoothctl
 
     echo -e 'show\npower off\npower on\nquit' | bluetoothctl
 
-### TODO (WIP)
+## TODO (WIP)
 
 Get battery status of all connected devices (notebook battery, mouse, keyboard,
 headphones, etc.)
 
     upower --dump
 
-### References
+## References
 
 - https://wiki.archlinux.org/title/Installation_guide
 - https://wiki.archlinux.org/title/GRUB
