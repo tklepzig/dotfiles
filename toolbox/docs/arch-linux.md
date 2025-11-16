@@ -2,6 +2,7 @@
 
 <!-- vim-markdown-toc GFM -->
 
+* [Remarks before beginning](#remarks-before-beginning)
 * [Setup live system](#setup-live-system)
 * [BIOS or UEFI?](#bios-or-uefi)
 * [Create partitions and mount them](#create-partitions-and-mount-them)
@@ -27,12 +28,21 @@
     * [Prevent going to sleep while running a program](#prevent-going-to-sleep-while-running-a-program)
 * [Upgrade System](#upgrade-system)
     * [Troubleshooting](#troubleshooting)
+        * [Read the news](#read-the-news)
         * [File /var/cache/pacman/pkg/something.tar.xz is corrupted (invalid or corrupted package (PGP signature)).](#file-varcachepacmanpkgsomethingtarxz-is-corrupted-invalid-or-corrupted-package-pgp-signature)
+        * [Restore all packages to a specific date](#restore-all-packages-to-a-specific-date)
 * [Bluetooth Troubleshooting](#bluetooth-troubleshooting)
 * [TODO (WIP)](#todo-wip)
 * [References](#references)
 
 <!-- vim-markdown-toc -->
+
+### Remarks before beginning
+
+- Think about using lightdm instead of gdm (i3 compatibility, less resource
+  usage)
+  - Install `lightdm` and `lightdm-gtk-greeter` instead of gdm packages
+  - Enable `lightdm` service instead of gdm
 
 ### Setup live system
 
@@ -458,6 +468,10 @@ the respective repositories.
 
 #### Troubleshooting
 
+##### Read the news
+
+Checkout https://archlinux.org/news/ for any solutions to known issues.
+
 ##### File /var/cache/pacman/pkg/something.tar.xz is corrupted (invalid or corrupted package (PGP signature)).
 
 That means that the package integrity cannot be checked by its PGP signature.
@@ -468,6 +482,24 @@ are signed with the new (PGP) keys.
 Update the keyring
 
     sudo pacman -Sy archlinux-keyring
+
+##### Restore all packages to a specific date
+
+Edit `/etc/pacman.conf` and replace the `Include` for the desired mirrors (e.g.
+`core`, `extra` and `multilib`) with a specific `Server` (best by commenting out
+`Include`) which contains the desired date, see below:
+
+    [core]
+    #Include = /etc/pacman.d/mirrorlist
+    # Using package versions as of 2025-07-20
+    Server = https://archive.archlinux.org/repos/2025/07/20/$repo/os/$arch
+
+Then update the package database and force a downgrade:
+
+    pacman -Syyuu
+
+> See also
+> https://wiki.archlinux.org/title/Arch_Linux_Archive#How_to_restore_all_packages_to_a_specific_date
 
 ### Bluetooth Troubleshooting
 
