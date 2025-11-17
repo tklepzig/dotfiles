@@ -13,9 +13,6 @@ DF_THEME ||= ENV['DOTFILES_THEME']
 DF_PATH ||= "#{HOME}/.dotfiles".freeze
 DF_LOCAL_PATH ||= "#{HOME}/.dotfiles-local".freeze
 
-# https://rubystyle.guide/
-# TODO: symlink my own global config to $HOME/.rubocop.yml
-
 module Logger
   @level = 0
 
@@ -314,8 +311,11 @@ def install(variant = DF_VARIANT)
     File.write("#{HOME}/.bc", "scale=2\n")
   end
 
-  Logger.log 'Configuring default gems' do
+  Logger.log 'Configuring ruby' do
+    Logger.log 'Symlinking default gems configuration'
     `ln -sf #{DF_PATH}/ruby/default-gems #{HOME}/.default-gems`
+    Logger.log 'Symlinking rubocop configuration'
+    `ln -sf #{DF_PATH}/ruby/rubocop.yml #{HOME}/.rubocop.yml`
   end
 
   Logger.log 'Initializing toolbox' do
@@ -343,15 +343,21 @@ def install(variant = DF_VARIANT)
     `echo | #{vim_binary} +CocUpdateSync +qall > /dev/null 2>&1`
   end
 
-  # TODO: move up into one block of "linking"
-  if OS.mac?
-    add_link_with_override "#{DF_PATH}/tmux/vars.osx.conf", "#{HOME}/.tmux.conf"
-  else
-    add_link_with_override "#{DF_PATH}/tmux/vars.linux.conf", "#{HOME}/.tmux.conf"
+  Logger.log 'Configuring tmux' do
+    # TODO: move up into one block of "linking"
+    if OS.mac?
+      Logger.log 'Symlinking tmux variables for macOS'
+      add_link_with_override "#{DF_PATH}/tmux/vars.osx.conf", "#{HOME}/.tmux.conf"
+    else
+      Logger.log 'Symlinking tmux variables for Linux'
+      add_link_with_override "#{DF_PATH}/tmux/vars.linux.conf", "#{HOME}/.tmux.conf"
+    end
+    Logger.log 'Symlinking tmux main configuration'
+    add_link_with_override "#{DF_PATH}/tmux/tmux.conf", "#{HOME}/.tmux.conf"
   end
-  add_link_with_override "#{DF_PATH}/tmux/tmux.conf", "#{HOME}/.tmux.conf"
 
   if program_installed? 'kitty'
+    Logger.log 'Configuring kitty'
     add_link_with_override "#{DF_PATH}/kitty/kitty.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
     add_link_with_override "#{DF_PATH}/kitty/kitty.theme.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
 
@@ -360,27 +366,37 @@ def install(variant = DF_VARIANT)
   end
 
   if program_installed? 'ranger'
+    Logger.log 'Configuring ranger'
     `mkdir -p #{HOME}/.config/ranger`
     `ln -sf #{DF_PATH}/ranger/rc.conf #{HOME}/.config/ranger/rc.conf`
   end
 
   if program_installed? 'i3'
-    add_link_with_override "#{DF_PATH}/i3/config", "#{HOME}/.config/i3/config", 'include'
+    Logger.log 'Configuring i3' do
+      Logger.log 'Symlinking i3 main configuration'
+      add_link_with_override "#{DF_PATH}/i3/config", "#{HOME}/.config/i3/config", 'include'
 
-    `mkdir -p #{HOME}/.config/i3blocks`
-    `ln -sf #{DF_PATH}/i3/i3blocks.config #{HOME}/.config/i3blocks/config`
+      Logger.log 'Symlinking i3blocks configuration'
+      `mkdir -p #{HOME}/.config/i3blocks`
+      `ln -sf #{DF_PATH}/i3/i3blocks.config #{HOME}/.config/i3blocks/config`
 
-    # `mkdir -p #{HOME}/.config/i3status`
-    # `ln -sf #{DF_PATH}/i3/i3status.config #{HOME}/.config/i3status/config`
+      # `mkdir -p #{HOME}/.config/i3status`
+      # `ln -sf #{DF_PATH}/i3/i3status.config #{HOME}/.config/i3status/config`
 
-    `mkdir -p #{HOME}/.config/dunst`
-    `ln -sf #{DF_PATH}/i3/dunst.config #{HOME}/.config/dunst/dunstrc`
+      Logger.log 'Symlinking dunst configuration'
+      `mkdir -p #{HOME}/.config/dunst`
+      `ln -sf #{DF_PATH}/i3/dunst.config #{HOME}/.config/dunst/dunstrc`
 
-    `mkdir -p #{HOME}/.config/picom`
-    `ln -sf #{DF_PATH}/i3/picom.config #{HOME}/.config/picom/picom.conf`
+      Logger.log 'Symlinking picom configuration'
+      `mkdir -p #{HOME}/.config/picom`
+      `ln -sf #{DF_PATH}/i3/picom.config #{HOME}/.config/picom/picom.conf`
+    end
   end
 
-  `ln -sf #{DF_PATH}/aerospace/config.toml #{HOME}/.aerospace.toml` if OS.mac?
+  if OS.mac?
+    Logger.log 'Configuring aerospace for macOS'
+    `ln -sf #{DF_PATH}/aerospace/config.toml #{HOME}/.aerospace.toml`
+  end
 
   unless Dir.exist?("#{HOME}/.fzf")
     Logger.log 'Installing fzf'
@@ -444,6 +460,9 @@ def uninstall
 
   Logger.log 'Removing default gems configuration'
   `rm -f #{HOME}/.default-gems`
+
+  Logger.log 'Removing rubocop configuration'
+  `rm -f #{HOME}/.rubocop.yml`
 
   Logger.log 'Removing git configuration'
   `#{DF_PATH}/git/uninstall`
