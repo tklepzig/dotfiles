@@ -4,6 +4,8 @@
 require 'English'
 require 'json'
 
+primary_text = ENV['primaryText'].sub(/colour/, '')
+secondary_text = ENV['secondaryText'].sub(/colour/, '')
 secondary_bg = ENV['secondaryBg']
 secondary_fg = ENV['secondaryFg']
 cache_time = 60
@@ -28,9 +30,11 @@ if ARGV[0] == 'tile'
   exit 0
 end
 
-# TODO: Add more colors
-# TODO: sort and/or group them?
 # TODO: Close only on 'q' and allow navigation with j/k and opening the links
-notifications.each do |item|
-  puts "- [\e[0;34m#{item['repository']['full_name']}\e[0m] #{item['subject']['type']}, #{item['reason']}: #{item['subject']['title']}"
+grouped_by_repo = notifications.group_by { |item| item['repository']['full_name'] }
+grouped_by_repo.sort.each do |repo, items|
+  puts "\e[38;5;#{primary_text}m#{repo}\e[0m"
+  items.each do |item|
+    puts " - [#{item['subject']['type']}, #{item['reason']}] \e[38;5;#{secondary_text}m#{item['subject']['title']}\e[0m"
+  end
 end
