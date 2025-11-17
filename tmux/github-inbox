@@ -1,8 +1,19 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'io/console'
 require 'English'
 require 'json'
+
+module OS
+  def self.mac?
+    (/darwin/ =~ RUBY_PLATFORM) != nil
+  end
+
+  def self.linux?
+    (/linux/ =~ RUBY_PLATFORM) != nil
+  end
+end
 
 primary_text = ENV['primaryText'].sub(/colour/, '')
 secondary_text = ENV['secondaryText'].sub(/colour/, '')
@@ -37,4 +48,10 @@ grouped_by_repo.sort.each do |repo, items|
   items.each do |item|
     puts " - [#{item['subject']['type']}, #{item['reason']}] \e[38;5;#{secondary_text}m#{item['subject']['title']}\e[0m"
   end
+end
+
+input = $stdin.getch
+if input == 'o'
+  cmd = OS.linux? ? 'xdg-open' : 'open'
+  `#{cmd} https://github.com/notifications`
 end
