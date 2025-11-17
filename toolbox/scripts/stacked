@@ -303,6 +303,18 @@ def help
 end
 
 def run
+  `command -v gh &>/dev/null`
+  unless $CHILD_STATUS.success?
+    Logger.error 'GitHub CLI (gh) not found in PATH, please install it first'
+    exit 1
+  end
+
+  `gh auth status &>/dev/null`
+  unless $CHILD_STATUS.success?
+    Logger.error 'GitHub CLI (gh) not authenticated, please run "gh auth login" first'
+    exit 1
+  end
+
   command = ARGV[0]
 
   if %w[init branch pr parent open edit update sync help].include?(command)
