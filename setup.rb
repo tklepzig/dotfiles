@@ -315,7 +315,7 @@ def install(variant = DF_VARIANT)
   end
 
   Logger.log 'Configuring default gems' do
-    `ln -sf #{DF_PATH}/default-gems #{HOME}/.default-gems`
+    `ln -sf #{DF_PATH}/ruby/default-gems #{HOME}/.default-gems`
   end
 
   Logger.log 'Initializing toolbox' do

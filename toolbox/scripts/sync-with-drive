@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+
+rsync -avz --stats --delete --filter="dir-merge,- .gitignore" --exclude  ".git" "$HOME/.dotfiles/" "$1/dotfiles"
