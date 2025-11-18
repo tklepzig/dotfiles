@@ -17,9 +17,11 @@ module Logger
   @level = 0
 
   def self.log(message)
-    prefix = @level.zero? ? "\e[1;34m\u276f " : ''
+    text_color = (ENV['primaryText'] || '4').sub(/colour/, '')
+
+    prefix = @level.zero? ? "\e[1;38;5;#{text_color}m\u276f " : ''
     message = message.rjust(message.length + 2 * @level)
-    puts "#{prefix}\e[0;34m#{message}\e[0m"
+    puts "#{prefix}\e[0;38;5;#{text_color}m#{message}\e[0m"
 
     return unless block_given?
 
@@ -30,9 +32,11 @@ module Logger
   end
 
   def self.success(message)
-    prefix = @level.zero? ? "\e[1;36m\u276f " : ''
+    text_color = (ENV['accentText'] || '6').sub(/colour/, '')
+
+    prefix = @level.zero? ? "\e[1;38;5;#{text_color}m\u276f " : ''
     message = message.rjust(message.length + 2 * @level)
-    puts "#{prefix}\e[0;36m#{message}\e[0m"
+    puts "#{prefix}\e[0;38;5;#{text_color}m#{message}\e[0m"
   end
 
   def self.error(message)
