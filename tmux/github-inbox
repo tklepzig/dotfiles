@@ -5,6 +5,8 @@ require 'io/console'
 require 'English'
 require 'json'
 
+CACHE_IN_SECONDS = 120
+
 module OS
   def self.mac?
     (/darwin/ =~ RUBY_PLATFORM) != nil
@@ -15,43 +17,102 @@ module OS
   end
 end
 
-primary_text = ENV['primaryText'].sub(/colour/, '')
-secondary_text = ENV['secondaryText'].sub(/colour/, '')
-secondary_bg = ENV['secondaryBg']
-secondary_fg = ENV['secondaryFg']
-cache_time = 60
+def open_url(api_url)
+  return unless api_url
 
-output = `gh api -i --cache #{cache_time}s notifications`
-exit 1 unless $CHILD_STATUS.success?
+  html_url = `gh api --cache #{CACHE_IN_SECONDS}s #{api_url} --jq .html_url`
+  return unless html_url && $CHILD_STATUS.success?
 
-# rate_limit_remaining = output.lines.find { |line| line.start_with?('X-Ratelimit-Remaining:') }.split(':').last.strip.to_i
-# pp rate_limit_remaining
-
-# Export in some way to use that for the next run as cache_time
-# poll_interval = output.lines.find { |line| line.start_with?('X-Poll-Interval:') }.split(':').last.strip.to_i
-
-json = output.split("\r\n").last
-notifications = JSON.parse(json)
-
-mentions = notifications.select { |item| item['reason'] == 'mention' }.length
-prs = notifications.select { |item| item['subject']['type'] == 'PullRequest' }.length
-
-if ARGV[0] == 'tile'
-  puts "#[fg=#{secondary_fg},bg=#{secondary_bg}] #{prs.zero? ? '-' : prs}/#{mentions.zero? ? '-' : mentions} #[default] "
+  `#{OS.linux? ? 'xdg-open' : 'open'} #{html_url}`
   exit 0
 end
 
-# TODO: Close only on 'q' and allow navigation with j/k and opening the links
-grouped_by_repo = notifications.group_by { |item| item['repository']['full_name'] }
-grouped_by_repo.sort.each do |repo, items|
-  puts "\e[38;5;#{primary_text}m#{repo}\e[0m"
-  items.each do |item|
-    puts " - [#{item['subject']['type']}, #{item['reason']}] \e[38;5;#{secondary_text}m#{item['subject']['title']}\e[0m"
+def wait_for_second_char(stdin, input, timeout = 0.8)
+  # Wait up to 0.8s for a second character
+  return input unless IO.select([stdin], nil, nil, timeout)
+
+  input + stdin.getc.chr
+end
+
+def print_and_read(lines, urls)
+  rows, = IO.console.winsize
+  screen_height = rows - 2
+  start = 0
+
+  loop do
+    $stdout.clear_screen
+    visible = lines[start, screen_height] || []
+    visible.each { |line| puts line }
+
+    $stdin.raw do |stdin|
+      input = stdin.getc.chr
+      case input
+      when "\u0003" # Ctrl-C
+        exit 1
+      when 'j'
+        start += 1 if start + screen_height < lines.size
+      when 'k'
+        start -= 1 if start.positive?
+      when 'g'
+        start = 0 if wait_for_second_char(stdin, input) == 'gg'
+      when 'G'
+        start = [lines.size - screen_height, 0].max
+      when 'o'
+        `#{OS.linux? ? 'xdg-open' : 'open'} https://github.com/notifications`
+        exit 0
+      when 'q'
+        exit 0
+      else
+        api_url = urls[wait_for_second_char(stdin, input)]
+        open_url(api_url)
+      end
+    end
   end
 end
 
-input = $stdin.getch
-if input == 'o'
-  cmd = OS.linux? ? 'xdg-open' : 'open'
-  `#{cmd} https://github.com/notifications`
+def gh_notifications
+  primary_text = ENV['primaryText'].sub(/colour/, '')
+  secondary_text = ENV['secondaryText'].sub(/colour/, '')
+  accent_text = ENV['accentText'].sub(/colour/, '')
+  secondary_bg = ENV['secondaryBg']
+  secondary_fg = ENV['secondaryFg']
+
+  response = `gh api -i --cache #{CACHE_IN_SECONDS}s notifications`
+  exit 1 unless $CHILD_STATUS.success?
+  # rate_limit_remaining = response.lines.find { |line| line.start_with?('X-Ratelimit-Remaining:') }.split(':').last.strip.to_i
+  # pp rate_limit_remaining
+
+  # Export in some way to use that for the next run as cache_time
+  # poll_interval = response.lines.find { |line| line.start_with?('X-Poll-Interval:') }.split(':').last.strip.to_i
+  # pp poll_interval
+
+  json = response.split("\r\n").last
+  notifications = JSON.parse(json)
+
+  mentions = notifications.select { |item| item['reason'] == 'mention' }.length
+  prs = notifications.select { |item| item['subject']['type'] == 'PullRequest' }.length
+
+  if ARGV[0] == 'tile'
+    puts "#[fg=#{secondary_fg},bg=#{secondary_bg}] #{prs.zero? ? '-' : prs}/#{mentions.zero? ? '-' : mentions} #[default] "
+    exit 0
+  end
+
+  grouped_by_repo = notifications.group_by { |item| item['repository']['full_name'] }
+
+  urls = {}
+  lines = []
+  item_number = 1
+  grouped_by_repo.sort.each do |repo, items|
+    lines << "\e[1;38;5;#{primary_text}m#{repo}\e[0m"
+    items.each do |item|
+      reason = item['reason'] == 'mention' ? "\e[38;5;#{accent_text}mmention\e[0m" : item['reason']
+      url = item['subject']['latest_comment_url']
+      urls[item_number.to_s] = url
+      lines << "  #{item_number}. [#{item['subject']['type']}, #{reason}] \e[38;5;#{secondary_text}m#{item['subject']['title']}\e[0m"
+      item_number += 1
+    end
+  end
+  [lines, urls]
 end
+
+print_and_read(*gh_notifications)
