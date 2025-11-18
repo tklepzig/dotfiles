@@ -46,7 +46,8 @@ precmd() {
     elapsedMinutes=$(printf %02d $((($elapsed % 3600000) / 60000)))
     elapsedSeconds=$(printf %02d $((($elapsed % 60000) / 1000)))
     elapsedMilliseconds=$(printf %03d $(($elapsed % 1000)))
-    elapsedTime=" ${elapsedHours}:${elapsedMinutes}:${elapsedSeconds}.${elapsedMilliseconds} "
+    now=$(date +"%Y-%m-%d %H:%M:%S")
+    elapsedTime=" ${elapsedHours}:${elapsedMinutes}:${elapsedSeconds}.${elapsedMilliseconds} (${now})"
 
     if [ "$lastExitCode" != 0 ]
     then
