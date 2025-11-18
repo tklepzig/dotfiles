@@ -1,10 +1,14 @@
+Lint/UselessAssignment:
+  SafeAutoCorrect: false
 Style/Documentation:
+  Enabled: false
+Style/FrozenStringLiteralComment:
   Enabled: false
 Metrics/MethodLength:
   Enabled: false
-Metrics/AbcSize:
+Metrics/BlockLength:
   Enabled: false
-Style/FrozenStringLiteralComment:
+Metrics/AbcSize:
   Enabled: false
 Layout/LineLength:
   Enabled: false
