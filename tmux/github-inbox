@@ -25,7 +25,9 @@ def open_url(api_url)
 
   `#{OS.linux? ? 'xdg-open' : 'open'} #{html_url}`
   # Clear cache to avoid showing opened (and now read) notification again when showing the inbox
-  `gh config clear-cache &>/dev/null`
+  # Location of cache in linux: ~/.cache/gh
+  # Seems not to work when running from this script? (Work when running manually in a terminal)
+  # `gh config clear-cache &>/dev/null`
   exit 0
 end
 
