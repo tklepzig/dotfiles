@@ -24,6 +24,8 @@ def open_url(api_url)
   return unless html_url && $CHILD_STATUS.success?
 
   `#{OS.linux? ? 'xdg-open' : 'open'} #{html_url}`
+  # Clear cache to avoid showing opened (and now read) notification again when showing the inbox
+  `gh config clear-cache &>/dev/null`
   exit 0
 end
 
