@@ -108,7 +108,7 @@ def gh_notifications
     lines << "\e[1;38;5;#{primary_text}m#{repo}\e[0m"
     items.each do |item|
       reason = item['reason'] == 'mention' ? "\e[38;5;#{accent_text}mmention\e[0m" : item['reason']
-      url = item['subject']['latest_comment_url']
+      url = item['subject']['latest_comment_url'] || item['subject']['url']
       urls[item_number.to_s] = url
       lines << "  #{item_number}. [#{item['subject']['type']}, #{reason}] \e[38;5;#{secondary_text}m#{item['subject']['title']}\e[0m"
       item_number += 1
