@@ -125,6 +125,8 @@ alias berui="ENV=test bundle exec rake unit integration"
 alias ai="asdf install"
 alias nig="npm install -g @github/copilot@latest mcp-hub@latest && asdf reshim nodejs"
 
+alias co="copilot"
+
 if isProgramInstalled pacman
 then
     alias pm='sudo pacman'
