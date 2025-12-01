@@ -123,6 +123,7 @@ alias beri="ENV=test bundle exec rake integration"
 alias berui="ENV=test bundle exec rake unit integration"
 
 alias ai="asdf install"
+alias nig="npm install -g @github/copilot@latest mcp-hub@latest && asdf reshim nodejs"
 
 if isProgramInstalled pacman
 then
