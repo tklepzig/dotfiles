@@ -1,5 +1,11 @@
 # Linux in General
 
+## TODO
+
+- uniq, nl, gv, column, tee, <(), >()
+  > See https://www.youtube.com/watch?v=2A4bs40scSo and
+  > https://www.youtube.com/watch?v=pyV3SEIWsKQ
+
 ## Useful and up-to-date Commands
 
 - grep (replaces egrep/fgrep)
