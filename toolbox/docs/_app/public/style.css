@@ -172,12 +172,12 @@ body > article {
       padding: 0;
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
-      align-items: start;
       gap: 1rem;
 
       > li {
         margin: 0;
         list-style-type: none;
+        display: grid;
 
         > a {
           padding: 0.5rem;
@@ -185,7 +185,8 @@ body > article {
           transition: background-color 0.15s ease-in-out;
           box-shadow: 0 0 6px 1px rgba(0, 0, 0, var(--shadow-alpha));
           border: 1px solid var(--olive-subtle);
-          display: block;
+          display: grid;
+          align-items: center;
           font-size: 1.1rem;
           text-decoration: none;
           color: var(--color-fg-default);

@@ -1,4 +1,4 @@
-const CACHE_NAME = "docs-cache-2023-12-28";
+const CACHE_NAME = "docs-cache-2026-01-02";
 const baseCache = [
   "/",
   "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs",
@@ -16,7 +16,7 @@ self.addEventListener("install", function (event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function (cache) {
       return cache.addAll([...baseCache, ...docsCache]);
-    })
+    }),
   );
 });
 
@@ -44,6 +44,6 @@ self.addEventListener("fetch", function (event) {
 
         return response;
       });
-    })
+    }),
   );
 });
