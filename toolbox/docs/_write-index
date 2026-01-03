@@ -7,7 +7,8 @@ def create_section(path, name)
   entries = Dir.glob(File.join(path, '*.md')).filter_map do |file|
     entry = File.basename(file, '.*')
     entry
-  end
+  end.sort_by(&:downcase)
+
   { name:, entries: }
 end
 
