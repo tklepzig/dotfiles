@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# For usage with copilot-cli to play a sound when user interaction is required
+# First put a sound file at ~/.dotfiles-local/sounds/copilot-notify.wav.
+# Then create the file .github/hooks/notify.json in your repo with the following content:
+# 
+# {
+#   "version": 1,
+#   "hooks": {
+#     "preToolUse": [
+#       {
+#         "type": "command",
+#         "bash": "~/.dotfiles/toolbox/misc/copilot-notify",
+#         "timeoutSec": 10
+#       }
+#     ]
+#   }
+# }
+
+
+isOS()
+{
+    shopt -s nocasematch
+    if [[ "$OSTYPE" == *"$1"* ]]
+    then
+        return 0;
+    fi
+
+    return 1;
+}
+
+if isOS darwin
+then
+    afplay -v 0.2 ~/.dotfiles-local/sounds/copilot-notify.wav
+else
+    aplay ~/.dotfiles-local/sounds/copilot-notify.wav
+fi
+
