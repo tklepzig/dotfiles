@@ -15,6 +15,7 @@
 * [Current Maps and Built-Ins](#current-maps-and-built-ins)
     * [Mappings](#mappings)
     * [Built-Ins](#built-ins)
+* [Remove all duplicates, keeping only the unique lines](#remove-all-duplicates-keeping-only-the-unique-lines)
 * [TODO](#todo)
 
 <!-- vim-markdown-toc -->
@@ -187,6 +188,10 @@ Paste the content of the register in the current buffer:
 List all built-in mappings
 
     :help index
+
+## Remove all duplicates, keeping only the unique lines
+
+    :%!awk '{count[$0]++} END {for (line in count) if (count[line] == 1) print line}'
 
 ## TODO
 
