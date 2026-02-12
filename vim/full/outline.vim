@@ -2,8 +2,10 @@ function! s:QueryForCurrentBuffer()
   if &filetype =~ 'typescript'
     if expand('%:t') =~ 'spec'
       return '^test.describe( | ^test( '
-    else
+    elseif expand('%:t') =~ 'test'
       return '^describe | ^it '
+    else
+      return '^class | ^function | ^interface | ^type'
     endif
   elseif &filetype =~ 'ruby'
     if expand('%:t') =~ 'spec'
