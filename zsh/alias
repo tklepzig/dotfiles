@@ -86,7 +86,7 @@ alias vcf="f(){ vim \$(git show --pretty='format:' --name-only \"\$1\"); unset -
 # Skip configuration and start vim without any config
 alias vclean='vim -u /dev/null'
 
-alias vbeta='vim -u $HOME/.dotfiles/vim/beta.vimrc'
+alias vbeta="vim -u $dotfilesDir/vim/beta.vimrc"
 
 # With `. ranger` (or `source ranger`) the last visited directory will be used for the shell when exiting ranger
 # If you want to go back where you left off, just enter `cd -`
