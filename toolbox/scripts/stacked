@@ -93,21 +93,35 @@ class CheckoutError < StandardError
   end
 end
 
-MERGE_QUEUE_PATH = File.join(Dir.pwd, 'merge-queue.yaml')
-def merge_queue
-  unless File.exist?(MERGE_QUEUE_PATH)
-    Logger.error 'Merge queue not found, run "stacked init" first'
+CONFIG_PATH = File.join(Dir.pwd, 'stacked.yaml')
+
+def config
+  unless File.exist?(CONFIG_PATH)
+    Logger.error 'Config not found, run "stacked init" first'
     exit 1
   end
 
-  YAML.load_file(MERGE_QUEUE_PATH).compact
+  YAML.load_file(CONFIG_PATH)
+end
+
+def update_config(config)
+  current = File.exist?(CONFIG_PATH) ? YAML.load_file(CONFIG_PATH) : {}
+  File.write(CONFIG_PATH, current.merge(config).to_yaml)
+end
+
+def stack
+  config['stack']
+end
+
+def stack_base_ref
+  config['baseRef']
 end
 
 def parent_branch(branch_name)
-  branch_index = merge_queue.index(branch_name)
+  branch_index = stack.index(branch_name)
   raise 'Branch not found' unless branch_index
 
-  return merge_queue.at(branch_index - 1) if branch_index.positive?
+  return stack.at(branch_index - 1) if branch_index.positive?
 
   'main'
 end
@@ -137,7 +151,7 @@ def keep_current_branch
 end
 
 def stack_refs(start_index)
-  merge_queue.drop(start_index).map { |branch| [branch, `git rev-parse --short #{branch}`.strip] }
+  stack.drop(start_index).map { |branch| [branch, `git rev-parse --short #{branch}`.strip] }
 end
 
 # Why "(Make sure running this cmd on the branch which got an update)":
@@ -153,10 +167,10 @@ def sync
   Logger.log 'Syncing stack (Make sure running this cmd on the branch which got an update)' do
     keep_current_branch do
       current_branch = `git branch --show-current`.strip
-      stack_start = merge_queue.index(current_branch)
+      stack_start = stack.index(current_branch)
 
-      `git checkout #{merge_queue.last}`
-      raise CheckoutError, merge_queue.last unless $CHILD_STATUS.success?
+      `git checkout #{stack.last}`
+      raise CheckoutError, stack.last unless $CHILD_STATUS.success?
 
       Logger.log 'Old refs' do
         stack_refs(stack_start + 1).each do |(branch, ref)|
@@ -173,7 +187,7 @@ def sync
         end
       end
 
-      Logger.log `git push --force-with-lease origin #{merge_queue.drop(1).join(' ')} 2>&1`
+      Logger.log `git push --force-with-lease origin #{stack.drop(1).join(' ')} 2>&1`
 
       Logger.success 'Done.'
     end
@@ -187,23 +201,13 @@ def update
 
   keep_current_branch do
     Logger.log 'Rebasing stack to updated base branch' do
-      base = merge_queue.at(0)
-      first_branch = merge_queue.at(1)
+      base = stack.at(0)
+      first_branch = stack.at(1)
 
+      Logger.log 'Fetching repository'
       `git fetch origin #{base}`
 
-      # Use rebase --onto
-      `git checkout #{first_branch}`
-      raise CheckoutError, first_branch unless $CHILD_STATUS.success?
-
-      Logger.log "Old ref of #{first_branch}: #{`git rev-parse --short #{first_branch}`.accent}"
-
-      `git rebase #{base} --onto origin/#{base} --autostash`
-      raise RebaseError, first_branch unless $CHILD_STATUS.success?
-
-      Logger.log "New ref of #{first_branch}: #{`git rev-parse --short #{first_branch}`.strip.accent}"
-      # --
-
+      Logger.log 'Updating base branch'
       `git checkout #{base}`
       raise CheckoutError, base unless $CHILD_STATUS.success?
 
@@ -214,8 +218,24 @@ def update
         raise RebaseError, base unless $CHILD_STATUS.success?
       end
 
+      # Use rebase --onto
       `git checkout #{first_branch}`
-      raise CheckoutError, base unless $CHILD_STATUS.success?
+      raise CheckoutError, first_branch unless $CHILD_STATUS.success?
+
+      Logger.log "Old ref of #{first_branch}: #{`git rev-parse --short #{first_branch}`.accent}"
+
+      `git rebase #{stack_base_ref} --onto #{base} --autostash`
+      raise RebaseError, first_branch unless $CHILD_STATUS.success?
+
+      Logger.log "New ref of #{first_branch}: #{`git rev-parse --short #{first_branch}`.strip.accent}"
+      # --
+
+      base_ref = `git rev-parse --short #{base}`.strip
+      Logger.log "Update base ref from #{stack_base_ref} to #{base_ref}"
+      update_config('baseRef' => base_ref)
+
+      `git checkout #{first_branch}`
+      raise CheckoutError, first_branch unless $CHILD_STATUS.success?
 
       sync
 
@@ -227,15 +247,18 @@ rescue StandardError => e
 end
 
 def init
+  return if File.exist?(CONFIG_PATH)
+
   current_branch = `git branch --show-current`.strip
-  queue = ['main']
-  queue.push(current_branch) if current_branch != 'main'
-  File.write(MERGE_QUEUE_PATH, queue.to_yaml)
+  stack = ['main']
+  stack.push(current_branch) if current_branch != 'main'
+  base_ref = `git rev-parse --short #{stack.at(0)}`.strip
+  update_config('stack' => stack, 'baseRef' => base_ref)
 end
 
 def branch(name)
   `git checkout -b #{name}`
-  File.write(MERGE_QUEUE_PATH, [*merge_queue, name].to_yaml)
+  update_config('stack' => [*stack, name])
 end
 
 def pr
@@ -247,7 +270,7 @@ end
 # index: absolute number (1, 2) or relative number (-1, +2) or the word 'last'
 # if ommitted, a fuzzy search via fzf is started
 def checkout(index = nil)
-  queue_without_base = merge_queue.drop(1)
+  queue_without_base = stack.drop(1)
 
   if index.nil?
     branches_list = queue_without_base.map { |x| "\"#{x}\"" }.join(' ')
@@ -285,13 +308,13 @@ def open
   remote = `git remote get-url origin`.strip
   org_and_repo = remote[/:(.*)\.git/, 1]
 
-  merge_queue.drop(1).each do |branch|
+  stack.drop(1).each do |branch|
     `#{cmd} https://github.com/#{org_and_repo}/pull/#{branch}`
   end
 end
 
 def edit
-  system(ENV['EDITOR'], MERGE_QUEUE_PATH)
+  system(ENV['EDITOR'], CONFIG_PATH)
 end
 
 def help
@@ -302,7 +325,7 @@ def help
   puts '[-, +, -<number>, +<number>] - Checkout a branch relative to the current one in the stack'
   puts '[last, <number>] - Checkout a branch in the stack'
   puts 'open - Open the GitHub PR for the current branch in your browser'
-  puts 'edit - Edit the merge-queues.yaml file in your system editor'
+  puts 'edit - Edit the stacked.yaml file in your system editor'
   puts 'update - Update local stack if remote has changed'
   puts 'sync - Sync local stack changes to remote'
   puts 'help - Print this help information'
