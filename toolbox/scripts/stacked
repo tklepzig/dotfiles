@@ -317,6 +317,10 @@ def edit
   system(ENV['EDITOR'], CONFIG_PATH)
 end
 
+def list
+  puts stack
+end
+
 def help
   puts 'init - Initialize stacked in this directory'
   puts 'branch - Create a new branch at the top of this stack'
@@ -346,7 +350,7 @@ def run
 
   command = ARGV[0]
 
-  if %w[init branch pr parent open edit update sync help].include?(command)
+  if %w[init branch pr parent open edit update sync help list].include?(command)
     send(command, *ARGV[1..])
   elsif command == '-'
     checkout('-1')

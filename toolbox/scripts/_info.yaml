@@ -149,6 +149,7 @@ stacked:
     - help
     - init
     - last
+    - list
     - open
     - parent
     - pr
