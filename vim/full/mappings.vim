@@ -17,6 +17,7 @@ nnoremap <Leader>: :History:<CR>
 nnoremap <Leader>o :Outline<CR>
 nnoremap <Leader>G :GFiles?<CR>
 nnoremap <Leader>b :Buffers<CR>
+nnoremap <Leader>B :BLines<CR>
 nnoremap <Leader>p :GFiles<CR>
 nnoremap <Leader>P :History<CR>
 nnoremap <Leader>; :Commands<CR>
