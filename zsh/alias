@@ -129,6 +129,14 @@ alias co="copilot"
 alias coc="copilot --continue"
 alias cor="copilot --resume"
 
+devpad-hdmi() {
+    # --auto disableds the output if disconnected but mode would be invalid, so call it twice
+    xrandr --output HDMI-2 --auto &>/dev/null
+    # This time it would enable it, otherwise the cmd fails (bc of --mode) but we don't care
+    xrandr --output HDMI-2 --primary --mode 1920x1080 --auto --right-of eDP-1 &>/dev/null
+    xrandr --output eDP-1 --pos 0x312 &>/dev/null
+}
+
 if isProgramInstalled pacman
 then
     alias pm='sudo pacman'
