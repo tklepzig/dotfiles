@@ -51,6 +51,15 @@ git-fetch-merge:
   args:
     - name: --all
       optional: true
+git-github-compare:
+  help: |-
+    Opens github.com with compare view
+    If one ref is given, the current branch is compared to the given ref. If two refs are given, they are compared to each other.
+  args:
+    - name: Base Branch
+      optional: true
+    - name: Branch to compare
+      optional: true
 git-github-pr:
   help: |-
     Opens github.com with current branch's PR

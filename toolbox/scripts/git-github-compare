@@ -9,7 +9,8 @@ isOS()
 
     return 1;
 }
-currentBranch=$(basename $(git symbolic-ref HEAD))
+defaultBranch=$([ -f "$(git rev-parse --show-toplevel)/.git/refs/heads/master" ] && echo master || echo main)
+currentBranch=$(git rev-parse --abbrev-ref HEAD)
 cmd=$(isOS linux && echo "xdg-open" || echo "open")
 remote=$(git remote get-url origin)
 # for https
@@ -20,9 +21,4 @@ remote=$(git remote get-url origin)
 orgAndRepo=${remote##*:}
 orgAndRepo=${orgAndRepo/.git/$nop}
 
-if [ "$1" = "new" ]
-then
-  $cmd https://github.com/$orgAndRepo/pull/new/$currentBranch
-else
-  $cmd https://github.com/$orgAndRepo/pull/$currentBranch
-fi
+$cmd https://github.com/$orgAndRepo/compare/${1:-$defaultBranch}..${2:-$currentBranch}

@@ -161,6 +161,7 @@ git config --global alias.rvn "revert -n"
 
 git config --global alias.prn "!f() { . ~/.dotfiles/toolbox/scripts/git-github-pr new; }; f"
 git config --global alias.pro "!f() { . ~/.dotfiles/toolbox/scripts/git-github-pr; }; f"
+git config --global alias.cmp "!f() { . ~/.dotfiles/toolbox/scripts/git-github-compare \$1 \$2; }; f"
 
 
 #search for regex in all files history
