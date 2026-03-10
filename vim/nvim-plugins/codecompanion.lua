@@ -8,7 +8,9 @@ require("codecompanion").setup({
     mcphub = {
       callback = "mcphub.extensions.codecompanion",
       opts = {
-        make_vars = true,
+        --make_vars = true,
+        --temp. workaround, see https://github.com/ravitemer/mcphub.nvim/issues/275
+        make_vars = false,
         make_slash_commands = true,
         show_result_in_chat = true
       }
