@@ -1,0 +1,6 @@
+#!/usr/bin/env zsh
+
+pane_dir="$1"
+output_file="$pane_dir/tmux_pane_$(basename "$pane_dir")_$(date +%Y%m%d_%H%M%S).txt"
+
+tmux capture-pane -p -S - > "$output_file" && tmux display-message "Saved: $output_file"
