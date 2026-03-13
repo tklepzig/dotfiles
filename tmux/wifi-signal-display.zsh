@@ -25,22 +25,27 @@ if [[ -z "$state" ]]; then
 fi
 
 if [[ "$state" = "disconnected" ]]; then
-    echo "#[fg=$infoFg,bg=$infoBg] ⊘"
+    echo "#[fg=$statusInactiveFg] ✕"
     exit
 fi
 
 if [[ "$state" = "excellent" ]]; then
     bars="▂▄▆█"
-    color="#[fg=$secondaryFg,bg=$secondaryBg]"
+    # Alternative
+    #bars="▪▪▪▪"
+    color="#[fg=$secondaryText]"
 elif [[ "$state" = "good" ]]; then
     bars="▂▄▆"
-    color="#[fg=$secondaryFg,bg=$secondaryBg]"
+    #bars="▪▪▪▫"
+    color="#[fg=$secondaryText]"
 elif [[ "$state" = "fair" ]]; then
     bars="▂▄"
-    color="#[fg=$warningFg,bg=$warningBg]"
+    #bars="▪▪▫▫"
+    color="#[fg=$warningBg]"
 else
     bars="▂"
-    color="#[fg=$criticalFg,bg=$criticalBg]"
+    #bars="▪▫▫▫"
+    color="#[fg=$criticalBg]"
 fi
 
 echo "$color $bars"

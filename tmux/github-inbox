@@ -78,8 +78,6 @@ def gh_notifications
   primary_text = ENV['primaryText'].sub(/colour/, '')
   secondary_text = ENV['secondaryText'].sub(/colour/, '')
   accent_text = ENV['accentText'].sub(/colour/, '')
-  secondary_bg = ENV['secondaryBg']
-  secondary_fg = ENV['secondaryFg']
 
   response = `gh api -i --cache #{CACHE_IN_SECONDS}s notifications`
   exit 1 unless $CHILD_STATUS.success?
@@ -97,7 +95,7 @@ def gh_notifications
   prs = notifications.select { |item| item['subject']['type'] == 'PullRequest' }.length
 
   if ARGV[0] == 'tile'
-    puts "#[fg=#{secondary_fg},bg=#{secondary_bg}] #{prs.zero? ? '-' : prs}/#{mentions.zero? ? '-' : mentions} #[default] "
+    puts "#[fg=colour#{secondary_text}] #{prs.zero? ? '-' : prs}/#{mentions.zero? ? '-' : mentions}#[default]"
     exit 0
   end
 
