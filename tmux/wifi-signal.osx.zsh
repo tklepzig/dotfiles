@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-rssi=$(system_profiler SPAirPortDataType 2>/dev/null | awk '/Current Network Information/{found=1} found && /Signal \/ Noise/{gsub(/[^-0-9 ]/, ""); print $1; exit}')
+rssi=$(swift -e 'import CoreWLAN; if let r = CWWiFiClient.shared().interface()?.rssiValue(), r != 0 { print(r) }' 2>/dev/null)
 
 if [[ -z "$rssi" || ! "$rssi" =~ ^-?[0-9]+$ ]]; then
     echo "disconnected"
