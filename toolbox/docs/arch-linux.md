@@ -309,7 +309,8 @@ Additional Software (run as non-privileged user)
     sudo pacman -S easytag audacity gimp vlc pqiv git-delta jless git-filter-repo ueberzugpp cmus
     sudo pacman -S networkmanager-vpnc android-tools smartmontools
 
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/JetBrains/JetBrainsMono/master/install_manual.sh)"
+    sudo pacman -S ttf-jetbrains-mono
+    # Or manually: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/JetBrains/JetBrainsMono/master/install_manual.sh)"
 
     git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf
     cd $HOME/.asdf
