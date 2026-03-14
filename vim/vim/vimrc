@@ -68,7 +68,7 @@ au BufWritePre * let &bex = '@' . strftime("%F.%H:%M:%S")
 set directory=~/.vim/.swp/,/tmp//,.
 set undodir=~/.vim/.undo/,/tmp//,.
 
-if !empty($DOTFILES_NVIM) && has('nvim')
+if has('nvim')
   set undodir=~/.config/nvim/.undo/
 endif
 
@@ -112,12 +112,12 @@ function! s:ExecuteSelection() range
 endfunction
 command! -range ExecuteSelection <line1>,<line2>call <SID>ExecuteSelection()
 
-source $HOME/.dotfiles/vim/basic/mappings.vim
-source $HOME/.dotfiles/vim/basic/quick-memo.vim
+source $HOME/.dotfiles/vim/vim/mappings.vim
+source $HOME/.dotfiles/vim/vim/quick-memo.vim
 
 colorscheme codedark
 
-if !empty($DOTFILES_NVIM) && has('nvim')
+if has('nvim')
   " Disable termguicolors which is enabeld by default in neovim 0.10.0 to
   " avoid awkward colors bc currently only termcolors are set, no gui colors
   " See also https://neovim.io/doc/user/news-0.10.html

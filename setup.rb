@@ -8,7 +8,7 @@ require 'yaml'
 DF_REPO ||= ENV['DOTFILES_REPO'] || 'tklepzig/dotfiles'
 DF_BRANCH ||= ENV['DOTFILES_BRANCH'] || nil
 HOME ||= ENV['HOME']
-DF_VARIANT ||= ENV['DOTFILES_VARIANT'] || 'full'
+DF_VARIANT ||= ENV['DOTFILES_VARIANT'] || 'neovim'
 DF_THEME ||= ENV['DOTFILES_THEME']
 DF_PATH ||= "#{HOME}/.dotfiles".freeze
 DF_LOCAL_PATH ||= "#{HOME}/.dotfiles-local".freeze
@@ -165,24 +165,24 @@ end
 
 def cleanup_vim
   Logger.log 'Cleanup vim' do
-    require "#{DF_PATH}/vim/basic/uninstall.rb"
-    return unless DF_VARIANT == 'full'
+    require "#{DF_PATH}/vim/vim/uninstall.rb"
+    return unless DF_VARIANT == 'neovim'
 
-    require "#{DF_PATH}/vim/full/uninstall.rb"
+    require "#{DF_PATH}/vim/neovim/uninstall.rb"
   end
 end
 
 def setup_vim(variant)
-  Logger.log "Setup#{variant == 'basic' ? ' basic' : ''} vim" do
-    link_vim_plugins 'basic'
-    add_link_with_override "#{DF_PATH}/vim/basic/vimrc", "#{HOME}/.vimrc"
-    require "#{DF_PATH}/vim/basic/install.rb"
+  Logger.log "Setup#{variant == 'vim' ? ' vim' : ''} vim" do
+    link_vim_plugins 'vim'
+    add_link_with_override "#{DF_PATH}/vim/vim/vimrc", "#{HOME}/.vimrc"
+    require "#{DF_PATH}/vim/vim/install.rb"
 
-    return unless variant == 'full'
+    return unless variant == 'neovim'
 
-    link_vim_plugins 'full'
-    add_link_with_override "#{DF_PATH}/vim/full/vimrc", "#{HOME}/.vimrc"
-    require "#{DF_PATH}/vim/full/install.rb"
+    link_vim_plugins 'neovim'
+    add_link_with_override "#{DF_PATH}/vim/neovim/vimrc", "#{HOME}/.vimrc"
+    require "#{DF_PATH}/vim/neovim/install.rb"
   end
 end
 
@@ -295,9 +295,6 @@ def install(variant = DF_VARIANT)
   add_link_with_override "#{DF_PATH}/colours.zsh", "#{HOME}/.zshrc"
   add_link_with_override "#{DF_PATH}/colours.tmux.conf", "#{HOME}/.tmux.conf"
 
-  # TODO: part of vim setup, move into one block
-  Logger.log 'Configuring for neovim' if ENV['DOTFILES_NVIM']
-
   unless File.exist?("#{DF_LOCAL_PATH}/plugins.vim")
     File.write("#{DF_LOCAL_PATH}/plugins.vim",
                "\"Plug 'any/vim-plugin'")
@@ -336,12 +333,12 @@ def install(variant = DF_VARIANT)
 
   Logger.log 'Installing and updating vim plugins'
   # We can't rely on aliases since the subshell from ruby spawns a sh and has no idea about zsh aliases
-  vim_binary = ENV['DOTFILES_NVIM'] ? 'nvim' : 'vim'
+  vim_binary = variant == 'neovim' ? 'nvim' : 'vim'
 
   # "echo" to suppress the "Please press ENTER to continue...
   `echo | #{vim_binary} +PlugInstall +PlugUpdate +qall > /dev/null 2>&1`
 
-  if variant == 'full'
+  if variant == 'neovim'
     # The coc plugin is installed
     Logger.log 'Updating coc extensions'
     `echo | #{vim_binary} +CocUpdateSync +qall > /dev/null 2>&1`
@@ -481,5 +478,5 @@ if ARGV[0] == '--uninstall'
   uninstall
 elsif __FILE__ == $PROGRAM_NAME
   # only run installation if script is invoked directly and not by requiring it
-  ARGV[0] == '--basic' ? install('basic') : install
+  ARGV[0] == '--vim' ? install('vim') : install
 end
