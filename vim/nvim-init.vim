@@ -1,4 +1,4 @@
 set runtimepath^=~/.vim runtimepath+=~/.vim/after
 let &packpath=&runtimepath
 source ~/.vimrc
-lua require("tkdf.plugin-config")
+lua require("tkdf.lazy-init")

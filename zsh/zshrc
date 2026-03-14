@@ -77,7 +77,7 @@ unsetopt auto_cd
 
 cdpath=(~ ~/development)
 
-if [ -n "$DOTFILES_NVIM" ]
+if [ "$DOTFILES_VARIANT" = "neovim" ]
 then
   export EDITOR=nvim
   export VISUAL=nvim
