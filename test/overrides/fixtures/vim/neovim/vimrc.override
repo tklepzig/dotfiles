@@ -1,0 +1,1 @@
+let g:nvim_vimrc_override_test = 1

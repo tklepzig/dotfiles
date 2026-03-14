@@ -1,0 +1,35 @@
+FROM archlinux:latest
+
+RUN pacman -Syu --noconfirm && \
+    pacman -S --noconfirm \
+      zsh neovim vim git ruby curl which diffutils \
+      nodejs npm \
+      ripgrep bat ranger eza tmux lynx \
+      python \
+    && pacman -Sc --noconfirm
+
+ENV HOME=/root
+
+COPY . /root/.dotfiles
+
+# Place test fixture override files before running setup so that setup.rb
+# picks up the file-based overrides (vimrc, plugins.override.vim) correctly.
+RUN cp /root/.dotfiles/test/overrides/fixtures/vim/vim/vimrc.override \
+       /root/.dotfiles/vim/vim/vimrc.override && \
+    cp /root/.dotfiles/test/overrides/fixtures/vim/neovim/vimrc.override \
+       /root/.dotfiles/vim/neovim/vimrc.override && \
+    cp /root/.dotfiles/test/overrides/fixtures/vim/vim/plugins.override.vim \
+       /root/.dotfiles/vim/vim/plugins.override.vim && \
+    cp /root/.dotfiles/test/overrides/fixtures/vim/nvim-lazy-plugins.override.lua \
+       /root/.dotfiles/vim/nvim-lazy-plugins.override.lua && \
+    mkdir -p /root/.dotfiles-local && \
+    cp /root/.dotfiles/test/overrides/fixtures/dotfiles-local/plugins.vim \
+       /root/.dotfiles-local/plugins.vim && \
+    cp /root/.dotfiles/test/overrides/fixtures/dotfiles-local/lazy-plugins.lua \
+       /root/.dotfiles-local/lazy-plugins.lua
+
+RUN cd /root/.dotfiles && ruby setup.rb --local
+
+RUN /root/.dotfiles/test/overrides/run.sh
+
+CMD ["zsh", "-l"]
