@@ -1,11 +1,20 @@
-execute 'highlight Primary ctermfg='.primaryFg.' ctermbg='.primaryBg
-execute 'highlight Accent ctermfg='.accentFg.' ctermbg='.accentBg
-execute 'highlight Gap ctermfg=NONE ctermbg=NONE'
-execute 'highlight Secondary ctermfg='.secondaryFg.' ctermbg='.secondaryBg
-execute 'highlight Error ctermfg='.criticalFg.' ctermbg='.criticalBg
-execute 'highlight Inactive ctermfg='.infoFg.' ctermbg='.infoBg
-execute 'highlight Line ctermfg=244 ctermbg=NONE'
-execute 'highlight WinSeparator ctermfg=244 ctermbg=NONE'
+function! s:StatuslineColors()
+  execute 'highlight Primary ctermfg='.g:primaryFg.' ctermbg='.g:primaryBg
+  execute 'highlight Accent ctermfg='.g:accentFg.' ctermbg='.g:accentBg
+  execute 'highlight Gap ctermfg=NONE ctermbg=NONE'
+  execute 'highlight Secondary ctermfg='.g:secondaryFg.' ctermbg='.g:secondaryBg
+  execute 'highlight Error ctermfg='.g:criticalFg.' ctermbg='.g:criticalBg
+  execute 'highlight Inactive ctermfg='.g:infoFg.' ctermbg='.g:infoBg
+  execute 'highlight Line ctermfg=244 ctermbg=NONE'
+  execute 'highlight WinSeparator ctermfg=244 ctermbg=NONE'
+  highlight Normal ctermbg=NONE
+  highlight EndOfBuffer ctermbg=NONE
+  highlight LineNr ctermbg=NONE
+  highlight SignColumn ctermbg=NONE
+endfunction
+
+call s:StatuslineColors()
+autocmd ColorScheme * call s:StatuslineColors()
 
 set fillchars+=stl:\―,stlnc:\―
 

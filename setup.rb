@@ -12,6 +12,7 @@ DF_VARIANT ||= ENV['DOTFILES_VARIANT'] || 'neovim'
 DF_THEME ||= ENV['DOTFILES_THEME']
 DF_PATH ||= "#{HOME}/.dotfiles".freeze
 DF_LOCAL_PATH ||= "#{HOME}/.dotfiles-local".freeze
+DF_LOCAL ||= ARGV.include?('--local')
 
 module Logger
   @level = 0
@@ -243,39 +244,41 @@ def install(variant = DF_VARIANT)
   check_optional_installation 'tmux'
   check_optional_installation 'lynx'
 
-  if Dir.exist?(DF_PATH)
-    Logger.log "Found existing dotfiles in #{DF_PATH}, updating"
-    Dir.chdir(DF_PATH) do
-      current_hash = `git rev-parse --short HEAD`.strip
+  unless DF_LOCAL
+    if Dir.exist?(DF_PATH)
+      Logger.log "Found existing dotfiles in #{DF_PATH}, updating"
+      Dir.chdir(DF_PATH) do
+        current_hash = `git rev-parse --short HEAD`.strip
 
-      # Set the branch if it is defined
-      `git remote set-branches origin #{DF_BRANCH}` if DF_BRANCH
+        # Set the branch if it is defined
+        `git remote set-branches origin #{DF_BRANCH}` if DF_BRANCH
 
-      # Update repo
-      `git fetch --depth=1 > /dev/null 2>&1`
+        # Update repo
+        `git fetch --depth=1 > /dev/null 2>&1`
 
-      # Remove tracked changes
-      `git reset --hard origin/#{DF_BRANCH || 'master'} > /dev/null 2>&1`
+        # Remove tracked changes
+        `git reset --hard origin/#{DF_BRANCH || 'master'} > /dev/null 2>&1`
 
-      # Checkout branch if it is defined
-      if DF_BRANCH
-        Logger.success "Switching to branch #{DF_BRANCH}"
-        `git checkout --quiet #{DF_BRANCH}`
+        # Checkout branch if it is defined
+        if DF_BRANCH
+          Logger.success "Switching to branch #{DF_BRANCH}"
+          `git checkout --quiet #{DF_BRANCH}`
+        end
+
+        Logger.success "Updated dotfiles from #{current_hash} to #{`git rev-parse --short HEAD`.strip}."
+
+        # Remove ignored changes
+        # Do not remove ignored changes, e.g. to keep generated certificates
+        # `git clean -fx > /dev/null 2>&1`
       end
+    else
+      Logger.log "Cloning repo from #{DF_REPO} to #{DF_PATH}"
+      Logger.success "Switching to branch #{DF_BRANCH}" if DF_BRANCH
+      `git clone --quiet --depth=1#{DF_BRANCH ? " -b #{DF_BRANCH}" : ''} https://github.com/#{DF_REPO}.git #{DF_PATH}`
 
-      Logger.success "Updated dotfiles from #{current_hash} to #{`git rev-parse --short HEAD`.strip}."
-
-      # Remove ignored changes
-      # Do not remove ignored changes, e.g. to keep generated certificates
-      # `git clean -fx > /dev/null 2>&1`
-    end
-  else
-    Logger.log "Cloning repo from #{DF_REPO} to #{DF_PATH}"
-    Logger.success "Switching to branch #{DF_BRANCH}" if DF_BRANCH
-    `git clone --quiet --depth=1#{DF_BRANCH ? " -b #{DF_BRANCH}" : ''} https://github.com/#{DF_REPO}.git #{DF_PATH}`
-
-    Dir.chdir(DF_PATH) do
-      Logger.success "Installed dotfiles at #{`git rev-parse --short HEAD`.strip}."
+      Dir.chdir(DF_PATH) do
+        Logger.success "Installed dotfiles at #{`git rev-parse --short HEAD`.strip}."
+      end
     end
   end
 
@@ -326,22 +329,21 @@ def install(variant = DF_VARIANT)
   end
 
   # TODO: part of vim setup
-  unless File.exist?("#{HOME}/.vim/autoload/plug.vim")
-    Logger.log 'Installing vim-plug'
-    `curl -fLo #{HOME}/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim>/dev/null 2>&1`
-  end
-
-  Logger.log 'Installing and updating vim plugins'
   # We can't rely on aliases since the subshell from ruby spawns a sh and has no idea about zsh aliases
   vim_binary = variant == 'neovim' ? 'nvim' : 'vim'
 
-  # "echo" to suppress the "Please press ENTER to continue...
-  `echo | #{vim_binary} +PlugInstall +PlugUpdate +qall > /dev/null 2>&1`
-
   if variant == 'neovim'
-    # The coc plugin is installed
+    Logger.log 'Installing and syncing neovim plugins'
+    `#{vim_binary} --headless "+Lazy! sync" "+qa" > /dev/null 2>&1`
     Logger.log 'Updating coc extensions'
     `echo | #{vim_binary} +CocUpdateSync +qall > /dev/null 2>&1`
+  else
+    unless File.exist?("#{HOME}/.vim/autoload/plug.vim")
+      Logger.log 'Installing vim-plug'
+      `curl -fLo #{HOME}/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim>/dev/null 2>&1`
+    end
+    Logger.log 'Installing and updating vim plugins'
+    `echo | #{vim_binary} +PlugInstall +PlugUpdate +qall > /dev/null 2>&1`
   end
 
   Logger.log 'Configuring tmux' do
@@ -478,5 +480,6 @@ if ARGV[0] == '--uninstall'
   uninstall
 elsif __FILE__ == $PROGRAM_NAME
   # only run installation if script is invoked directly and not by requiring it
-  ARGV[0] == '--vim' ? install('vim') : install
+  variant = ARGV.include?('--vim') ? 'vim' : DF_VARIANT
+  install(variant)
 end

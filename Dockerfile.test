@@ -1,0 +1,24 @@
+FROM archlinux:latest
+
+RUN pacman -Syu --noconfirm && \
+    pacman -S --noconfirm \
+      zsh neovim vim git ruby curl which diffutils \
+      nodejs npm \
+      ripgrep bat ranger eza tmux lynx \
+      python \
+    && pacman -Sc --noconfirm
+
+ENV HOME=/root
+
+COPY . /root/.dotfiles
+
+# VARIANT build arg controls which profile is tested (neovim or vim)
+ARG VARIANT=neovim
+RUN cd /root/.dotfiles && \
+    if [ "$VARIANT" = "vim" ]; then \
+      ruby setup.rb --local --vim; \
+    else \
+      ruby setup.rb --local; \
+    fi
+
+CMD ["zsh", "-l"]
