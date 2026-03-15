@@ -14,7 +14,10 @@ function! s:StatuslineColors()
 endfunction
 
 call s:StatuslineColors()
-autocmd ColorScheme * call s:StatuslineColors()
+augroup StatuslineColors
+  autocmd!
+  autocmd ColorScheme * call s:StatuslineColors()
+augroup END
 
 set fillchars+=stl:\―,stlnc:\―
 

@@ -12,6 +12,7 @@ check_optional_installation 'bat'
 `ln -sf #{DF_PATH}/vim/neovim/solargraph.yaml #{HOME}/.config/solargraph/config.yml`
 
 `mkdir -p #{HOME}/.config/nvim`
+`mkdir -p #{HOME}/.config/nvim/.undo`
 `ln -sf #{DF_PATH}/vim/neovim/coc-settings.json #{HOME}/.config/nvim/coc-settings.json`
 
 `mkdir -p #{HOME}/.config/nvim/lua/tkdf`

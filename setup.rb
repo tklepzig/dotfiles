@@ -6,7 +6,7 @@ require 'English'
 require 'yaml'
 
 DF_REPO ||= ENV['DOTFILES_REPO'] || 'tklepzig/dotfiles'
-DF_BRANCH ||= ENV['DOTFILES_BRANCH'] || nil
+DF_BRANCH ||= ENV['DOTFILES_BRANCH']
 HOME ||= ENV['HOME']
 DF_VARIANT ||= ENV['DOTFILES_VARIANT'] || 'neovim'
 DF_THEME ||= ENV['DOTFILES_THEME']
@@ -17,12 +17,15 @@ DF_LOCAL ||= ARGV.include?('--local')
 module Logger
   @level = 0
 
-  def self.log(message)
-    text_color = (ENV['primaryText'] || '4').sub(/colour/, '')
+  def self.format_line(message, color)
+    prefix = @level.zero? ? "\e[1;38;5;#{color}m\u276f " : ''
+    indented = message.rjust(message.length + 2 * @level)
+    "#{prefix}\e[0;38;5;#{color}m#{indented}\e[0m"
+  end
 
-    prefix = @level.zero? ? "\e[1;38;5;#{text_color}m\u276f " : ''
-    message = message.rjust(message.length + 2 * @level)
-    puts "#{prefix}\e[0;38;5;#{text_color}m#{message}\e[0m"
+  def self.log(message)
+    color = (ENV['primaryText'] || '4').sub(/colour/, '')
+    puts format_line(message, color)
 
     return unless block_given?
 
@@ -33,52 +36,27 @@ module Logger
   end
 
   def self.success(message)
-    text_color = (ENV['accentText'] || '6').sub(/colour/, '')
-
-    prefix = @level.zero? ? "\e[1;38;5;#{text_color}m\u276f " : ''
-    message = message.rjust(message.length + 2 * @level)
-    puts "#{prefix}\e[0;38;5;#{text_color}m#{message}\e[0m"
+    color = (ENV['accentText'] || '6').sub(/colour/, '')
+    puts format_line(message, color)
   end
 
   def self.error(message)
     prefix = @level.zero? ? "\e[1;31m\u276f " : ''
-    message = message.rjust(message.length + 2 * @level)
-    puts "#{prefix}\e[0;31m#{message}\e[0m"
+    indented = message.rjust(message.length + 2 * @level)
+    puts "#{prefix}\e[0;31m#{indented}\e[0m"
   end
 end
 
 module OS
   def self.mac?
-    (/darwin/ =~ RUBY_PLATFORM) != nil
+    RUBY_PLATFORM.match?(/darwin/)
   end
 
   def self.linux?
-    (/linux/ =~ RUBY_PLATFORM) != nil
+    RUBY_PLATFORM.match?(/linux/)
   end
 end
 
-def migrate_local_dir(old, new)
-  return unless Dir.exist?(old)
-
-  Logger.log "Migrating '#{old}' to '#{new}'"
-  `mv #{old} #{new}`
-end
-
-def migrate_local_file(old, new)
-  return unless File.exist?(old)
-
-  Logger.log "Migrating '#{old}' to '#{new}'"
-  `mv #{old} #{new}`
-end
-
-def migrate_local_entries
-  migrate_local_file "#{HOME}/.df-post-install", "#{DF_LOCAL_PATH}/post-install"
-  migrate_local_file "#{HOME}/.plugins.custom.vim", "#{DF_LOCAL_PATH}/plugins.vim"
-  migrate_local_file "#{HOME}/.df-tmux-sessions.json", "#{DF_LOCAL_PATH}/tmux-sessions.json"
-  migrate_local_dir "#{HOME}/.local-scripts", "#{DF_LOCAL_PATH}/scripts"
-  migrate_local_dir "#{HOME}/.zsh-sounds", "#{DF_LOCAL_PATH}/sounds"
-  migrate_local_dir "#{HOME}/vim-quick-memo", "#{DF_LOCAL_PATH}/quick-memo"
-end
 
 def find_override(file_path)
   return "#{file_path}.override" if File.exist?("#{file_path}.override")
@@ -97,10 +75,7 @@ def merge(base_path, override_path)
 end
 
 def program_installed?(program)
-  result = `sh -c 'command -v #{program}'`
-  return true unless result.empty?
-
-  false
+  !`sh -c 'command -v #{program}'`.empty?
 end
 
 def check_mandatory_installation(program)
@@ -144,7 +119,7 @@ def write_link(link, file, command = 'source')
 end
 
 def add_link_with_override(link, file, command = 'source')
-  File.new(file, 'w') unless File.exist?(file)
+  File.write(file, '') unless File.exist?(file)
 
   write_link(link, file, command)
 
@@ -154,13 +129,13 @@ def add_link_with_override(link, file, command = 'source')
   write_link(override, file, command)
 end
 
-def link_vim_plugins(variant)
-  if File.exist?("#{DF_PATH}/vim/#{variant}/plugins.override.vim")
-    merge("#{DF_PATH}/vim/#{variant}/plugins.vim",
-          "#{DF_PATH}/vim/#{variant}/plugins.override.vim")
+def link_vim_plugins
+  if File.exist?("#{DF_PATH}/vim/vim/plugins.override.vim")
+    merge("#{DF_PATH}/vim/vim/plugins.vim",
+          "#{DF_PATH}/vim/vim/plugins.override.vim")
   end
 
-  `sed 's/\\"pluginfile/source $HOME\\/.dotfiles\\/vim\\/#{variant}\\/plugins.vim\\
+  `sed 's/\\"pluginfile/source $HOME\\/.dotfiles\\/vim\\/vim\\/plugins.vim\\
 \\"pluginfile/g' #{DF_PATH}/vim/plugins.vim > #{DF_PATH}/vim/plugins.vim.tmp && mv #{DF_PATH}/vim/plugins.vim.tmp #{DF_PATH}/vim/plugins.vim`
 end
 
@@ -174,14 +149,13 @@ def cleanup_vim
 end
 
 def setup_vim(variant)
-  Logger.log "Setup#{variant == 'vim' ? ' vim' : ''} vim" do
-    link_vim_plugins 'vim'
+  Logger.log "Setup #{variant}" do
+    link_vim_plugins
     add_link_with_override "#{DF_PATH}/vim/vim/vimrc", "#{HOME}/.vimrc"
     require "#{DF_PATH}/vim/vim/install.rb"
 
     return unless variant == 'neovim'
 
-    link_vim_plugins 'neovim'
     add_link_with_override "#{DF_PATH}/vim/neovim/vimrc", "#{HOME}/.vimrc"
     require "#{DF_PATH}/vim/neovim/install.rb"
   end
@@ -200,7 +174,7 @@ def link_scripts(path)
   if Dir.exist?(File.join(path, 'scripts'))
     Logger.log 'Linking scripts'
     Dir.glob(File.join(path, 'scripts', '*')) do |file|
-      next if ['_info.yaml'].include?(File.basename(file))
+      next if File.basename(file) == '_info.yaml'
 
       `ln -sf "#{file}" "#{DF_PATH}/toolbox/scripts"`
     end
@@ -289,7 +263,6 @@ def install(variant = DF_VARIANT)
   end
 
   `mkdir -p #{DF_LOCAL_PATH}`
-  migrate_local_entries
 
   Logger.log "Using theme #{ENV['DOTFILES_THEME']}" if ENV['DOTFILES_THEME']
   `#{DF_PATH}/toolbox/scripts/set-theme`
@@ -444,9 +417,9 @@ end
 def uninstall
   remove_links '\.dotfiles', '.zshrc'
   remove_links '\.fzf', '.zshrc'
-  remove_links "\.dotfiles", '.vimrc'
-  remove_links "\.dotfiles", '.tmux.conf'
-  remove_links "\.dotfiles", '.config/kitty/kitty.conf'
+  remove_links '\.dotfiles', '.vimrc'
+  remove_links '\.dotfiles', '.tmux.conf'
+  remove_links '\.dotfiles', '.config/kitty/kitty.conf'
 
   # Remove fzf to ensure that the fzf include is added during install again after all dotfiles zsh includes
   Logger.log 'Removing fzf'
