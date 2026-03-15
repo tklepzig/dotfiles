@@ -167,6 +167,9 @@ function! s:SynStack()
 endfunction
 command! SynStack call <SID>SynStack()
 
+" Fix randomly broken syntax highlighting in large files
+command! SyntaxResync syntax sync fromstart
+
 command! SearchCount echo searchcount({ "maxcount": 0 }).total
 
 "hybrid line numbers
