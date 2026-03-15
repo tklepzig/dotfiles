@@ -68,7 +68,7 @@ au BufWritePre * let &bex = '@' . strftime("%F.%H:%M:%S")
 set directory=~/.vim/.swp/,/tmp//,.
 set undodir=~/.vim/.undo/,/tmp//,.
 
-if !empty($DOTFILES_NVIM) && has('nvim')
+if has('nvim')
   set undodir=~/.config/nvim/.undo/
 endif
 
@@ -112,29 +112,29 @@ function! s:ExecuteSelection() range
 endfunction
 command! -range ExecuteSelection <line1>,<line2>call <SID>ExecuteSelection()
 
-source $HOME/.dotfiles/vim/basic/mappings.vim
-source $HOME/.dotfiles/vim/basic/quick-memo.vim
+source $HOME/.dotfiles/vim/vim/mappings.vim
+source $HOME/.dotfiles/vim/vim/quick-memo.vim
 
-colorscheme codedark
+if !has('nvim')
+  colorscheme codedark
+  source $HOME/.dotfiles/vim/vim/highlight-overrides.vim
+endif
 
-if !empty($DOTFILES_NVIM) && has('nvim')
-  " Disable termguicolors which is enabeld by default in neovim 0.10.0 to
+if has('nvim')
+  " Disable termguicolors which is enabled by default in neovim 0.10.0 to
   " avoid awkward colors bc currently only termcolors are set, no gui colors
   " See also https://neovim.io/doc/user/news-0.10.html
   set notermguicolors
 endif
 
-" Use nicer highlight colors
-hi Search ctermfg=black ctermbg=228
 set cursorline
-hi CursorLine ctermbg=237
-hi CursorLineNR ctermfg=39
-hi CursorColumn ctermbg=238
 
 if dotfilesTheme =~ '-light$'
   set background=light
-  colorscheme onehalflight
-  hi CursorLine ctermbg=251
+  if !has('nvim')
+    colorscheme onehalflight
+    hi CursorLine ctermbg=251
+  endif
 endif
 
 augroup BgHighlight
@@ -145,23 +145,9 @@ augroup END
 " Optimize performance, use when necessary
 "https://vi.stackexchange.com/questions/10495/most-annoying-slow-down-of-a-plain-text-editor
 
-hi diffAdded ctermfg=41
-hi diffRemoved ctermfg=Red
-
-hi diffFile cterm=NONE ctermfg=39
-hi gitcommitDiff cterm=NONE ctermfg=39
-hi diffIndexLine cterm=NONE ctermfg=39
-hi diffLine cterm=NONE ctermfg=39
-
 " Move focus to newly created splits
 set splitbelow
 set splitright
-
-" Transparent background (so use terminal background)
-hi Normal ctermbg=NONE
-hi EndOfBuffer ctermbg=NONE
-hi LineNr ctermbg=NONE
-hi SignColumn ctermbg=NONE
 
 command! CopyFilename let @* = expand("%")
 
@@ -180,6 +166,9 @@ function! s:SynStack()
   endfor
 endfunction
 command! SynStack call <SID>SynStack()
+
+" Fix randomly broken syntax highlighting in large files
+command! SyntaxResync syntax sync fromstart
 
 command! SearchCount echo searchcount({ "maxcount": 0 }).total
 

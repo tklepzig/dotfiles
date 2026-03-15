@@ -308,6 +308,14 @@ Additional Software (run as non-privileged user)
     sudo pacman -S nautilus gparted eog gnome-tweaks gdmap texlive-core texlive-latexextra texlive-binextra evince xpdf texworks pass paperkey
     sudo pacman -S easytag audacity gimp vlc pqiv git-delta jless git-filter-repo ueberzugpp cmus
     sudo pacman -S networkmanager-vpnc android-tools smartmontools
+    sudo pacman -S docker docker-buildx
+
+Enable Docker and add user to docker group
+
+    sudo systemctl enable --now docker.socket
+    sudo usermod -aG docker $USER
+
+> Log out and back in for the group change to take effect
 
     sudo pacman -S ttf-jetbrains-mono
     # Or manually: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/JetBrains/JetBrainsMono/master/install_manual.sh)"

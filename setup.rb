@@ -6,22 +6,26 @@ require 'English'
 require 'yaml'
 
 DF_REPO ||= ENV['DOTFILES_REPO'] || 'tklepzig/dotfiles'
-DF_BRANCH ||= ENV['DOTFILES_BRANCH'] || nil
+DF_BRANCH ||= ENV['DOTFILES_BRANCH']
 HOME ||= ENV['HOME']
-DF_VARIANT ||= ENV['DOTFILES_VARIANT'] || 'full'
+DF_VARIANT ||= ENV['DOTFILES_VARIANT'] || 'neovim'
 DF_THEME ||= ENV['DOTFILES_THEME']
 DF_PATH ||= "#{HOME}/.dotfiles".freeze
 DF_LOCAL_PATH ||= "#{HOME}/.dotfiles-local".freeze
+DF_LOCAL ||= ARGV.include?('--local')
 
 module Logger
   @level = 0
 
-  def self.log(message)
-    text_color = (ENV['primaryText'] || '4').sub(/colour/, '')
+  def self.format_line(message, color)
+    prefix = @level.zero? ? "\e[1;38;5;#{color}m\u276f " : ''
+    indented = message.rjust(message.length + 2 * @level)
+    "#{prefix}\e[0;38;5;#{color}m#{indented}\e[0m"
+  end
 
-    prefix = @level.zero? ? "\e[1;38;5;#{text_color}m\u276f " : ''
-    message = message.rjust(message.length + 2 * @level)
-    puts "#{prefix}\e[0;38;5;#{text_color}m#{message}\e[0m"
+  def self.log(message)
+    color = (ENV['primaryText'] || '4').sub(/colour/, '')
+    puts format_line(message, color)
 
     return unless block_given?
 
@@ -32,52 +36,27 @@ module Logger
   end
 
   def self.success(message)
-    text_color = (ENV['accentText'] || '6').sub(/colour/, '')
-
-    prefix = @level.zero? ? "\e[1;38;5;#{text_color}m\u276f " : ''
-    message = message.rjust(message.length + 2 * @level)
-    puts "#{prefix}\e[0;38;5;#{text_color}m#{message}\e[0m"
+    color = (ENV['accentText'] || '6').sub(/colour/, '')
+    puts format_line(message, color)
   end
 
   def self.error(message)
     prefix = @level.zero? ? "\e[1;31m\u276f " : ''
-    message = message.rjust(message.length + 2 * @level)
-    puts "#{prefix}\e[0;31m#{message}\e[0m"
+    indented = message.rjust(message.length + 2 * @level)
+    puts "#{prefix}\e[0;31m#{indented}\e[0m"
   end
 end
 
 module OS
   def self.mac?
-    (/darwin/ =~ RUBY_PLATFORM) != nil
+    RUBY_PLATFORM.match?(/darwin/)
   end
 
   def self.linux?
-    (/linux/ =~ RUBY_PLATFORM) != nil
+    RUBY_PLATFORM.match?(/linux/)
   end
 end
 
-def migrate_local_dir(old, new)
-  return unless Dir.exist?(old)
-
-  Logger.log "Migrating '#{old}' to '#{new}'"
-  `mv #{old} #{new}`
-end
-
-def migrate_local_file(old, new)
-  return unless File.exist?(old)
-
-  Logger.log "Migrating '#{old}' to '#{new}'"
-  `mv #{old} #{new}`
-end
-
-def migrate_local_entries
-  migrate_local_file "#{HOME}/.df-post-install", "#{DF_LOCAL_PATH}/post-install"
-  migrate_local_file "#{HOME}/.plugins.custom.vim", "#{DF_LOCAL_PATH}/plugins.vim"
-  migrate_local_file "#{HOME}/.df-tmux-sessions.json", "#{DF_LOCAL_PATH}/tmux-sessions.json"
-  migrate_local_dir "#{HOME}/.local-scripts", "#{DF_LOCAL_PATH}/scripts"
-  migrate_local_dir "#{HOME}/.zsh-sounds", "#{DF_LOCAL_PATH}/sounds"
-  migrate_local_dir "#{HOME}/vim-quick-memo", "#{DF_LOCAL_PATH}/quick-memo"
-end
 
 def find_override(file_path)
   return "#{file_path}.override" if File.exist?("#{file_path}.override")
@@ -96,10 +75,7 @@ def merge(base_path, override_path)
 end
 
 def program_installed?(program)
-  result = `sh -c 'command -v #{program}'`
-  return true unless result.empty?
-
-  false
+  !`sh -c 'command -v #{program}'`.empty?
 end
 
 def check_mandatory_installation(program)
@@ -143,7 +119,7 @@ def write_link(link, file, command = 'source')
 end
 
 def add_link_with_override(link, file, command = 'source')
-  File.new(file, 'w') unless File.exist?(file)
+  File.write(file, '') unless File.exist?(file)
 
   write_link(link, file, command)
 
@@ -153,36 +129,35 @@ def add_link_with_override(link, file, command = 'source')
   write_link(override, file, command)
 end
 
-def link_vim_plugins(variant)
-  if File.exist?("#{DF_PATH}/vim/#{variant}/plugins.override.vim")
-    merge("#{DF_PATH}/vim/#{variant}/plugins.vim",
-          "#{DF_PATH}/vim/#{variant}/plugins.override.vim")
+def link_vim_plugins
+  if File.exist?("#{DF_PATH}/vim/vim/plugins.override.vim")
+    merge("#{DF_PATH}/vim/vim/plugins.vim",
+          "#{DF_PATH}/vim/vim/plugins.override.vim")
   end
 
-  `sed 's/\\"pluginfile/source $HOME\\/.dotfiles\\/vim\\/#{variant}\\/plugins.vim\\
+  `sed 's/\\"pluginfile/source $HOME\\/.dotfiles\\/vim\\/vim\\/plugins.vim\\
 \\"pluginfile/g' #{DF_PATH}/vim/plugins.vim > #{DF_PATH}/vim/plugins.vim.tmp && mv #{DF_PATH}/vim/plugins.vim.tmp #{DF_PATH}/vim/plugins.vim`
 end
 
 def cleanup_vim
   Logger.log 'Cleanup vim' do
-    require "#{DF_PATH}/vim/basic/uninstall.rb"
-    return unless DF_VARIANT == 'full'
+    require "#{DF_PATH}/vim/vim/uninstall.rb"
+    return unless DF_VARIANT == 'neovim'
 
-    require "#{DF_PATH}/vim/full/uninstall.rb"
+    require "#{DF_PATH}/vim/neovim/uninstall.rb"
   end
 end
 
 def setup_vim(variant)
-  Logger.log "Setup#{variant == 'basic' ? ' basic' : ''} vim" do
-    link_vim_plugins 'basic'
-    add_link_with_override "#{DF_PATH}/vim/basic/vimrc", "#{HOME}/.vimrc"
-    require "#{DF_PATH}/vim/basic/install.rb"
+  Logger.log "Setup #{variant}" do
+    link_vim_plugins
+    add_link_with_override "#{DF_PATH}/vim/vim/vimrc", "#{HOME}/.vimrc"
+    require "#{DF_PATH}/vim/vim/install.rb"
 
-    return unless variant == 'full'
+    return unless variant == 'neovim'
 
-    link_vim_plugins 'full'
-    add_link_with_override "#{DF_PATH}/vim/full/vimrc", "#{HOME}/.vimrc"
-    require "#{DF_PATH}/vim/full/install.rb"
+    add_link_with_override "#{DF_PATH}/vim/neovim/vimrc", "#{HOME}/.vimrc"
+    require "#{DF_PATH}/vim/neovim/install.rb"
   end
 end
 
@@ -199,7 +174,7 @@ def link_scripts(path)
   if Dir.exist?(File.join(path, 'scripts'))
     Logger.log 'Linking scripts'
     Dir.glob(File.join(path, 'scripts', '*')) do |file|
-      next if ['_info.yaml'].include?(File.basename(file))
+      next if File.basename(file) == '_info.yaml'
 
       `ln -sf "#{file}" "#{DF_PATH}/toolbox/scripts"`
     end
@@ -243,39 +218,41 @@ def install(variant = DF_VARIANT)
   check_optional_installation 'tmux'
   check_optional_installation 'lynx'
 
-  if Dir.exist?(DF_PATH)
-    Logger.log "Found existing dotfiles in #{DF_PATH}, updating"
-    Dir.chdir(DF_PATH) do
-      current_hash = `git rev-parse --short HEAD`.strip
+  unless DF_LOCAL
+    if Dir.exist?(DF_PATH)
+      Logger.log "Found existing dotfiles in #{DF_PATH}, updating"
+      Dir.chdir(DF_PATH) do
+        current_hash = `git rev-parse --short HEAD`.strip
 
-      # Set the branch if it is defined
-      `git remote set-branches origin #{DF_BRANCH}` if DF_BRANCH
+        # Set the branch if it is defined
+        `git remote set-branches origin #{DF_BRANCH}` if DF_BRANCH
 
-      # Update repo
-      `git fetch --depth=1 > /dev/null 2>&1`
+        # Update repo
+        `git fetch --depth=1 > /dev/null 2>&1`
 
-      # Remove tracked changes
-      `git reset --hard origin/#{DF_BRANCH || 'master'} > /dev/null 2>&1`
+        # Remove tracked changes
+        `git reset --hard origin/#{DF_BRANCH || 'master'} > /dev/null 2>&1`
 
-      # Checkout branch if it is defined
-      if DF_BRANCH
-        Logger.success "Switching to branch #{DF_BRANCH}"
-        `git checkout --quiet #{DF_BRANCH}`
+        # Checkout branch if it is defined
+        if DF_BRANCH
+          Logger.success "Switching to branch #{DF_BRANCH}"
+          `git checkout --quiet #{DF_BRANCH}`
+        end
+
+        Logger.success "Updated dotfiles from #{current_hash} to #{`git rev-parse --short HEAD`.strip}."
+
+        # Remove ignored changes
+        # Do not remove ignored changes, e.g. to keep generated certificates
+        # `git clean -fx > /dev/null 2>&1`
       end
+    else
+      Logger.log "Cloning repo from #{DF_REPO} to #{DF_PATH}"
+      Logger.success "Switching to branch #{DF_BRANCH}" if DF_BRANCH
+      `git clone --quiet --depth=1#{DF_BRANCH ? " -b #{DF_BRANCH}" : ''} https://github.com/#{DF_REPO}.git #{DF_PATH}`
 
-      Logger.success "Updated dotfiles from #{current_hash} to #{`git rev-parse --short HEAD`.strip}."
-
-      # Remove ignored changes
-      # Do not remove ignored changes, e.g. to keep generated certificates
-      # `git clean -fx > /dev/null 2>&1`
-    end
-  else
-    Logger.log "Cloning repo from #{DF_REPO} to #{DF_PATH}"
-    Logger.success "Switching to branch #{DF_BRANCH}" if DF_BRANCH
-    `git clone --quiet --depth=1#{DF_BRANCH ? " -b #{DF_BRANCH}" : ''} https://github.com/#{DF_REPO}.git #{DF_PATH}`
-
-    Dir.chdir(DF_PATH) do
-      Logger.success "Installed dotfiles at #{`git rev-parse --short HEAD`.strip}."
+      Dir.chdir(DF_PATH) do
+        Logger.success "Installed dotfiles at #{`git rev-parse --short HEAD`.strip}."
+      end
     end
   end
 
@@ -286,7 +263,6 @@ def install(variant = DF_VARIANT)
   end
 
   `mkdir -p #{DF_LOCAL_PATH}`
-  migrate_local_entries
 
   Logger.log "Using theme #{ENV['DOTFILES_THEME']}" if ENV['DOTFILES_THEME']
   `#{DF_PATH}/toolbox/scripts/set-theme`
@@ -294,9 +270,6 @@ def install(variant = DF_VARIANT)
   add_link_with_override "#{DF_PATH}/colours.vim", "#{HOME}/.vimrc"
   add_link_with_override "#{DF_PATH}/colours.zsh", "#{HOME}/.zshrc"
   add_link_with_override "#{DF_PATH}/colours.tmux.conf", "#{HOME}/.tmux.conf"
-
-  # TODO: part of vim setup, move into one block
-  Logger.log 'Configuring for neovim' if ENV['DOTFILES_NVIM']
 
   unless File.exist?("#{DF_LOCAL_PATH}/plugins.vim")
     File.write("#{DF_LOCAL_PATH}/plugins.vim",
@@ -329,22 +302,21 @@ def install(variant = DF_VARIANT)
   end
 
   # TODO: part of vim setup
-  unless File.exist?("#{HOME}/.vim/autoload/plug.vim")
-    Logger.log 'Installing vim-plug'
-    `curl -fLo #{HOME}/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim>/dev/null 2>&1`
-  end
-
-  Logger.log 'Installing and updating vim plugins'
   # We can't rely on aliases since the subshell from ruby spawns a sh and has no idea about zsh aliases
-  vim_binary = ENV['DOTFILES_NVIM'] ? 'nvim' : 'vim'
+  vim_binary = variant == 'neovim' ? 'nvim' : 'vim'
 
-  # "echo" to suppress the "Please press ENTER to continue...
-  `echo | #{vim_binary} +PlugInstall +PlugUpdate +qall > /dev/null 2>&1`
-
-  if variant == 'full'
-    # The coc plugin is installed
+  if variant == 'neovim'
+    Logger.log 'Installing and syncing neovim plugins'
+    `#{vim_binary} --headless "+Lazy! sync" "+qa" > /dev/null 2>&1`
     Logger.log 'Updating coc extensions'
     `echo | #{vim_binary} +CocUpdateSync +qall > /dev/null 2>&1`
+  else
+    unless File.exist?("#{HOME}/.vim/autoload/plug.vim")
+      Logger.log 'Installing vim-plug'
+      `curl -fLo #{HOME}/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim>/dev/null 2>&1`
+    end
+    Logger.log 'Installing and updating vim plugins'
+    `echo | #{vim_binary} +PlugInstall +PlugUpdate +qall > /dev/null 2>&1`
   end
 
   Logger.log 'Configuring tmux' do
@@ -445,9 +417,9 @@ end
 def uninstall
   remove_links '\.dotfiles', '.zshrc'
   remove_links '\.fzf', '.zshrc'
-  remove_links "\.dotfiles", '.vimrc'
-  remove_links "\.dotfiles", '.tmux.conf'
-  remove_links "\.dotfiles", '.config/kitty/kitty.conf'
+  remove_links '\.dotfiles', '.vimrc'
+  remove_links '\.dotfiles', '.tmux.conf'
+  remove_links '\.dotfiles', '.config/kitty/kitty.conf'
 
   # Remove fzf to ensure that the fzf include is added during install again after all dotfiles zsh includes
   Logger.log 'Removing fzf'
@@ -481,5 +453,6 @@ if ARGV[0] == '--uninstall'
   uninstall
 elsif __FILE__ == $PROGRAM_NAME
   # only run installation if script is invoked directly and not by requiring it
-  ARGV[0] == '--basic' ? install('basic') : install
+  variant = ARGV.include?('--vim') ? 'vim' : DF_VARIANT
+  install(variant)
 end

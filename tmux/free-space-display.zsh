@@ -11,11 +11,11 @@ then
     color="#[fg=$warningBg,bold]"
 elif [[ "$state" = "critical" ]]
 then
-    if [[ "$(tmux show-environment FREESPACE_BLINK 2>/dev/null)" = "FREESPACE_BLINK=1" ]]; then
-        tmux set-environment FREESPACE_BLINK 0
+    if [[ "$(tmux show-environment -gh FREESPACE_BLINK 2>/dev/null)" = "FREESPACE_BLINK=1" ]]; then
+        tmux set-environment -gh FREESPACE_BLINK 0
         color="#[fg=$criticalBg,bold]"
     else
-        tmux set-environment FREESPACE_BLINK 1
+        tmux set-environment -gh FREESPACE_BLINK 1
         color="#[bg=$criticalBg,bold]"
     fi
 fi
