@@ -76,7 +76,7 @@ set explicitly:
 | `full` (default) | `neovim` (default) |
 | `basic`          | `vim`              |
 
-### Local config files (`.vimrc`, `.tmux.conf`, `.zshrc`)
+### Local config files (`.vimrc`, `.tmux.conf`)
 
 `setup.rb` only ever appends source lines to local config files — it never
 removes old ones. After upgrading, stale lines pointing to the old paths will
