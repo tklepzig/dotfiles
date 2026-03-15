@@ -293,7 +293,7 @@ def install(variant = DF_VARIANT)
 
   add_link_with_override "#{DF_PATH}/colours.vim", "#{HOME}/.vimrc"
   add_link_with_override "#{DF_PATH}/colours.zsh", "#{HOME}/.zshrc"
-  add_link_with_override "#{DF_PATH}/colours.zsh", "#{HOME}/.tmux.conf"
+  add_link_with_override "#{DF_PATH}/colours.tmux.conf", "#{HOME}/.tmux.conf"
 
   # TODO: part of vim setup, move into one block
   Logger.log 'Configuring for neovim' if ENV['DOTFILES_NVIM']

@@ -8,12 +8,7 @@ accentFg=232
 accentBg=172
 accentText=172
 
-inactivePaneBorder=244
 inactivePaneBackground=255
-
-infoFg=7
-infoBg=238
-warningFg=0
-warningBg=220
-criticalFg=0
-criticalBg=124
+statusInactiveFg=238
+statusSeparatorFg=244
+statusDateTimeFg=235

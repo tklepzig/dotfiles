@@ -6,7 +6,12 @@ then
   theme="${DOTFILES_THEME:-lcars}"
 fi
 
-cat $HOME/.dotfiles/themes/colours.$theme.zsh > $HOME/.dotfiles/colours.zsh
+cat $HOME/.dotfiles/themes/colours.defaults.zsh $HOME/.dotfiles/themes/colours.$theme.zsh \
+  > $HOME/.dotfiles/colours.tmux.conf
+
+cat $HOME/.dotfiles/themes/colours.defaults.zsh $HOME/.dotfiles/themes/colours.$theme.zsh \
+  | sed 's/^\([a-zA-Z_][a-zA-Z_0-9]*=\)/export \1/' \
+  > $HOME/.dotfiles/colours.zsh
 
 
 kitty_theme="dark"
@@ -22,7 +27,7 @@ do
   [[ -z $line ]] && continue
   [[ $line =~ ^#.* ]] && continue
   echo "let $line" >> $HOME/.dotfiles/colours.vim
-done <$HOME/.dotfiles/colours.zsh
+done <$HOME/.dotfiles/colours.tmux.conf
 
 # Reload tmux config if in tmux
 if [ -n "$TMUX" ] && [ -f $HOME/.tmux.conf ]
