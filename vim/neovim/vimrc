@@ -166,7 +166,6 @@ function! JumpToSameIndent(direction, inVisualMode)
 endfunction
 
 source $HOME/.dotfiles/vim/neovim/outline.vim
-source $HOME/.dotfiles/vim/neovim/markdown-navigator.vim
 source $HOME/.dotfiles/vim/neovim/statusline.vim
 source $HOME/.dotfiles/vim/neovim/mappings.vim
 

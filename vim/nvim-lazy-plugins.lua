@@ -43,6 +43,7 @@ return {
   { "junegunn/limelight.vim" },
   { "plasticboy/vim-markdown" },
   { "mzlogin/vim-markdown-toc" },
+  { "tklepzig/vim-markdown-navigator" },
   { "lervag/vimtex" },
 
   -- ruby
