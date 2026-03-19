@@ -5,17 +5,18 @@
     read -r value
 } <<< "$(source $HOME/.dotfiles/tmux/free-space.zsh)"
 
-color="#[fg=$secondaryFg,bg=$secondaryBg]"
+color="#[fg=$secondaryText]"
 if [[ "$state" = "warning" ]]
 then
-    color="#[fg=$warningFg,bg=$warningBg,bold]"
+    color="#[fg=$warningBg,bold]"
 elif [[ "$state" = "critical" ]]
 then
-    if [[ "$(($(date '+%s') % 3))" = "1" ]]
-    then
-        color="#[fg=$criticalBg,bg=terminal,bold]"
+    if [[ "$(tmux show-environment FREESPACE_BLINK 2>/dev/null)" = "FREESPACE_BLINK=1" ]]; then
+        tmux set-environment FREESPACE_BLINK 0
+        color="#[fg=$criticalBg,bold]"
     else
-        color="#[fg=$criticalFg,bg=$criticalBg,bold]"
+        tmux set-environment FREESPACE_BLINK 1
+        color="#[bg=$criticalBg,bold]"
     fi
 fi
 
