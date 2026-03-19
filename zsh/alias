@@ -127,6 +127,10 @@ alias co="copilot"
 alias coc="copilot --continue"
 alias cor="copilot --resume"
 
+alias cl="claude"
+alias clc="claude --continue"
+alias clr="claude --resume"
+
 devpad-hdmi() {
     # --auto disableds the output if disconnected but mode would be invalid, so call it twice
     xrandr --output HDMI-2 --auto &>/dev/null
