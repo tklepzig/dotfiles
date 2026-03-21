@@ -1,9 +1,8 @@
+if !has('nvim') | finish | endif
+
 " Set syntax scheme to json and format it (by using python, make sure it is installed)
 command Json set syntax=json | execute '%!python -m json.tool'
 
-highlight GitGutterAdd    ctermfg=2
-highlight GitGutterChange ctermfg=3
-highlight GitGutterDelete ctermfg=1
 
 let g:gitgutter_map_keys = 0
 "
@@ -38,7 +37,6 @@ call NERDTreeHighlightFile('json', 'yellow', 'none', 'yellow', '#151515')
 call NERDTreeHighlightFile('html', 'yellow', 'none', 'yellow', '#151515')
 call NERDTreeHighlightFile('css', 'cyan', 'none', 'cyan', '#151515')
 call NERDTreeHighlightFile('js', 'Red', 'none', '#ffa500', '#151515')
-highlight Directory guibg=NONE ctermbg=NONE
 
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
@@ -102,13 +100,6 @@ augroup mygroup
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
-hi CocUnusedHighlight ctermfg=250
-hi CocMenuSel ctermbg=22
-hi CocSearch ctermfg=184
-
-if dotfilesTheme =~ '-light$'
-  hi CocHighlightText ctermbg=248
-endif
 
 " Use `:Format` to format current buffer
 command! -nargs=0 Format :call CocAction('format')
@@ -174,10 +165,9 @@ function! JumpToSameIndent(direction, inVisualMode)
   endif
 endfunction
 
-source $HOME/.dotfiles/vim/full/outline.vim
-source $HOME/.dotfiles/vim/full/markdown-navigator.vim
-source $HOME/.dotfiles/vim/full/statusline.vim
-source $HOME/.dotfiles/vim/full/mappings.vim
+source $HOME/.dotfiles/vim/neovim/outline.vim
+source $HOME/.dotfiles/vim/neovim/statusline.vim
+source $HOME/.dotfiles/vim/neovim/mappings.vim
 
 let g:BufferNavigatorMapKeys = 0
 
@@ -189,7 +179,6 @@ if dotfilesTheme =~ '-light$'
   autocmd FileType buffernavigator highlight BufferNavigatorDir ctermfg=0 ctermbg=NONE 
 endif
 
-highlight NormalFloat ctermbg=236
 
 " For whatever reason, vim started to set the filetype for *.html files to sh
 augroup fixHtmlFiletype
@@ -204,9 +193,6 @@ augroup END
 
 " rhysd/conflict-marker.vim
 let g:conflict_marker_highlight_group = ''
-highlight ConflictMarkerOurs ctermbg=23
-highlight ConflictMarkerTheirs ctermbg=58
-highlight ConflictMarkerCommonAncestorsHunk ctermbg=237
 
 
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.tsx, *.jsx'
@@ -220,22 +206,6 @@ autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx
 let g:vim_markdown_toc_autofit = 1
 let g:vim_markdown_folding_disabled = 1
 
-" Customize highlight of markdown headlines depending on current theme
-execute 'highlight htmlH1 ctermfg='.accentText
-execute 'highlight htmlH2 ctermfg='.primaryText
-execute 'highlight htmlH3 ctermfg='.secondaryText
-execute 'highlight htmlH4 ctermfg='.secondaryText
-execute 'highlight htmlH5 ctermfg='.secondaryText
-execute 'highlight htmlH6 ctermfg='.secondaryText
-
-" And one more for our markdown navigator plugin to make it independent of the
-" vim-markdown plugin
-execute 'highlight MarkdownNavigatorH1 ctermfg='.accentText
-execute 'highlight MarkdownNavigatorH2 ctermfg='.primaryText
-execute 'highlight MarkdownNavigatorH3 ctermfg='.secondaryText
-execute 'highlight MarkdownNavigatorH4 ctermfg='.secondaryText
-execute 'highlight MarkdownNavigatorH5 ctermfg='.secondaryText
-execute 'highlight MarkdownNavigatorH6 ctermfg='.secondaryText
 
 let g:vimtex_syntax_conceal_disable = 1
 
@@ -338,8 +308,8 @@ augroup filetype_ruby
 augroup END
 
 augroup skeletons_ruby
-  autocmd BufNewFile,BufReadPost *_spec\.rb if getline(1,'$') == [''] | 0r $HOME/.dotfiles/vim/full/skeletons/spec.rb | endif
-  autocmd BufNewFile,BufReadPost *.rb if getline(1,'$') == [''] | 0r $HOME/.dotfiles/vim/full/skeletons/ruby.rb | endif
+  autocmd BufNewFile,BufReadPost *_spec\.rb if getline(1,'$') == [''] | 0r $HOME/.dotfiles/vim/neovim/skeletons/spec.rb | endif
+  autocmd BufNewFile,BufReadPost *.rb if getline(1,'$') == [''] | 0r $HOME/.dotfiles/vim/neovim/skeletons/ruby.rb | endif
 augroup END
 
 let g:BufferNavigatorWidth = 50
@@ -354,23 +324,3 @@ let g:copilot_filetypes = {
       \ 'gitcommit': v:true,
       \ }
 
-if !empty($DOTFILES_NVIM) && has('nvim')
-  "Copilot Chat Stuff
-lua << EOF
-local copilot_chat = require("CopilotChat")
-copilot_chat.setup({
-  build = function()
-    vim.notify("Please update the remote plugins by running ':UpdateRemotePlugins', then restart Neovim.")
-  end,
-  event = "VeryLazy",
-  mappings = {
-    complete = "<C-x>",
-    reset = "<leader>cr",
-    accept_diff = "<leader>ca"
-  }
-})
-EOF
-
-command! -range CC CopilotChat
-command! -range CT CopilotTests
-endif

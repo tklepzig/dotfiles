@@ -16,11 +16,11 @@ then
     color="#[fg=$accentText]"
 elif [[ $value -lt 16 ]]
 then
-    if [[ "$(tmux show-environment BATTERY_BLINK 2>/dev/null)" = "BATTERY_BLINK=1" ]]; then
-        tmux set-environment BATTERY_BLINK 0
+    if [[ "$(tmux show-environment -gh BATTERY_BLINK 2>/dev/null)" = "BATTERY_BLINK=1" ]]; then
+        tmux set-environment -gh BATTERY_BLINK 0
         color="#[fg=$criticalBg,bold]"
     else
-        tmux set-environment BATTERY_BLINK 1
+        tmux set-environment -gh BATTERY_BLINK 1
         color="#[bg=$criticalBg,bold]"
     fi
 elif [[ $value -lt 31 ]]

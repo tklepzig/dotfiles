@@ -120,7 +120,7 @@ nnoremap <silent> <leader>m :QuickMemo<cr>
 nnoremap <silent> <leader>M :QuickMemo git<cr>
 
 
-if !empty($DOTFILES_NVIM) && has('nvim')
+if has('nvim')
   tnoremap <Esc> <C-\><C-n>
   tnoremap jj <C-\><C-n>
   nnoremap <leader>$ :terminal<cr>i
