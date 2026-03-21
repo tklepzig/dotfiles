@@ -32,12 +32,16 @@ hi GitGutterAdd    ctermfg=2
 hi GitGutterChange ctermfg=3
 hi GitGutterDelete ctermfg=1
 
-" CoC
-hi CocUnusedHighlight ctermfg=250
-hi CocMenuSel ctermbg=22
-hi CocSearch ctermfg=184
+" LSP + nvim-cmp
+hi CmpItemAbbrMatch ctermfg=184          " matched chars in completion popup (was CocSearch)
+hi PmenuSel ctermbg=22                   " selected completion item (was CocMenuSel)
+hi DiagnosticUnnecessary ctermfg=250     " unused symbols dimmed (was CocUnusedHighlight)
+hi LspReferenceText ctermbg=248          " document highlight under cursor
+hi LspReferenceRead ctermbg=248
+hi LspReferenceWrite ctermbg=240
 if dotfilesTheme =~ '-light$'
-  hi CocHighlightText ctermbg=248
+  hi LspReferenceText ctermbg=248
+  hi LspReferenceRead ctermbg=248
 endif
 
 " Conflict markers (rhysd/conflict-marker.vim)

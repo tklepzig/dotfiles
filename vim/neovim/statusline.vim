@@ -75,23 +75,20 @@ endfunction
 set showtabline=2
 set tabline=%!TabLine()
 
-function! CocStatus()
-  if !exists(':CocCommand')
+function! LspStatus()
+  let errors = luaeval('#vim.diagnostic.get(0, {severity = vim.diagnostic.severity.ERROR})')
+  if type(errors) != type(0) || errors == 0
     return ''
   endif
 
-  let info = get(b:, 'coc_diagnostic_info', {})
-  if empty(info) 
+  let diags = luaeval('vim.diagnostic.get(0, {severity = vim.diagnostic.severity.ERROR})')
+  if empty(diags)
     return ''
   endif
 
-  let errorCount = get(info, "error", 0)
-  if empty(errorCount)
-    return ''
-  endif
-
-  let errorLineNr = printf(' (Line %d) ', (info.lnums)[0])
-  return ' Errors: '.errorCount.errorLineNr
+  " lnum is 0-indexed in vim.diagnostic
+  let firstLine = diags[0]['lnum'] + 1
+  return printf(' Errors: %d (Line %d) ', errors, firstLine)
 endfunction
 
 function! StatusLine()
@@ -146,7 +143,7 @@ function! StatusLine()
 
   let modeName = get(mode, 'name')
   let modeHighlight = get(mode, 'highlight')
-  let cocStatus = CocStatus()
+  let lspStatus = LspStatus()
 
   let line = modeHighlight.' '
   let line .= '%#Gap# '
@@ -165,9 +162,9 @@ function! StatusLine()
   let line .= modeHighlight
   let line .= ' 0x%B '
 
-  if !empty(cocStatus)
+  if !empty(lspStatus)
     let line .= '%#Gap# '
-    let line .= '%#Error#'.cocStatus
+    let line .= '%#Error#'.lspStatus
   endif
 
   return line

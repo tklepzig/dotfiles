@@ -166,115 +166,33 @@ augroup ruby
     autocmd FileType ruby nnoremap <buffer> <leader>2 :AlternateSafe<cr>
 augroup END
 
-" Coc
+" LSP
 
-" Use <down> and <up> to navigate completion list:
-inoremap <silent><expr> <Down>
-      \ coc#pum#visible() ? coc#pum#next(1) : "\<Down>"
-inoremap <expr><Up> coc#pum#visible() ? coc#pum#prev(1) : "\<Up>"
+" Navigate diagnostics (mirrors CoC <leader>K / <leader>J)
+nmap <silent> <leader>K <cmd>lua vim.diagnostic.goto_prev()<CR>
+nmap <silent> <leader>J <cmd>lua vim.diagnostic.goto_next()<CR>
 
-" Map <tab> for trigger completion, completion confirm, snippet expand and jump
-inoremap <silent><expr> <TAB>
-      \ coc#pum#visible() ? coc#_select_confirm() :
-      \ coc#expandableOrJumpable() ?
-      \ "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
+" Go to definition / type / implementation / references (same keys as CoC)
+nmap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
+nmap <silent> gy <cmd>lua vim.lsp.buf.type_definition()<CR>
+nmap <silent> gi <cmd>lua vim.lsp.buf.implementation()<CR>
+nmap <silent> gr <cmd>lua vim.lsp.buf.references()<CR>
 
-" Map <shift-tab> additionally to avoid conflicts with copilot
-inoremap <silent><expr> <S-TAB>
-      \ coc#pum#visible() ? coc#_select_confirm() :
-      \ coc#expandableOrJumpable() ?
-      \ "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-      \ <SID>check_back_space() ? "\<S-TAB>" :
-      \ coc#refresh()
+" Show hover documentation (mirrors CoC <leader>i)
+nnoremap <silent> <leader>i <cmd>lua
+      \ if vim.tbl_contains({'vim', 'help'}, vim.bo.filetype) then
+      \   vim.cmd('h ' .. vim.fn.expand('<cword>'))
+      \ else
+      \   vim.lsp.buf.hover()
+      \ end<CR>
 
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
+" Rename symbol (mirrors CoC <leader>rr)
+nmap <leader>rr <cmd>lua vim.lsp.buf.rename()<CR>
 
-let g:coc_snippet_next = '<tab>'
+" Code action for selected region or current line (mirrors CoC <leader>a / <leader>ac)
+xmap <leader>a  <cmd>lua vim.lsp.buf.code_action()<CR>
+nmap <leader>a  <cmd>lua vim.lsp.buf.code_action()<CR>
+nmap <silent> <leader>ac <cmd>lua vim.lsp.buf.code_action()<CR>
 
-" Use <CR> to confirm completion
-" No abbreviations with carriage returns in it are possible anymore
-"inoremap <expr> <cr> coc#pum#visible() ? coc#_select_confirm() : "\<CR>"
-
-" Use <c-x> to trigger completion
-inoremap <silent><expr> <c-x> coc#refresh()
-
-
-" Navigate diagnostics
-nmap <silent> <leader>K <Plug>(coc-diagnostic-prev)
-nmap <silent> <leader>J <Plug>(coc-diagnostic-next)
-
-" Remap keys for gotos
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-
-" show info (like tooltip)
-nnoremap <silent> <leader>i :call <SID>show_documentation()<CR>
-
-function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  else
-    call CocAction('doHover')
-  endif
-endfunction
-
-
-" Remap for rename current word
-nmap <leader>rr <Plug>(coc-rename)
-
-" Remap for format selected region
-"xmap <leader>f  <Plug>(coc-format-selected)
-"nmap <leader>f  <Plug>(coc-format-selected)
-
-" Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
-xmap <leader>a  <Plug>(coc-codeaction-selected)
-nmap <leader>a  <Plug>(coc-codeaction-selected)
-
-" Remap for do codeAction of current line
-nmap <silent> <leader>ac  <Plug>(coc-codeaction)
-" Fix autofix problem of current line
-nmap <silent> <leader>.  <Plug>(coc-fix-current)
-
-" Create mappings for function text object, requires document symbols feature of languageserver.
-"xmap if <Plug>(coc-funcobj-i)
-"xmap af <Plug>(coc-funcobj-a)
-"omap if <Plug>(coc-funcobj-i)
-"omap af <Plug>(coc-funcobj-a)
-
-" Use <C-d> for select selections ranges, needs server support, like: coc-tsserver, coc-python
-"nmap <silent> <C-d> <Plug>(coc-range-select)
-"xmap <silent> <C-d> <Plug>(coc-range-select)
-
-
-" Using CocList
-"" Show all diagnostics
-"nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
-"" Manage extensions
-"nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
-"" Show commands
-"nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
-"" Find symbol of current document
-"nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
-"" Search workspace symbols
-"nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
-"" Do default action for next item.
-"nnoremap <silent> <space>j  :<C-u>CocNext<CR>
-"" Do default action for previous item.
-"nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
-"" Resume latest coc list
-"nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
-
-
-" Since single <tab> is used for coc completion, use double <tab> to accept
-" copilot suggestions
-"Not needed anymore, since tab is used for all again but Shift-Tab
-"additionally added for coc completion
-"imap <silent><script><expr> <Tab><Tab> copilot#Accept("\<CR>")
-"let g:copilot_no_tab_map = v:true
+" Apply preferred / first quick-fix (mirrors CoC <leader>.)
+nmap <silent> <leader>. <cmd>lua vim.lsp.buf.code_action({ apply = true, filter = function(a) return a.isPreferred end })<CR>

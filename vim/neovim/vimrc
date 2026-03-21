@@ -65,78 +65,35 @@ let g:mergetool_layout = 'b,mr'
 "let g:VimuxResetSequence = "C-c"
 
 " =============================================================
-" Coc Settings
+" LSP Settings
 " =============================================================
 
-" if hidden is not set, TextEdit might fail.
+" Required for LSP TextEdit support
 set hidden
-
-" Some servers have issues with backup files, see #649
-" UPDATE: Re-enable backup for avoiding data-loss reasons, let's see whether coc can
-" handle it...
-"set nobackup
-"set nowritebackup
 
 " Better display for messages
 set cmdheight=1
 
-" You will have bad experience for diagnostic messages when it's default 4000.
+" Faster diagnostic updates
 set updatetime=300
 
-" don't give |ins-completion-menu| messages.
+" Suppress ins-completion-menu messages
 set shortmess+=c
 
-" always show signcolumns
+" Always show sign column (for diagnostics)
 set signcolumn=yes
 
-" Highlight symbol under cursor on CursorHold
-autocmd CursorHold * silent call CocActionAsync('highlight')
+" Show diagnostic float on CursorHold
+autocmd CursorHold * lua vim.diagnostic.open_float(nil, { focusable = false })
 
-augroup mygroup
-  autocmd!
-  " Setup formatexpr specified filetype(s).
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-  " Update signature help on jump placeholder
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-augroup end
+" :OR to organize imports via LSP
+command! -nargs=0 OR lua vim.lsp.buf.code_action({ context = { only = { 'source.organizeImports' } }, apply = true })
 
-
-" Use `:Format` to format current buffer
-command! -nargs=0 Format :call CocAction('format')
-
-" Use `:Fold` to fold current buffer
-command! -nargs=? Fold :call     CocAction('fold', <f-args>)
-
-" use `:OR` for organize import of current buffer
-command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
-
-let g:coc_snippet_next = '<tab>'
-
-"coc-emoji is triggered when typing ':'
-let g:coc_global_extensions = [
-      \'coc-snippets',
-      \'coc-json',
-      \'coc-tsserver',
-      \'coc-prettier',
-      \'coc-eslint',
-      \'coc-css',
-      \'coc-styled-components',
-      \'https://github.com/andys8/vscode-jest-snippets',
-      \'https://github.com/akamud/vscode-javascript-snippet-pack',
-      \'@yaegassy/coc-tailwindcss3',
-      \'coc-emmet',
-      \'coc-python',
-      \'coc-emoji',
-      \'coc-dictionary',
-      \'coc-word',
-      \'coc-vimlsp',
-      \'coc-sumneko-lua',
-      \'coc-solargraph',
-      \'coc-db',
-      \]
+" :Fold to fold via LSP
+command! -nargs=? Fold lua vim.lsp.buf.folding_range()
 
 " =============================================================
-" End Coc Settings
+" End LSP Settings
 " =============================================================
 
 function! OpenRangerForCurrentFile()
