@@ -256,11 +256,22 @@ def install(variant = DF_VARIANT)
     end
   end
 
-  # Update chosen variant in .zshrc
-  `sed "/DOTFILES_VARIANT/d" #{HOME}/.zshrc > #{HOME}/.zshrc.tmp && mv #{HOME}/.zshrc.tmp #{HOME}/.zshrc`
-  File.open("#{HOME}/.zshrc", 'a') do |f|
-    f.puts "export DOTFILES_VARIANT='#{variant}'"
+  # Update chosen variant in .zshrc (must come before the dotfiles zsh source line,
+  # since aliases defined there depend on DOTFILES_VARIANT being set correctly)
+  variant_export = "export DOTFILES_VARIANT='#{variant}'"
+  zshrc = File.read("#{HOME}/.zshrc")
+  if zshrc.match?(/DOTFILES_VARIANT/)
+    # Already present: replace in-place, preserving its position
+    zshrc.gsub!(/export DOTFILES_VARIANT=.*/, variant_export)
+  elsif zshrc.include?("#{DF_PATH}/zsh/zshrc")
+    # Source line already added (e.g. previous install): insert export before it.
+    # Captures the source line as \1 and prepends the export line above it.
+    zshrc.gsub!(/^(.*#{Regexp.escape("#{DF_PATH}/zsh/zshrc")}.*)/, "#{variant_export}\n\\1")
+  else
+    # First install, source line not yet added: append here; source line will be appended after
+    zshrc += "#{variant_export}\n"
   end
+  File.write("#{HOME}/.zshrc", zshrc)
 
   `mkdir -p #{DF_LOCAL_PATH}`
 
