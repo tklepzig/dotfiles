@@ -310,6 +310,7 @@ Additional Software (run as non-privileged user)
     sudo pacman -S networkmanager-vpnc android-tools smartmontools
 
     sudo pacman -S ttf-jetbrains-mono
+    sudo pacman -S ncdu dysk
     # Or manually: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/JetBrains/JetBrainsMono/master/install_manual.sh)"
 
     git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf
