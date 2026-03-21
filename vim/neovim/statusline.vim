@@ -7,6 +7,7 @@ function! s:StatuslineColors()
   execute 'highlight Inactive ctermfg='.g:infoFg.' ctermbg='.g:infoBg
   execute 'highlight Line ctermfg=244 ctermbg=NONE'
   execute 'highlight WinSeparator ctermfg=244 ctermbg=NONE'
+  highlight TabLineFill ctermbg=NONE
   highlight Normal ctermbg=NONE
   highlight EndOfBuffer ctermbg=NONE
   highlight LineNr ctermbg=NONE
