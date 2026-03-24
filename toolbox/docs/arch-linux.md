@@ -178,7 +178,7 @@ Mount
 
 ## Package Installation
 
-    pacstrap /mnt base base-devel linux linux-firmware ntfs-3g kitty git gvim zsh tmux terminus-font man-db man-pages texinfo networkmanager wpa_supplicant xorg-server xorg-apps xorg-xinit gdm gnome-control-center noto-fonts gnome-keyring
+    pacstrap /mnt base base-devel linux linux-firmware ntfs-3g kitty git gvim zsh tmux terminus-font man-db man-pages texinfo networkmanager wpa_supplicant xorg-server xorg-xinit gdm gnome-control-center noto-fonts gnome-keyring
 
 ## System Setup
 
@@ -230,18 +230,20 @@ Add kernel parameter to `GRUB_CMDLINE_LINUX` in `/etc/default/grub`
 
     cryptdevice=UUID=<UUID of encrypted partition>:cryptroot
 
-Add `keymap` and `encrypt` hook to `HOOKS` in `/etc/mkinitcpio.conf` (Add at the
-end)
+Add `keyboard`, `keymap` and `encrypt` hooks to `HOOKS` in `/etc/mkinitcpio.conf`
+(Add at the end)
 
-    HOOKS="... keymap encrypt"
+    HOOKS=(... keyboard keymap encrypt)
 
-> The `keymap` hook must occur **before** the `encrypt` hook. It is necessary to
-> allow non-US keyboard layout, otherwise using a non-US keyboard for entering
-> the passphrase could be a challenge...
+> The `keyboard` hook must occur **before** `keymap`, and `keymap` must occur
+> **before** the `encrypt` hook. `keyboard` is necessary for keyboard input to
+> work at all in the initramfs; `keymap` is necessary to allow non-US keyboard
+> layout, otherwise using a non-US keyboard for entering the passphrase could be
+> a challenge...
 
 Regenerate initramfs image (ramdisk)
 
-    mkinitcpio -p linux
+    mkinitcpio -P
 
 #### BIOS
 
@@ -305,7 +307,7 @@ Setup WiFi, Keyboard Layout, etc.
 Additional Software (run as non-privileged user)
 
     sudo pacman -S xclip ripgrep ranger tig fzf lynx xdotool eza peco sshfs pwgen mat2 btop net-tools lsof iproute2
-    sudo pacman -S nautilus gparted eog gnome-tweaks gdmap texlive-core texlive-latexextra texlive-binextra evince xpdf texworks pass paperkey
+    sudo pacman -S nautilus gparted eog gnome-tweaks texlive-core texlive-latexextra texlive-binextra evince xpdf texworks pass paperkey
     sudo pacman -S easytag audacity gimp vlc pqiv git-delta jless git-filter-repo ueberzugpp cmus
     sudo pacman -S networkmanager-vpnc android-tools smartmontools
     sudo pacman -S docker docker-buildx
@@ -321,9 +323,10 @@ Enable Docker and add user to docker group
     sudo pacman -S ncdu dysk
     # Or manually: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/JetBrains/JetBrainsMono/master/install_manual.sh)"
 
-    git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf
-    cd $HOME/.asdf
-    git checkout "$(git describe --abbrev=0 --tags)"
+    # asdf is available in the AUR
+    git clone https://aur.archlinux.org/asdf-vm.git
+    cd asdf-vm
+    makepkg -sic
     cd -
 
 AUR Packages
@@ -384,11 +387,11 @@ Edit `MODULES` in `/etc/mkinitcpio.conf` and add the usb stick's filesystem
 
 Regenerate initramfs image (ramdisk)
 
-    mkinitcpio -p linux
+    mkinitcpio -P
 
 Add kernel parameter to `GRUB_CMDLINE_LINUX` in `/etc/default/grub`
 
-    cryptkey=UUID=<UUID of usb stick partition with key file>:auto:/absolute/path/to/mykeyfile
+    cryptkey=UUID=<UUID of usb stick partition with key file>:ext4:/absolute/path/to/mykeyfile
 
 Recreate grub config
 
