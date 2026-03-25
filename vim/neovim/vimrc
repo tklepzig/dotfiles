@@ -167,6 +167,7 @@ endfunction
 
 source $HOME/.dotfiles/vim/neovim/outline.vim
 source $HOME/.dotfiles/vim/neovim/statusline.vim
+source $HOME/.dotfiles/vim/neovim/git-history-nav.vim
 source $HOME/.dotfiles/vim/neovim/mappings.vim
 
 let g:BufferNavigatorMapKeys = 0
