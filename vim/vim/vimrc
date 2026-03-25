@@ -114,6 +114,7 @@ command! -range ExecuteSelection <line1>,<line2>call <SID>ExecuteSelection()
 
 source $HOME/.dotfiles/vim/vim/mappings.vim
 source $HOME/.dotfiles/vim/vim/quick-memo.vim
+source $HOME/.dotfiles/vim/vim/claude.vim
 
 if !has('nvim')
   colorscheme codedark
