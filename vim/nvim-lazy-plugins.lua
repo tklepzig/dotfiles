@@ -110,7 +110,18 @@ return {
   { "tpope/vim-abolish" },
   { "mracos/mermaid.vim" },
   { "markonm/traces.vim" },
-  { "github/copilot.vim" },
+  {
+    "supermaven-inc/supermaven-nvim",
+    config = function()
+      require("supermaven-nvim").setup({
+        keymaps = {
+          accept_suggestion = "<C-f>",
+          clear_suggestion = "<C-]>",
+          accept_word = "<C-j>",
+        },
+      })
+    end,
+  },
   { "wellle/context.vim" },
   { "samoshkin/vim-mergetool" },
   { "rhysd/conflict-marker.vim" },
@@ -143,29 +154,6 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
-  },
-
-  {
-    "CopilotC-Nvim/CopilotChat.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    event = "VeryLazy",
-    config = function()
-      require("CopilotChat").setup({
-        mappings = {
-          complete = "<C-x>",
-          reset = "<leader>cr",
-          accept_diff = "<leader>ca"
-        }
-      })
-
-      vim.api.nvim_create_user_command("CC", function(opts)
-        vim.cmd("CopilotChat " .. opts.args)
-      end, { range = true, nargs = "*" })
-
-      vim.api.nvim_create_user_command("CT", function(opts)
-        vim.cmd("CopilotTests " .. opts.args)
-      end, { range = true, nargs = "*" })
-    end,
   },
 
   {

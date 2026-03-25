@@ -179,7 +179,6 @@ inoremap <silent><expr> <TAB>
       \ <SID>check_back_space() ? "\<TAB>" :
       \ coc#refresh()
 
-" Map <shift-tab> additionally to avoid conflicts with copilot
 inoremap <silent><expr> <S-TAB>
       \ coc#pum#visible() ? coc#_select_confirm() :
       \ coc#expandableOrJumpable() ?
