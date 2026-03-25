@@ -8,9 +8,91 @@ return {
   -- general
   { "godlygeek/tabular" },
   { "fladson/vim-kitty" },
-  { "scrooloose/nerdtree" },
-  { "Xuyuanp/nerdtree-git-plugin" },
-  { "PhilRunninger/nerdtree-visual-selection" },
+  {
+    "nvim-tree/nvim-tree.lua",
+    config = function()
+      local is_zoomed = false
+
+      require("nvim-tree").setup({
+        on_attach = function(bufnr)
+          local api = require("nvim-tree.api")
+          api.config.mappings.default_on_attach(bufnr)
+          vim.keymap.set("n", "A", function()
+            if is_zoomed then
+              api.tree.resize({ width = 50 })
+              is_zoomed = false
+            else
+              api.tree.resize({ width = vim.o.columns })
+              is_zoomed = true
+            end
+          end, { buffer = bufnr, noremap = true, silent = true, nowait = true })
+        end,
+        filters = {
+          git_ignored = true,
+          dotfiles = false,
+        },
+        view = {
+          width = 50,
+        },
+        actions = {
+          open_file = {
+            quit_on_open = true,
+          },
+        },
+        renderer = {
+          group_empty = false,
+          special_files = {},
+          icons = {
+            show = {
+              file = false,
+              folder = false,
+              folder_arrow = true,
+              git = true,
+            },
+            glyphs = {
+              git = {
+                unstaged  = "✹",
+                staged    = "✚",
+                untracked = "✭",
+                renamed   = "➜",
+                unmerged  = "═",
+                deleted   = "✖",
+                ignored   = "☒",
+              },
+            },
+          },
+        },
+      })
+
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "NvimTree",
+        callback = function()
+          vim.cmd([[
+            hi! NvimTreeImageFile ctermfg=211  ctermbg=NONE guifg=#f48fb1 guibg=NONE
+            hi! NvimTreeExecFile  ctermfg=NONE ctermbg=NONE guifg=NONE guibg=NONE
+            syn match NvimTreeFileImg   #\zs.*\.\(svg\|png\|jpg\|jpeg\|gif\|ico\|webp\)$#
+            syn match NvimTreeFileMd    #\zs.*\.mdx\?$#
+            syn match NvimTreeFileYml   #\zs.*\.yml$#
+            syn match NvimTreeFileJson  #\zs.*\.json$#
+            syn match NvimTreeFileHtml  #\zs.*\.html$#
+            syn match NvimTreeFileCss   #\zs.*\.css$#
+            syn match NvimTreeFileJs    #\zs.*\.js$#
+            syn match NvimTreeFileTs    #\zs.*\.tsx\?$#
+            syn match NvimTreeFileConf  #\zs.*\.\(conf\|config\)$#
+            hi NvimTreeFileImg  ctermfg=211    ctermbg=NONE guifg=#f48fb1 guibg=NONE
+            hi NvimTreeFileMd   ctermfg=blue   ctermbg=NONE guifg=#3366FF guibg=NONE
+            hi NvimTreeFileYml  ctermfg=yellow ctermbg=NONE guifg=yellow  guibg=NONE
+            hi NvimTreeFileJson ctermfg=yellow ctermbg=NONE guifg=yellow  guibg=NONE
+            hi NvimTreeFileHtml ctermfg=yellow ctermbg=NONE guifg=yellow  guibg=NONE
+            hi NvimTreeFileCss  ctermfg=cyan   ctermbg=NONE guifg=cyan    guibg=NONE
+            hi NvimTreeFileJs   ctermfg=214    ctermbg=NONE guifg=#ffa500 guibg=NONE
+            hi NvimTreeFileTs   ctermfg=176    ctermbg=NONE guifg=#c586c0 guibg=NONE
+            hi NvimTreeFileConf ctermfg=yellow ctermbg=NONE guifg=yellow  guibg=NONE
+          ]])
+        end,
+      })
+    end,
+  },
   { "tpope/vim-fugitive" },
   { "junegunn/gv.vim" },
   { "airblade/vim-gitgutter" },

@@ -1,16 +1,14 @@
 let mapleader = "\<space>"
 
-function! NERDTreeSmartToggle()
+function! NvimTreeSmartToggle()
   if @% == ""
-    NERDTreeToggle
-  elseif (exists("t:NERDTreeBufName") && bufwinnr(t:NERDTreeBufName) != -1)
-    NERDTreeClose
+    NvimTreeToggle
   else
-    NERDTreeFind
+    NvimTreeFindFileToggle
   endif
 endfun
 
-nnoremap <silent> <leader>n :call NERDTreeSmartToggle()<CR>
+nnoremap <silent> <leader>n :call NvimTreeSmartToggle()<CR>
 
 nnoremap <Leader>/ :History/<CR>
 nnoremap <Leader>: :History:<CR>

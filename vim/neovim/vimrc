@@ -21,28 +21,6 @@ let g:NERDCustomDelimiters = {
       \ 'typescript.tsx': { 'left': '//', 'leftAlt': '{/*', 'rightAlt': '*/}' },
       \ 'css': { 'left': '/*', 'right': '*/' }
       \ }
-let g:NERDTreeWinSize=50
-
-" NERDTree File highlighting
-function! NERDTreeHighlightFile(extension, fg, bg, guifg, guibg)
- exec 'autocmd filetype nerdtree highlight ' . a:extension .' ctermbg='. a:bg .' ctermfg='. a:fg .' guibg='. a:guibg .' guifg='. a:guifg
- exec 'autocmd filetype nerdtree syn match ' . a:extension .' #^\s\+.*'. a:extension .'$#'
-endfunction
-
-call NERDTreeHighlightFile('md', 'blue', 'none', '#3366FF', '#151515')
-call NERDTreeHighlightFile('yml', 'yellow', 'none', 'yellow', '#151515')
-call NERDTreeHighlightFile('config', 'yellow', 'none', 'yellow', '#151515')
-call NERDTreeHighlightFile('conf', 'yellow', 'none', 'yellow', '#151515')
-call NERDTreeHighlightFile('json', 'yellow', 'none', 'yellow', '#151515')
-call NERDTreeHighlightFile('html', 'yellow', 'none', 'yellow', '#151515')
-call NERDTreeHighlightFile('css', 'cyan', 'none', 'cyan', '#151515')
-call NERDTreeHighlightFile('js', 'Red', 'none', '#ffa500', '#151515')
-
-let NERDTreeMinimalUI = 1
-let NERDTreeDirArrows = 1
-let NERDTreeQuitOnOpen = 1
-let NERDTreeShowHidden = 1
-let NERDTreeCascadeSingleChildDir = 0
 
 let g:vim_ai_chat = {
 \  "options": {
@@ -50,7 +28,7 @@ let g:vim_ai_chat = {
 \  },
 \}
 
-let g:context_filetype_blacklist = ["nerdtree", "buffernavigator"]
+let g:context_filetype_blacklist = ["NvimTree", "buffernavigator"]
 let g:context_highlight_tag = '<hide>'
 let g:context_add_mappings = 0
 let g:context_enabled = 0
