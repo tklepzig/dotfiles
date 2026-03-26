@@ -1,0 +1,9 @@
+#compdef +
+
+_plus() {
+  local -a completion
+  completion=( ${(f)"$($dotfilesDir/toolbox/scripts/_run.rb --completion git-worktree-list)"} )
+  _describe -t completion 'subcommands' completion
+}
+
+_plus

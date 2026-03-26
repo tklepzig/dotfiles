@@ -1,0 +1,208 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# git-worktree-list - git worktree helper
+# Usage: + [add <branch> [path] [--cd] | rm | tmux]
+# No args: fzf picker to switch (cd) into a worktree
+#
+# When switching, the selected path is printed to stdout so the calling
+# shell function can cd into it (scripts cannot change the parent shell's cwd).
+
+require 'open3'
+
+# --- ANSI colors ---------------------------------------------------------------
+
+RESET  = "\e[0m"
+DIM    = "\e[2m"
+RED    = "\e[31m"
+GREEN  = "\e[32m"
+YELLOW = "\e[33m"
+CYAN   = "\e[36m"
+BOLD   = "\e[1m"
+
+# --- helpers -------------------------------------------------------------------
+
+def run(*cmd)
+  out, _err, status = Open3.capture3(*cmd)
+  status.success? ? out.chomp : nil
+end
+
+def git_root
+  @git_root ||= run('git', 'rev-parse', '--show-toplevel')
+end
+
+def abort_if_no_repo
+  abort 'git-worktree-list: not a git repository' unless git_root
+end
+
+# --- symlink helpers -----------------------------------------------------------
+
+def symlink_ignored_files(main_repo, worktree)
+  out, = Open3.capture3('git', '-C', main_repo, 'ls-files', '--others', '--ignored', '--exclude-standard', '--directory')
+  out.lines
+     .map(&:chomp)
+     .reject { |item| item.include?('/') } # skip directories and nested paths
+     .each do |item|
+       src = File.join(main_repo, item)
+       dst = File.join(worktree, item)
+       next unless File.file?(src) && !File.exist?(dst) && !File.symlink?(dst)
+
+       File.symlink(src, dst)
+       warn "  linked: #{item}"
+     end
+end
+
+# --- worktree data -------------------------------------------------------------
+
+def worktrees
+  @worktrees ||= begin
+    raw, = Open3.capture3('git', 'worktree', 'list', '--porcelain')
+    raw.split("\n\n").filter_map do |block|
+      lines  = block.lines.map(&:chomp)
+      field  = ->(prefix) { lines.find { |l| l.start_with?(prefix) }&.delete_prefix(prefix) }
+      path   = field.call('worktree ') or next
+      hash   = field.call('HEAD ')&.slice(0, 7)
+      branch = field.call('branch ')&.delete_prefix('refs/heads/')
+      { path:, hash:, branch: }
+    end
+  end
+end
+
+def sync_indicator(worktree_path)
+  counts = run('git', '-C', worktree_path, 'rev-list', '--left-right', '--count', 'HEAD...@{upstream}')
+  return ['?', "#{DIM}?#{RESET}"] unless counts
+
+  ahead, behind = counts.split("\t").map(&:to_i)
+  case [ahead.zero?, behind.zero?]
+  in [true,  true]  then ['=',                   "#{GREEN}=#{RESET}"]
+  in [false, true]  then [">#{ahead}",           "#{YELLOW}>#{ahead}#{RESET}"]
+  in [true,  false] then ["<#{behind}",          "#{RED}<#{behind}#{RESET}"]
+  else                   [">#{ahead}<#{behind}", "#{YELLOW}>#{ahead}#{RESET}#{RED}<#{behind}#{RESET}"]
+  end
+end
+
+def dirty_indicator(worktree_path)
+  dirty = run('git', '-C', worktree_path, 'status', '--porcelain').then { _1 && !_1.empty? }
+  dirty ? ['*', "#{RED}*#{RESET}"] : ['', '']
+end
+
+def build_rows
+  raw_rows = worktrees.map do |wt|
+    wt => { path:, hash:, branch: }
+    dir = File.basename(path)
+    {
+      path:,
+      sync: sync_indicator(path),
+      dirty: dirty_indicator(path),
+      dir: [dir, "#{BOLD}#{dir}#{RESET}"],
+      colored_hash: "#{YELLOW}#{hash}#{RESET}",
+      colored_branch: "#{DIM}[#{RESET}#{CYAN}#{branch || 'detached'}#{RESET}#{DIM}]#{RESET}"
+    }
+  end
+
+  widths = %i[sync dirty dir].to_h { |k| [k, raw_rows.map { |r| r[k][0].length }.max.to_i] }
+
+  raw_rows.map do |row|
+    pad = ->(key) { row[key][1] + ' ' * (widths[key] - row[key][0].length) }
+    line = [row[:path], pad.call(:sync), pad.call(:dirty), pad.call(:dir), row[:colored_hash], row[:colored_branch]].join('  ')
+    { line:, path: row[:path] }
+  end
+end
+
+# --- fzf -----------------------------------------------------------------------
+
+LOG_FMT = '--format=%C(yellow)%h%C(reset) %C(cyan)%><(15)%ad%C(reset) %s %C(dim white)- %an%C(reset)'
+PREVIEW = 'b=$(git -C {1} merge-base HEAD origin/HEAD 2>/dev/null ' \
+           '|| git -C {1} merge-base HEAD origin/master 2>/dev/null ' \
+           '|| git -C {1} merge-base HEAD origin/main 2>/dev/null); ' \
+           "out=$([[ -n $b ]] && git -C {1} log --color=always --date=human '#{LOG_FMT}' $b..HEAD 2>/dev/null); " \
+           'if [[ -n $out ]]; then echo $out; ' \
+           "else git -C {1} log --color=always --date=human '#{LOG_FMT}' -10; fi".freeze
+
+def fzf_pick(rows, prompt:, multi: false)
+  fzf_flags = ['fzf', '--ansi', "--prompt=#{prompt}", "--preview=#{PREVIEW}", '--with-nth=2..', '--nth=4',
+               *('--multi' if multi)]
+
+  (IO.popen(fzf_flags, 'r+') do |io|
+    rows.each { |row| io.puts row[:line] }
+    io.close_write
+    io.read.lines.map { |line| line.chomp.split('  ', 2).first }.compact
+  end) || []
+rescue Errno::EPIPE
+  []
+end
+
+# --- subcommands ---------------------------------------------------------------
+
+abort_if_no_repo
+case ARGV[0]
+
+when 'add'
+  args     = ARGV[1..].reject { |arg| arg == '--cd' }
+  cd_after = ARGV.include?('--cd')
+  branch   = args[0] or abort 'Usage: + add <branch> [<path>] [--cd]'
+
+  repo_name = File.basename(git_root)
+  new_path  = args[1] || File.join(File.dirname(git_root), "#{repo_name}-worktrees", branch.gsub('/', '-'))
+
+  local_exists  = system('git', 'show-ref', '--verify', '--quiet', "refs/heads/#{branch}",          out: '/dev/null', err: '/dev/null')
+  remote_exists = system('git', 'show-ref', '--verify', '--quiet', "refs/remotes/origin/#{branch}", out: '/dev/null', err: '/dev/null')
+
+  worktree_cmd = if local_exists
+                   ['git', 'worktree', 'add', new_path, branch]
+                 elsif remote_exists
+                   ['git', 'worktree', 'add', '--track', '-b', branch, new_path, "origin/#{branch}"]
+                 else
+                   ['git', 'worktree', 'add', '-b', branch, new_path]
+                 end
+  system(*worktree_cmd, out: :err)
+
+  warn 'Linking ignored files...'
+  symlink_ignored_files(git_root, new_path)
+
+  [['pnpm-lock.yaml', 'pnpm'], ['package-lock.json', 'npm']]
+    .find { |lockfile, _| File.exist?(File.join(new_path, lockfile)) }
+    &.then do |_, pm|
+      warn "Detected #{pm}, running #{pm} install..."
+      system(pm, 'install', chdir: new_path, out: :err)
+    end
+
+  puts new_path if cd_after
+
+when 'rm'
+  selected_paths = fzf_pick(build_rows, prompt: 'Remove worktree(s)> ', multi: true)
+  exit 0 if selected_paths.empty?
+
+  puts "About to remove:\n#{selected_paths.map { |p| "  #{p}" }.join("\n")}"
+  print 'Confirm? [y/N] '
+  $stdout.flush
+
+  if $stdin.gets&.chomp&.downcase == 'y'
+    selected_paths.each do |path|
+      system('git', 'worktree', 'remove', path)
+      puts "Removed: #{path}"
+    end
+    system('git', 'worktree', 'prune', '-v')
+  end
+
+when 'tmux'
+  first, *rest = worktrees
+  session = File.basename(first[:path])
+
+  unless system('tmux', 'has-session', '-t', session, out: '/dev/null', err: '/dev/null')
+    system('tmux', 'new-session', '-d', '-s', session, '-c', first[:path], '-n', File.basename(first[:path]))
+    rest.each { |wt| system('tmux', 'new-window', '-t', session, '-c', wt[:path], '-n', File.basename(wt[:path])) }
+    puts "Created tmux session '#{session}' with #{worktrees.size} window(s)."
+  end
+
+  if ENV['TMUX']
+    exec('tmux', 'switch-client', '-t', session)
+  else
+    exec('tmux', 'attach', '-t', session)
+  end
+
+else
+  selected_paths = fzf_pick(build_rows, prompt: 'Switch worktree> ')
+  puts selected_paths.first if selected_paths.first
+
+end

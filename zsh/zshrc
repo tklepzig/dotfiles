@@ -31,8 +31,8 @@ reset=%f%k%b
 
 source $dotfilesDir/zsh/alias
 
-# Add completions from .zsh/completion
-fpath=($HOME/.zsh/completion $fpath)
+# Add completions from .zsh/completion and dotfiles
+fpath=($HOME/.zsh/completion $dotfilesDir/zsh/completion $fpath)
 
 autoload -Uz colors compinit promptinit edit-command-line vcs_info
 colors
