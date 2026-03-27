@@ -186,12 +186,13 @@ when 'rm'
   end
 
 when 'tmux'
-  first, *rest = worktrees
+  first, = worktrees
   session = File.basename(first[:path])
 
   unless system('tmux', 'has-session', '-t', session, out: '/dev/null', err: '/dev/null')
-    system('tmux', 'new-session', '-d', '-s', session, '-c', first[:path], '-n', File.basename(first[:path]))
-    rest.each { |wt| system('tmux', 'new-window', '-t', session, '-c', wt[:path], '-n', File.basename(wt[:path])) }
+    system('tmux', 'new-session', '-d', '-s', session, '-c', Dir.home, '-n', '__init__')
+    worktrees.each { |wt| system('tmux', 'new-window', '-t', session, '-c', wt[:path], '-n', '') }
+    system('tmux', 'kill-window', '-t', "#{session}:__init__")
     puts "Created tmux session '#{session}' with #{worktrees.size} window(s)."
   end
 
