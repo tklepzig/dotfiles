@@ -50,9 +50,9 @@ alias git='LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 git'
 alias g='git'
 gcln() { source $HOME/.dotfiles/toolbox/scripts/git-clone-cd $1 }
 
-# + — git worktree helper (delegates to git-worktree-list Ruby script)
+# k — git worktree helper (delegates to git-worktree-list Ruby script)
 # The zsh function only exists to handle `cd` (scripts can't change the parent shell's cwd).
-+() {
+k() {
   case "${1:-}" in
     rm|prune|tmux)
       $dotfilesDir/toolbox/scripts/git-worktree-list "$@"

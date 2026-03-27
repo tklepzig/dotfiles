@@ -79,7 +79,7 @@ git-status-all:
       default: 1
 git-worktree-list:
   help: |-
-    Manage git worktrees with fzf. Called via the `+` zsh function.
+    Manage git worktrees with fzf. Called via the `k` zsh function.
     No args: fzf picker to switch into a worktree
     add:    create a new worktree (defaults to ../<repo>-worktrees/<branch>)
             tracks remote branch if it exists on origin
