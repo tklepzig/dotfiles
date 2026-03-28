@@ -1,22 +1,25 @@
 #!/usr/bin/env zsh
 
 defaultBranch=$([ -f "$(git rev-parse --show-toplevel)/.git/refs/heads/master" ] && echo master || echo main)
-currentBranch=$(git symbolic-ref HEAD)
+currentBranch=$(git symbolic-ref --short HEAD)
 baseBranch=${1:-$defaultBranch}
 
-git fetch
-if [ "$1" = "--all" ]
-then
-    for branch in $(git for-each-ref --format='%(refname)' refs/heads/); do
-        if [ $currentBranch != $branch ]
-        then
-            git fetch origin +$branch:$branch
+git fetch origin
+
+# Update base branch if we're not on it
+if [ "$currentBranch" != "$baseBranch" ]; then
+    # Find the worktree where the base branch is checked out, works only for paths without spaces!!
+    baseBranchWorktree=$(git worktree list | awk -v b="[$baseBranch]" '$3 == b {print $1}')
+
+    if [ -n "$baseBranchWorktree" ]; then
+        # Try to fast-forward the base branch in its worktree, if it fails (e.g. due to local changes), just skip it
+        if ! git -C "$baseBranchWorktree" merge --ff-only origin/$baseBranch 2>&1; then
+            echo "Warning: Could not fast-forward $baseBranch in $baseBranchWorktree, skipping update"
         fi
-    done
-elif [ $currentBranch != refs/heads/$baseBranch ]
-then
-    git fetch origin +$baseBranch:$baseBranch
+    else
+        # The base branch is not checked out in any worktree, we can safely update it
+        git fetch origin +$baseBranch:$baseBranch
+    fi
 fi
 
-git fetch origin $currentBranch
 git merge --ff-only
