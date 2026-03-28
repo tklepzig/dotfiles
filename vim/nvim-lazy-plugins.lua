@@ -17,6 +17,7 @@ return {
         on_attach = function(bufnr)
           local api = require("nvim-tree.api")
           api.config.mappings.default_on_attach(bufnr)
+          vim.keymap.set("n", "_", api.tree.change_root_to_node, { buffer = bufnr, noremap = true, silent = true, nowait = true, desc = "CD" })
           vim.keymap.set("n", "A", function()
             if is_zoomed then
               api.tree.resize({ width = 50 })
