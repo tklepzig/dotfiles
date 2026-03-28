@@ -37,6 +37,9 @@ return {
         actions = {
           open_file = {
             quit_on_open = true,
+            window_picker = {
+              enable = false
+            },
           },
         },
         renderer = {
@@ -97,16 +100,16 @@ return {
   { "junegunn/gv.vim" },
   { "airblade/vim-gitgutter" },
   { "scrooloose/nerdcommenter" },
-  { "sheerun/vim-polyglot", commit = "4d4aa5fe553a47ef5c5c6d0a97bb487fdfda2d5b" },
+  { "sheerun/vim-polyglot",           commit = "4d4aa5fe553a47ef5c5c6d0a97bb487fdfda2d5b" },
   { "tpope/vim-surround" },
   { "jiangmiao/auto-pairs" },
   { "dyng/ctrlsf.vim" },
   { "Yggdroot/indentLine" },
   { "benmills/vimux" },
-  { "junegunn/fzf", build = function() vim.fn["fzf#install"]() end },
+  { "junegunn/fzf",                   build = function() vim.fn["fzf#install"]() end },
   { "junegunn/fzf.vim" },
   { "tklepzig/vim-buffer-navigator" },
-  { "neoclide/coc.nvim", branch = "release" },
+  { "neoclide/coc.nvim",              branch = "release" },
   { "tpope/vim-abolish" },
   { "mracos/mermaid.vim" },
   { "markonm/traces.vim" },
