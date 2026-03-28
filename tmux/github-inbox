@@ -1,120 +1,191 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'io/console'
 require 'English'
 require 'json'
+require 'open3'
 
-CACHE_IN_SECONDS = 120
+CACHE = '120s'
+
+RESET   = "\e[0m"
+DIM     = "\e[2m"
+BOLD    = "\e[1m"
+GREEN   = "\e[32m"
+YELLOW  = "\e[33m"
+CYAN    = "\e[36m"
+MAGENTA = "\e[35m"
 
 module OS
-  def self.mac?
-    (/darwin/ =~ RUBY_PLATFORM) != nil
+  def self.linux? = (/linux/ =~ RUBY_PLATFORM) != nil
+  def self.open_cmd = linux? ? 'xdg-open' : 'open'
+end
+
+def fetch_notifications(all: false)
+  # -i includes HTTP headers in the output; headers are stripped below.
+  # Useful for reading X-Poll-Interval / X-Ratelimit-Remaining if needed in future.
+  endpoint = all ? 'notifications?all=true' : 'notifications'
+  response = `gh api -i --cache #{CACHE} #{endpoint}`
+  exit 1 unless $CHILD_STATUS.success?
+
+  json = response.split("\r\n").last
+  JSON.parse(json)
+end
+
+def tile_output(notifications)
+  secondary = ENV['secondaryText']&.sub(/colour/, '')
+  mentions  = notifications.count { |notif| notif['reason'] == 'mention' }
+  prs       = notifications.count { |notif| notif['subject']['type'] == 'PullRequest' }
+  puts "#[fg=colour#{secondary}] #{prs.zero? ? '-' : prs}/#{mentions.zero? ? '-' : mentions}#[default]"
+end
+
+def api_path(url)
+  url&.sub('https://api.github.com/', '')
+end
+
+TYPE_BADGES = {
+  'PullRequest' => ['PR', "#{CYAN}PR#{RESET}"],
+  'Issue' => ['IS', "#{GREEN}IS#{RESET}"],
+  'Release' => ['RL', "#{YELLOW}RL#{RESET}"],
+  'Commit' => ['CM', "#{DIM}CM#{RESET}"],
+  'Discussion' => ['DS', "#{DIM}DS#{RESET}"]
+}.freeze
+
+def type_badge(type)
+  TYPE_BADGES[type] || ['??', "#{DIM}??#{RESET}"]
+end
+
+def reason_badge(reason)
+  colored = reason == 'mention' ? "#{MAGENTA}#{reason}#{RESET}" : "#{DIM}#{reason}#{RESET}"
+  [reason, colored]
+end
+
+def truncate(str, max)
+  str.length <= max ? str : "#{str[0, max - 1]}…"
+end
+
+MAX_REPO  = 35
+MAX_TITLE = 55
+
+def build_rows(notifications)
+  data = notifications.reject { |notification| notification['subject']['type'] == 'CheckSuite' }.map do |notification|
+    {
+      path:   api_path(notification['subject']['url']) || '_',
+      repo:   truncate(notification['repository']['full_name'], MAX_REPO),
+      type:   type_badge(notification['subject']['type']),
+      reason: reason_badge(notification['reason']),
+      title:  truncate(notification['subject']['title'], MAX_TITLE)
+    }
   end
 
-  def self.linux?
-    (/linux/ =~ RUBY_PLATFORM) != nil
+  repo_w   = data.map { |row| row[:repo].length }.max.to_i
+  reason_w = data.map { |row| row[:reason][0].length }.max.to_i
+
+  data.map do |row|
+    repo_pad   = row[:repo].ljust(repo_w)
+    reason_pad = row[:reason][1] + ' ' * (reason_w - row[:reason][0].length)
+
+    visible = [
+      "#{BOLD}#{repo_pad}#{RESET}",
+      row[:type][1],
+      reason_pad,
+      row[:title]
+    ].join('  ')
+
+    { line: "#{row[:path]}  #{visible}", path: row[:path] }
   end
 end
 
-def open_url(api_url)
-  return unless api_url
+PREVIEW_CMD = <<~'SH'.chomp
+  reset=$(printf '\033[0m')
+  dim=$(printf '\033[2m')
+  bold=$(printf '\033[1m')
+  red=$(printf '\033[31m')
+  green=$(printf '\033[32m')
+  yellow=$(printf '\033[33m')
+  magenta=$(printf '\033[35m')
+  cyan=$(printf '\033[36m')
+  grey=$(printf '\033[90m')
+  gh api --cache 120s {1} 2>/dev/null | jq -r \
+    --arg reset "$reset" \
+    --arg dim "$dim" \
+    --arg bold "$bold" \
+    --arg red "$red" \
+    --arg green "$green" \
+    --arg yellow "$yellow" \
+    --arg magenta "$magenta" \
+    --arg cyan "$cyan" \
+    --arg grey "$grey" \
+    'if .message then
+      ($dim + "No details available (\(.message))" + $reset)
+    else
+      (if (.merged // false) then ($magenta + "MERGED" + $reset)
+      elif (.draft // false) then ($grey + "DRAFT" + $reset)
+      elif .state == "open" then ($green + "OPEN" + $reset)
+      elif .state == "closed" then ($red + "CLOSED" + $reset)
+      else ($dim + "N/A" + $reset) end) as $state |
+      ($bold + (.title // .name // "(untitled)") + $reset),
+      ($state + (if .number then "  #\(.number | tostring)" else "" end) + "  " + $cyan + "@" + (.user.login // .author.login // "unknown") + $reset),
+      (if .updated_at then
+        ((.updated_at | strptime("%Y-%m-%dT%H:%M:%SZ") | mktime) as $updated_ts |
+        (now - $updated_ts) as $diff |
+        if $diff < 14400 then
+          if $diff < 3600 then ($diff / 60 | floor | tostring) + "m ago"
+          else ($diff / 3600 | floor | tostring) + "h ago"
+          end
+        else (.updated_at | strptime("%Y-%m-%dT%H:%M:%SZ") | strftime("%d.%m.%Y %H:%M"))
+        end) as $updated_str |
+        ($dim + "Updated:" + $reset + "   " + $updated_str)
+      else empty end),
+      (if .changed_files then ($dim + "Files:" + $reset + "     \(.changed_files)  " + $green + "+\(.additions)" + $reset + "  " + $red + "-\(.deletions)" + $reset) else empty end),
+      (if .review_comments and .review_comments > 0 then ($dim + "Reviews:" + $reset + "   \(.review_comments) comment\(if .review_comments == 1 then "" else "s" end)") else empty end),
+      (if ((.labels // []) | length) > 0 then ($dim + "Labels:" + $reset + "    \(.labels | map(.name) | join(", "))") else empty end),
+      (if ((.assignees // []) | length) > 0 then ($dim + "Assignees:" + $reset + " \(.assignees | map(.login) | join(", "))") else empty end),
+      "",
+      (.body // "(no description)")
+    end'
+SH
 
-  html_url = `gh api --cache #{CACHE_IN_SECONDS}s #{api_url} --jq .html_url`
-  return unless html_url && $CHILD_STATUS.success?
+def fzf_pick(rows)
+  script = File.expand_path(__FILE__)
+  flags = ['fzf', '--ansi', '--multi',
+           '--prompt=Unread> ',
+           '--header=ctrl-r: all  ctrl-u: unread only',
+           "--bind=ctrl-r:reload(#{script} --rows --all)+change-prompt(All> )",
+           "--bind=ctrl-u:reload(#{script} --rows)+change-prompt(Unread> )",
+           "--preview=#{PREVIEW_CMD}",
+           '--preview-window=right:50%:wrap',
+           '--with-nth=2..']
 
-  `#{OS.linux? ? 'xdg-open' : 'open'} #{html_url}`
-  # Clear cache to avoid showing opened (and now read) notification again when showing the inbox
-  # Location of cache in linux: ~/.cache/gh
-  # Seems not to work when running from this script? (Work when running manually in a terminal)
-  # `gh config clear-cache &>/dev/null`
+  (IO.popen(flags, 'r+') do |io|
+    rows.each { |row| io.puts row[:line] }
+    io.close_write
+    io.read.lines.map { |line| line.chomp.split('  ', 2).first }.compact
+  end) || []
+rescue Errno::EPIPE
+  []
+end
+
+all           = ARGV.include?('--all')
+notifications = fetch_notifications(all:)
+
+if ARGV[0] == 'tile'
+  tile_output(notifications)
   exit 0
 end
 
-def wait_for_second_char(stdin, input, timeout = 0.8)
-  # Wait up to 0.8s for a second character
-  return input unless IO.select([stdin], nil, nil, timeout)
-
-  input + stdin.getc.chr
+if ARGV.include?('--rows')
+  build_rows(notifications).each { |row| puts row[:line] }
+  exit 0
 end
 
-def print_and_read(lines, urls)
-  rows, = IO.console.winsize
-  screen_height = rows - 2
-  start = 0
+rows = build_rows(notifications)
+selected = fzf_pick(rows)
 
-  loop do
-    $stdout.clear_screen
-    visible = lines[start, screen_height] || []
-    visible.each { |line| puts line }
+selected.each do |path|
+  next if path == '_'
 
-    $stdin.raw do |stdin|
-      input = stdin.getc.chr
-      case input
-      when "\u0003" # Ctrl-C
-        exit 1
-      when 'j'
-        start += 1 if start + screen_height < lines.size
-      when 'k'
-        start -= 1 if start.positive?
-      when 'g'
-        start = 0 if wait_for_second_char(stdin, input) == 'gg'
-      when 'G'
-        start = [lines.size - screen_height, 0].max
-      when 'o'
-        `#{OS.linux? ? 'xdg-open' : 'open'} https://github.com/notifications`
-        exit 0
-      when 'q'
-        exit 0
-      else
-        api_url = urls[wait_for_second_char(stdin, input)]
-        open_url(api_url)
-      end
-    end
-  end
+  html_url = `gh api --cache #{CACHE} #{path} --jq .html_url`.chomp
+  next if html_url.empty?
+
+  system(OS.open_cmd, html_url)
 end
-
-def gh_notifications
-  primary_text = ENV['primaryText'].sub(/colour/, '')
-  secondary_text = ENV['secondaryText'].sub(/colour/, '')
-  accent_text = ENV['accentText'].sub(/colour/, '')
-
-  response = `gh api -i --cache #{CACHE_IN_SECONDS}s notifications`
-  exit 1 unless $CHILD_STATUS.success?
-  # rate_limit_remaining = response.lines.find { |line| line.start_with?('X-Ratelimit-Remaining:') }.split(':').last.strip.to_i
-  # pp rate_limit_remaining
-
-  # Export in some way to use that for the next run as cache_time
-  # poll_interval = response.lines.find { |line| line.start_with?('X-Poll-Interval:') }.split(':').last.strip.to_i
-  # pp poll_interval
-
-  json = response.split("\r\n").last
-  notifications = JSON.parse(json)
-
-  mentions = notifications.select { |item| item['reason'] == 'mention' }.length
-  prs = notifications.select { |item| item['subject']['type'] == 'PullRequest' }.length
-
-  if ARGV[0] == 'tile'
-    puts "#[fg=colour#{secondary_text}] #{prs.zero? ? '-' : prs}/#{mentions.zero? ? '-' : mentions}#[default]"
-    exit 0
-  end
-
-  grouped_by_repo = notifications.group_by { |item| item['repository']['full_name'] }
-
-  urls = {}
-  lines = []
-  item_number = 1
-  grouped_by_repo.sort.each do |repo, items|
-    lines << "\e[1;38;5;#{primary_text}m#{repo}\e[0m"
-    items.each do |item|
-      reason = item['reason'] == 'mention' ? "\e[38;5;#{accent_text}mmention\e[0m" : item['reason']
-      url = item['subject']['latest_comment_url'] || item['subject']['url']
-      urls[item_number.to_s] = url
-      lines << "  #{item_number}. [#{item['subject']['type']}, #{reason}] \e[38;5;#{secondary_text}m#{item['subject']['title']}\e[0m"
-      item_number += 1
-    end
-  end
-  [lines, urls]
-end
-
-print_and_read(*gh_notifications)
