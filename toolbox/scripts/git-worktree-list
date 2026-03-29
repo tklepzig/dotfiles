@@ -173,15 +173,33 @@ when 'rm'
   selected_paths = fzf_pick(build_rows, prompt: 'Remove worktree(s)> ', multi: true)
   exit 0 if selected_paths.empty?
 
-  puts "About to remove:\n#{selected_paths.map { |p| "  #{p}" }.join("\n")}"
+  puts "About to remove:\n#{selected_paths.map { |path| "  #{path}" }.join("\n")}"
   print 'Confirm? [y/N] '
   $stdout.flush
 
   if $stdin.gets&.chomp&.downcase == 'y'
-    selected_paths.each do |path|
-      system('git', 'worktree', 'remove', path)
-      puts "Removed: #{path}"
+    failed_paths = selected_paths.reject do |path|
+      if system('git', 'worktree', 'remove', path)
+        puts "Removed: #{path}"
+        true
+      else
+        warn "#{RED}Failed#{RESET}: #{path} (has modified or untracked files)"
+        false
+      end
     end
+
+    failed_paths.each do |path|
+      print "\nForce remove #{path}? [y/N] "
+      $stdout.flush
+      next unless $stdin.gets&.chomp&.downcase == 'y'
+
+      if system('git', 'worktree', 'remove', '--force', path)
+        puts "Removed: #{path}"
+      else
+        warn "#{RED}Failed#{RESET}: #{path}"
+      end
+    end
+
     system('git', 'worktree', 'prune', '-v')
   end
 
