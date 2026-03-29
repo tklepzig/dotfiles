@@ -207,4 +207,5 @@ return {
       })
     end,
   },
+  { dir = vim.fn.expand("$HOME/.dotfiles/vim/neovim/local-plugins/claude-code"), name = "claude-code" },
 }
