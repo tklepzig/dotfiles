@@ -167,10 +167,11 @@ def fzf_pick(rows)
   mark_read_cmd = "printf '%s\\n' {+1} | xargs -I{} gh api --method PATCH notifications/threads/{}"
   flags = ['fzf', '--ansi', '--multi',
            '--prompt=Unread> ',
-           '--header=ctrl-f: all  ctrl-u: unread only  ctrl-r: mark read',
+           '--header=ctrl-f: all  ctrl-u: unread only  ctrl-r: mark read  ctrl-o: open in browser',
            "--bind=ctrl-f:reload(#{script} --rows --all)+change-prompt(All> )",
            "--bind=ctrl-u:reload(#{script} --rows)+change-prompt(Unread> )",
            "--bind=ctrl-r:execute-silent(#{mark_read_cmd})+reload(#{script} --rows --no-cache)+change-prompt(Unread> )",
+           "--bind=ctrl-o:execute-silent(#{OS.open_cmd} https://github.com/notifications)",
            "--preview=#{PREVIEW_CMD}",
            '--preview-window=right:50%:wrap',
            '--with-nth=3..']
