@@ -1,0 +1,3 @@
+#!/bin/sh
+win=$(tmux list-windows -F '#{window_bell_flag}:#{window_index}' | grep '^1:' | head -n1 | cut -d: -f2)
+[ -n "$win" ] && tmux select-window -t "$win" || true
