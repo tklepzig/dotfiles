@@ -34,6 +34,8 @@ generate-password:
     - name: length
       optional: true
       default: 16
+git-branch-diff:
+  help: List branches and preview/view their diff against the default branch (main/master)
 git-checkout-fuzzy:
   help: Use git checkout with fzf's fuzzy search
 git-clone-cd:
