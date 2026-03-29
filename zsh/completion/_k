@@ -1,6 +1,6 @@
-#compdef +
+#compdef k
 
-_plus() {
+_k() {
   if (( CURRENT == 2 )); then
     local -a subcommands
     subcommands=( ${(f)"$($dotfilesDir/toolbox/scripts/_run.rb --completion git-worktree-list)"} )
@@ -12,4 +12,4 @@ _plus() {
   fi
 }
 
-_plus
+_k
