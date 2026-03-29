@@ -5,7 +5,7 @@ require 'English'
 require 'json'
 require 'open3'
 
-CACHE = '120s'
+CACHE = ARGV.delete('--no-cache') ? '' : '--cache 120s'
 
 RESET   = "\e[0m"
 DIM     = "\e[2m"
@@ -30,7 +30,7 @@ def fetch_notifications(all: false)
     results = []
     page = 1
     loop do
-      output = `gh api --cache #{CACHE} 'notifications?all=true&page=#{page}'`
+      output = `gh api #{CACHE} 'notifications?all=true&page=#{page}'`
       exit 1 unless $CHILD_STATUS.success?
       batch = JSON.parse(output)
       results.concat(batch)
@@ -41,7 +41,7 @@ def fetch_notifications(all: false)
   else
     # Unread only: paginate to ensure every unread notification is returned.
     # --jq '.[]' flattens each page's array so output is one JSON object per line.
-    output = `gh api --paginate --cache #{CACHE} --jq '.[]' 'notifications'`
+    output = `gh api --paginate #{CACHE} --jq '.[]' 'notifications'`
     exit 1 unless $CHILD_STATUS.success?
     output.lines.map { |line| JSON.parse(line) }
   end
@@ -85,6 +85,7 @@ MAX_TITLE = 55
 def build_rows(notifications)
   data = notifications.reject { |notification| notification['subject']['type'] == 'CheckSuite' }.map do |notification|
     {
+      id:     notification['id'],
       path:   api_path(notification['subject']['url']) || '_',
       repo:   truncate(notification['repository']['full_name'], MAX_REPO),
       type:   type_badge(notification['subject']['type']),
@@ -107,7 +108,7 @@ def build_rows(notifications)
       row[:title]
     ].join('  ')
 
-    { line: "#{row[:path]}  #{visible}", path: row[:path] }
+    { line: "#{row[:id]}  #{row[:path]}  #{visible}", path: row[:path] }
   end
 end
 
@@ -121,7 +122,7 @@ PREVIEW_CMD = <<~'SH'.chomp
   magenta=$(printf '\033[35m')
   cyan=$(printf '\033[36m')
   grey=$(printf '\033[90m')
-  gh api --cache 120s {1} 2>/dev/null | jq -r \
+  gh api --cache 120s {2} 2>/dev/null | jq -r \
     --arg reset "$reset" \
     --arg dim "$dim" \
     --arg bold "$bold" \
@@ -163,19 +164,21 @@ SH
 
 def fzf_pick(rows)
   script = File.expand_path(__FILE__)
+  mark_read_cmd = "printf '%s\\n' {+1} | xargs -I{} gh api --method PATCH notifications/threads/{}"
   flags = ['fzf', '--ansi', '--multi',
            '--prompt=Unread> ',
-           '--header=ctrl-r: all  ctrl-u: unread only',
-           "--bind=ctrl-r:reload(#{script} --rows --all)+change-prompt(All> )",
+           '--header=ctrl-f: all  ctrl-u: unread only  ctrl-r: mark read',
+           "--bind=ctrl-f:reload(#{script} --rows --all)+change-prompt(All> )",
            "--bind=ctrl-u:reload(#{script} --rows)+change-prompt(Unread> )",
+           "--bind=ctrl-r:execute-silent(#{mark_read_cmd})+reload(#{script} --rows --no-cache)+change-prompt(Unread> )",
            "--preview=#{PREVIEW_CMD}",
            '--preview-window=right:50%:wrap',
-           '--with-nth=2..']
+           '--with-nth=3..']
 
   (IO.popen(flags, 'r+') do |io|
     rows.each { |row| io.puts row[:line] }
     io.close_write
-    io.read.lines.map { |line| line.chomp.split('  ', 2).first }.compact
+    io.read.lines.map { |line| line.chomp.split('  ', 3)[1] }.compact
   end) || []
 rescue Errno::EPIPE
   []
@@ -200,7 +203,7 @@ selected = fzf_pick(rows)
 selected.each do |path|
   next if path == '_'
 
-  html_url = `gh api --cache #{CACHE} #{path} --jq .html_url`.chomp
+  html_url = `gh api #{CACHE} #{path} --jq .html_url`.chomp
   next if html_url.empty?
 
   system(OS.open_cmd, html_url)
