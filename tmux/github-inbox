@@ -21,14 +21,30 @@ module OS
 end
 
 def fetch_notifications(all: false)
-  # -i includes HTTP headers in the output; headers are stripped below.
-  # Useful for reading X-Poll-Interval / X-Ratelimit-Remaining if needed in future.
-  endpoint = all ? 'notifications?all=true' : 'notifications'
-  response = `gh api -i --cache #{CACHE} #{endpoint}`
-  exit 1 unless $CHILD_STATUS.success?
-
-  json = response.split("\r\n").last
-  JSON.parse(json)
+  # Note: -i (include HTTP headers) was removed to simplify parsing but could be re-added
+  # to read X-Poll-Interval / X-Ratelimit-Remaining if needed in future.
+  if all
+    # Cap at 200 for "all" (includes read). Fetch pages until we reach 200 or hit a partial
+    # page (signals last page), to avoid over-fetching. GitHub caps per_page at 50 for this
+    # endpoint regardless of what we request.
+    results = []
+    page = 1
+    loop do
+      output = `gh api --cache #{CACHE} 'notifications?all=true&page=#{page}'`
+      exit 1 unless $CHILD_STATUS.success?
+      batch = JSON.parse(output)
+      results.concat(batch)
+      break if results.size >= 200 || batch.size < 50
+      page += 1
+    end
+    results.first(200)
+  else
+    # Unread only: paginate to ensure every unread notification is returned.
+    # --jq '.[]' flattens each page's array so output is one JSON object per line.
+    output = `gh api --paginate --cache #{CACHE} --jq '.[]' 'notifications'`
+    exit 1 unless $CHILD_STATUS.success?
+    output.lines.map { |line| JSON.parse(line) }
+  end
 end
 
 def tile_output(notifications)
