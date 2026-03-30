@@ -32,6 +32,9 @@ load_override("$HOME/.dotfiles-local/lazy-plugins.lua")
 require("lazy").setup(plugins, {
   -- Colorscheme used by lazy.nvim's own UI during plugin installation only.
   install = { colorscheme = { "codedark" } },
+  rocks = {
+    enabled = false,
+  },
 })
 
 local theme = vim.env.DOTFILES_THEME or 'lcars'
