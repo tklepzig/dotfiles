@@ -122,6 +122,13 @@ PREVIEW_CMD = <<~'SH'.chomp
   magenta=$(printf '\033[35m')
   cyan=$(printf '\033[36m')
   grey=$(printf '\033[90m')
+  notifurl="{2}"
+  notifurl="${notifurl//\'/}"
+  reviews='[]'
+  case "$notifurl" in */pulls/*)
+    reviews=$(gh api --cache 120s "${notifurl}/reviews" 2>/dev/null)
+    [ -z "$reviews" ] && reviews='[]'
+  esac
   gh api --cache 120s {2} 2>/dev/null | jq -r \
     --arg reset "$reset" \
     --arg dim "$dim" \
@@ -132,6 +139,7 @@ PREVIEW_CMD = <<~'SH'.chomp
     --arg magenta "$magenta" \
     --arg cyan "$cyan" \
     --arg grey "$grey" \
+    --argjson reviews "$reviews" \
     'if .message then
       ($dim + "No details available (\(.message))" + $reset)
     else
@@ -140,6 +148,16 @@ PREVIEW_CMD = <<~'SH'.chomp
       elif .state == "open" then ($green + "OPEN" + $reset)
       elif .state == "closed" then ($red + "CLOSED" + $reset)
       else ($dim + "N/A" + $reset) end) as $state |
+      (($reviews | if type == "array" then . else [] end |
+        map(select(.state == "APPROVED" or .state == "CHANGES_REQUESTED")) |
+        group_by(.user.login) | map(sort_by(.submitted_at) | last)) as $latest_reviews |
+        ($latest_reviews | map(select(.state == "APPROVED") | .user.login)) as $approvers |
+        ($latest_reviews | map(select(.state == "CHANGES_REQUESTED") | .user.login)) as $requesters |
+        { state: (if ($latest_reviews | length) == 0 then null
+                  elif ($requesters | length) > 0 and ($approvers | length) == 0 then "changes_requested"
+                  elif ($requesters | length) == 0 then "approved"
+                  else "mixed" end),
+          approvers: $approvers, requesters: $requesters }) as $review |
       ($bold + (.title // .name // "(untitled)") + $reset),
       ($state + (if .number then "  #\(.number | tostring)" else "" end) + "  " + $cyan + "@" + (.user.login // .author.login // "unknown") + $reset),
       (if .updated_at then
@@ -154,7 +172,16 @@ PREVIEW_CMD = <<~'SH'.chomp
         ($dim + "Updated:" + $reset + "   " + $updated_str)
       else empty end),
       (if .changed_files then ($dim + "Files:" + $reset + "     \(.changed_files)  " + $green + "+\(.additions)" + $reset + "  " + $red + "-\(.deletions)" + $reset) else empty end),
-      (if .review_comments and .review_comments > 0 then ($dim + "Reviews:" + $reset + "   \(.review_comments) comment\(if .review_comments == 1 then "" else "s" end)") else empty end),
+      (if $review.state == "approved" then
+         ($dim + "Reviews:" + $reset + "   " + $green + "✓ " + ($review.approvers | join(", ")) + $reset)
+       elif $review.state == "changes_requested" then
+         ($dim + "Reviews:" + $reset + "   " + $red + "✗ " + ($review.requesters | join(", ")) + $reset +
+          (if ($review.approvers | length) > 0 then "  " + $green + "✓ " + ($review.approvers | join(", ")) + $reset else "" end))
+       elif $review.state == "mixed" then
+         ($dim + "Reviews:" + $reset + "   " + $green + "✓ " + ($review.approvers | join(", ")) + $reset +
+          "  " + $red + "✗ " + ($review.requesters | join(", ")) + $reset)
+       elif (.review_comments // 0) > 0 then ($dim + "Reviews:" + $reset + "   \(.review_comments) comment\(if .review_comments == 1 then "" else "s" end)")
+       else empty end),
       (if ((.labels // []) | length) > 0 then ($dim + "Labels:" + $reset + "    \(.labels | map(.name) | join(", "))") else empty end),
       (if ((.assignees // []) | length) > 0 then ($dim + "Assignees:" + $reset + " \(.assignees | map(.login) | join(", "))") else empty end),
       "",
