@@ -6,11 +6,16 @@ vim.api.nvim_create_user_command("Claude", function(opts)
   local filetype   = vim.bo.filetype
   local message    = opts.args
 
-  local raw = vim.fn.system("tmux list-panes -F '#{pane_id} #{pane_current_command}'")
+  local raw = vim.fn.system("tmux list-panes -F '#{pane_id} #{pane_pid}'")
   local claude_panes = {}
-  for pane_id, command in raw:gmatch("(%%%d+) (%S+)") do
-    if command == "claude" then
-      table.insert(claude_panes, pane_id)
+  for pane_id, shell_pid in raw:gmatch("(%%%d+) (%d+)") do
+    local child_pids = vim.fn.system("pgrep -P " .. shell_pid)
+    for child_pid in child_pids:gmatch("%d+") do
+      local args = vim.fn.system("ps -p " .. child_pid .. " -o args= 2>/dev/null")
+      if args:match("claude") then
+        table.insert(claude_panes, pane_id)
+        break
+      end
     end
   end
 
