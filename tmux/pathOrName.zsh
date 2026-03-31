@@ -2,12 +2,20 @@
 
 pwd="$1"
 name="$2"
+mode="$3"
 pwd=${pwd/#$HOME/\~};
 
 if [[ -n $name ]]
 then
-    echo "$name"
+    label="$name"
 else
-    echo "$(basename "$pwd")"
+    label="$(basename "$pwd")"
+fi
+
+if [[ "$mode" == "short" && ${#label} -gt 3 ]]
+then
+    echo "${label:0:3}…"
+else
+    echo "$label"
 fi
 
