@@ -1,0 +1,12 @@
+#!/bin/sh
+input="$1"
+[ -z "$input" ] && exit 0
+matches=$(tmux ls -F "#{session_created}:#{session_name}" | sort -n | grep ":$input" | cut -d: -f2)
+count=$(printf '%s\n' "$matches" | grep -c .)
+if [ "$count" -eq 0 ]; then
+    tmux display-message "No session: $input"
+elif [ "$count" -gt 1 ]; then
+    tmux display-message "Ambiguous: $(printf '%s' "$matches" | tr '\n' ' ')"
+else
+    tmux switch-client -t "$matches"
+fi
