@@ -1,0 +1,14 @@
+#!/usr/bin/env zsh
+# Usage: textconv <gpg-key-id> <file>
+# Configure in gitconfig as: textconv = /path/to/textconv YOUR_KEY_ID
+
+key_id="$1"
+file="$2"
+
+content=$(cat "$file")
+if [[ $(echo $content | sed -n '/BEGIN PGP MESSAGE/p;q') ]]
+then
+  echo $content | gpg --decrypt -q -r "$key_id" 2>/dev/null
+else
+  echo $content
+fi
