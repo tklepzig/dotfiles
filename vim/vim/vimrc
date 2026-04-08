@@ -189,6 +189,19 @@ endfunction
 
 command! -nargs=? -bang Wrap :call <SID>Wrap(<bang>0)
 
+let g:fullscreen = 0
+function! ToggleFullscreen()
+  if g:fullscreen
+    let g:fullscreen = 0
+    set laststatus=2 showtabline=2 cmdheight=1 number relativenumber signcolumn=yes
+  else
+    let g:fullscreen = 1
+    set laststatus=0 showtabline=0 cmdheight=0 nonumber norelativenumber signcolumn=no
+  endif
+endfunction
+command! Fullscreen call ToggleFullscreen()
+
+
 function! ExcludeSynGroupAbbr(abbr, text, synGroups)
   " The abbreviation is removed during the expansion, therefore
   " remove the length of the abbreviation from col to correctly
