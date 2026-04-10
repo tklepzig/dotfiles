@@ -13,7 +13,8 @@ if [ "$currentBranch" != "$baseBranch" ]; then
 
     if [ -n "$baseBranchWorktree" ]; then
         # Try to fast-forward the base branch in its worktree, if it fails (e.g. due to local changes), just skip it
-        if ! git -C "$baseBranchWorktree" merge --ff-only origin/$baseBranch 2>&1; then
+        # GIT_DIR is set by git's ! alias execution, must unset it so -C discovers the correct .git in the target worktree
+        if ! GIT_DIR= git -C "$baseBranchWorktree" merge --ff-only origin/$baseBranch 2>&1; then
             echo "Warning: Could not fast-forward $baseBranch in $baseBranchWorktree, skipping update"
         fi
     else
