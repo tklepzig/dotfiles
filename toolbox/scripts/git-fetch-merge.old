@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-defaultBranch=$([ -f "$(git rev-parse --show-toplevel)/.git/refs/heads/master" ] && echo master || echo main)
+defaultBranch=$(git rev-parse --verify --quiet refs/heads/master > /dev/null && echo master || echo main)
 currentBranch=$(git symbolic-ref HEAD)
 baseBranch=${1:-$defaultBranch}
 

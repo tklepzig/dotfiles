@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-default_branch=$([ -f "$(git rev-parse --show-toplevel)/.git/refs/heads/master" ] && echo master || echo main)
+default_branch=$(git rev-parse --verify --quiet refs/heads/master > /dev/null && echo master || echo main)
 export GIT_BRANCH_DIFF_BASE="$default_branch"
 
 selected_branch=$(
