@@ -88,14 +88,16 @@ git-worktree-list:
             symlinks top-level git-ignored files (not directories)
             runs pnpm/npm install if a lock file is detected
             --cd: cd into the new worktree after creation
-    rm:     fzf multi-picker to remove one or more worktrees (with confirmation, auto-prunes after)
-    tmux:   open all worktrees in a tmux session (named after the repo, one window per worktree)
+    rm:      fzf multi-picker to remove one or more worktrees (with confirmation, auto-prunes after)
+    rm-self: remove the current worktree directly (no fzf, with confirmation, auto-prunes after)
+    tmux:    open all worktrees in a tmux session (named after the repo, one window per worktree)
   args:
     - name: subcommand
       optional: true
   completion:
     - add
     - rm
+    - rm-self
     - tmux
 gpg-add-subkey:
   help: Add a new subkey to an existing GPG key

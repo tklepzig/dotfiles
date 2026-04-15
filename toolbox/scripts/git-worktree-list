@@ -204,6 +204,37 @@ when 'rm'
     system('git', '-C', worktrees.first[:path], 'worktree', 'prune', '-v')
   end
 
+when 'rm-self'
+  main_wt = worktrees.first
+  current_wt = worktrees.find { |wt| git_root == wt[:path] }
+  abort 'Not inside a worktree' unless current_wt
+  abort 'Cannot remove the main worktree' if current_wt[:path] == main_wt[:path]
+
+  path = current_wt[:path]
+  puts "About to remove:\n  #{path}"
+  print 'Confirm? [y/N] '
+  $stdout.flush
+
+  if $stdin.gets&.chomp&.downcase == 'y'
+    if system('git', 'worktree', 'remove', path)
+      puts "Removed: #{path}"
+    else
+      warn "#{RED}Failed#{RESET}: #{path} (has modified or untracked files)"
+      print "\nForce remove #{path}? [y/N] "
+      $stdout.flush
+      if $stdin.gets&.chomp&.downcase == 'y'
+        if system('git', 'worktree', 'remove', '--force', path)
+          puts "Removed: #{path}"
+        else
+          warn "#{RED}Failed#{RESET}: #{path}"
+        end
+      end
+    end
+
+    # Run from main worktree — cwd no longer exists since we just removed it
+    system('git', '-C', main_wt[:path], 'worktree', 'prune', '-v')
+  end
+
 when 'tmux'
   first, = worktrees
   session = File.basename(first[:path])

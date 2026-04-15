@@ -54,7 +54,7 @@ gcln() { source $HOME/.dotfiles/toolbox/scripts/git-clone-cd $1 }
 # The zsh function only exists to handle `cd` (scripts can't change the parent shell's cwd).
 k() {
   case "${1:-}" in
-    rm)
+    rm|rm-self)
       local main_wt_path
       main_wt_path=$(git worktree list --porcelain | head -1 | sed 's/^worktree //')
       $dotfilesDir/toolbox/scripts/git-worktree-list "$@"
