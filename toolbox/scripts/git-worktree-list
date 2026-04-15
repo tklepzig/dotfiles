@@ -200,7 +200,8 @@ when 'rm'
       end
     end
 
-    system('git', 'worktree', 'prune', '-v')
+    # Run from main worktree — cwd may no longer exist if we removed the worktree we were in
+    system('git', '-C', worktrees.first[:path], 'worktree', 'prune', '-v')
   end
 
 when 'tmux'
