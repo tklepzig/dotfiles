@@ -5,7 +5,7 @@ require 'English'
 require 'json'
 require 'open3'
 
-CACHE = ARGV.delete('--no-cache') ? '' : '--cache 120s'
+CACHE = ARGV.delete('--no-cache') ? '--cache 1s' : '--cache 120s'
 
 RESET   = "\e[0m"
 DIM     = "\e[2m"
@@ -81,6 +81,22 @@ end
 
 MAX_REPO  = 35
 MAX_TITLE = 55
+
+def rate_limit_line
+  output = `gh api rate_limit --jq '.rate | "\\(.remaining) \\(.limit)"' 2>/dev/null`
+  unless $CHILD_STATUS.success?
+    return "_  _  #{DIM}API: ?#{RESET}"
+  end
+
+  remaining, limit = output.chomp.split.map(&:to_i)
+  if limit.zero?
+    return "_  _  #{DIM}API: ?#{RESET}"
+  end
+
+  used = limit - remaining
+  percentage = (used * 100.0 / limit).round
+  "_  _  #{DIM}API: #{used}/#{limit} (#{percentage}%)#{RESET}"
+end
 
 def build_rows(notifications)
   data = notifications.reject { |notification| notification['subject']['type'] == 'CheckSuite' }.map do |notification|
@@ -193,6 +209,7 @@ def fzf_pick(rows)
   script = File.expand_path(__FILE__)
   mark_read_cmd = "printf '%s\\n' {+1} | xargs -I{} gh api --method PATCH notifications/threads/{}"
   flags = ['fzf', '--ansi', '--multi',
+           '--header-lines=1',
            '--prompt=Unread> ',
            '--header=ctrl-f: all  ctrl-u: unread only  ctrl-r: mark read  ctrl-o: open in browser',
            "--bind=ctrl-f:reload(#{script} --rows --all)+change-prompt(All> )",
@@ -204,6 +221,7 @@ def fzf_pick(rows)
            '--with-nth=3..']
 
   (IO.popen(flags, 'r+') do |io|
+    io.puts rate_limit_line
     rows.each { |row| io.puts row[:line] }
     io.close_write
     io.read.lines.map { |line| line.chomp.split('  ', 3)[1] }.compact
@@ -221,6 +239,7 @@ if ARGV[0] == 'tile'
 end
 
 if ARGV.include?('--rows')
+  puts rate_limit_line
   build_rows(notifications).each { |row| puts row[:line] }
   exit 0
 end
