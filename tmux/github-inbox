@@ -6,6 +6,8 @@ require 'json'
 require 'open3'
 
 CACHE = ARGV.delete('--no-cache') ? '--cache 1s' : '--cache 120s'
+SHOW_DRAFTS = !ARGV.delete('--show-drafts').nil?
+SHOW_CLOSED = !ARGV.delete('--show-closed').nil?
 
 RESET   = "\e[0m"
 DIM     = "\e[2m"
@@ -48,14 +50,109 @@ def fetch_notifications(all: false)
 end
 
 def tile_output(notifications)
-  secondary = ENV['secondaryText']&.sub(/colour/, '')
-  mentions  = notifications.count { |notif| notif['reason'] == 'mention' }
-  prs       = notifications.count { |notif| notif['subject']['type'] == 'PullRequest' }
-  puts "#[fg=colour#{secondary}] #{prs.zero? ? '-' : prs}/#{mentions.zero? ? '-' : mentions}#[default]"
+  mentions = notifications.count { |notif| notif['reason'] == 'mention' }
+  return if mentions.zero?
+
+  puts "#[fg=#{ENV['secondaryText']}] #{mentions}#[fg=#{ENV['statusSeparatorFg']}] │#[default]"
 end
 
 def api_path(url)
   url&.sub('https://api.github.com/', '')
+end
+
+def state_file_path = ENV['INBOX_STATE_FILE']
+
+def read_state
+  path = state_file_path
+  return {} unless path && File.exist?(path)
+
+  JSON.parse(File.read(path))
+rescue JSON::ParserError
+  {}
+end
+
+def write_state(state)
+  path = state_file_path
+  return unless path
+
+  File.write(path, JSON.generate(state))
+end
+
+def mutate_state
+  state = read_state
+  yield state
+  write_state(state)
+end
+
+def current_prompt
+  state = read_state
+  parts = [state['all'] ? 'All' : 'Unread']
+  parts << '+drafts' if state['show_drafts']
+  parts << '+closed' if state['show_closed']
+  "#{parts.join(' ')}> "
+end
+
+def fetch_pull_request_statuses(pr_notifications)
+  return {} if pr_notifications.empty?
+
+  query_parts = []
+  id_by_alias = {}
+  pr_notifications.each_with_index do |notification, index|
+    path = api_path(notification['subject']['url'])
+    match = path&.match(%r{^repos/([^/]+)/([^/]+)/pulls/(\d+)$})
+    next unless match
+
+    owner, repository_name, number = match.captures
+    alias_key = "pr#{index}"
+    id_by_alias[alias_key] = notification['id']
+    query_parts << "#{alias_key}: repository(owner: #{JSON.generate(owner)}, " \
+                   "name: #{JSON.generate(repository_name)}) " \
+                   "{ pullRequest(number: #{number}) { isDraft state } }"
+  end
+
+  return {} if query_parts.empty?
+
+  query = "query { #{query_parts.join(' ')} }"
+  command = ['gh', 'api', 'graphql'] + CACHE.split + ['-f', "query=#{query}"]
+  output, status = Open3.capture2(*command)
+  return {} unless status.success?
+
+  parsed = begin
+    JSON.parse(output)
+  rescue JSON::ParserError
+    nil
+  end
+  return {} unless parsed.is_a?(Hash)
+
+  data = parsed['data'] || {}
+  statuses = {}
+  id_by_alias.each do |alias_key, notification_id|
+    pull_request = data.dig(alias_key, 'pullRequest')
+    next unless pull_request
+
+    statuses[notification_id] = {
+      is_draft: pull_request['isDraft'] == true,
+      state: pull_request['state']
+    }
+  end
+  statuses
+end
+
+def filter_pull_requests(notifications, show_drafts:, show_closed:)
+  return notifications if show_drafts && show_closed
+
+  pr_notifications = notifications.select { |notification| notification['subject']['type'] == 'PullRequest' }
+  return notifications if pr_notifications.empty?
+
+  statuses = fetch_pull_request_statuses(pr_notifications)
+  notifications.reject do |notification|
+    status = statuses[notification['id']]
+    next false unless status
+
+    hide_for_draft  = !show_drafts && status[:is_draft]
+    hide_for_closed = !show_closed && status[:state] && status[:state] != 'OPEN'
+    hide_for_draft || hide_for_closed
+  end
 end
 
 TYPE_BADGES = {
@@ -208,14 +305,20 @@ SH
 def fzf_pick(rows)
   script = File.expand_path(__FILE__)
   mark_read_cmd = "printf '%s\\n' {+1} | xargs -I{} gh api --method PATCH notifications/threads/{}"
+  refresh_prompt = "transform-prompt(#{script} --prompt)"
+  header_lines = [
+    'u: all/unread  d: drafts  p: closed/merged',
+    'r: mark read  o: open in browser'
+  ].join("\n")
   flags = ['fzf', '--ansi', '--multi',
            '--header-lines=1',
-           '--prompt=Unread> ',
-           '--header=ctrl-f: all  ctrl-u: unread only  ctrl-r: mark read  ctrl-o: open in browser',
-           "--bind=ctrl-f:reload(#{script} --rows --all)+change-prompt(All> )",
-           "--bind=ctrl-u:reload(#{script} --rows)+change-prompt(Unread> )",
-           "--bind=ctrl-r:execute-silent(#{mark_read_cmd})+reload(#{script} --rows --no-cache)+change-prompt(Unread> )",
-           "--bind=ctrl-o:execute-silent(#{OS.open_cmd} https://github.com/notifications)",
+           "--prompt=#{current_prompt}",
+           "--header=#{header_lines}",
+           "--bind=ctrl-u:execute-silent(#{script} --toggle all)+#{refresh_prompt}+reload(#{script} --rows)",
+           "--bind=ctrl-d:execute-silent(#{script} --toggle show_drafts)+#{refresh_prompt}+reload(#{script} --rows)",
+           "--bind=ctrl-p:execute-silent(#{script} --toggle show_closed)+#{refresh_prompt}+reload(#{script} --rows)",
+           "--bind=ctrl-r:execute-silent(#{mark_read_cmd})+reload(#{script} --rows --no-cache)",
+           "--bind=ctrl-o:execute-silent(#{OS.open_cmd} https://github.com/notifications)+abort",
            "--preview=#{PREVIEW_CMD}",
            '--preview-window=right:50%:wrap',
            '--with-nth=3..']
@@ -230,13 +333,62 @@ rescue Errno::EPIPE
   []
 end
 
-all           = ARGV.include?('--all')
+has_toggle         = ARGV.include?('--toggle')
+has_rows           = ARGV.include?('--rows')
+has_prompt         = ARGV.include?('--prompt')
+has_tile           = ARGV[0] == 'tile'
+is_state_mutation  = has_toggle
+is_subcommand_invocation = has_rows || has_prompt || has_tile || is_state_mutation
+
+unless is_subcommand_invocation
+  ENV['INBOX_STATE_FILE'] = "/tmp/github-inbox-#{Process.pid}.state"
+  initial_state = {
+    'all'         => ARGV.include?('--all'),
+    'show_drafts' => SHOW_DRAFTS,
+    'show_closed' => SHOW_CLOSED
+  }
+  File.write(ENV['INBOX_STATE_FILE'], JSON.generate(initial_state))
+  at_exit do
+    File.delete(ENV['INBOX_STATE_FILE'])
+  rescue Errno::ENOENT
+    nil
+  end
+end
+
+if (toggle_index = ARGV.index('--toggle'))
+  ARGV.delete_at(toggle_index)
+  toggle_key = ARGV.delete_at(toggle_index)
+  mutate_state { |state| state[toggle_key] = !state[toggle_key] } if %w[all show_drafts show_closed].include?(toggle_key)
+end
+
+if has_prompt
+  puts current_prompt
+  exit 0
+end
+
+if is_state_mutation && !has_rows && !has_tile
+  exit 0
+end
+
+if state_file_path && File.exist?(state_file_path)
+  state = read_state
+  all          = state['all'] == true
+  show_drafts  = state['show_drafts'] == true
+  show_closed  = state['show_closed'] == true
+else
+  all          = ARGV.include?('--all')
+  show_drafts  = SHOW_DRAFTS
+  show_closed  = SHOW_CLOSED
+end
+
 notifications = fetch_notifications(all:)
 
 if ARGV[0] == 'tile'
   tile_output(notifications)
   exit 0
 end
+
+notifications = filter_pull_requests(notifications, show_drafts:, show_closed:)
 
 if ARGV.include?('--rows')
   puts rate_limit_line
