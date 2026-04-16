@@ -142,8 +142,9 @@ when 'add'
   cd_after = ARGV.include?('--cd')
   branch   = args[0] or abort 'Usage: k add <branch> [<path>] [--cd]'
 
-  repo_name = File.basename(git_root)
-  new_path  = args[1] || File.join(File.dirname(git_root), "#{repo_name}-worktrees", branch.gsub('/', '-'))
+  main_worktree = worktrees.first[:path]
+  repo_name     = File.basename(main_worktree)
+  new_path      = args[1] || File.join(File.dirname(main_worktree), "#{repo_name}-worktrees", branch.gsub('/', '-'))
 
   local_exists  = system('git', 'show-ref', '--verify', '--quiet', "refs/heads/#{branch}",          out: '/dev/null', err: '/dev/null')
   remote_exists = system('git', 'show-ref', '--verify', '--quiet', "refs/remotes/origin/#{branch}", out: '/dev/null', err: '/dev/null')
@@ -158,7 +159,7 @@ when 'add'
   system(*worktree_cmd, out: :err)
 
   warn 'Linking ignored files...'
-  symlink_ignored_files(git_root, new_path)
+  symlink_ignored_files(main_worktree, new_path)
 
   [['pnpm-lock.yaml', 'pnpm'], ['package-lock.json', 'npm']]
     .find { |lockfile, _| File.exist?(File.join(new_path, lockfile)) }
