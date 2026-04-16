@@ -87,7 +87,7 @@ git-worktree-list:
             tracks remote branch if it exists on origin
             symlinks top-level git-ignored files (not directories)
             runs pnpm/npm install if a lock file is detected
-            --cd: cd into the new worktree after creation
+            --no-cd: skip cd into the new worktree after creation (default: cd)
     rm:      fzf multi-picker to remove one or more worktrees (with confirmation, auto-prunes after)
     rm-self: remove the current worktree directly (no fzf, with confirmation, auto-prunes after)
     tmux:    open all worktrees in a tmux session (named after the repo, one window per worktree)

@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 # git-worktree-list - git worktree helper
-# Usage: k [add <branch> [path] [--cd] | rm | tmux]
+# Usage: k [add <branch> [path] [--no-cd] | rm | tmux]
 # No args: fzf picker to switch (cd) into a worktree
 #
 # When switching, the selected path is printed to stdout so the calling
@@ -138,9 +138,9 @@ abort_if_no_repo
 case ARGV[0]
 
 when 'add'
-  args     = ARGV[1..].reject { |arg| arg == '--cd' }
-  cd_after = ARGV.include?('--cd')
-  branch   = args[0] or abort 'Usage: k add <branch> [<path>] [--cd]'
+  args     = ARGV[1..].reject { |arg| arg == '--no-cd' }
+  cd_after = !ARGV.include?('--no-cd')
+  branch   = args[0] or abort 'Usage: k add <branch> [<path>] [--no-cd]'
 
   main_worktree = worktrees.first[:path]
   repo_name     = File.basename(main_worktree)

@@ -5,10 +5,16 @@ _k() {
     local -a subcommands
     subcommands=( ${(f)"$($dotfilesDir/toolbox/scripts/_run.rb --completion git-worktree-list)"} )
     _describe -t subcommands 'subcommands' subcommands
-  elif (( CURRENT == 3 )) && [[ $words[2] == 'add' ]]; then
-    local -a branches
-    branches=( ${(f)"$(git branch --list --format='%(refname:short)' 2>/dev/null)"} )
-    _describe -t branches 'branches' branches
+  elif [[ $words[2] == 'add' ]]; then
+    if (( CURRENT == 3 )); then
+      local -a branches
+      branches=( ${(f)"$(git branch --list --format='%(refname:short)' 2>/dev/null)"} )
+      _describe -t branches 'branches' branches
+    elif (( CURRENT >= 4 )); then
+      local -a options
+      options=('--no-cd:skip cd into new worktree')
+      _describe -t options 'options' options
+    fi
   fi
 }
 
