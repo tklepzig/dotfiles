@@ -8,7 +8,13 @@ _k() {
   elif [[ $words[2] == 'add' ]]; then
     if (( CURRENT == 3 )); then
       local -a branches
-      branches=( ${(f)"$(git branch --list --format='%(refname:short)' 2>/dev/null)"} )
+      # (f) splits output on newlines into array elements
+      local -a local_branches remote_branches
+      local_branches=( ${(f)"$(git for-each-ref --format='%(refname:strip=2)' refs/heads/ 2>/dev/null)"} )
+      remote_branches=( ${(f)"$(git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin/ 2>/dev/null)"} )
+      branches=( $local_branches[@] $remote_branches[@] )
+      # (u) deduplicates; ${...:#HEAD} removes the remote HEAD entry
+      branches=( ${(u)branches[@]:#HEAD} )
       _describe -t branches 'branches' branches
     elif (( CURRENT >= 4 )); then
       local -a options
