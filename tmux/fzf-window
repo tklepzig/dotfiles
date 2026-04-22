@@ -1,0 +1,13 @@
+#!/bin/sh
+# Fuzzy-pick a window in the current session via fzf and switch to it.
+# Intended to be run inside a tmux popup (display-popup -E).
+
+current_window=$(tmux display-message -p '#I')
+
+selected=$(
+    tmux list-windows -F '#{window_index}: #{?#{window_name},#{window_name},#{b:pane_current_path}}' \
+        | grep -v "^${current_window}:" \
+        | fzf --prompt='Window> ' --reverse --no-info --no-mouse
+)
+
+[ -n "$selected" ] && tmux select-window -t "${selected%%:*}"
