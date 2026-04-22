@@ -336,8 +336,9 @@ def fzf_pick(rows)
   refresh_prompt = "transform-prompt(#{script} --prompt)"
   header_lines = [
     'u: all/unread  d: drafts  p: closed/merged',
-    'r: mark read  o: open in browser'
+    'r: mark read  o: open in browser  f: zoom'
   ].join("\n")
+  zoom_layouts = 'hidden|right:40%:wrap'
   flags = ['fzf', '--ansi', '--multi',
            '--header-lines=1',
            "--prompt=#{current_prompt}",
@@ -347,6 +348,7 @@ def fzf_pick(rows)
            "--bind=ctrl-p:execute-silent(#{script} --toggle show_closed)+#{refresh_prompt}+reload(#{script} --rows)",
            "--bind=ctrl-r:execute-silent(#{mark_read_cmd})+reload(#{script} --rows --no-cache)",
            "--bind=ctrl-o:execute-silent(#{OS.open_cmd} https://github.com/notifications)+abort",
+           "--bind=ctrl-f:change-preview-window(#{zoom_layouts})",
            "--preview=#{PREVIEW_CMD}",
            '--preview-window=right:40%:wrap',
            '--with-nth=3..']
