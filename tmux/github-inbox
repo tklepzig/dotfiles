@@ -23,7 +23,7 @@ module OS
 end
 
 def fetch_notifications(all: false)
-  # Note: -i (include HTTP headers) was removed to simplify parsing but could be re-added
+  # NOTE: -i (include HTTP headers) was removed to simplify parsing but could be re-added
   # to read X-Poll-Interval / X-Ratelimit-Remaining if needed in future.
   if all
     # Cap at 200 for "all" (includes read). Fetch pages until we reach 200 or hit a partial
@@ -37,6 +37,7 @@ def fetch_notifications(all: false)
       batch = JSON.parse(output)
       results.concat(batch)
       break if results.size >= 200 || batch.size < 50
+
       page += 1
     end
     results.first(200)
@@ -92,9 +93,7 @@ def current_prompt
   "#{parts.join(' ')}> "
 end
 
-def fetch_pull_request_statuses(pr_notifications)
-  return {} if pr_notifications.empty?
-
+def build_pr_graphql_query(pr_notifications)
   query_parts = []
   id_by_alias = {}
   pr_notifications.each_with_index do |notification, index|
@@ -109,24 +108,30 @@ def fetch_pull_request_statuses(pr_notifications)
                    "name: #{JSON.generate(repository_name)}) " \
                    "{ pullRequest(number: #{number}) { isDraft state author { login } } }"
   end
+  [query_parts, id_by_alias]
+end
 
+def execute_graphql_query(query)
+  command = %w[gh api graphql] + CACHE.split + ['-f', "query=#{query}"]
+  output, status = Open3.capture2(*command)
+  return nil unless status.success?
+
+  JSON.parse(output)
+rescue JSON::ParserError
+  nil
+end
+
+def fetch_pull_request_statuses(pr_notifications)
+  return {} if pr_notifications.empty?
+
+  query_parts, id_by_alias = build_pr_graphql_query(pr_notifications)
   return {} if query_parts.empty?
 
-  query = "query { #{query_parts.join(' ')} }"
-  command = ['gh', 'api', 'graphql'] + CACHE.split + ['-f', "query=#{query}"]
-  output, status = Open3.capture2(*command)
-  return {} unless status.success?
-
-  parsed = begin
-    JSON.parse(output)
-  rescue JSON::ParserError
-    nil
-  end
+  parsed = execute_graphql_query("query { #{query_parts.join(' ')} }")
   return {} unless parsed.is_a?(Hash)
 
   data = parsed['data'] || {}
-  statuses = {}
-  id_by_alias.each do |alias_key, notification_id|
+  id_by_alias.each_with_object({}) do |(alias_key, notification_id), statuses|
     pull_request = data.dig(alias_key, 'pullRequest')
     next unless pull_request
 
@@ -136,7 +141,12 @@ def fetch_pull_request_statuses(pr_notifications)
       author: pull_request.dig('author', 'login')
     }
   end
-  statuses
+end
+
+def hide_pr?(status, show_drafts:, show_closed:)
+  hide_for_draft  = !show_drafts && status[:is_draft]
+  hide_for_closed = !show_closed && status[:state] && status[:state] != 'OPEN'
+  hide_for_draft || hide_for_closed
 end
 
 def filter_pull_requests(notifications, statuses, show_drafts:, show_closed:)
@@ -145,11 +155,7 @@ def filter_pull_requests(notifications, statuses, show_drafts:, show_closed:)
 
   notifications.reject do |notification|
     status = statuses[notification['id']]
-    next false unless status
-
-    hide_for_draft  = !show_drafts && status[:is_draft]
-    hide_for_closed = !show_closed && status[:state] && status[:state] != 'OPEN'
-    hide_for_draft || hide_for_closed
+    status && hide_pr?(status, show_drafts:, show_closed:)
   end
 end
 
@@ -184,56 +190,67 @@ MAX_TITLE = 55
 
 def rate_limit_line
   output = `gh api rate_limit --jq '.rate | "\\(.remaining) \\(.limit)"' 2>/dev/null`
-  unless $CHILD_STATUS.success?
-    return "_  _  #{DIM}API: ?#{RESET}"
-  end
+  return "_  _  #{DIM}API: ?#{RESET}" unless $CHILD_STATUS.success?
 
   remaining, limit = output.chomp.split.map(&:to_i)
-  if limit.zero?
-    return "_  _  #{DIM}API: ?#{RESET}"
-  end
+  return "_  _  #{DIM}API: ?#{RESET}" if limit.zero?
 
   used = limit - remaining
   percentage = (used * 100.0 / limit).round
   "_  _  #{DIM}API: #{used}/#{limit} (#{percentage}%)#{RESET}"
 end
 
+def row_for(notification, pr_statuses)
+  author_login = pr_statuses.dig(notification['id'], :author)
+  {
+    id: notification['id'],
+    path: api_path(notification['subject']['url']) || '_',
+    repo: truncate(notification['repository']['full_name'], MAX_REPO),
+    type: type_badge(notification['subject']['type']),
+    reason: reason_badge(notification['reason']),
+    author: author_login ? "@#{author_login}" : '',
+    title: truncate(notification['subject']['title'], MAX_TITLE)
+  }
+end
+
+def format_row(row, widths)
+  repo_pad   = row[:repo].ljust(widths[:repo])
+  reason_pad = row[:reason][1] + ' ' * (widths[:reason] - row[:reason][0].length)
+  author_colored = row[:author].empty? ? '' : "#{DIM}#{row[:author]}#{RESET}"
+  author_pad = author_colored + ' ' * (widths[:author] - row[:author].length)
+  title_pad  = row[:title].ljust(widths[:title])
+
+  visible = [
+    "#{BOLD}#{repo_pad}#{RESET}",
+    row[:type][1],
+    reason_pad,
+    title_pad,
+    author_pad
+  ].join('  ')
+
+  { line: "#{row[:id]}  #{row[:path]}  #{visible}", path: row[:path] }
+end
+
+def max_width(data, &)
+  data.map(&).max || 0
+end
+
+def column_widths(data)
+  {
+    repo: max_width(data) { |row| row[:repo].length },
+    reason: max_width(data) { |row| row[:reason][0].length },
+    author: max_width(data) { |row| row[:author].length },
+    title: max_width(data) { |row| row[:title].length }
+  }
+end
+
 def build_rows(notifications, pr_statuses = {})
-  data = notifications.reject { |notification| notification['subject']['type'] == 'CheckSuite' }.map do |notification|
-    author_login = pr_statuses.dig(notification['id'], :author)
-    {
-      id:     notification['id'],
-      path:   api_path(notification['subject']['url']) || '_',
-      repo:   truncate(notification['repository']['full_name'], MAX_REPO),
-      type:   type_badge(notification['subject']['type']),
-      reason: reason_badge(notification['reason']),
-      author: author_login ? "@#{author_login}" : '',
-      title:  truncate(notification['subject']['title'], MAX_TITLE)
-    }
-  end
+  data = notifications
+         .reject { |notification| notification['subject']['type'] == 'CheckSuite' }
+         .map { |notification| row_for(notification, pr_statuses) }
 
-  repo_w   = data.map { |row| row[:repo].length }.max.to_i
-  reason_w = data.map { |row| row[:reason][0].length }.max.to_i
-  author_w = data.map { |row| row[:author].length }.max.to_i
-  title_w  = data.map { |row| row[:title].length }.max.to_i
-
-  data.map do |row|
-    repo_pad   = row[:repo].ljust(repo_w)
-    reason_pad = row[:reason][1] + ' ' * (reason_w - row[:reason][0].length)
-    author_colored = row[:author].empty? ? '' : "#{DIM}#{row[:author]}#{RESET}"
-    author_pad = author_colored + ' ' * (author_w - row[:author].length)
-    title_pad  = row[:title].ljust(title_w)
-
-    visible = [
-      "#{BOLD}#{repo_pad}#{RESET}",
-      row[:type][1],
-      reason_pad,
-      title_pad,
-      author_pad
-    ].join('  ')
-
-    { line: "#{row[:id]}  #{row[:path]}  #{visible}", path: row[:path] }
-  end
+  widths = column_widths(data)
+  data.map { |row| format_row(row, widths) }
 end
 
 PREVIEW_CMD = <<~'SH'.chomp
@@ -354,7 +371,7 @@ is_subcommand_invocation = has_rows || has_prompt || has_tile || is_state_mutati
 unless is_subcommand_invocation
   ENV['INBOX_STATE_FILE'] = "/tmp/github-inbox-#{Process.pid}.state"
   initial_state = {
-    'all'         => ARGV.include?('--all'),
+    'all' => ARGV.include?('--all'),
     'show_drafts' => SHOW_DRAFTS,
     'show_closed' => SHOW_CLOSED
   }
@@ -377,9 +394,7 @@ if has_prompt
   exit 0
 end
 
-if is_state_mutation && !has_rows && !has_tile
-  exit 0
-end
+exit 0 if is_state_mutation && !has_rows && !has_tile
 
 if state_file_path && File.exist?(state_file_path)
   state = read_state
