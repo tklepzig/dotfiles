@@ -107,7 +107,7 @@ def fetch_pull_request_statuses(pr_notifications)
     id_by_alias[alias_key] = notification['id']
     query_parts << "#{alias_key}: repository(owner: #{JSON.generate(owner)}, " \
                    "name: #{JSON.generate(repository_name)}) " \
-                   "{ pullRequest(number: #{number}) { isDraft state } }"
+                   "{ pullRequest(number: #{number}) { isDraft state author { login } } }"
   end
 
   return {} if query_parts.empty?
@@ -132,19 +132,17 @@ def fetch_pull_request_statuses(pr_notifications)
 
     statuses[notification_id] = {
       is_draft: pull_request['isDraft'] == true,
-      state: pull_request['state']
+      state: pull_request['state'],
+      author: pull_request.dig('author', 'login')
     }
   end
   statuses
 end
 
-def filter_pull_requests(notifications, show_drafts:, show_closed:)
+def filter_pull_requests(notifications, statuses, show_drafts:, show_closed:)
   return notifications if show_drafts && show_closed
+  return notifications if statuses.empty?
 
-  pr_notifications = notifications.select { |notification| notification['subject']['type'] == 'PullRequest' }
-  return notifications if pr_notifications.empty?
-
-  statuses = fetch_pull_request_statuses(pr_notifications)
   notifications.reject do |notification|
     status = statuses[notification['id']]
     next false unless status
@@ -167,9 +165,14 @@ def type_badge(type)
   TYPE_BADGES[type] || ['??', "#{DIM}??#{RESET}"]
 end
 
+REASON_LABELS = {
+  'review_requested' => 'review'
+}.freeze
+
 def reason_badge(reason)
-  colored = reason == 'mention' ? "#{MAGENTA}#{reason}#{RESET}" : "#{DIM}#{reason}#{RESET}"
-  [reason, colored]
+  label = REASON_LABELS[reason] || reason
+  colored = reason == 'mention' ? "#{MAGENTA}#{label}#{RESET}" : "#{DIM}#{label}#{RESET}"
+  [label, colored]
 end
 
 def truncate(str, max)
@@ -195,30 +198,38 @@ def rate_limit_line
   "_  _  #{DIM}API: #{used}/#{limit} (#{percentage}%)#{RESET}"
 end
 
-def build_rows(notifications)
+def build_rows(notifications, pr_statuses = {})
   data = notifications.reject { |notification| notification['subject']['type'] == 'CheckSuite' }.map do |notification|
+    author_login = pr_statuses.dig(notification['id'], :author)
     {
       id:     notification['id'],
       path:   api_path(notification['subject']['url']) || '_',
       repo:   truncate(notification['repository']['full_name'], MAX_REPO),
       type:   type_badge(notification['subject']['type']),
       reason: reason_badge(notification['reason']),
+      author: author_login ? "@#{author_login}" : '',
       title:  truncate(notification['subject']['title'], MAX_TITLE)
     }
   end
 
   repo_w   = data.map { |row| row[:repo].length }.max.to_i
   reason_w = data.map { |row| row[:reason][0].length }.max.to_i
+  author_w = data.map { |row| row[:author].length }.max.to_i
+  title_w  = data.map { |row| row[:title].length }.max.to_i
 
   data.map do |row|
     repo_pad   = row[:repo].ljust(repo_w)
     reason_pad = row[:reason][1] + ' ' * (reason_w - row[:reason][0].length)
+    author_colored = row[:author].empty? ? '' : "#{DIM}#{row[:author]}#{RESET}"
+    author_pad = author_colored + ' ' * (author_w - row[:author].length)
+    title_pad  = row[:title].ljust(title_w)
 
     visible = [
       "#{BOLD}#{repo_pad}#{RESET}",
       row[:type][1],
       reason_pad,
-      row[:title]
+      title_pad,
+      author_pad
     ].join('  ')
 
     { line: "#{row[:id]}  #{row[:path]}  #{visible}", path: row[:path] }
@@ -320,7 +331,7 @@ def fzf_pick(rows)
            "--bind=ctrl-r:execute-silent(#{mark_read_cmd})+reload(#{script} --rows --no-cache)",
            "--bind=ctrl-o:execute-silent(#{OS.open_cmd} https://github.com/notifications)+abort",
            "--preview=#{PREVIEW_CMD}",
-           '--preview-window=right:50%:wrap',
+           '--preview-window=right:40%:wrap',
            '--with-nth=3..']
 
   (IO.popen(flags, 'r+') do |io|
@@ -388,15 +399,18 @@ if ARGV[0] == 'tile'
   exit 0
 end
 
-notifications = filter_pull_requests(notifications, show_drafts:, show_closed:)
+pr_notifications = notifications.select { |notification| notification['subject']['type'] == 'PullRequest' }
+pr_statuses = fetch_pull_request_statuses(pr_notifications)
+
+notifications = filter_pull_requests(notifications, pr_statuses, show_drafts:, show_closed:)
 
 if ARGV.include?('--rows')
   puts rate_limit_line
-  build_rows(notifications).each { |row| puts row[:line] }
+  build_rows(notifications, pr_statuses).each { |row| puts row[:line] }
   exit 0
 end
 
-rows = build_rows(notifications)
+rows = build_rows(notifications, pr_statuses)
 selected = fzf_pick(rows)
 
 selected.each do |path|
