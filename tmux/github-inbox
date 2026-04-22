@@ -4,6 +4,7 @@
 require 'English'
 require 'json'
 require 'open3'
+require 'time'
 
 CACHE = ARGV.delete('--no-cache') ? '--cache 1s' : '--cache 120s'
 SHOW_DRAFTS = !ARGV.delete('--show-drafts').nil?
@@ -185,6 +186,21 @@ def truncate(str, max)
   str.length <= max ? str : "#{str[0, max - 1]}…"
 end
 
+def format_relative_time(timestamp)
+  return '' unless timestamp
+
+  updated = Time.parse(timestamp)
+  diff = Time.now - updated
+  return 'now' if diff < 60
+  return "#{(diff / 60).floor}m" if diff < 3600
+  return "#{(diff / 3600).floor}h" if diff < 86_400
+  return "#{(diff / 86_400).floor}d" if diff < 604_800
+
+  "#{(diff / 604_800).floor}w"
+rescue ArgumentError
+  ''
+end
+
 MAX_REPO  = 35
 MAX_TITLE = 55
 
@@ -209,7 +225,8 @@ def row_for(notification, pr_statuses)
     type: type_badge(notification['subject']['type']),
     reason: reason_badge(notification['reason']),
     author: author_login ? "@#{author_login}" : '',
-    title: truncate(notification['subject']['title'], MAX_TITLE)
+    title: truncate(notification['subject']['title'], MAX_TITLE),
+    updated: format_relative_time(notification['updated_at'])
   }
 end
 
@@ -219,13 +236,15 @@ def format_row(row, widths)
   author_colored = row[:author].empty? ? '' : "#{DIM}#{row[:author]}#{RESET}"
   author_pad = author_colored + ' ' * (widths[:author] - row[:author].length)
   title_pad  = row[:title].ljust(widths[:title])
+  updated_pad = "#{DIM}#{row[:updated].rjust(widths[:updated])}#{RESET}"
 
   visible = [
     "#{BOLD}#{repo_pad}#{RESET}",
     row[:type][1],
     reason_pad,
     title_pad,
-    author_pad
+    author_pad,
+    updated_pad
   ].join('  ')
 
   { line: "#{row[:id]}  #{row[:path]}  #{visible}", path: row[:path] }
@@ -240,7 +259,8 @@ def column_widths(data)
     repo: max_width(data) { |row| row[:repo].length },
     reason: max_width(data) { |row| row[:reason][0].length },
     author: max_width(data) { |row| row[:author].length },
-    title: max_width(data) { |row| row[:title].length }
+    title: max_width(data) { |row| row[:title].length },
+    updated: max_width(data) { |row| row[:updated].length }
   }
 end
 
