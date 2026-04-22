@@ -356,7 +356,7 @@ def fzf_pick(rows)
   refresh_prompt = "transform-prompt(#{script} --prompt)"
   header_lines = [
     'u: all/unread  d: drafts  p: closed/merged',
-    'r: mark read  o: open in browser  f: zoom'
+    'r: mark read  o: open in browser  f: fullscreen'
   ].join("\n")
   zoom_layouts = 'hidden|right:40%:wrap'
   flags = ['fzf', '--ansi', '--multi',

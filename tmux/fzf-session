@@ -1,0 +1,13 @@
+#!/bin/sh
+# Fuzzy-pick a tmux session via fzf and switch to it.
+# Intended to be run inside a tmux popup (display-popup -E).
+
+current=$(tmux display-message -p '#S')
+
+selected=$(
+    tmux list-sessions -F '#{session_name}' \
+        | grep -vx "$current" \
+        | fzf --prompt='Session> ' --reverse --no-info --no-mouse
+)
+
+[ -n "$selected" ] && tmux switch-client -t "$selected"
