@@ -19,5 +19,5 @@ fi
 
 if [[ -n $title ]]
 then
-    echo "#[fg=$secondaryText] $icon $title#[fg=$statusSeparatorFg] │#[default]"
+    echo "#[fg=$secondaryText] $icon $title#[default]"
 fi
