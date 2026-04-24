@@ -146,6 +146,13 @@ when 'add'
   repo_name     = File.basename(main_worktree)
   new_path      = args[1] || File.join(File.dirname(main_worktree), "#{repo_name}-worktrees", branch.gsub('/', '-'))
 
+  existing = worktrees.find { |wt| wt[:path] == new_path || wt[:branch] == branch }
+  if existing
+    warn "Worktree already exists at #{existing[:path]}, switching to it"
+    puts existing[:path] if cd_after
+    exit 0
+  end
+
   local_exists  = system('git', 'show-ref', '--verify', '--quiet', "refs/heads/#{branch}",          out: '/dev/null', err: '/dev/null')
   remote_exists = system('git', 'show-ref', '--verify', '--quiet', "refs/remotes/origin/#{branch}", out: '/dev/null', err: '/dev/null')
 
