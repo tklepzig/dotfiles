@@ -55,7 +55,7 @@ def tile_output(notifications)
   mentions = notifications.count { |notif| notif['reason'] == 'mention' }
   return if mentions.zero?
 
-  puts "#[fg=#{ENV['secondaryText']}] #{mentions}#[fg=#{ENV['statusSeparatorFg']}] │#[default]"
+  puts "#[fg=#{ENV['accentText']},bold] @#{mentions}#[fg=#{ENV['statusSeparatorFg']}] │#[default]"
 end
 
 def api_path(url)
