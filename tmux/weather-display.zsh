@@ -19,4 +19,25 @@ fi
 
 icon="${${weather%%|*}// /}"
 temp="${${weather##*|}//+/}"
-echo "#[fg=$statusSeparatorFg] │#[default] $icon $temp"
+
+temperature_number="${temp//[^-0-9]/}"
+
+if [[ -z "$temperature_number" ]]; then
+    temperature_color="$statusDateTimeFg"
+elif (( temperature_number < -5 )); then
+    temperature_color="colour33"
+elif (( temperature_number < 5 )); then
+    temperature_color="colour39"
+elif (( temperature_number < 12 )); then
+    temperature_color="colour45"
+elif (( temperature_number < 18 )); then
+    temperature_color="$statusDateTimeFg"
+elif (( temperature_number < 24 )); then
+    temperature_color="colour214"
+elif (( temperature_number < 30 )); then
+    temperature_color="colour208"
+else
+    temperature_color="colour196"
+fi
+
+echo "#[fg=$temperature_color] $icon $temp#[default]"
