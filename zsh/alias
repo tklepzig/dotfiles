@@ -154,8 +154,14 @@ alias coc="copilot --continue"
 alias cor="copilot --resume"
 
 alias cl="claude"
+alias cls="claude --model sonnet"
+alias clo="claude --model opus"
 alias clc="claude --continue"
+alias clcs="claude --continue --model sonnet"
+alias clco="claude --continue --model opus"
 alias clr="claude --resume"
+alias clrs="claude --resume --model sonnet"
+alias clro="claude --resume --model opus"
 
 devpad-hdmi() {
     # --auto disableds the output if disconnected but mode would be invalid, so call it twice
