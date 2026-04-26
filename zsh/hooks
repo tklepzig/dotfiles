@@ -28,6 +28,10 @@ preexec() {
   else
     timer=$(($(date +%s%0N)/1000000))
   fi
+
+  if [ -n "$TMUX_PANE" ] && [ -d "${HOME}/.dotfiles-local/tmux-snapshot" ]; then
+    print -r -- "$1" > "${HOME}/.dotfiles-local/tmux-snapshot/pane-cmd-${TMUX_PANE}"
+  fi
 }
 
 precmd() {

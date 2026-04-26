@@ -65,15 +65,23 @@ def tmux_windows(session_name)
   end
 end
 
+def read_pane_last_command(pane_id)
+  file = "#{ENV['HOME']}/.dotfiles-local/tmux-snapshot/pane-cmd-#{pane_id}"
+  return nil unless File.exist?(file)
+  cmd = File.read(file).strip
+  cmd.empty? ? nil : cmd
+end
+
 def tmux_panes(session_name, window_index)
   # Maybe using a comma as divider is not the best idea (thinking of filenames and paths with a comma in it)
-  pane_list = `tmux list-panes -t "#{session_name}:#{window_index}" -F "#\{pane_index\},#\{pane_active\},#\{pane_tty\},#\{pane_current_path\}"`
+  pane_list = `tmux list-panes -t "#{session_name}:#{window_index}" -F "#\{pane_index\},#\{pane_active\},#\{pane_tty\},#\{pane_current_path\},#\{pane_id\}"`
               .split(/\n/)
 
   pane_list.map do |pane|
-    index, active, tty, path = pane.split(/,/)
+    index, active, tty, path, pane_id = pane.split(/,/)
     content = `tmux capture-pane -t "#{session_name}:#{window_index}.#{index}" -peTJ -S -`
-    [index, { active: !active.to_i.zero?, path:, command: tty_command(tty), content: }]
+    command = tty_command(tty) || read_pane_last_command(pane_id)
+    [index, { active: !active.to_i.zero?, path:, command:, content: }]
   end
 end
 
@@ -110,7 +118,8 @@ def restore_panes(session, window)
     if pane['command']&.include?('vim')
       restore_vim_session(session_name: session['name'], window_index: window['index'], pane_index: pane['index'])
     elsif !pane['command'].nil?
-      send_keys(session['name'], window['index'], pane['index'], "print -s '#{pane['command']}' && clear")
+      # Leading space intentional: hist_ignore_space prevents the meta-command from appearing in history, only the restored command does.
+      send_keys(session['name'], window['index'], pane['index'], " print -s '#{pane['command']}' && clear")
     end
 
     window_set_layout(session['name'], window['index'], window['layout'])
@@ -134,7 +143,8 @@ def restore_windows(session)
       new_session(session['name'], window['name'])
       # Don't use new-session's -c option to set the initial directory, use cd instead
       # Reason: new-session's -c option sets the initial directory for all windows, not just the first one
-      send_keys(session['name'], window['index'], 1, "cd '#{window['panes'].first['path']}' && clear")
+      # Leading space intentional: hist_ignore_space prevents this from appearing in history.
+      send_keys(session['name'], window['index'], 1, " cd '#{window['panes'].first['path']}' && clear")
     end
 
     restore_panes(session, window)
@@ -198,24 +208,31 @@ if PRINT_PANE_CONTENT
   current_window = `tmux display-message -p '#I'`.strip
   current_pane = `tmux display-message -p '#P'`.strip
 
-  snapshot = JSON.parse(File.read("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot.json"))
+  snapshot = JSON.parse(File.read("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot/snapshot.json"))
   puts snapshot['sessions'].find { |session| session['name'] == current_session }['windows'].find { |window| window['index'] == current_window }['panes'].find { |pane| pane['index'] == current_pane }['content']
   exit
 end
 
 if ENV['TMUX']
-  if File.exist?("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot.json")
+  if File.exist?("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot/snapshot.json")
     puts 'Existing snapshot found, overwrite it? (y/n)'
     exit 1 unless $stdin.gets.chomp == 'y'
   end
 
   `mkdir -p #{ENV['HOME']}/.dotfiles-local/vim-sessions`
+  `mkdir -p #{ENV['HOME']}/.dotfiles-local/tmux-snapshot`
 
   snapshot = tmux_snapshot
-  File.write("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot.json", snapshot.to_json)
+  File.write("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot/snapshot.json", snapshot.to_json)
+
+  current_pane_ids = `tmux list-panes -a -F "#\{pane_id\}"`.split(/\n/).to_set
+  Dir.glob("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot/pane-cmd-*").each do |file|
+    pane_id = File.basename(file).delete_prefix('pane-cmd-')
+    File.delete(file) unless current_pane_ids.include?(pane_id)
+  end
 
   # Transforming the keys to strings to be able to treat the hash the same way as it was read from the file
   close_all(JSON.parse(snapshot.to_json)) if CLOSE_ALL
 else
-  restore(JSON.parse(File.read("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot.json")))
+  restore(JSON.parse(File.read("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot/snapshot.json")))
 end
