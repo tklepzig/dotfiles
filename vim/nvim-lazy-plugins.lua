@@ -88,11 +88,10 @@ return {
           "json-lsp",
           "tailwindcss-language-server",
           "emmet-language-server",
+          "eslint-lsp",
           -- Formatters
           "prettierd",
           "stylua",
-          -- Linters
-          "eslint_d",
         },
         auto_update = false,
         run_on_start = true,
@@ -103,7 +102,7 @@ return {
       })
 
       local lspconfig = require("lspconfig")
-      local capabilities = require("cmp_nvim_lsp").default_capabilities()
+      local capabilities = require("blink.cmp").get_lsp_capabilities()
 
       -- Simple servers with default config
       for _, server in ipairs({ "pyright", "vimls" }) do
@@ -147,6 +146,17 @@ return {
 
       -- Emmet (HTML/JSX expanding)
       lspconfig.emmet_language_server.setup({ capabilities = capabilities })
+
+      -- ESLint (vscode-eslint LSP) — diagnostics + code actions + fix-on-save
+      lspconfig.eslint.setup({
+        capabilities = capabilities,
+        on_attach = function(_, bufnr)
+          vim.api.nvim_create_autocmd("BufWritePre", {
+            buffer = bufnr,
+            command = "EslintFixAll",
+          })
+        end,
+      })
 
       -- Ruby (Solargraph)
       lspconfig.solargraph.setup({
@@ -197,103 +207,77 @@ return {
   },
 
   -- =========================================================
-  -- Completion: nvim-cmp
+  -- Completion: blink.cmp (replaces nvim-cmp + cmp-* sources)
   -- =========================================================
   {
-    "hrsh7th/nvim-cmp",
+    "saghen/blink.cmp",
+    version = "*", -- use prebuilt fuzzy-matcher binary; no Rust toolchain needed
     dependencies = {
-      { "hrsh7th/cmp-nvim-lsp" },
-      { "hrsh7th/cmp-buffer" },
-      { "hrsh7th/cmp-path" },
-      { "hrsh7th/cmp-omni" },
-      { "hrsh7th/cmp-emoji" },           -- replaces coc-emoji
-      { "uga-rosa/cmp-dictionary" },     -- replaces coc-dictionary / coc-word
+      { "saghen/blink.compat", version = "*", lazy = true, opts = {} },
       { "L3MON4D3/LuaSnip" },
-      { "saadparwaiz1/cmp_luasnip" },
       { "rafamadriz/friendly-snippets" }, -- includes jest + JS snippets
+      { "hrsh7th/cmp-emoji" },             -- via blink.compat
+      { "uga-rosa/cmp-dictionary" },       -- via blink.compat
     },
-    config = function()
-      local cmp = require("cmp")
-      local luasnip = require("luasnip")
+    opts = {
+      keymap = {
+        preset = "none",
+        ["<Down>"] = { "select_next", "fallback" },
+        ["<Up>"] = { "select_prev", "fallback" },
+        -- <Tab>: accept selection OR jump forward in snippet (mirrors CoC Tab logic)
+        ["<Tab>"] = { "select_and_accept", "snippet_forward", "fallback" },
+        -- <S-Tab>: accept selection OR jump backward in snippet
+        ["<S-Tab>"] = { "select_and_accept", "snippet_backward", "fallback" },
+        -- <C-x>: trigger completion manually
+        ["<C-x>"] = { "show", "fallback" },
+      },
 
-      -- Load VSCode-style snippets from friendly-snippets (jest, JS, etc.)
+      snippets = { preset = "luasnip" },
+
+      completion = {
+        list = { selection = { preselect = true, auto_insert = false } },
+      },
+
+      sources = {
+        default = { "lsp", "snippets", "path", "buffer" },
+        per_filetype = {
+          markdown = { "lsp", "snippets", "emoji", "dictionary", "buffer" },
+          gitcommit = { "lsp", "snippets", "emoji", "dictionary", "buffer" },
+          sql = { "dadbod", "buffer" },
+          mysql = { "dadbod", "buffer" },
+          plsql = { "dadbod", "buffer" },
+        },
+        providers = {
+          emoji = {
+            name = "emoji",
+            module = "blink.compat.source",
+          },
+          dictionary = {
+            name = "dictionary",
+            module = "blink.compat.source",
+            min_keyword_length = 3,
+          },
+          dadbod = {
+            name = "vim-dadbod-completion",
+            module = "blink.compat.source",
+          },
+        },
+      },
+
+      fuzzy = { implementation = "prefer_rust_with_warning" },
+    },
+    config = function(_, opts)
+      -- friendly-snippets: load VSCode-style snippets into LuaSnip
       require("luasnip.loaders.from_vscode").lazy_load()
 
-      -- Dictionary source: /usr/share/dict/words for prose filetypes
+      -- cmp-dictionary needs setup with paths even when used via blink.compat
       require("cmp_dictionary").setup({
         paths = { "/usr/share/dict/words" },
         first_case_insensitive = true,
         document = { enable = false },
       })
 
-      cmp.setup({
-        preselect = cmp.PreselectMode.Item, -- replaces suggest.noselect: false
-
-        snippet = {
-          expand = function(args)
-            luasnip.lsp_expand(args.body)
-          end,
-        },
-
-        mapping = cmp.mapping.preset.insert({
-          -- Navigate popup (mirrors existing <Down>/<Up> CoC mappings)
-          ["<Down>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
-          ["<Up>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
-
-          -- <Tab>: confirm selection OR expand/jump snippet (mirrors CoC Tab logic)
-          ["<Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.confirm({ select = true })
-            elseif luasnip.expand_or_jumpable() then
-              luasnip.expand_or_jump()
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
-
-          -- <S-Tab>: same as Tab (mirrors CoC S-Tab)
-          ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.confirm({ select = true })
-            elseif luasnip.jumpable(-1) then
-              luasnip.jump(-1)
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
-
-          -- <C-x>: trigger completion manually (mirrors CoC <c-x>)
-          ["<C-x>"] = cmp.mapping.complete(),
-        }),
-
-        sources = cmp.config.sources({
-          { name = "nvim_lsp" },
-          { name = "luasnip" },
-          { name = "path" },
-        }, {
-          { name = "buffer" },
-          { name = "omni" },
-        }),
-      })
-
-      -- Emoji + dictionary only for markdown / gitcommit (mirrors coc-settings filetypes)
-      cmp.setup.filetype({ "markdown", "gitcommit" }, {
-        sources = cmp.config.sources({
-          { name = "nvim_lsp" },
-          { name = "luasnip" },
-          { name = "emoji" },
-          { name = "dictionary", keyword_length = 3 },
-          { name = "buffer" },
-        }),
-      })
-
-      -- vim-dadbod completion for SQL buffers
-      cmp.setup.filetype({ "sql", "mysql", "plsql" }, {
-        sources = cmp.config.sources({
-          { name = "vim-dadbod-completion" },
-          { name = "buffer" },
-        }),
-      })
+      require("blink.cmp").setup(opts)
     end,
   },
 
@@ -328,30 +312,6 @@ return {
       vim.api.nvim_create_user_command("Format", function()
         require("conform").format({ async = true, lsp_format = "fallback" })
       end, {})
-    end,
-  },
-
-  -- =========================================================
-  -- Linting: nvim-lint (replaces coc-eslint)
-  -- =========================================================
-  {
-    "mfussenegger/nvim-lint",
-    config = function()
-      local lint = require("lint")
-
-      lint.linters_by_ft = {
-        javascript      = { "eslint_d" },
-        javascriptreact = { "eslint_d" },
-        typescript      = { "eslint_d" },
-        typescriptreact = { "eslint_d" },
-      }
-
-      -- Run linter on save and after leaving insert (mirrors eslint.autoFixOnSave)
-      vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
-        callback = function()
-          lint.try_lint()
-        end,
-      })
     end,
   },
 

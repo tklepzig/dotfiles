@@ -27,28 +27,28 @@ stack. Everything that CoC provided is covered by focused, composable plugins.
 | `coc-tailwindcss3` | `tailwindcss-language-server` (mason) | Tailwind LSP |
 | `coc-emmet` | `emmet-language-server` (mason) | Emmet expansion |
 | `coc-prettier` | `conform.nvim` + `prettierd` | Format on save |
-| `coc-eslint` | `nvim-lint` + `eslint_d` | Lint + autofix |
-| `coc-snippets` | `LuaSnip` + `cmp_luasnip` | Snippet engine |
+| `coc-eslint` | `eslint-lsp` (vscode-eslint, mason) | Lint diagnostics + code actions + fix on save |
+| `coc-snippets` | `LuaSnip` (+ `friendly-snippets`) | Snippet engine + content |
 | jest-snippets + js-snippet-pack | `friendly-snippets` | Community snippet library |
-| `coc-emoji` | `hrsh7th/cmp-emoji` | Emoji completion |
-| `coc-dictionary` + `coc-word` | `uga-rosa/cmp-dictionary` | Word/dictionary completion |
-| `coc-db` | `vim-dadbod-completion` | SQL/DB completion |
-| completion popup | `nvim-cmp` | Completion engine |
-| completion sources | `cmp-nvim-lsp`, `cmp-buffer`, `cmp-path`, `cmp-omni` | Completion sources |
+| `coc-emoji` | `hrsh7th/cmp-emoji` (via `blink.compat`) | Emoji completion |
+| `coc-dictionary` + `coc-word` | `uga-rosa/cmp-dictionary` (via `blink.compat`) | Word/dictionary completion |
+| `coc-db` | `vim-dadbod-completion` (via `blink.compat`) | SQL/DB completion |
+| completion popup | `blink.cmp` | Completion engine (built-in lsp/buffer/path/snippets sources) |
 
 ---
 
 ## Feature Parity
 
-### Completion (`nvim-cmp`)
+### Completion (`blink.cmp`)
 
-- LSP completions, snippets, buffer words, file paths, omni
+- LSP completions, snippets, buffer words, file paths — all built-in sources, no extra cmp-* deps
+- Rust-backed fuzzy matcher (prebuilt binary via `version = "*"`, no toolchain required)
 - `<Down>` / `<Up>`: navigate popup (same as before)
-- `<Tab>`: confirm selection OR expand/jump snippet (same as before)
-- `<S-Tab>`: same as Tab (same as before)
+- `<Tab>`: accept selection OR jump forward in active snippet (same as before)
+- `<S-Tab>`: accept selection OR jump backward in active snippet (same as before)
 - `<C-x>`: trigger completion manually (same as before)
-- Emoji + dictionary sources scoped to `markdown` / `gitcommit` only (same as before)
-- SQL/DB completions scoped to `sql`, `mysql`, `plsql` filetypes
+- Emoji + dictionary sources scoped to `markdown` / `gitcommit` only — wired via `blink.compat` since these don't have native blink sources
+- SQL/DB completions scoped to `sql`, `mysql`, `plsql` filetypes (also via `blink.compat`)
 
 ### LSP Keybindings (unchanged)
 
@@ -81,7 +81,18 @@ HTML/YAML/Ruby/Lua. Falls back to LSP formatting when no formatter is configured
 
 ### ESLint auto-fix on save
 
-`nvim-lint` runs `eslint_d` on `BufWritePost` + `InsertLeave` for JS/TS filetypes.
+`eslint-lsp` (`vscode-eslint-language-server`) provides diagnostics, code actions
+and the `EslintFixAll` command. Fix-on-save is wired via an `LspAttach` autocmd
+that registers `EslintFixAll` on `BufWritePre` for buffers where the eslint LSP
+attaches — replicating the old `editor.codeActionsOnSave: source.fixAll.eslint`.
+
+**Ordering caveat:** `conform.nvim`'s `format_on_save` and the eslint
+`BufWritePre` autocmd both fire on save. `conform` registers at startup;
+the eslint autocmd registers per-buffer at LspAttach — so `prettier` runs
+*before* eslint's fix-all. In repos that use `eslint-config-prettier` (i.e. eslint
+disables formatting rules and lets prettier own them) this is fine. If your
+eslint and prettier configs disagree on style, you'll see the order matter and
+need a custom save hook.
 
 ### Symbol highlight under cursor
 
@@ -100,10 +111,10 @@ using `vim.diagnostic.get()`.
 
 ### Highlights
 
-| Old (CoC) | New (LSP/cmp) |
+| Old (CoC) | New (LSP/blink) |
 |---|---|
-| `CocSearch` | `CmpItemAbbrMatch` |
-| `CocMenuSel` | `PmenuSel` |
+| `CocSearch` | `BlinkCmpLabelMatch` |
+| `CocMenuSel` | `BlinkCmpMenuSelection` (or `PmenuSel`) |
 | `CocUnusedHighlight` | `DiagnosticUnnecessary` |
 | `CocHighlightText` | `LspReferenceText` / `LspReferenceRead` / `LspReferenceWrite` |
 
@@ -130,132 +141,24 @@ Progress can be monitored with `:Mason`.
 Manually installed tools (if not via Mason): `rubocop` (gem), `prettierd`/`prettier`
 (npm global or project-local).
 
-## Origin
-
-Current CoC Features → Modern Replacements
-
-1. Core LSP: nvim-lspconfig + mason.nvim
-
-Replaces all your coc-* language servers. Mason handles installing them
-automatically.
-
-{ "neovim/nvim-lspconfig" },
-{ "williamboman/mason.nvim" },
-{ "williamboman/mason-lspconfig.nvim" }, -- bridges the two
-
-Language servers to install via Mason:
-
-┌──────────────────┬────────────────────────────────────┐
-│  CoC Extension   │          Mason / LSP name          │
-├──────────────────┼────────────────────────────────────┤
-│ coc-tsserver     │ ts_ls (typescript-language-server) │
-├──────────────────┼────────────────────────────────────┤
-│ coc-python       │ pyright                            │
-├──────────────────┼────────────────────────────────────┤
-│ coc-solargraph   │ solargraph                         │
-├──────────────────┼────────────────────────────────────┤
-│ coc-sumneko-lua  │ lua_ls                             │
-├──────────────────┼────────────────────────────────────┤
-│ coc-vimlsp       │ vimls                              │
-├──────────────────┼────────────────────────────────────┤
-│ coc-css          │ cssls                              │
-├──────────────────┼────────────────────────────────────┤
-│ coc-json         │ jsonls                             │
-├──────────────────┼────────────────────────────────────┤
-│ coc-tailwindcss3 │ tailwindcss                        │
-└──────────────────┴────────────────────────────────────┘
-
-2. Completion: nvim-cmp
-
-Replaces CoC's completion popup with a composable system:
-
-{ "hrsh7th/nvim-cmp" },
-{ "hrsh7th/cmp-nvim-lsp" },    -- LSP source
-{ "hrsh7th/cmp-buffer" },       -- buffer words
-{ "hrsh7th/cmp-path" },         -- file paths
-{ "uga-rosa/cmp-dictionary" },  -- replaces coc-dictionary
-{ "hrsh7th/cmp-emoji" },        -- replaces coc-emoji
-{ "David-Kunz/cmp-npm" },       -- bonus: npm package completion
-
-For word completion (replaces coc-word): cmp-buffer covers most of it, or add
-hrsh7th/cmp-omni.
-
-3. Snippets: LuaSnip + friendly-snippets
-
-Replaces coc-snippets:
-
-{ "L3MON4D3/LuaSnip" },
-{ "saadparwaiz1/cmp_luasnip" },     -- nvim-cmp source for LuaSnip
-{ "rafamadriz/friendly-snippets" },  -- community snippet collection (includes
-jest, JS)
-
-Your jest + JS snippet packs from GitHub are largely covered by
-friendly-snippets.
-
-4. Formatting + Linting: conform.nvim + nvim-lint
-
-Replaces coc-prettier + coc-eslint:
-
-{ "stevearc/conform.nvim" },  -- formatOnSave, prettier
-{ "mfussenegger/nvim-lint" }, -- ESLint diagnostics + autofix
-
-conform.nvim config to replicate your current behavior:
-require("conform").setup({
-format_on_save = { timeout_ms = 500, lsp_format = "fallback" },
-formatters_by_ft = {
-    javascript = { "prettierd", "prettier" },
-    typescript = { "prettierd", "prettier" },
-    css = { "prettierd" },
-    -- etc.
-},
-})
-
-5. Emmet: emmet-language-server
-
-Install via Mason (emmet-language-server), configure in nvim-lspconfig.
-Replaces coc-emmet.
-
-6. Diagnostics Statusline
-
-Replace your CocStatus() function using the built-in vim.diagnostic API:
-function DiagnosticStatus()
-local errors = #vim.diagnostic.get(0, { severity =
-vim.diagnostic.severity.ERROR })
--- same logic as your current CocStatus()
-end
-
-Or use a statusline plugin like lualine.nvim that has built-in diagnostic
-support.
-
-7. Database: already covered
-
-You already have vim-dadbod + vim-dadbod-ui. Just add:
-{ "kristijanhusak/vim-dadbod-completion" } -- cmp source
-
 ---
-Keybinding Equivalents
 
-All your current keybindings (gd, gy, gi, gr, <leader>rr, <leader>i, etc.) map
-directly to vim.lsp.buf.* functions — no behavioral change needed, just
-different wiring.
+## Notes on follow-up swaps (post-initial PoC)
 
----
-Recommended Starter: LazyVim or kickstart.nvim
+The first iteration used `nvim-cmp` (with cmp-* sources) and `nvim-lint` +
+`eslint_d`. Both have since been replaced:
 
-Since you're on lazy.nvim, the easiest path is to look at
-https://github.com/nvim-lua/kickstart.nvim — it's a minimal single-file config
-that wires up exactly this stack (lspconfig + mason + nvim-cmp + LuaSnip +
-conform + nvim-lint). You can cherry-pick the relevant sections into your
-existing config.
+- **`nvim-cmp` → `blink.cmp`.** `nvim-cmp` is effectively unmaintained
+  upstream. `blink.cmp` provides built-in `lsp` / `buffer` / `path` / `snippets`
+  sources (so the cmp-nvim-lsp / cmp-buffer / cmp-path / cmp-omni / cmp_luasnip
+  zoo collapses into one plugin), a Rust-backed fuzzy matcher (prebuilt binary
+  via `version = "*"`, no Rust toolchain on the user's machine), and simpler
+  keymap config. cmp-only sources we still need (`cmp-emoji`, `cmp-dictionary`,
+  `vim-dadbod-completion`) are wired through `blink.compat`.
 
----
-Migration Strategy
-
-1. Remove coc.nvim from nvim-lazy-plugins.lua
-2. Add the plugins above incrementally (LSP first, then completion, then
-formatting)
-3. Port your keybindings in an LspAttach autocmd so they only activate when an
-LSP is attached
-4. Move CoC-specific settings from vimrc (the set hidden, updatetime, etc. —
-most are already good defaults in Neovim)
-
+- **`nvim-lint` + `eslint_d` → `eslint-lsp` (vscode-eslint).** ESLint is a
+  language server upstream, so running it through `nvim-lint` is wrapping a
+  language server in a non-LSP shim. Using `eslint-lsp` directly gives us
+  diagnostics, code actions, and `EslintFixAll` for free, and removes the
+  `nvim-lint` plugin entirely. This is what `coc-eslint` was wrapping under
+  the hood.
