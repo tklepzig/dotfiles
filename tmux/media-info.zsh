@@ -1,23 +1,26 @@
 #!/usr/bin/env zsh
 
-# get current playing title of vlc
-title=$(qdbus org.mpris.MediaPlayer2.vlc /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Metadata | grep "xesam:title:" | cut -c 14-)
-state=$(qdbus org.mpris.MediaPlayer2.vlc /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlaybackStatus)
+{
+    read -r state
+    read -r title
+} <<< "$(source $HOME/.dotfiles/tmux/media-info.$1.zsh)"
+
+if [[ -z $title ]]
+then
+    exit
+fi
 
 if [[ $state == "Playing" ]]
 then
-    icon=$(echo -e '\u25b6')
+    icon=$(echo -e '▶')
 elif [[ $state == "Paused" ]]
 then
-    icon=$(echo -e '\u23f8')
+    icon=$(echo -e '⏸')
 elif [[ $state == "Stopped" ]]
 then
-    icon=$(echo -e '\u23f9')
+    icon=$(echo -e '⏹')
 else
     icon=""
 fi
 
-if [[ -n $title ]]
-then
-    echo "#[fg=$secondaryText] $icon $title#[default]"
-fi
+echo "#[fg=$secondaryText] $icon $title#[default]"
