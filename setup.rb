@@ -346,6 +346,10 @@ def install(variant = DF_VARIANT)
   if program_installed? 'kitty'
     Logger.log 'Configuring kitty'
     add_link_with_override "#{DF_PATH}/kitty/kitty.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
+    unless OS.mac?
+      Logger.log 'Symlinking kitty variables for Linux'
+      add_link_with_override "#{DF_PATH}/kitty/kitty.linux.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
+    end
     add_link_with_override "#{DF_PATH}/kitty/kitty.theme.conf", "#{HOME}/.config/kitty/kitty.conf", 'include'
 
     # Open kitty in fullscreen mode, the macos way
