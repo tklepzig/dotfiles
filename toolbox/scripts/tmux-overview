@@ -1,0 +1,118 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# tmux-overview — quick snapshot of all sessions/windows with git context
+
+require 'open3'
+
+def load_theme
+  colours_file = File.expand_path('~/.dotfiles/colours.zsh')
+  return {} unless File.exist?(colours_file)
+  File.readlines(colours_file).each_with_object({}) do |line, hash|
+    match = line.strip.match(/^(?:export\s+)?([a-zA-Z_]\w*)=(\d+)$/)
+    hash[match[1]] = match[2].to_i if match
+  end
+end
+
+def ansi_fg(n) = "\e[38;5;#{n}m"
+
+THEME = load_theme
+
+RESET   = "\e[0m"
+BOLD    = "\e[1m"
+MUTED   = ansi_fg(THEME.fetch('statusInactiveFg', 248))
+SESSION = ansi_fg(THEME.fetch('primaryText',       28))
+BRANCH  = ansi_fg(THEME.fetch('accentText',        64))
+DIRTY   = "\e[31m"
+
+def run(*cmd)
+  out, _err, status = Open3.capture3(*cmd)
+  status.success? ? out.chomp : nil
+end
+
+def git_info(dir)
+  return nil unless File.directory?(dir)
+
+  branch = run('git', '-C', dir, 'rev-parse', '--abbrev-ref', 'HEAD')
+  return nil unless branch
+
+  dirty     = run('git', '-C', dir, 'status', '--porcelain').then { _1 && !_1.empty? }
+  git_dir   = run('git', '-C', dir, 'rev-parse', '--git-dir')
+  worktree  = git_dir&.include?('.git/worktrees/')
+  repo_name = worktree ? File.basename(git_dir.split('/.git/worktrees/').first) : nil
+
+  { branch:, dirty:, worktree:, repo_name: }
+end
+
+def git_col(git)
+  return ['(no git)', "#{MUTED}(no git)#{RESET}"] unless git
+
+  dirty_raw = git[:dirty]    ? '*'                 : ''
+  dirty_col = git[:dirty]    ? "#{DIRTY}*#{RESET}" : ''
+  wt_raw    = git[:worktree] ? " (worktree of #{git[:repo_name]})"               : ''
+  wt_col    = git[:worktree] ? " #{MUTED}(worktree of #{git[:repo_name]})#{RESET}" : ''
+
+  ["[#{git[:branch]}#{dirty_raw}]#{wt_raw}",
+   "[#{BRANCH}#{git[:branch]}#{RESET}#{dirty_col}]#{wt_col}"]
+end
+
+def sessions
+  out = run('tmux', 'list-sessions', '-F', '#{session_name}')
+  return [] unless out
+  out.lines.map(&:chomp).reject(&:empty?)
+end
+
+def windows(session_name)
+  out = run('tmux', 'list-windows', '-t', session_name, '-F', '#{window_index};;#{window_name}')
+  return [] unless out
+
+  out.lines.filter_map do |line|
+    parts = line.chomp.split(';;', 2)
+    next unless parts.length == 2
+    { index: parts[0].to_i, name: parts[1] }
+  end
+end
+
+def pane_paths(session_name, window_index)
+  out = run('tmux', 'list-panes', '-t', "#{session_name}:#{window_index}", '-F', '#{pane_current_path}')
+  return [] unless out
+  out.lines.map(&:chomp).reject(&:empty?).uniq
+end
+
+all_sessions = sessions
+if all_sessions.empty?
+  puts "#{MUTED}No tmux sessions.#{RESET}"
+  exit 0
+end
+
+all_sessions.each_with_index do |session_name, session_idx|
+  puts '' unless session_idx.zero?
+  puts "#{BOLD}#{SESSION}#{session_name}#{RESET}"
+
+  rows = []
+
+  windows(session_name).each do |window|
+    paths = pane_paths(session_name, window[:index])
+
+    paths.each_with_index do |path, pane_idx|
+      short_path       = path.sub(Dir.home, '~')
+      raw_git, col_git = git_col(git_info(path))
+
+      raw_label = pane_idx.zero? ? "[#{window[:index]}] #{window[:name]}" : ''
+      col_label = pane_idx.zero? ? "#{MUTED}[#{window[:index]}]#{RESET} #{window[:name]}" : ''
+
+      rows << { raw_label:, col_label:, short_path:, raw_git:, col_git: }
+    end
+  end
+
+  label_w = rows.map { |row| row[:raw_label].length }.max.to_i
+  path_w  = rows.map { |row| row[:short_path].length }.max.to_i
+
+  rows.each do |row|
+    label_pad = ' ' * (label_w - row[:raw_label].length)
+    path_pad  = ' ' * (path_w  - row[:short_path].length)
+    puts "  #{row[:col_label]}#{label_pad}  #{row[:short_path]}#{path_pad}  #{row[:col_git]}"
+  end
+end
+
+puts ''

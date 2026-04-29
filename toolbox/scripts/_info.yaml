@@ -190,6 +190,8 @@ sync-with-drive:
   help: Sync current dotfiles with drive
   args:
     - name: path/to/drive
+tmux-overview:
+  help: Show all tmux sessions and windows with git branch, dirty status, and worktree indicator
 tmux-snapshot:
   help: |-
     When run inside tmux, it will save a snapshot of all tmux sessions. If --close-all is given, all sessions will be closed. If -p is given, it will print the content from the snapshot for the current pane if existing.
