@@ -23,6 +23,12 @@ nmap H ^
 vmap H ^
 nmap L $
 vmap L $
+" Move by display line (respects wraps), but use real lines with a count (e.g. 5j)
+" so jump list (C-o) still works correctly
+nnoremap <expr> j v:count ? 'j' : 'gj'
+nnoremap <expr> k v:count ? 'k' : 'gk'
+vnoremap <expr> j v:count ? 'j' : 'gj'
+vnoremap <expr> k v:count ? 'k' : 'gk'
 vnoremap <silent> P "0p
 nnoremap <leader>$ :shell<cr>
 
