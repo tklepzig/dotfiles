@@ -13,7 +13,7 @@ fi
 
 weather=$(< "$cache_file")
 
-if [[ -z "$weather" ]] || [[ "$weather" == *"nknown"* ]]; then
+if [[ -z "$weather" ]] || [[ "$weather" == *"nknown"* ]] || [[ "$weather" == *"notavailable"* ]]; then
     exit
 fi
 
