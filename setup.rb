@@ -161,10 +161,52 @@ def setup_vim(variant)
   end
 end
 
-def run_toolbox_setup
-  Logger.log 'Running toolbox setup'
-  system("npm install --silent --prefix \"#{DF_PATH}/toolbox\"")
-  raise 'Toolbox setup failed' unless system("node \"#{DF_PATH}/toolbox/setup.mjs\"")
+def link_docs(path)
+  return unless Dir.exist?(File.join(path, 'docs'))
+
+  Logger.log 'Linking docs'
+  Dir.glob(File.join(path, 'docs', '*')) do |file|
+    `ln -sf "#{file}" "#{DF_PATH}/toolbox/docs"`
+  end
+end
+
+def link_scripts(path)
+  if Dir.exist?(File.join(path, 'scripts'))
+    Logger.log 'Linking scripts'
+    Dir.glob(File.join(path, 'scripts', '*')) do |file|
+      next if File.basename(file) == '_info.yaml'
+
+      `ln -sf "#{file}" "#{DF_PATH}/toolbox/scripts"`
+    end
+  end
+
+  return unless File.exist?(File.join(path, 'scripts', '_info.yaml'))
+
+  Logger.log 'Merging _info.yaml'
+  infos = YAML.load_file("#{DF_PATH}/toolbox/scripts/_info.yaml")
+  infos_include = YAML.load_file(File.join(path, 'scripts', '_info.yaml'))
+  File.write("#{DF_PATH}/toolbox/scripts/_info.yaml", infos.merge(infos_include).to_yaml)
+end
+
+def add_toolbox_includes
+  toolbox_includes = "#{DF_LOCAL_PATH}/toolbox-include.yaml"
+  return unless File.exist?(toolbox_includes)
+
+  Logger.log 'Processing includes'
+  YAML.load_file(toolbox_includes).each do |raw_path|
+    path = File.expand_path(raw_path, DF_LOCAL_PATH)
+    next unless Dir.exist?(path)
+
+    Logger.log raw_path do
+      if Dir.exist?(File.join(path, '.git'))
+        Logger.log 'Found git repo, updating'
+        `cd "#{path}" && git fetch > /dev/null && git merge > /dev/null`
+      end
+
+      link_docs(path)
+      link_scripts(path)
+    end
+  end
 end
 
 # TODO: clean up, split into smaller chunks, don't do all of this for basic variant
@@ -267,7 +309,7 @@ def install(variant = DF_VARIANT)
   Logger.log 'Initializing toolbox' do
     # TODO: Only when in full mode?
     add_link_with_override "#{DF_PATH}/toolbox/init.zsh", "#{HOME}/.zshrc"
-    run_toolbox_setup
+    add_toolbox_includes
   end
 
   # TODO: part of vim setup
