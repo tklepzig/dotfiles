@@ -1,0 +1,182 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# workspaces — manage and open tmux sessions for active workspaces
+# Config: ~/.dotfiles-local/open-workspaces (one path per line, # comments)
+# Git repos get one tmux window per worktree; plain dirs get a single window.
+
+require 'open3'
+require 'fileutils'
+
+CONFIG_FILE = File.expand_path('~/.dotfiles-local/open-workspaces')
+
+RESET = "\e[0m"
+DIM   = "\e[2m"
+
+def read_config_lines
+  return [] unless File.exist?(CONFIG_FILE)
+
+  File.readlines(CONFIG_FILE).map(&:chomp)
+end
+
+def read_workspaces
+  read_config_lines
+    .reject { |line| line.empty? || line.start_with?('#') }
+    .map    { |line| File.expand_path(line) }
+end
+
+def to_stored_path(expanded)
+  home = Dir.home
+  return "~#{expanded[home.length..]}" if expanded == home || expanded.start_with?("#{home}/")
+
+  expanded
+end
+
+def write_config(lines)
+  FileUtils.mkdir_p(File.dirname(CONFIG_FILE))
+  File.write(CONFIG_FILE, lines.join("\n") + (lines.empty? ? '' : "\n"))
+end
+
+def git_worktree_paths(dir)
+  raw, _err, status = Open3.capture3('git', '-C', dir, 'worktree', 'list', '--porcelain')
+  return nil unless status.success?
+
+  paths = raw.split("\n\n").filter_map do |block|
+    block.lines.map(&:chomp).find { |line| line.start_with?('worktree ') }&.delete_prefix('worktree ')
+  end
+  paths.empty? ? nil : paths
+end
+
+def sanitize_session_name(name)
+  # tmux rejects session names containing '.', ':', or whitespace
+  name.gsub(/[.:\s]/, '-')
+end
+
+def open_session(session_name, windows)
+  return true if system('tmux', 'has-session', '-t', session_name, out: '/dev/null', err: '/dev/null')
+
+  system('tmux', 'new-session', '-d', '-s', session_name, '-c', Dir.home, '-n', '__init__')
+
+  created_count = 0
+  windows.each do |path|
+    if File.directory?(path)
+      system('tmux', 'new-window', '-t', session_name, '-c', path, '-n', '')
+      created_count += 1
+    else
+      warn "  Skipping missing worktree: #{path}"
+    end
+  end
+
+  if created_count.zero?
+    system('tmux', 'kill-session', '-t', session_name)
+    warn "Skipped '#{session_name}' (no valid paths found)"
+    return false
+  end
+
+  system('tmux', 'kill-window', '-t', "#{session_name}:__init__")
+  warn "Created '#{session_name}' (#{created_count} window#{created_count == 1 ? '' : 's'})"
+  true
+end
+
+case ARGV[0]
+
+when nil, 'open'
+  workspaces = read_workspaces
+  abort 'No workspaces configured. Use `ws add` to add one.' if workspaces.empty?
+
+  first_session_name = nil
+  seen_sessions      = {}
+
+  workspaces.each do |path|
+    unless File.directory?(path)
+      warn "Skipping #{to_stored_path(path)} (directory not found)"
+      next
+    end
+
+    worktree_paths = git_worktree_paths(path)
+    # For git repos, name the session after the main worktree (first in the list),
+    # not the registered path which may itself be a worktree.
+    main_path    = worktree_paths&.first || path
+    session_name = sanitize_session_name(File.basename(main_path))
+
+    if seen_sessions.key?(session_name)
+      warn "Skipping #{to_stored_path(path)}: session name '#{session_name}' already used by #{to_stored_path(seen_sessions[session_name])}"
+      next
+    end
+
+    seen_sessions[session_name] = path
+    usable = open_session(session_name, worktree_paths || [path])
+    first_session_name ||= session_name if usable
+  end
+
+  abort 'No valid workspace directories found.' unless first_session_name
+
+  if ENV['TMUX']
+    exec('tmux', 'switch-client', '-t', first_session_name)
+  else
+    exec('tmux', 'attach', '-t', first_session_name)
+  end
+
+when 'add'
+  target = ARGV[1] ? File.expand_path(ARGV[1]) : Dir.pwd
+  abort "Not a directory: #{target}" unless File.directory?(target)
+
+  if read_workspaces.include?(target)
+    puts "Already in workspaces: #{to_stored_path(target)}"
+    exit 0
+  end
+
+  lines = read_config_lines
+  lines << to_stored_path(target)
+  write_config(lines)
+  puts "Added: #{to_stored_path(target)}"
+
+when 'rm-self'
+  target = Dir.pwd
+  workspaces = read_workspaces
+  abort "Not in workspaces: #{to_stored_path(target)}" unless workspaces.include?(target)
+
+  remaining = read_config_lines.reject do |line|
+    !line.start_with?('#') && File.expand_path(line) == target
+  end
+
+  write_config(remaining)
+  puts "Removed: #{to_stored_path(target)}"
+
+when 'rm'
+  workspaces = read_workspaces
+  abort 'No workspaces configured.' if workspaces.empty?
+
+  display_lines = workspaces.map { |path| to_stored_path(path) }
+  selected_display = begin
+    IO.popen(['fzf', '--multi', '--prompt=Remove workspace(s)> '], 'r+') do |io|
+      display_lines.each { |line| io.puts line }
+      io.close_write
+      io.read.lines.map(&:chomp).reject(&:empty?)
+    end || []
+  rescue Errno::ENOENT
+    abort 'ws rm requires fzf to be installed. Use `ws rm-self` to remove the current directory.'
+  end
+
+  exit 0 if selected_display.empty?
+
+  selected_expanded = selected_display.map { |s| File.expand_path(s) }
+  remaining = read_config_lines.reject do |line|
+    !line.start_with?('#') && selected_expanded.include?(File.expand_path(line))
+  end
+
+  write_config(remaining)
+  selected_display.each { |s| puts "Removed: #{s}" }
+
+when 'list'
+  workspaces = read_workspaces
+  if workspaces.empty?
+    puts "#{DIM}No workspaces configured.#{RESET}"
+  else
+    workspaces.each { |path| puts to_stored_path(path) }
+  end
+
+else
+  abort "Unknown subcommand: #{ARGV[0]}\nUsage: ws [open | add [<path>] | rm | rm-self | list]"
+
+end

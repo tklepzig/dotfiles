@@ -76,6 +76,7 @@ k() {
   esac
 }
 
+alias ws="$dotfilesDir/toolbox/scripts/workspaces"
 alias ghs='gh status'
 alias s='# stacked'
 alias c='clear'

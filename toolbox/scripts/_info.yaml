@@ -206,6 +206,25 @@ tmux-snapshot:
     - -p
 vicy:
   help: Opens vicy's CLI
+workspaces:
+  help: |-
+    Manage and open tmux sessions for active workspaces. Called via the `ws` alias.
+    Config: ~/.dotfiles-local/open-workspaces (one path per line, # comments supported)
+    Git repos get one window per worktree; plain dirs get a single window.
+    open:  (default) open tmux sessions for all configured workspaces
+    add:   add current directory (or given path) to the config
+    rm:      fzf multi-picker to remove workspace(s) from the config
+    rm-self: remove the current directory from the config without fzf
+    list:    print all configured workspaces
+  args:
+    - name: subcommand
+      optional: true
+  completion:
+    - open
+    - add
+    - rm
+    - rm-self
+    - list
 vicy-serve:
   help: Open vicy in browser
 weather:
