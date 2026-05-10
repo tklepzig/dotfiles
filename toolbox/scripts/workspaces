@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 # workspaces — manage and open tmux sessions for active workspaces
-# Config: ~/.dotfiles-local/open-workspaces (one path per line, # comments)
+# Config: ~/.dotfiles-local/open-workspaces (INI-style: [session-name] sections with paths below)
 # Git repos get one tmux window per worktree; plain dirs get a single window.
 
 require 'open3'
@@ -19,10 +19,33 @@ def read_config_lines
   File.readlines(CONFIG_FILE).map(&:chomp)
 end
 
-def read_workspaces
-  read_config_lines
-    .reject { |line| line.empty? || line.start_with?('#') }
-    .map    { |line| File.expand_path(line) }
+# Returns [{ section: String, paths: [String] }] in file order. Empty sections excluded.
+def read_config
+  groups = {}
+  section_order = []
+  current_section = nil
+
+  read_config_lines.each do |line|
+    next if line.empty? || line.start_with?('#')
+
+    if (match = line.match(/^\[(.+)\]$/))
+      current_section = match[1]
+      unless groups.key?(current_section)
+        groups[current_section] = []
+        section_order << current_section
+      end
+    elsif current_section
+      groups[current_section] << File.expand_path(line)
+    end
+  end
+
+  section_order
+    .map    { |name| { section: name, paths: groups[name] } }
+    .reject { |group| group[:paths].empty? }
+end
+
+def all_configured_paths
+  read_config.flat_map { |group| group[:paths] }
 end
 
 def to_stored_path(expanded)
@@ -63,7 +86,7 @@ def open_session(session_name, windows)
       system('tmux', 'new-window', '-t', session_name, '-c', path, '-n', '')
       created_count += 1
     else
-      warn "  Skipping missing worktree: #{path}"
+      warn "  Skipping missing path: #{path}"
     end
   end
 
@@ -78,34 +101,72 @@ def open_session(session_name, windows)
   true
 end
 
+def auto_session_name(path)
+  worktree_paths = git_worktree_paths(path)
+  main_path = worktree_paths&.first || path
+  File.basename(main_path)
+end
+
+# Removes lines for the given expanded paths, then drops any section headers
+# that have no paths remaining beneath them.
+def remove_paths_from_lines(lines, targets_expanded)
+  after_removal = lines.reject do |line|
+    next false if line.empty? || line.start_with?('#') || line.match?(/^\[.+\]$/)
+
+    targets_expanded.include?(File.expand_path(line))
+  end
+
+  result = []
+  idx = 0
+  while idx < after_removal.length
+    line = after_removal[idx]
+    if line.match?(/^\[.+\]$/)
+      lookahead = idx + 1
+      has_paths = false
+      while lookahead < after_removal.length
+        la = after_removal[lookahead]
+        break if la.match?(/^\[.+\]$/)
+        has_paths = true if !la.empty? && !la.start_with?('#')
+        lookahead += 1
+      end
+      result << line if has_paths
+    else
+      result << line
+    end
+    idx += 1
+  end
+
+  result
+end
+
 case ARGV[0]
 
 when nil, 'open'
-  workspaces = read_workspaces
-  abort 'No workspaces configured. Use `ws add` to add one.' if workspaces.empty?
+  groups = read_config
+  abort 'No workspaces configured. Use `ws add` to add one.' if groups.empty?
 
   first_session_name = nil
   seen_sessions      = {}
 
-  workspaces.each do |path|
-    unless File.directory?(path)
-      warn "Skipping #{to_stored_path(path)} (directory not found)"
-      next
-    end
-
-    worktree_paths = git_worktree_paths(path)
-    # For git repos, name the session after the main worktree (first in the list),
-    # not the registered path which may itself be a worktree.
-    main_path    = worktree_paths&.first || path
-    session_name = sanitize_session_name(File.basename(main_path))
+  groups.each do |group|
+    session_name = sanitize_session_name(group[:section])
 
     if seen_sessions.key?(session_name)
-      warn "Skipping #{to_stored_path(path)}: session name '#{session_name}' already used by #{to_stored_path(seen_sessions[session_name])}"
+      warn "Skipping session '#{session_name}': name already used by another section"
       next
     end
 
-    seen_sessions[session_name] = path
-    usable = open_session(session_name, worktree_paths || [path])
+    windows = group[:paths].each_with_object([]) do |path, arr|
+      unless File.directory?(path)
+        warn "Skipping #{to_stored_path(path)} (directory not found)"
+        next
+      end
+      worktree_paths = git_worktree_paths(path)
+      arr.concat(worktree_paths || [path])
+    end
+
+    seen_sessions[session_name] = true
+    usable = open_session(session_name, windows)
     first_session_name ||= session_name if usable
   end
 
@@ -118,36 +179,59 @@ when nil, 'open'
   end
 
 when 'add'
-  target = ARGV[1] ? File.expand_path(ARGV[1]) : Dir.pwd
+  args = ARGV[1..]
+  session_name = nil
+
+  if args[0] == '--session' || args[0] == '-s'
+    abort "#{args[0]} requires a session name" if args[1].nil? || args[1].start_with?('-')
+
+    session_name = args[1]
+    args = args[2..]
+  end
+
+  target = args[0] ? File.expand_path(args[0]) : Dir.pwd
   abort "Not a directory: #{target}" unless File.directory?(target)
 
-  if read_workspaces.include?(target)
+  session_name ||= auto_session_name(target)
+
+  if all_configured_paths.include?(target)
     puts "Already in workspaces: #{to_stored_path(target)}"
     exit 0
   end
 
-  lines = read_config_lines
-  lines << to_stored_path(target)
+  lines          = read_config_lines
+  stored_path    = to_stored_path(target)
+  section_header = "[#{session_name}]"
+
+  section_line_idx = lines.index { |line| line == section_header }
+
+  if section_line_idx
+    insert_idx = section_line_idx + 1
+    insert_idx += 1 while insert_idx < lines.length && !lines[insert_idx].match?(/^\[.+\]$/)
+    insert_idx -= 1 while insert_idx > section_line_idx + 1 && lines[insert_idx - 1].strip.empty?
+    lines.insert(insert_idx, stored_path)
+  else
+    lines << '' unless lines.empty? || lines.last.strip.empty?
+    lines << section_header
+    lines << stored_path
+  end
+
   write_config(lines)
-  puts "Added: #{to_stored_path(target)}"
+  puts "Added: #{stored_path} → [#{session_name}]"
 
 when 'rm-self'
   target = Dir.pwd
-  workspaces = read_workspaces
-  abort "Not in workspaces: #{to_stored_path(target)}" unless workspaces.include?(target)
+  abort "Not in workspaces: #{to_stored_path(target)}" unless all_configured_paths.include?(target)
 
-  remaining = read_config_lines.reject do |line|
-    !line.start_with?('#') && File.expand_path(line) == target
-  end
-
+  remaining = remove_paths_from_lines(read_config_lines, [target])
   write_config(remaining)
   puts "Removed: #{to_stored_path(target)}"
 
 when 'rm'
-  workspaces = read_workspaces
-  abort 'No workspaces configured.' if workspaces.empty?
+  all_paths = all_configured_paths
+  abort 'No workspaces configured.' if all_paths.empty?
 
-  display_lines = workspaces.map { |path| to_stored_path(path) }
+  display_lines = all_paths.map { |path| to_stored_path(path) }
   selected_display = begin
     IO.popen(['fzf', '--multi', '--prompt=Remove workspace(s)> '], 'r+') do |io|
       display_lines.each { |line| io.puts line }
@@ -161,22 +245,30 @@ when 'rm'
   exit 0 if selected_display.empty?
 
   selected_expanded = selected_display.map { |s| File.expand_path(s) }
-  remaining = read_config_lines.reject do |line|
-    !line.start_with?('#') && selected_expanded.include?(File.expand_path(line))
-  end
+  remaining = remove_paths_from_lines(read_config_lines, selected_expanded)
 
   write_config(remaining)
   selected_display.each { |s| puts "Removed: #{s}" }
 
+when 'edit'
+  FileUtils.mkdir_p(File.dirname(CONFIG_FILE))
+  FileUtils.touch(CONFIG_FILE) unless File.exist?(CONFIG_FILE)
+  editor = ENV['VISUAL'] || ENV['EDITOR'] || 'vi'
+  exec(editor, CONFIG_FILE)
+
 when 'list'
-  workspaces = read_workspaces
-  if workspaces.empty?
+  groups = read_config
+  if groups.empty?
     puts "#{DIM}No workspaces configured.#{RESET}"
   else
-    workspaces.each { |path| puts to_stored_path(path) }
+    groups.each_with_index do |group, idx|
+      puts '' if idx > 0
+      puts "[#{group[:section]}]"
+      group[:paths].each { |path| puts "  #{to_stored_path(path)}" }
+    end
   end
 
 else
-  abort "Unknown subcommand: #{ARGV[0]}\nUsage: ws [open | add [<path>] | rm | rm-self | list]"
+  abort "Unknown subcommand: #{ARGV[0]}\nUsage: ws [open | add [-s <session>] [<path>] | rm | rm-self | list | edit]"
 
 end
