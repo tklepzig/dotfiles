@@ -155,6 +155,8 @@ def filter_pull_requests(notifications, statuses, show_drafts:, show_closed:)
   return notifications if statuses.empty?
 
   notifications.reject do |notification|
+    next false if notification['reason'] == 'mention'
+
     status = statuses[notification['id']]
     status && hide_pr?(status, show_drafts:, show_closed:)
   end
