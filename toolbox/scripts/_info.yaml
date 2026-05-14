@@ -204,8 +204,6 @@ tmux-snapshot:
   completion:
     - --close-all
     - -p
-vicy:
-  help: Opens vicy's CLI
 workspaces:
   help: |-
     Manage and open tmux sessions for active workspaces. Called via the `ws` alias.
@@ -229,8 +227,6 @@ workspaces:
     - rm-self
     - list
     - edit
-vicy-serve:
-  help: Open vicy in browser
 weather:
   help: Get the weather forecast
   args:
