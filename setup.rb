@@ -78,6 +78,17 @@ def program_installed?(program)
   !`sh -c 'command -v #{program}'`.empty?
 end
 
+def ensure_brew_package(package, binary = package)
+  Logger.log "Checking for #{package}" do
+    if program_installed?(binary)
+      Logger.success "Found: #{`which #{binary}`.strip}."
+    else
+      Logger.log "Not found, installing via brew"
+      system("brew install #{package}")
+    end
+  end
+end
+
 def check_mandatory_installation(program)
   Logger.log "Searching for #{program}" do
     unless program_installed? program
@@ -387,6 +398,10 @@ def install(variant = DF_VARIANT)
   if OS.mac?
     Logger.log 'Configuring aerospace for macOS'
     `ln -sf #{DF_PATH}/aerospace/config.toml #{HOME}/.aerospace.toml`
+
+    Logger.log 'Ensuring macOS dependencies' do
+      ensure_brew_package 'nowplaying-cli'
+    end
   end
 
   unless Dir.exist?("#{HOME}/.fzf")
