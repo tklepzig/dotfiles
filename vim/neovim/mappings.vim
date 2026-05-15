@@ -79,6 +79,10 @@ nnoremap <leader>gd :Gvdiffsplit<CR>
 nnoremap <leader>gb :execute 'Gvdiffsplit! ' . $DOTFILES_GIT_DEFAULT_BRANCH . ' \| wincmd p'<CR>
 nnoremap <leader>gl :GV<CR>
 nnoremap <leader>gf :GV!<CR>
+
+" Section/block git history — shows how the current section (markdown) or block (code) evolved
+nnoremap <silent> <leader>gS :execute '!' . $HOME . '/.dotfiles/toolbox/scripts/git-section-log ' . shellescape(expand('%')) . ' ' . line('.')<CR>
+vnoremap <silent> <leader>gS :<C-u>execute '!' . $HOME . '/.dotfiles/toolbox/scripts/git-section-log ' . shellescape(expand('%')) . ' ' . line("'<") . ',' . line("'>")<CR>
 nmap <leader>k <Plug>(GitGutterPrevHunk)
 nmap <leader>j <Plug>(GitGutterNextHunk)
 nmap <leader>ghp <Plug>(GitGutterPreviewHunk)

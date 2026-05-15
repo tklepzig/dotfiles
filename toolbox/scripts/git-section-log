@@ -1,0 +1,95 @@
+#!/usr/bin/env zsh
+
+# Usage:
+#   git-section-log <file> <line>
+#   git-section-log <file> <start>,<end>
+#
+# Shows the git history of a scoped region of a file:
+#   - Markdown: the section around the cursor line (bounded by same-level or higher headlines)
+#   - Code: the enclosing indentation block (heuristic; pass explicit start,end for precision)
+#
+# Encrypted repos: --textconv ensures diffs are piped through the configured textconv filter.
+
+file="$1"
+line_arg="$2"
+
+if [[ -z "$file" || -z "$line_arg" ]]; then
+  echo "Usage: git-section-log <file> <line|start,end>" >&2
+  exit 1
+fi
+
+if [[ ! -f "$file" ]]; then
+  echo "File not found: $file" >&2
+  exit 1
+fi
+
+if [[ "$line_arg" == *,* ]]; then
+  start="${line_arg%%,*}"
+  end="${line_arg##*,}"
+else
+  line="$line_arg"
+  ext="${${file:t:l}##*.}"  # lowercase extension, strips path
+
+  case "$ext" in
+    md|markdown)
+      read -r start end < <(awk -v cursor="$line" '
+        BEGIN { section_start = 1; section_level = 0; found = 0 }
+        /^#{1,6} / {
+          match($0, /^#+/)
+          level = RLENGTH
+          if (NR <= cursor) {
+            section_start = NR
+            section_level = level
+          } else if (section_level == 0 || level <= section_level) {
+            print section_start, NR - 1
+            found = 1
+            exit
+          }
+        }
+        END { if (!found) print section_start, NR }
+      ' "$file")
+      ;;
+    *)
+      read -r start end < <(awk -v cursor="$line" '
+        { lines[NR] = $0 }
+        END {
+          line = lines[cursor]
+          sub(/[^ \t].*/, "", line)
+          cursor_indent = length(line)
+
+          block_start = 1
+          for (idx = cursor - 1; idx >= 1; idx--) {
+            l = lines[idx]
+            if (l ~ /^[[:space:]]*$/) continue
+            stripped = l
+            sub(/[^ \t].*/, "", stripped)
+            if (length(stripped) < cursor_indent) {
+              block_start = idx
+              break
+            }
+          }
+
+          opener = lines[block_start]
+          sub(/[^ \t].*/, "", opener)
+          opener_indent = length(opener)
+
+          block_end = NR
+          for (idx = cursor + 1; idx <= NR; idx++) {
+            l = lines[idx]
+            if (l ~ /^[[:space:]]*$/) continue
+            stripped = l
+            sub(/[^ \t].*/, "", stripped)
+            if (length(stripped) <= opener_indent) {
+              block_end = idx - 1
+              break
+            }
+          }
+
+          print block_start, block_end
+        }
+      ' "$file")
+      ;;
+  esac
+fi
+
+git log -L "${start},${end}:${file}" --textconv

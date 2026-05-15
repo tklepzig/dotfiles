@@ -163,6 +163,9 @@ git config --global alias.prn "!f() { . ~/.dotfiles/toolbox/scripts/git-github-p
 git config --global alias.pro "!f() { . ~/.dotfiles/toolbox/scripts/git-github-pr; }; f"
 git config --global alias.cmp "!f() { . ~/.dotfiles/toolbox/scripts/git-github-compare \$1 \$2; }; f"
 
+# Show history scoped to a section (markdown) or block (code) — see git-section-log
+git config --global alias.sl "!f() { ~/.dotfiles/toolbox/scripts/git-section-log \"\$1\" \"\$2\"; }; f"
+
 
 #search for regex in all files history
 #git log -G regex [-- path/to/specific file]

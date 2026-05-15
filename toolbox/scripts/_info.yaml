@@ -73,6 +73,16 @@ git-search:
   help: The git pickaxe, searches for a string in the whole history
   args:
     - name: search string
+git-section-log:
+  help: |-
+    Show the git history of a section or block within a file.
+    For markdown: the section containing the given line (bounded by same-level or higher headlines).
+    For code: the enclosing indentation block (heuristic).
+    Encrypted repos are handled transparently via --textconv.
+    Also available as: git sl <file> <line|start,end>
+  args:
+    - name: file
+    - name: line number or start,end range
 git-status-all:
   help: Outputs git status for every repo in current directory
   args:
