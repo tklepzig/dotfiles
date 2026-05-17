@@ -39,6 +39,8 @@ alias battery-monitor="$dotfilesDir/battery-monitor.rb"
 if isOS linux
 then
     alias n='nautilus .'
+    # macOS has a built-in say; on Linux use piper-tts with Cori voice
+    alias say='f(){ echo "$*" | piper-tts --model ~/.local/share/piper/en_GB-cori-high.onnx --output_raw | aplay -r 22050 -f S16_LE -t raw - 2>/dev/null; }; f'
 fi
 
 if isOS darwin
