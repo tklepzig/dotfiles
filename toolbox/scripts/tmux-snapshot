@@ -85,7 +85,7 @@ def tmux_panes(session_name, window_index)
 
   pane_list.map do |pane|
     index, active, tty, path, pane_id = pane.split(/,/)
-    content = `tmux capture-pane -t "#{session_name}:#{window_index}.#{index}" -peTJ -S -`
+    content = `tmux capture-pane -t "#{session_name}:#{window_index}.#{index}" -peTJ -S -`.force_encoding('UTF-8').scrub('')
     command = tty_command(tty) || read_pane_last_command(pane_id)
     [index, { active: !active.to_i.zero?, path:, command:, content: }]
   end
