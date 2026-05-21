@@ -220,6 +220,33 @@ def add_toolbox_includes
   end
 end
 
+def install_tmux_snapshot_scheduler
+  `mkdir -p "#{DF_LOCAL_PATH}/tmux-snapshot"`
+
+  if OS.mac?
+    Logger.log 'Installing tmux-snapshot LaunchAgent'
+    launch_agents = "#{HOME}/Library/LaunchAgents"
+    `mkdir -p "#{launch_agents}"`
+    plist_src = "#{DF_PATH}/tmux/scheduler/dev.dotfiles.tmux-snapshot.plist"
+    plist_dst = "#{launch_agents}/dev.dotfiles.tmux-snapshot.plist"
+    rendered = File.read(plist_src)
+                   .gsub('__DF_PATH__', DF_PATH)
+                   .gsub('__HOME__', HOME)
+    File.write(plist_dst, rendered)
+    # Bootout is best-effort — fails if not loaded; ignore.
+    `launchctl bootout gui/#{Process.uid}/dev.dotfiles.tmux-snapshot 2>/dev/null`
+    `launchctl bootstrap gui/#{Process.uid} "#{plist_dst}"`
+  elsif OS.linux?
+    Logger.log 'Installing tmux-snapshot systemd user units'
+    unit_dir = "#{HOME}/.config/systemd/user"
+    `mkdir -p "#{unit_dir}"`
+    `ln -sf "#{DF_PATH}/tmux/scheduler/tmux-snapshot.service" "#{unit_dir}/tmux-snapshot.service"`
+    `ln -sf "#{DF_PATH}/tmux/scheduler/tmux-snapshot.timer"   "#{unit_dir}/tmux-snapshot.timer"`
+    `systemctl --user daemon-reload`
+    `systemctl --user enable --now tmux-snapshot.timer`
+  end
+end
+
 # TODO: clean up, split into smaller chunks, don't do all of this for basic variant
 def install(variant = DF_VARIANT)
   check_mandatory_installation 'git'
@@ -352,6 +379,8 @@ def install(variant = DF_VARIANT)
     end
     Logger.log 'Symlinking tmux main configuration'
     add_link_with_override "#{DF_PATH}/tmux/tmux.conf", "#{HOME}/.tmux.conf"
+
+    install_tmux_snapshot_scheduler
   end
 
   if program_installed? 'kitty'

@@ -1,0 +1,9 @@
+[Unit]
+Description=Periodic tmux snapshot
+ConditionPathExists=%h/development/dotfiles/toolbox/scripts/tmux-snapshot
+
+[Service]
+Type=oneshot
+ExecStart=%h/development/dotfiles/toolbox/scripts/tmux-snapshot --auto
+StandardOutput=append:%h/.dotfiles-local/tmux-snapshot/auto.log
+StandardError=append:%h/.dotfiles-local/tmux-snapshot/auto.log

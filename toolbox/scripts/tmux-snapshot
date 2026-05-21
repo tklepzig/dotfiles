@@ -6,6 +6,12 @@ require 'json'
 
 CLOSE_ALL = ARGV.include?('--close-all')
 PRINT_PANE_CONTENT = ARGV.include?('-p')
+AUTO = ARGV.include?('--auto')
+
+SNAPSHOT_DIR = "#{ENV['HOME']}/.dotfiles-local/tmux-snapshot"
+SNAPSHOTS_DIR = "#{SNAPSHOT_DIR}/snapshots"
+SNAPSHOT_FILE = "#{SNAPSHOT_DIR}/snapshot.json"
+MAX_SNAPSHOTS = 20
 
 def linux?
   (/linux/ =~ RUBY_PLATFORM) != nil
@@ -95,7 +101,7 @@ def tmux_snapshot
       panes = tmux_panes(session_name, window_index).map do |pane|
         pane_index, pane_info = pane
 
-        save_vim_session(session_name:, window_index:, pane_index:) if pane_info[:command]&.include?('vim')
+        save_vim_session(session_name:, window_index:, pane_index:) if pane_info[:command]&.include?('vim') && !AUTO
 
         { index: pane_index, **pane_info }
       end
@@ -203,30 +209,62 @@ def close_all(snapshot)
   end
 end
 
+def write_auto_snapshot(snapshot_json)
+  `mkdir -p #{SNAPSHOTS_DIR}`
+  timestamp = Time.now.utc.strftime('%Y%m%dT%H%M%SZ')
+  path = "#{SNAPSHOTS_DIR}/snapshot-#{timestamp}.json"
+  File.write(path, snapshot_json)
+
+  # Prune oldest, keeping the newest MAX_SNAPSHOTS
+  files = Dir.glob("#{SNAPSHOTS_DIR}/snapshot-*.json").sort
+  files[0...-MAX_SNAPSHOTS].to_a.each { |file| File.delete(file) }
+
+  # Atomically point snapshot.json at the newest one so restore picks it up
+  tmp = "#{SNAPSHOT_FILE}.tmp"
+  File.delete(tmp) if File.exist?(tmp) || File.symlink?(tmp)
+  File.symlink(path, tmp)
+  File.rename(tmp, SNAPSHOT_FILE)
+end
+
 if PRINT_PANE_CONTENT
   current_session = `tmux display-message -p '#S'`.strip
   current_window = `tmux display-message -p '#I'`.strip
   current_pane = `tmux display-message -p '#P'`.strip
 
-  snapshot = JSON.parse(File.read("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot/snapshot.json"))
+  snapshot = JSON.parse(File.read(SNAPSHOT_FILE))
   puts snapshot['sessions'].find { |session| session['name'] == current_session }['windows'].find { |window| window['index'] == current_window }['panes'].find { |pane| pane['index'] == current_pane }['content']
   exit
 end
 
+# --auto: meant for scheduled runs. No prompt, no close-all, no vim mksession,
+# writes to a rotated file under snapshots/ and repoints snapshot.json at it.
+# Runs without requiring TMUX env var (so it works under launchd/systemd).
+if AUTO
+  # No tmux server, nothing to snapshot. Exit quietly so the scheduler stays happy.
+  exit 0 unless system('tmux has-session 2>/dev/null')
+
+  `mkdir -p #{SNAPSHOT_DIR}`
+  snapshot_json = tmux_snapshot.to_json
+  write_auto_snapshot(snapshot_json)
+  exit 0
+end
+
 if ENV['TMUX']
-  if File.exist?("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot/snapshot.json")
+  if File.exist?(SNAPSHOT_FILE) && !File.symlink?(SNAPSHOT_FILE)
     puts 'Existing snapshot found, overwrite it? (y/n)'
     exit 1 unless $stdin.gets.chomp == 'y'
   end
 
   `mkdir -p #{ENV['HOME']}/.dotfiles-local/vim-sessions`
-  `mkdir -p #{ENV['HOME']}/.dotfiles-local/tmux-snapshot`
+  `mkdir -p #{SNAPSHOT_DIR}`
 
   snapshot = tmux_snapshot
-  File.write("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot/snapshot.json", snapshot.to_json)
+  # If snapshot.json is a symlink from the auto path, replace it with a real file.
+  File.delete(SNAPSHOT_FILE) if File.symlink?(SNAPSHOT_FILE)
+  File.write(SNAPSHOT_FILE, snapshot.to_json)
 
   current_pane_ids = `tmux list-panes -a -F "#\{pane_id\}"`.split(/\n/).to_set
-  Dir.glob("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot/pane-cmd-*").each do |file|
+  Dir.glob("#{SNAPSHOT_DIR}/pane-cmd-*").each do |file|
     pane_id = File.basename(file).delete_prefix('pane-cmd-')
     File.delete(file) unless current_pane_ids.include?(pane_id)
   end
@@ -234,5 +272,5 @@ if ENV['TMUX']
   # Transforming the keys to strings to be able to treat the hash the same way as it was read from the file
   close_all(JSON.parse(snapshot.to_json)) if CLOSE_ALL
 else
-  restore(JSON.parse(File.read("#{ENV['HOME']}/.dotfiles-local/tmux-snapshot/snapshot.json")))
+  restore(JSON.parse(File.read(SNAPSHOT_FILE)))
 end
