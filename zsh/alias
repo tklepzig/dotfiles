@@ -54,6 +54,9 @@ fi
 if isOS darwin
 then
     alias o='open .'
+    speak() {
+        python3 -m edge_tts --text "$*" --voice en-GB-SoniaNeural --write-media /tmp/tts_out.mp3 && afplay /tmp/tts_out.mp3
+    }
 fi
 
 alias git='LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 git'
