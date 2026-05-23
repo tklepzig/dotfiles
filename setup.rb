@@ -232,10 +232,13 @@ def install_tmux_snapshot_scheduler
     rendered = File.read(plist_src)
                    .gsub('__DF_PATH__', DF_PATH)
                    .gsub('__HOME__', HOME)
-    File.write(plist_dst, rendered)
-    # Bootout is best-effort — fails if not loaded; ignore.
-    `launchctl bootout gui/#{Process.uid}/dev.dotfiles.tmux-snapshot 2>/dev/null`
-    `launchctl bootstrap gui/#{Process.uid} "#{plist_dst}"`
+    existing = File.exist?(plist_dst) ? File.read(plist_dst) : nil
+    if rendered != existing
+      File.write(plist_dst, rendered)
+      # Bootout is best-effort — fails if not loaded; ignore.
+      `launchctl bootout gui/#{Process.uid}/dev.dotfiles.tmux-snapshot 2>/dev/null`
+      `launchctl bootstrap gui/#{Process.uid} "#{plist_dst}"`
+    end
   elsif OS.linux?
     Logger.log 'Installing tmux-snapshot systemd user units'
     unit_dir = "#{HOME}/.config/systemd/user"
