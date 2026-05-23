@@ -209,6 +209,14 @@ def close_all(snapshot)
   end
 end
 
+def cleanup_stale_pane_cmd_files
+  current_pane_ids = `tmux list-panes -a -F "#\{pane_id\}"`.split(/\n/).to_set
+  Dir.glob("#{SNAPSHOT_DIR}/pane-cmd-*").each do |file|
+    pane_id = File.basename(file).delete_prefix('pane-cmd-')
+    File.delete(file) unless current_pane_ids.include?(pane_id)
+  end
+end
+
 def write_auto_snapshot(snapshot_json)
   `mkdir -p #{SNAPSHOTS_DIR}`
   timestamp = Time.now.utc.strftime('%Y%m%dT%H%M%SZ')
@@ -246,6 +254,8 @@ if AUTO
   `mkdir -p #{SNAPSHOT_DIR}`
   snapshot_json = tmux_snapshot.to_json
   write_auto_snapshot(snapshot_json)
+
+  cleanup_stale_pane_cmd_files
   exit 0
 end
 
@@ -263,11 +273,7 @@ if ENV['TMUX']
   File.delete(SNAPSHOT_FILE) if File.symlink?(SNAPSHOT_FILE)
   File.write(SNAPSHOT_FILE, snapshot.to_json)
 
-  current_pane_ids = `tmux list-panes -a -F "#\{pane_id\}"`.split(/\n/).to_set
-  Dir.glob("#{SNAPSHOT_DIR}/pane-cmd-*").each do |file|
-    pane_id = File.basename(file).delete_prefix('pane-cmd-')
-    File.delete(file) unless current_pane_ids.include?(pane_id)
-  end
+  cleanup_stale_pane_cmd_files
 
   # Transforming the keys to strings to be able to treat the hash the same way as it was read from the file
   close_all(JSON.parse(snapshot.to_json)) if CLOSE_ALL
