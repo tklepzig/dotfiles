@@ -7,6 +7,7 @@
 * [Interactive Rebase and preserve merge commits](#interactive-rebase-and-preserve-merge-commits)
 * [Push existing branch of old repo into new created repo](#push-existing-branch-of-old-repo-into-new-created-repo)
 * [Ignore files/dirs when doing git log](#ignore-filesdirs-when-doing-git-log)
+* [Find reason why a file is gitignored](#find-reason-why-a-file-is-gitignored)
 
 <!-- vim-markdown-toc -->
 
@@ -61,3 +62,10 @@ https://git-scm.com/docs/git-rebase#Documentation/git-rebase.txt---rebase-merges
 For example when using `g lp` and ignoring changes in `package-lock.json`
 
     g lp -- ':!package-lock.json'
+
+## Find reason why a file is gitignored
+
+This is the cleanest way to ask "is this file actually ignored, and by which
+rule?"
+
+    git check-ignore -v path/to/file
