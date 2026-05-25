@@ -28,6 +28,16 @@ encrypt-clone:
   args:
     - name: URL to repository
     - name: GPG Key ID
+ffmpeg-extract-frames:
+  help: |-
+    Extract frames from a video file.
+    Usage: ffmpeg-extract-frames <input> <output-dir> [--fps 1|source_fps] [--start HH:MM:SS] [--end HH:MM:SS] [--accurate]
+    --accurate: frame-accurate but slow seek (places -ss after -i); default is fast seek (before -i)
+  completion:
+    - --fps
+    - --start
+    - --end
+    - --accurate
 generate-password:
   help: Generate a random password, using letters, numbers and special chars
   args:

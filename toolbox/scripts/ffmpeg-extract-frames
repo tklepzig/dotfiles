@@ -1,0 +1,98 @@
+#!/usr/bin/env zsh
+
+# Extract frames from a video file using ffmpeg.
+#
+# Usage:
+#   ffmpeg-extract-frames <input> <output-dir> [options]
+#
+# Options:
+#   --fps <n|source>   Frames per second to extract (default: source_fps)
+#   --start <HH:MM:SS> Start time
+#   --end <HH:MM:SS>   End time
+#   --accurate         Frame-accurate but slow seek (places -ss after -i)
+#   --help             Show this help
+#
+# Hint: by default -ss is placed BEFORE -i (fast keyframe seek, ±seconds off).
+# Use --accurate to place -ss AFTER -i (slow full decode, frame-exact).
+# For inpainting/compositing where the exact frame matters, prefer --accurate.
+#
+# Note: --end is interpreted differently depending on seek mode:
+#   fast (default): --end is an absolute timestamp in the file
+#   accurate:       --end is relative to --start (duration from seek point)
+# If the extracted range is wrong or too short, this is the first thing to check.
+
+set -euo pipefail
+
+usage() {
+  grep '^#' "$0" | grep -v '^#!/' | sed 's/^# \{0,1\}//'
+  exit 0
+}
+
+input=""
+output_dir=""
+fps="source_fps"
+start_time=""
+end_time=""
+accurate=false
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --help|-h) usage ;;
+    --fps) fps="$2"; shift 2 ;;
+    --start) start_time="$2"; shift 2 ;;
+    --end) end_time="$2"; shift 2 ;;
+    --accurate) accurate=true; shift ;;
+    -*)
+      echo "Unknown option: $1" >&2
+      exit 1
+      ;;
+    *)
+      if [[ -z "$input" ]]; then
+        input="$1"
+      elif [[ -z "$output_dir" ]]; then
+        output_dir="$1"
+      else
+        echo "Unexpected argument: $1" >&2
+        exit 1
+      fi
+      shift
+      ;;
+  esac
+done
+
+if [[ -z "$input" || -z "$output_dir" ]]; then
+  echo "Usage: ffmpeg-extract-frames <input> <output-dir> [options]" >&2
+  echo "Run with --help for full usage." >&2
+  exit 1
+fi
+
+if [[ ! -f "$input" ]]; then
+  echo "Input file not found: $input" >&2
+  exit 1
+fi
+
+mkdir -p "$output_dir"
+
+# Build ffmpeg args. Fast seek (-ss before -i) is the default; --accurate
+# moves -ss after -i for frame-accurate but slower decoding.
+args=()
+
+if [[ "$accurate" == false && -n "$start_time" ]]; then
+  args+=(-ss "$start_time")
+fi
+
+args+=(-i "$input")
+
+if [[ "$accurate" == true && -n "$start_time" ]]; then
+  args+=(-ss "$start_time")
+fi
+
+if [[ -n "$end_time" ]]; then
+  args+=(-to "$end_time")
+fi
+
+args+=(-vf "fps=${fps}")
+args+=("${output_dir}/%04d.png")
+
+echo "Running: ffmpeg ${args[*]}"
+ffmpeg "${args[@]}"
