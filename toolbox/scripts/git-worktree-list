@@ -120,7 +120,7 @@ PREVIEW = 'b=$(git -C {1} merge-base HEAD origin/HEAD 2>/dev/null ' \
            "else git -C {1} log --color=always --date=human '#{LOG_FMT}' -10; fi".freeze
 
 def fzf_pick(rows, prompt:, multi: false)
-  fzf_flags = ['fzf', '--ansi', "--prompt=#{prompt}", "--preview=#{PREVIEW}", '--with-nth=2..', '--nth=4',
+  fzf_flags = ['fzf', '--ansi', "--prompt=#{prompt}", "--preview=#{PREVIEW}", '--with-nth=2..', '--nth=2,3',
                *('--multi' if multi)]
 
   (IO.popen(fzf_flags, 'r+') do |io|
