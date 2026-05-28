@@ -184,6 +184,7 @@ BATTERY_STATE=''  BATTERY_VALUE=''
 FREESPACE_STATE='' FREESPACE_VALUE=''
 WIFI_STATE=''     WIFI_VALUE=''
 NETWORK_LABEL=''
+MEDIA_STATE=''    MEDIA_TITLE=''
 
 read_widget_data() {
     BATTERY_STATE=''; BATTERY_VALUE=''
@@ -226,6 +227,27 @@ read_widget_data() {
         interface=$(ip route get 1.1.1.1 2>/dev/null | grep -oE 'dev [^ ]+' | awk '{print $2}')
         [[ -n "$interface" ]] && NETWORK_LABEL="$interface"
     fi
+
+    # Now-playing — same reader the statusbar uses (emits state\ntitle; exits
+    # silently when nothing is playing). Executed directly like the other
+    # readers (media-info.*.zsh carry the exec bit).
+    MEDIA_STATE=''; MEDIA_TITLE=''
+    if [[ -f "$HOME/.dotfiles/tmux/media-info.$OS.zsh" ]]; then
+        local mout
+        mout=$("$HOME/.dotfiles/tmux/media-info.$OS.zsh" 2>/dev/null)
+        MEDIA_STATE=$(sed -n 1p <<< "$mout")
+        MEDIA_TITLE=$(sed -n 2p <<< "$mout")
+    fi
+}
+
+# Now-playing state → icon (matches the statusbar's media-info.zsh).
+media_icon() {
+    case "$MEDIA_STATE" in
+        Playing) printf '▶' ;;
+        Paused)  printf '⏸' ;;
+        Stopped) printf '⏹' ;;
+        *)       printf '♪' ;;
+    esac
 }
 
 # ── Per-widget formatted strings ────────────────────────────────────────
@@ -413,6 +435,8 @@ render() {
     local cur_code cur_temp cur_feels cur_humidity cur_wind cur_icon knots
     local date_part max_part min_part code_part rain_part wind_part icon day_label
     local wifi_extra top_cell bot_cell forecast_top_line forecast_bot_line
+    local media_title media_line
+    local -i media_budget
     local -a weather_lines system_lines forecast_top forecast_bot forecast_cw all_rows
     local -i band_width band_left band_right wstart sstart frow col clear_row
     local -i idx cell_w pad_top pad_bot top_w bot_w forecast_total_w forecast_col
@@ -565,6 +589,16 @@ render() {
             put $(( top + clock_height + 3 )) $forecast_col "$forecast_top_line"
             put $(( top + clock_height + 4 )) $forecast_col "$forecast_bot_line"
         fi
+
+        # Now-playing — centered under the forecast, truncated to the band.
+        if [[ -n "$MEDIA_TITLE" ]]; then
+            media_budget=$(( band_width - 2 ))
+            (( ${#MEDIA_TITLE} > media_budget )) \
+                && media_title="${MEDIA_TITLE[1,media_budget-1]}…" \
+                || media_title="$MEDIA_TITLE"
+            media_line="$(ansi $value_color)$(media_icon) ${media_title}$(reset)"
+            put $(( top + clock_height + 6 )) $(center_col $(disp_width "$media_line")) "$media_line"
+        fi
     else
         # Narrow — centered vertical stack.
         put $(( top + clock_height + 1 )) $(center_col $(disp_width "$date_colored")) "$date_colored"
@@ -577,6 +611,16 @@ render() {
         if (( ${#forecast_top} )); then
             put $(( top + clock_height + 4 )) $forecast_col "$forecast_top_line"
             put $(( top + clock_height + 5 )) $forecast_col "$forecast_bot_line"
+        fi
+
+        # Now-playing — centered below the forecast.
+        if [[ -n "$MEDIA_TITLE" ]]; then
+            media_budget=$(( terminal_width - 4 ))
+            (( ${#MEDIA_TITLE} > media_budget )) \
+                && media_title="${MEDIA_TITLE[1,media_budget-1]}…" \
+                || media_title="$MEDIA_TITLE"
+            media_line="$(ansi $value_color)$(media_icon) ${media_title}$(reset)"
+            put $(( top + clock_height + 7 )) $(center_col $(disp_width "$media_line")) "$media_line"
         fi
 
         # System widgets — centered status strip at the bottom edge.
