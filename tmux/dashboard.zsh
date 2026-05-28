@@ -11,18 +11,23 @@ emulate -L zsh
 setopt multibyte
 
 # ── Colors (256-color codes, applied as `printf '\033[38;5;Nm'`) ────────
-clock_color=255
-date_color=245
+# Pull the active theme's palette (written by `set-theme`) so the clock and
+# widget accent track whatever theme is set. Falls back to borg-ish defaults.
+[[ -f "$HOME/.dotfiles/colours.zsh" ]] && source "$HOME/.dotfiles/colours.zsh"
+
+clock_color=${primaryText:-28}    # theme primaryText
+date_color=252
 weather_color=220
-forecast_color=245
-label_color=110
+forecast_color=252
+label_color=${accentText:-64}     # widget labels — theme accent
 value_color=252
 warning_color=214
 critical_color=196
-accent_color=110
+accent_color=${accentText:-64}    # e.g. battery charging
 dim_color=240
 
 ansi()  { printf '\033[38;5;%sm' "$1"; }
+bgansi(){ printf '\033[48;5;%sm' "$1"; }
 reset() { printf '\033[0m'; }
 bold()  { printf '\033[1m'; }
 
@@ -37,6 +42,11 @@ esac
 forecast_cache="/tmp/tmux_dashboard_forecast"
 forecast_ttl=600       # 10 min — j1 provides both current + forecast
 widget_refresh_interval=15
+
+# ── Layout ──────────────────────────────────────────────────────────────
+wide_breakpoint=110    # cols ≥ this → 3-column layout; below → centered stack
+band_max=160           # cap content-band width so panels flank the clock on
+                       # ultra-wide screens instead of drifting to the edges
 
 cache_age() {
     local file="$1"
@@ -53,6 +63,17 @@ refresh_forecast_cache() {
     (( $(cache_age "$forecast_cache") < forecast_ttl )) && return
     (curl -s --max-time 8 "wttr.in/?format=j1" 2>/dev/null > "${forecast_cache}.tmp" \
         && mv "${forecast_cache}.tmp" "$forecast_cache" &)
+}
+
+# Rain probability → 256-color code.
+rain_color() {
+    local pct="$1"
+    [[ -z "$pct" || ! "$pct" =~ ^[0-9]+$ ]] && { printf '%s' "$dim_color"; return; }
+    if   (( pct < 20 )); then printf '%s' "$dim_color"
+    elif (( pct < 50 )); then printf '39'    # blue / light rain possible
+    elif (( pct < 80 )); then printf '%s' "$warning_color"
+    else                      printf '%s' "$critical_color"
+    fi
 }
 
 # Temperature → 256-color code. Bands tuned for °C.
@@ -126,6 +147,36 @@ emoji_for_code() {
         200|386|389|392|395)                  printf '⛈️ ' ;;   # thunder
         *)                                    printf '· ' ;;
     esac
+}
+
+# ── Display width (platform-independent emoji handling) ─────────────────
+# wcwidth disagrees across macOS and glibc and undercounts VS16 symbols
+# (☀️ ☁️ ⛈️), so we measure width from a known glyph set rather than the
+# platform's wcwidth: every emoji below renders as 2 cells on any
+# emoji-capable terminal, on both macOS and Arch.
+typeset -ga WIDE_GLYPHS=(☀ ☁ ⛅ ⛈ 🌫 🌦 🌧 🌨 💧 💨)
+
+disp_width() {
+    setopt local_options extendedglob
+    local string glyph before
+    string=${(S)1//$'\033'\[[0-9;]#[a-zA-Z]/}   # strip CSI escapes (color/cursor)
+    string=${string//$'️'/}                # variation selector-16 (zero width)
+    local -i width=0
+    for glyph in "${WIDE_GLYPHS[@]}"; do
+        before=${#string}
+        string=${string//$glyph/}
+        width+=$(( (before - ${#string}) * 2 ))
+    done
+    width+=${#string}
+    print -r -- $width
+}
+
+# Starting column (1-based) to center a `width`-cell string on the terminal
+# axis — which is the same axis the clock is centered on.
+center_col() {
+    local -i col=$(( (term_cols - $1) / 2 + 1 ))
+    (( col < 1 )) && col=1
+    print -r -- $col
 }
 
 # ── Widget data readers (raw scripts emit `state\nvalue`) ───────────────
@@ -217,6 +268,24 @@ freespace_value_color() {
     esac
 }
 
+# ── Clock font — exact tmux 5×5 pixel grid (window-clock.c) ─────────────
+# X = lit pixel (rendered as a bg-colored space), space = unlit.
+# Using bg color avoids █ width ambiguity and matches tmux clock rendering.
+DIGIT=(
+    "XXXXX|X...X|X...X|X...X|XXXXX"   # 0
+    "....X|....X|....X|....X|....X"   # 1
+    "XXXXX|....X|XXXXX|X....|XXXXX"   # 2
+    "XXXXX|....X|XXXXX|....X|XXXXX"   # 3
+    "X...X|X...X|XXXXX|....X|....X"   # 4
+    "XXXXX|X....|XXXXX|....X|XXXXX"   # 5
+    "XXXXX|X....|XXXXX|X...X|XXXXX"   # 6
+    "XXXXX|....X|....X|....X|....X"   # 7
+    "XXXXX|X...X|XXXXX|X...X|XXXXX"   # 8
+    "XXXXX|X...X|XXXXX|....X|XXXXX"   # 9
+)
+COLON_DIGIT=".....|..X..|.....|..X..|....."
+clock_height=5
+
 # ── Cursor / screen control ─────────────────────────────────────────────
 move_to()     { printf '\033[%d;%dH' "$1" "$2"; }   # row, col (1-based)
 clear_to_eol(){ printf '\033[K'; }
@@ -224,150 +293,314 @@ clear_all()   { printf '\033[2J'; }
 hide_cursor() { printf '\033[?25l'; }
 show_cursor() { printf '\033[?25h'; }
 
-# Track rows we've written so we can blank rows that disappear between frames
-# (e.g. forecast row count shrinks). Avoids \033[2J — that causes flicker.
+# ── Terminal dimensions (refreshed on resize) ───────────────────────────
+# A plain read-loop script doesn't reliably see $COLUMNS/$LINES update on
+# resize, so we read the live size from the tty and refresh it on SIGWINCH.
+typeset -gi term_cols=80 term_rows=24
+typeset -g prev_term_cols='' prev_term_rows=''
+update_dims() {
+    local size
+    size=$(stty size 2>/dev/null < /dev/tty)
+    if [[ "$size" == <->" "<-> ]]; then
+        term_rows=${size%% *}
+        term_cols=${size##* }
+    else
+        term_rows=${LINES:-24}
+        term_cols=${COLUMNS:-80}
+    fi
+}
+TRAPWINCH() { update_dims; }
+
+# Track rows we've written so we can clear them between frames.
 typeset -ga DIRTY_ROWS=()
 typeset -ga PREV_DIRTY_ROWS=()
 
-# Buffer a write into the frame string at (row, col). Each piece is followed
-# by clear-to-EOL so shorter content properly truncates the previous line.
+# Buffer a positioned write at (row, col). No clear-to-EOL here: with multiple
+# columns sharing a row (weather | clock | system), an EOL clear from one
+# element would wipe its neighbours. Whole rows are cleared up-front instead —
+# see the clear_prefix in render().
 FRAME_BUFFER=''
 put() {
     local row=$1 col=$2 text=$3
-    FRAME_BUFFER+=$'\033['"${row};${col}"'H'"${text}"$'\033[K'
+    FRAME_BUFFER+=$'\033['"${row};${col}"'H'"${text}"
     DIRTY_ROWS+=("$row")
 }
 
-# Emit blanking escapes for rows that were written last frame but not this one.
-blank_stale_rows() {
-    # NOTE: all locals declared up-front. zsh prints `var=value` if a `local`
-    # declaration appears inside a loop body and is followed by an assignment.
-    local row stale current
-    for row in "${PREV_DIRTY_ROWS[@]}"; do
-        stale=1
-        for current in "${DIRTY_ROWS[@]}"; do
-            if [[ "$current" == "$row" ]]; then
-                stale=0
-                break
-            fi
-        done
-        if (( stale )); then
-            FRAME_BUFFER+=$'\033['"${row};1"'H'$'\033[K'
+# Render one 5-char bitmap row as a terminal string using run-length bg color.
+# Adjacent lit pixels share one bgansi..reset span — no seams between them.
+# Result stored in PIXEL_ROW_RESULT to avoid subshell overhead.
+PIXEL_ROW_RESULT=''
+CLK_BG_ON=''
+CLK_BG_RST=''
+pixel_row() {
+    local bitmap=$1 in_on char result
+    in_on=0
+    result=''
+    for char in "${(s::)bitmap}"; do
+        if [[ $char == X ]]; then
+            (( in_on )) || { result+="$CLK_BG_ON"; in_on=1; }
+            result+=' '
+        else
+            (( in_on )) && { result+="$CLK_BG_RST"; in_on=0; }
+            result+=' '
         fi
+    done
+    (( in_on )) && result+="$CLK_BG_RST"
+    PIXEL_ROW_RESULT="$result"
+}
+
+# Render clock at (start_row, start_col) into FRAME_BUFFER.
+# Font: exact tmux window-clock.c 5×5 grid, 1 cell per pixel, 6-col spacing.
+render_clock() {
+    local start_row=$1 start_col=$2
+    local hour minute row_idx row colon_bitmap
+    local -a h1_rows h2_rows m1_rows m2_rows colon_rows
+    local col_h1 col_h2 col_colon col_m1 col_m2
+    local h1_r h2_r m1_r m2_r col_r
+
+    hour=$(date '+%H')
+    minute=$(date '+%M')
+
+    col_h1=$start_col
+    col_h2=$(( start_col + 6 ))
+    col_colon=$(( start_col + 12 ))
+    col_m1=$(( start_col + 18 ))
+    col_m2=$(( start_col + 24 ))
+
+    CLK_BG_ON="$(bgansi $clock_color)"
+    CLK_BG_RST="$(reset)"
+
+    h1_rows=("${(s:|:)DIGIT[$((${hour[1]}  + 1))]}")
+    h2_rows=("${(s:|:)DIGIT[$((${hour[2]}  + 1))]}")
+    m1_rows=("${(s:|:)DIGIT[$((${minute[1]} + 1))]}")
+    m2_rows=("${(s:|:)DIGIT[$((${minute[2]} + 1))]}")
+    colon_rows=("${(s:|:)COLON_DIGIT}")
+
+    for row_idx in 1 2 3 4 5; do
+        row=$(( start_row + row_idx - 1 ))
+
+        pixel_row "${h1_rows[$row_idx]}"; h1_r="$PIXEL_ROW_RESULT"
+        pixel_row "${h2_rows[$row_idx]}"; h2_r="$PIXEL_ROW_RESULT"
+        pixel_row "${m1_rows[$row_idx]}"; m1_r="$PIXEL_ROW_RESULT"
+        pixel_row "${m2_rows[$row_idx]}"; m2_r="$PIXEL_ROW_RESULT"
+
+        # Colon is always lit — no blinking.
+        pixel_row "${colon_rows[$row_idx]}"
+        col_r="$PIXEL_ROW_RESULT"
+
+        put $row $col_h1 "$h1_r"
+        put $row $col_h2 "$h2_r"
+        put $row $col_colon "$col_r"
+        put $row $col_m1 "$m1_r"
+        put $row $col_m2 "$m2_r"
     done
 }
 
 # ── Render ──────────────────────────────────────────────────────────────
-# Layout (1-based rows/cols):
-#   Left column starts at col 6.
-#   Right column starts at col (COLUMNS / 2).
-#   Top padding: 3 rows.
+# Clock is always centered (tmux clock-mode: x = COLS/2-15, y = LINES/2-3).
+# Everything else arranges around it, responsive to terminal width:
+#
+#   Wide  (COLS ≥ wide_breakpoint): 3 columns inside a centered, width-capped
+#         band — weather left of the clock, system widgets right of it (both
+#         vertically aligned to the clock band), date + forecast centered below.
+#   Narrow: a single centered vertical stack — clock, date, weather, forecast,
+#         and a centered system status strip pinned to the bottom edge.
 render() {
     # NOTE: declare all locals at function top. zsh prints `var=value` if
     # `local` appears inside a loop body followed by an assignment.
-    local terminal_width terminal_height left_col right_col top
-    local time_str date_str current forecast_row fl
-    local date_part rest max_part min_part code_part rain_part wind_part
-    local icon day_label knots
-    local row wifi_extra
-    local cur_code cur_temp cur_feels cur_humidity cur_wind cur_icon
+    local terminal_width terminal_height clock_left top mode
+    local date_str date_colored current rest line wline fl clear_prefix
+    local cur_code cur_temp cur_feels cur_humidity cur_wind cur_icon knots
+    local date_part max_part min_part code_part rain_part wind_part icon day_label
+    local wifi_extra top_cell bot_cell forecast_top_line forecast_bot_line
+    local -a weather_lines system_lines forecast_top forecast_bot forecast_cw all_rows
+    local -i band_width band_left band_right wstart sstart frow col clear_row
+    local -i idx cell_w pad_top pad_bot top_w bot_w forecast_total_w forecast_col
 
-    terminal_width="${COLUMNS:-80}"
-    terminal_height="${LINES:-24}"
+    terminal_width=$term_cols
+    terminal_height=$term_rows
 
-    left_col=6
-    right_col=$(( terminal_width / 2 ))
-    (( right_col < left_col + 30 )) && right_col=$(( left_col + 30 ))
+    clock_left=$(( terminal_width / 2 - 15 ))
+    (( clock_left < 2 )) && clock_left=2
+    top=$(( terminal_height / 2 - 3 ))
+    (( top < 1 )) && top=1
 
-    top=3
+    if (( terminal_width >= wide_breakpoint )); then
+        mode=wide
+    else
+        mode=narrow
+    fi
 
     FRAME_BUFFER=''
     DIRTY_ROWS=()
-
-    # Left column ────────────────────────────────────────────────────────
-    time_str=$(date '+%H:%M')
-    put $top $left_col "$(bold)$(ansi $clock_color)${time_str}$(reset)"
-
-    date_str=$(date '+%A, %-d %B %Y')
-    put $(( top + 2 )) $left_col "$(ansi $date_color)${date_str}$(reset)"
-
-    current=$(read_weather_current)
-    if [[ -n "$current" ]]; then
-        cur_code="${current%%|*}"
-        rest="${current#*|}"
-        cur_temp="${rest%%|*}"
-        rest="${rest#*|}"
-        cur_feels="${rest%%|*}"
-        rest="${rest#*|}"
-        cur_humidity="${rest%%|*}"
-        cur_wind="${rest#*|}"
-        cur_icon=$(emoji_for_code "$cur_code")
-        knots=$(kmh_to_knots "$cur_wind")
-        put $(( top + 4 )) $left_col \
-            "${cur_icon} $(ansi $(temp_color $cur_temp))${cur_temp}°C$(reset)   $(ansi $dim_color)💧 ${cur_humidity}%  💨 ${cur_wind} km/h (${knots} kn)$(reset)"
+    # On any resize, repaint from a clean slate (still one buffered write → no
+    # flicker). Otherwise partial-width rows from the previous size can linger,
+    # and crossing the breakpoint would leave stranded content from both modes.
+    if [[ "$terminal_width" != "$prev_term_cols" || "$terminal_height" != "$prev_term_rows" ]]; then
+        FRAME_BUFFER+=$'\033[2J'
+        PREV_DIRTY_ROWS=()
     fi
 
-    forecast_row=$(( top + 6 ))
+    render_clock $top $clock_left
+
+    date_str=$(date '+%A, %-d %B %Y')
+    date_colored="$(ansi $date_color)${date_str}$(reset)"
+
+    # ── Current-weather lines (each individually colored) ─────────────────
+    weather_lines=()
+    current=$(read_weather_current)
+    if [[ -n "$current" ]]; then
+        cur_code="${current%%|*}";  rest="${current#*|}"
+        cur_temp="${rest%%|*}";     rest="${rest#*|}"
+        cur_feels="${rest%%|*}";    rest="${rest#*|}"
+        cur_humidity="${rest%%|*}"; cur_wind="${rest#*|}"
+        cur_icon=$(emoji_for_code "$cur_code")
+        knots=$(kmh_to_knots "$cur_wind")
+        weather_lines+=("${cur_icon}$(ansi $(temp_color $cur_temp))${cur_temp}°C$(reset)")
+        weather_lines+=("$(ansi $value_color)💧 ${cur_humidity}%$(reset)")
+        weather_lines+=("$(ansi $value_color)💨 ${cur_wind} km/h (${knots} kn)$(reset)")
+    fi
+
+    # ── Forecast: two stacked lines per day ───────────────────────────────
+    # Top:    "Day  icon  max°/min°"
+    # Bottom: "💧 rain%  💨 wind km/h"
+    # Each day becomes a fixed-width cell (the wider of its two lines) so the
+    # rain/wind line sits directly under the matching day card.
+    forecast_top=(); forecast_bot=(); forecast_cw=()
     while IFS= read -r fl; do
         [[ -z "$fl" ]] && continue
-        date_part="${fl%%|*}"
-        rest="${fl#*|}"
-        max_part="${rest%%|*}"
-        rest="${rest#*|}"
-        min_part="${rest%%|*}"
-        rest="${rest#*|}"
-        code_part="${rest%%|*}"
-        rest="${rest#*|}"
-        rain_part="${rest%%|*}"
-        wind_part="${rest#*|}"
+        date_part="${fl%%|*}";  rest="${fl#*|}"
+        max_part="${rest%%|*}";  rest="${rest#*|}"
+        min_part="${rest%%|*}";  rest="${rest#*|}"
+        code_part="${rest%%|*}"; rest="${rest#*|}"
+        rain_part="${rest%%|*}"; wind_part="${rest#*|}"
         icon=$(emoji_for_code "$code_part")
-        knots=$(kmh_to_knots "$wind_part")
         day_label=$(date -j -f "%Y-%m-%d" "$date_part" "+%a" 2>/dev/null \
             || date -d "$date_part" "+%a" 2>/dev/null \
             || echo "$date_part")
-        put $forecast_row $left_col \
-            "$(ansi $forecast_color)${day_label}$(reset)  ${icon} $(ansi $(temp_color $max_part))${max_part}°$(reset)$(ansi $forecast_color)/$(reset)$(ansi $(temp_color $min_part))${min_part}°$(reset)   $(ansi $dim_color)💧 ${rain_part}%  💨 ${wind_part} km/h (${knots} kn)$(reset)"
-        forecast_row=$(( forecast_row + 1 ))
+        knots=$(kmh_to_knots "$wind_part")
+        top_cell="$(ansi $forecast_color)${day_label}$(reset) ${icon}$(ansi $(temp_color $max_part))${max_part}°$(reset)$(ansi $forecast_color)/$(reset)$(ansi $(temp_color $min_part))${min_part}°$(reset)"
+        bot_cell="$(ansi $value_color)💧 ${rain_part}%  💨 ${wind_part} km/h (${knots} kn)$(reset)"
+        top_w=$(disp_width "$top_cell")
+        bot_w=$(disp_width "$bot_cell")
+        forecast_top+=("$top_cell")
+        forecast_bot+=("$bot_cell")
+        (( top_w >= bot_w )) && forecast_cw+=($top_w) || forecast_cw+=($bot_w)
     done < <(read_forecast)
 
-    # Right column ───────────────────────────────────────────────────────
-    row=$top
-
-    # Disk
-    if [[ -n "$FREESPACE_VALUE" ]]; then
-        put $row $right_col \
-            "$(ansi $label_color)Disk    $(reset)$(ansi $(freespace_value_color))${FREESPACE_VALUE}$(reset)"
-        row=$(( row + 1 ))
+    # Assemble the two centered rows (mode-independent — modes just pick the
+    # row offsets). Each cell is right-padded to its column width so both rows
+    # share one geometry and the block centers as a unit.
+    forecast_top_line=''; forecast_bot_line=''; forecast_total_w=0
+    if (( ${#forecast_top} )); then
+        for idx in {1..${#forecast_top}}; do
+            cell_w=${forecast_cw[$idx]}
+            pad_top=$(( cell_w - $(disp_width "${forecast_top[$idx]}") ))
+            pad_bot=$(( cell_w - $(disp_width "${forecast_bot[$idx]}") ))
+            forecast_top_line+="${forecast_top[$idx]}${(l:$pad_top:)}"
+            forecast_bot_line+="${forecast_bot[$idx]}${(l:$pad_bot:)}"
+            forecast_total_w+=$cell_w
+            if (( idx < ${#forecast_top} )); then
+                forecast_top_line+="    "; forecast_bot_line+="    "
+                forecast_total_w+=4
+            fi
+        done
+        forecast_col=$(center_col $forecast_total_w)
     fi
 
-    # Wi-Fi
+    # ── System-widget lines ───────────────────────────────────────────────
+    system_lines=()
+    if [[ -n "$FREESPACE_VALUE" ]]; then
+        system_lines+=("$(ansi $label_color)Disk $(reset)$(ansi $(freespace_value_color))${FREESPACE_VALUE}$(reset)")
+    fi
     if [[ -n "$WIFI_STATE" ]]; then
         wifi_extra=''
-        [[ "$WIFI_STATE" != "disconnected" && -n "$WIFI_VALUE" ]] && wifi_extra=" (${WIFI_VALUE}%)"
-        put $row $right_col \
-            "$(ansi $label_color)Wi-Fi   $(reset)$(ansi $(wifi_value_color))$(wifi_bars)  ${WIFI_STATE}${wifi_extra}$(reset)"
-        row=$(( row + 1 ))
+        [[ "$WIFI_STATE" != "disconnected" && -n "$WIFI_VALUE" ]] && wifi_extra=" ${WIFI_VALUE}%"
+        system_lines+=("$(ansi $label_color)Wi-Fi $(reset)$(ansi $(wifi_value_color))$(wifi_bars)${wifi_extra}$(reset)")
     fi
-
-    # Battery
     if [[ -n "$BATTERY_VALUE" ]]; then
-        put $row $right_col \
-            "$(ansi $label_color)Battery $(reset)$(ansi $(battery_value_color))${BATTERY_VALUE}%  ${BATTERY_STATE}$(reset)"
-        row=$(( row + 1 ))
+        system_lines+=("$(ansi $label_color)Bat $(reset)$(ansi $(battery_value_color))${BATTERY_VALUE}% ${BATTERY_STATE}$(reset)")
     fi
-
-    # Network
     if [[ -n "$NETWORK_LABEL" ]]; then
-        put $row $right_col \
-            "$(ansi $label_color)Network $(reset)$(ansi $value_color)${NETWORK_LABEL}$(reset)"
-        row=$(( row + 1 ))
+        system_lines+=("$(ansi $label_color)Net $(reset)$(ansi $value_color)${NETWORK_LABEL}$(reset)")
     fi
 
-    blank_stale_rows
+    if [[ "$mode" == wide ]]; then
+        # Content band: capped width, centered — keeps panels flanking the
+        # clock instead of drifting to the far edges on an ultra-wide screen.
+        band_width=$(( terminal_width - 4 ))
+        (( band_width > band_max )) && band_width=$band_max
+        band_left=$(( (terminal_width - band_width) / 2 + 1 ))
+        band_right=$(( band_left + band_width - 1 ))
+
+        # Weather — left-aligned at the band edge, centered in the clock band.
+        if (( ${#weather_lines} )); then
+            wstart=$(( top + (clock_height - ${#weather_lines}) / 2 ))
+            (( wstart < top )) && wstart=$top
+            frow=$wstart
+            for line in "${weather_lines[@]}"; do
+                put $frow $band_left "$line"
+                frow+=1
+            done
+        fi
+
+        # System — right-aligned to the band edge, centered in the clock band.
+        if (( ${#system_lines} )); then
+            sstart=$(( top + (clock_height - ${#system_lines}) / 2 ))
+            (( sstart < top )) && sstart=$top
+            frow=$sstart
+            for line in "${system_lines[@]}"; do
+                col=$(( band_right - $(disp_width "$line") + 1 ))
+                (( col < 1 )) && col=1
+                put $frow $col "$line"
+                frow+=1
+            done
+        fi
+
+        # Date — centered directly under the clock.
+        put $(( top + clock_height + 1 )) $(center_col $(disp_width "$date_colored")) "$date_colored"
+
+        # Forecast — two centered rows (day/temp, then rain/wind) under the date.
+        if (( ${#forecast_top} )); then
+            put $(( top + clock_height + 3 )) $forecast_col "$forecast_top_line"
+            put $(( top + clock_height + 4 )) $forecast_col "$forecast_bot_line"
+        fi
+    else
+        # Narrow — centered vertical stack.
+        put $(( top + clock_height + 1 )) $(center_col $(disp_width "$date_colored")) "$date_colored"
+
+        if (( ${#weather_lines} )); then
+            wline="${(j:   :)weather_lines}"
+            put $(( top + clock_height + 2 )) $(center_col $(disp_width "$wline")) "$wline"
+        fi
+
+        if (( ${#forecast_top} )); then
+            put $(( top + clock_height + 4 )) $forecast_col "$forecast_top_line"
+            put $(( top + clock_height + 5 )) $forecast_col "$forecast_bot_line"
+        fi
+
+        # System widgets — centered status strip at the bottom edge.
+        if (( ${#system_lines} )); then
+            line="${(j: · :)system_lines}"
+            put $(( terminal_height - 2 )) $(center_col $(disp_width "$line")) "$line"
+        fi
+    fi
+
+    # Clear every row touched this frame and last frame BEFORE painting, then
+    # lay down the positioned content. This replaces per-element clear-to-EOL
+    # (which wiped column neighbours) and also blanks rows that vanished since
+    # the last frame. Emitted as one prefix → still a single flicker-free write.
+    all_rows=("${DIRTY_ROWS[@]}" "${PREV_DIRTY_ROWS[@]}")
+    clear_prefix=''
+    for clear_row in ${(nou)all_rows}; do
+        clear_prefix+=$'\033['"${clear_row};1"'H'$'\033[2K'
+    done
     PREV_DIRTY_ROWS=("${DIRTY_ROWS[@]}")
+    prev_term_cols=$terminal_width
+    prev_term_rows=$terminal_height
 
     # Flush the entire frame in one write — no intermediate paints, no flicker.
-    printf '%s' "$FRAME_BUFFER"
+    printf '%s%s' "$clear_prefix" "$FRAME_BUFFER"
     # Park cursor in the bottom-left so it doesn't blink in the middle of content.
     move_to "$terminal_height" 1
 }
@@ -384,6 +617,7 @@ hide_cursor
 clear_all
 trap 'tmux set -g status "$prev_status" 2>/dev/null; show_cursor; clear_all; move_to 1 1' EXIT INT TERM
 
+update_dims
 refresh_forecast_cache
 read_widget_data
 
