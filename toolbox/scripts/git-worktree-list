@@ -261,7 +261,15 @@ when 'tmux'
   end
 
 else
-  selected_paths = fzf_pick(build_rows, prompt: 'Switch worktree> ')
-  puts selected_paths.first if selected_paths.first
+  if ARGV[0]
+    branch = ARGV[0]
+    found = worktrees.find { |wt| wt[:branch] == branch }
+    abort "k: no worktree for branch '#{branch}'" unless found
+
+    puts found[:path]
+  else
+    selected_paths = fzf_pick(build_rows, prompt: 'Switch worktree> ')
+    puts selected_paths.first if selected_paths.first
+  end
 
 end

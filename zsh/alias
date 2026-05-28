@@ -83,7 +83,7 @@ k() {
       ;;
     *)
       local target
-      target=$($dotfilesDir/toolbox/scripts/git-worktree-list)
+      target=$($dotfilesDir/toolbox/scripts/git-worktree-list "$@")
       [[ -n "$target" ]] && cd "$target"
       ;;
   esac
