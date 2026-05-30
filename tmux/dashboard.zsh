@@ -52,7 +52,7 @@ cache_age() {
     local file="$1"
     if [[ -f "$file" ]]; then
         local mtime
-        mtime=$(stat -f %m "$file" 2>/dev/null || stat -c %Y "$file" 2>/dev/null || echo 0)
+        mtime=$(stat -c %Y "$file" 2>/dev/null || stat -f %m "$file" 2>/dev/null || echo 0)
         echo $(( $(date +%s) - mtime ))
     else
         echo 999999
@@ -92,7 +92,7 @@ temp_color() {
 # Convert km/h to knots, rounded to nearest integer.
 kmh_to_knots() {
     local kmh="$1"
-    [[ -z "$kmh" ]] && { printf '0'; return; }
+    [[ -z "$kmh" || ! "$kmh" =~ ^[0-9]+(\.[0-9]+)?$ ]] && { printf '0'; return; }
     printf '%.0f' "$(( kmh * 0.539957 ))"
 }
 
