@@ -408,6 +408,13 @@ def install(variant = DF_VARIANT)
     `ln -sf #{DF_PATH}/ranger/rc.conf #{HOME}/.config/ranger/rc.conf`
   end
 
+  if program_installed? 'mpv'
+    Logger.log 'Configuring mpv'
+    `mkdir -p #{HOME}/.config/mpv`
+    `ln -sf #{DF_PATH}/mpv/mpv.conf #{HOME}/.config/mpv/mpv.conf`
+    `ln -sf #{DF_PATH}/mpv/input.conf #{HOME}/.config/mpv/input.conf`
+  end
+
   if program_installed? 'i3'
     Logger.log 'Configuring i3' do
       Logger.log 'Symlinking i3 main configuration'
