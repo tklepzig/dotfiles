@@ -1,8 +1,18 @@
 #!/usr/bin/env zsh
 
-# Read VLC's MPRIS DBus interface (Linux-only).
-title=$(qdbus org.mpris.MediaPlayer2.vlc /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Metadata 2>/dev/null | grep "xesam:title:" | cut -c 14-)
-state=$(qdbus org.mpris.MediaPlayer2.vlc /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlaybackStatus 2>/dev/null)
+# Read the active MPRIS player via playerctl (Linux-only).
+# playerctl auto-selects the most recently active player, so this surfaces any
+# MPRIS-capable app (VLC, mpv via mpv-mpris, Spotify, browsers, …) — not just VLC.
+# Install with: sudo pacman -S playerctl
+if ! command -v playerctl &>/dev/null; then
+    exit
+fi
+
+# Both calls print "No players found" to stderr and exit non-zero when nothing
+# is playing; 2>/dev/null leaves the vars empty and the wrapper bails on an
+# empty title.
+state=$(playerctl status 2>/dev/null)
+title=$(playerctl metadata title 2>/dev/null)
 
 echo "$state"
 echo "$title"

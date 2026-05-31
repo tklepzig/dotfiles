@@ -306,7 +306,7 @@ Additional Software (run as non-privileged user)
 
     sudo pacman -S xclip ripgrep ranger tig fzf lynx xdotool eza peco sshfs pwgen mat2 btop net-tools lsof iproute2
     sudo pacman -S nautilus gparted eog gnome-tweaks gdmap texlive-core texlive-latexextra texlive-binextra evince xpdf texworks pass paperkey
-    sudo pacman -S easytag audacity gimp vlc pqiv git-delta jless git-filter-repo ueberzugpp cmus mpv mpv-mpris obs-studio
+    sudo pacman -S easytag audacity gimp vlc pqiv git-delta jless git-filter-repo ueberzugpp cmus mpv mpv-mpris playerctl obs-studio
     sudo pacman -S networkmanager-vpnc android-tools smartmontools
     sudo pacman -S docker docker-buildx
 
