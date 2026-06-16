@@ -1,0 +1,4 @@
+Usage: git-fetch-merge [--all]
+
+fetches and merges the current and the default branch (master or main)
+If --all given, all branches are updated

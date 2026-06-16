@@ -2,11 +2,13 @@
 
 > **RESUME HERE (read this first).** Multi-week effort, done in small steps.
 > - **Branch:** `port-to-python`.
-> - **Current position:** Step 0 ✅ done. **Step 1 (`_run.rb` → `_run.py`) not yet started.**
-> - **Next action:** Step 1, sub-step 1 — build the golden-output harness
->   (capture `_run.rb` stdout for every mode listed in the Verification matrix)
->   *before* writing any Python. Then migrate `_info.yaml`→`_info.toml`, port
->   `_run.py` against `tomllib`, diff to byte-identical, flip call sites.
+> - **Current position:** Step 0 ✅ done. Step 1 **in progress** — sub-step 1
+>   (golden-output harness) ✅ done.
+> - **Next action:** Step 1, sub-step 2 — migrate `_info.yaml`→`_info.toml`
+>   (mechanical), then port `_run.py` against `tomllib`, run
+>   `toolbox/test/golden.py verify` to diff byte-identical, flip call sites.
+>   The "Learn by Doing" piece for the port = the arg-validation logic in
+>   `_run.py`.
 > - **Working style:** one chunk at a time, keep each `.rb` until its `.py` is
 >   verified, flip call sites late, delete `.rb` last. Hand Thomas a "Learn by
 >   Doing" contribution per chunk (next: arg-validation logic in `_run.py`).
@@ -48,6 +50,21 @@ prerequisite for bootstrapping a fresh machine.
   once on PATH — same shell-reload requirement every toolbox alias already has).
 
 ## Key facts (so we don't re-derive them)
+
+- **Golden harness:** `toolbox/test/golden.py` — `capture` (runs `_run.rb`,
+  writes raw-byte snapshots + `manifest.json` to `toolbox/test/golden/`) and
+  `verify [runner]` (diffs a candidate runner, default `_run.py`). Snapshots
+  captured from `_run.rb` (20 cases incl. the `#{nil}`→`""` trailing-space
+  cases). Lives *outside* `toolbox/scripts/` so `_run`'s glob doesn't list it.
+  Two gotchas baked into the harness: (1) it runs the runner under a throwaway
+  `$HOME` whose `.dotfiles` symlinks to the dev clone (so `SCRIPTS_PATH`
+  resolves here, not the deployed `~/.dotfiles`); (2) that fake `$HOME` breaks
+  the asdf `ruby`/`python3` shim (exits 126) unless `ASDF_DATA_DIR`/`ASDF_DIR`
+  are pinned to the real `~/.asdf` — the harness does this.
+- **`Dir.glob` is sorted in Ruby (since 3.0); Python `glob` is NOT.** `--list`
+  and `--details` golden output is lexicographically sorted → `_run.py` must
+  `sorted()` the globbed names or it breaks the byte-identical contract.
+
 
 - **Bootstrap / call sites to flip (LAST):**
   - `README.md:9` install one-liner — `ruby -e "$(curl …setup.rb)"`

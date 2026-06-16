@@ -1,0 +1,134 @@
+{
+  "list": {
+    "argv": [
+      "--list"
+    ],
+    "exit": 0
+  },
+  "details": {
+    "argv": [
+      "--details"
+    ],
+    "exit": 0
+  },
+  "completion-help": {
+    "argv": [
+      "--completion",
+      "help"
+    ],
+    "exit": 0
+  },
+  "completion-set-theme": {
+    "argv": [
+      "--completion",
+      "set-theme"
+    ],
+    "exit": 0
+  },
+  "completion-colours": {
+    "argv": [
+      "--completion",
+      "colours"
+    ],
+    "exit": 0
+  },
+  "completion-unknown": {
+    "argv": [
+      "--completion",
+      "nonexistent"
+    ],
+    "exit": 0
+  },
+  "help-set-theme": {
+    "argv": [
+      "help",
+      "set-theme"
+    ],
+    "exit": 1
+  },
+  "help-git-search": {
+    "argv": [
+      "help",
+      "git-search"
+    ],
+    "exit": 1
+  },
+  "help-colours": {
+    "argv": [
+      "help",
+      "colours"
+    ],
+    "exit": 1
+  },
+  "help-git-fetch-merge": {
+    "argv": [
+      "help",
+      "git-fetch-merge"
+    ],
+    "exit": 1
+  },
+  "help-unknown": {
+    "argv": [
+      "help",
+      "nonexistent"
+    ],
+    "exit": 1
+  },
+  "dispatch-list-ports": {
+    "argv": [
+      "list-ports"
+    ],
+    "exit": 0
+  },
+  "dispatch-colours-ok": {
+    "argv": [
+      "colours",
+      "4"
+    ],
+    "exit": 0
+  },
+  "dispatch-git-search-ok": {
+    "argv": [
+      "git-search",
+      "foo"
+    ],
+    "exit": 0
+  },
+  "missing-arg": {
+    "argv": [
+      "git-search"
+    ],
+    "exit": 1
+  },
+  "too-many-args": {
+    "argv": [
+      "colours",
+      "a",
+      "b"
+    ],
+    "exit": 1
+  },
+  "unknown-script": {
+    "argv": [
+      "nonexistent"
+    ],
+    "exit": 1
+  },
+  "help-empty": {
+    "argv": [
+      "help",
+      ""
+    ],
+    "exit": 1
+  },
+  "help-nil": {
+    "argv": [
+      "help"
+    ],
+    "exit": 1
+  },
+  "empty": {
+    "argv": [],
+    "exit": 1
+  }
+}

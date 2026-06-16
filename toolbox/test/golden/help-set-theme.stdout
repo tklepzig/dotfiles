@@ -1,0 +1,3 @@
+Usage: set-theme <theme name>
+
+Set the theme for kitty, tmux and vim

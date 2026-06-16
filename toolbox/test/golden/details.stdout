@@ -1,0 +1,50 @@
+help:[0;32;2mShow help for given command[0m
+battery-monitor:[0;32;2mIf battery level is lower than 16, plays an alert noise[0m
+blitz-ortung:[0;32;2mOpens blitzortung.org in browser[0m
+colours:[0;32;2mList all possible console colours[0m
+colours-zsh:[0;15;2mNo help for colours-zsh[0m
+docs:[0;32;2mOpens toolbox docs in vim[0m
+docs-app:[0;15;2mNo help for docs-app[0m
+docs-serve:[0;32;2mOpens toolbox docs in browser[0m
+encrypt-clone:[0;32;2mClone a repository and run setup to support encryption[0m
+ffmpeg-extract-frames:[0;32;2mExtract frames from a video file.[0m
+generate-password:[0;32;2mGenerate a random password, using letters, numbers and special chars[0m
+git-branch-diff:[0;32;2mList branches and preview/view their diff against the default branch (main/master)[0m
+git-checkout-fuzzy:[0;32;2mUse git checkout with fzf's fuzzy search[0m
+git-clone-cd:[0;32;2mClone a repository and cd into it[0m
+git-fetch-all:[0;32;2mFetches all repos in current directory[0m
+git-fetch-merge:[0;32;2mfetches and merges the current and the default branch (master or main)[0m
+git-fetch-merge.old:[0;15;2mNo help for git-fetch-merge.old[0m
+git-github-compare:[0;32;2mOpens github.com with compare view[0m
+git-github-pr:[0;32;2mOpens github.com with current branch's PR[0m
+git-interactive-rebase-branch:[0;15;2mNo help for git-interactive-rebase-branch[0m
+git-search:[0;32;2mThe git pickaxe, searches for a string in the whole history[0m
+git-status-all:[0;32;2mOutputs git status for every repo in current directory[0m
+git-update:[0;15;2mNo help for git-update[0m
+git-worktree-list:[0;32;2mManage git worktrees with fzf. Called via the `k` zsh function.[0m
+gpg-add-subkey:[0;32;2mAdd a new subkey to an existing GPG key[0m
+gpg-create:[0;32;2mCreate a new GPG keypair[0m
+gpg-delete-primary-only:[0;32;2mDelete only the primary key from a GPG key[0m
+gpg-delete-subkey:[0;32;2mDelete a subkey from a GPG keyring[0m
+gpg-export:[0;32;2mExport a GPG key to a file[0m
+gpg-import:[0;32;2mImport a GPG key from a file[0m
+gpg-list:[0;32;2mList all GPG keys in the keyring[0m
+gpg-renew:[0;32;2mExtend the expiration date of a GPG key[0m
+inhibit:[0;32;2mStop linux from going to sleep or idle[0m
+list-ports:[0;32;2mList all open ports[0m
+luks-close:[0;32;2mClose LUKS container[0m
+luks-open:[0;32;2mOpen LUKS container[0m
+mastermind:[0;32;2mJust a mastermind game[0m
+notify:[0;32;2mPlays an notify sound, e.g. for getting notified after long running cmd[0m
+npm-tabula-rasa:[0;32;2mRecursively remove node_modules[0m
+rename-auto-increment:[0;15;2mNo help for rename-auto-increment[0m
+set-theme:[0;32;2mSet the theme for kitty, tmux and vim[0m
+setup-asdf:[0;32;2mSet up asdf and plugins[0m
+stacked:[0;32;2mUsing stacked branches in git, see `stacked help`[0m
+sync-with-drive:[0;32;2mSync current dotfiles with drive[0m
+tmux-overview:[0;32;2mShow all tmux sessions and windows with git branch, dirty status, and worktree indicator[0m
+tmux-snapshot:[0;32;2mWhen run inside tmux, it will save a snapshot of all tmux sessions. If --close-all is given, all sessions will be closed. If -p is given, it will print the content from the snapshot for the current pane if existing.[0m
+vicy-serve.deprecated:[0;15;2mNo help for vicy-serve.deprecated[0m
+vicy.deprecated:[0;15;2mNo help for vicy.deprecated[0m
+weather:[0;32;2mGet the weather forecast[0m
+workspaces:[0;32;2mManage and open tmux sessions for active workspaces. Called via the `ws` alias.[0m
