@@ -1,34 +1,139 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
+# Install asdf (the Go rewrite) as a prebuilt binary and provision node, python
+# and a set of CLI tools. No Go/make toolchain — the whole thing lives under
+# ~/.asdf and can be removed with `rm -rf ~/.asdf`. Safe to re-run (idempotent).
+#
+# Everything tracks `asdf latest`, so the script never needs version bumps.
+#
+# Usage:  setup-asdf [--minimal] [--ruby]
+#   (default)   core (node, python, neovim) + dev tools (ctop, wrk, github-cli,
+#               gitui) — a full dev workstation.
+#   --minimal   core only; skip the dev-workstation tools (e.g. a Pi appliance).
+#   --ruby      also install ruby (opt-in: slow ARM compile, and the dotfiles
+#               toolbox runs on system ruby). Or set SETUP_ASDF_RUBY=1.
 
-if [ -d "$HOME/.asdf" ]
-then
-  echo "Warning: asdf already set up, exiting."
-  exit 1
-fi
+set -uo pipefail
 
-git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf
-cd $HOME/.asdf
-git checkout "$(git describe --abbrev=0 --tags)"
-make
-if ! grep -q 'export PATH="$HOME/.asdf:$PATH"' $HOME/.zshrc
-then
-  echo 'export PATH="$HOME/.asdf:$PATH"' >> $HOME/.zshrc;
-  echo 'export PATH="$HOME/.asdf/shims:$PATH"' >> $HOME/.zshrc;
-  mkdir -p "$HOME/.asdf/completions"
-  source $HOME/.zshrc
-  asdf completion zsh > "$HOME/.asdf/completions/_asdf"
-  echo 'fpath=($HOME/.asdf/completions $fpath)' >> $HOME/.zshrc;
-fi
-cd -
-
-source $HOME/.zshrc
-
-for plugin in nodejs python ruby vim ctop neovim wrk github-cli gitui
-do
-  asdf plugin add $plugin
-  asdf install $plugin latest
-  asdf set -u $plugin latest
+# --- arg parsing -------------------------------------------------------------
+minimal=0
+want_ruby=0
+[ "${SETUP_ASDF_RUBY:-}" = "1" ] && want_ruby=1
+for arg in "$@"; do
+  case "$arg" in
+    --minimal) minimal=1 ;;
+    --ruby)    want_ruby=1 ;;
+    *) printf 'Unknown argument: %s\nUsage: setup-asdf [--minimal] [--ruby]\n' "$arg" >&2
+       exit 1 ;;
+  esac
 done
 
+ASDF_BIN="$HOME/.asdf/bin"
 
+# --- 1. asdf binary ----------------------------------------------------------
+# Skip the download only if a real (Go) binary is already here. A shell script
+# at this path is the OLD classic asdf — the previous setup-asdf git-cloned asdf
+# and `make`d it, leaving a Bash asdf 0.15 at ~/.asdf/bin/asdf whose CLI has no
+# `set` subcommand. Detect that (shebang first line) and overwrite it with the
+# prebuilt Go binary instead of skipping. (To fully clear an old classic install
+# and its cloned repo: `rm -rf ~/.asdf` before running.)
+if [ -x "$ASDF_BIN/asdf" ] && ! head -n1 "$ASDF_BIN/asdf" | grep -q '^#!'; then
+  echo "asdf already installed at $ASDF_BIN/asdf — skipping download."
+else
+  mkdir -p "$ASDF_BIN"
 
+  # Debian's `dpkg --print-architecture` already yields arm64/amd64; elsewhere
+  # fall back to uname and normalise to the names asdf uses in its asset files.
+  asdf_arch="$(dpkg --print-architecture 2>/dev/null || uname -m)"
+  case "$asdf_arch" in
+    x86_64)  asdf_arch="amd64" ;;
+    aarch64) asdf_arch="arm64" ;;
+  esac
+  asdf_os="linux"
+  [ "$(uname -s)" = "Darwin" ] && asdf_os="darwin"
+
+  # Resolve the real asset URL from the API — asset naming has shifted across
+  # the Go-rewrite releases, so don't hand-build it. `grep -m1` (not `| head`)
+  # avoids a SIGPIPE abort under pipefail.
+  asdf_url="$(curl -fsSL https://api.github.com/repos/asdf-vm/asdf/releases/latest \
+    | grep -oE -m1 "https://[^\"]*asdf-v[^\"]*${asdf_os}-${asdf_arch}\.tar\.gz")"
+  if [ -z "$asdf_url" ]; then
+    echo "ERROR: could not resolve asdf download URL (GitHub API rate-limited, or asset naming changed?)." >&2
+    exit 1
+  fi
+
+  curl -fsSL "$asdf_url" | tar -xzf - -C "$ASDF_BIN"
+  if [ ! -x "$ASDF_BIN/asdf" ]; then
+    echo "ERROR: asdf binary missing at $ASDF_BIN/asdf after extraction (unexpected tarball layout?)." >&2
+    exit 1
+  fi
+fi
+
+export ASDF_DATA_DIR="$HOME/.asdf"
+export PATH="$HOME/.asdf/bin:$HOME/.asdf/shims:$PATH"
+
+# --- 2. persist PATH for interactive shells ----------------------------------
+# Written to BOTH rc files (created if absent) so a future bash -> zsh switch
+# doesn't silently lose asdf. The dotfiles zsh config does NOT manage this PATH,
+# so there's no double-append to worry about — the grep guard keeps it once.
+for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
+  touch "$rc"
+  if ! grep -q '.asdf/shims' "$rc"; then
+    printf '\n# asdf\nexport PATH="$HOME/.asdf/bin:$HOME/.asdf/shims:$PATH"\n' >> "$rc"
+  fi
+done
+
+# zsh completion: drop the generated _asdf into the dotfiles' completion dir,
+# which zsh/zshrc already has on fpath *before* compinit (the same dir setup.rb
+# uses for the docker completions). Assumes the dotfiles are installed (true here: on the Pi,
+# setup.rb runs before this script; standalone, you're running a dotfiles script
+# so the repo is present). Regenerated each run so it tracks the asdf version.
+# Write via .tmp + mv so a failed generation never leaves a broken _asdf that
+# would trip compinit.
+completions_dir="$HOME/.zsh/completion"
+mkdir -p "$completions_dir"
+if asdf completion zsh > "$completions_dir/_asdf.tmp" 2>/dev/null; then
+  mv "$completions_dir/_asdf.tmp" "$completions_dir/_asdf"
+else
+  rm -f "$completions_dir/_asdf.tmp"
+  echo "WARNING: 'asdf completion zsh' failed — zsh completion not installed." >&2
+fi
+
+# --- 3. languages + tools ----------------------------------------------------
+install_latest() {
+  local plugin="$1"
+  asdf plugin add "$plugin" 2>/dev/null || true
+  local version
+  version="$(asdf latest "$plugin" 2>/dev/null || true)"
+  if [ -z "$version" ]; then
+    echo "WARNING: could not resolve a latest version for '$plugin' — skipping." >&2
+    return
+  fi
+  echo ">> $plugin $version"
+  if asdf install "$plugin" "$version"; then
+    asdf set -u "$plugin" "$version"
+  else
+    echo "WARNING: 'asdf install $plugin $version' failed — skipping." >&2
+  fi
+}
+
+plugins=(nodejs python neovim)
+
+# Dev-workstation tools — skipped with --minimal (e.g. a Pi appliance doesn't
+# need a container-top, an HTTP benchmarker, or git/GitHub TUIs).
+if [ "$minimal" -eq 0 ]; then
+  plugins+=(ctop wrk github-cli gitui)
+fi
+
+for plugin in "${plugins[@]}"; do
+  install_latest "$plugin"
+done
+
+# ruby is opt-in (slow ARM compile; the dotfiles toolbox runs on system ruby).
+if [ "$want_ruby" -eq 1 ]; then
+  # Known-good master ruby-build (matches the dotfiles zshrc default) so a
+  # current stable ruby resolves.
+  export ASDF_RUBY_BUILD_VERSION=master
+  install_latest ruby
+fi
+
+echo "asdf provisioning complete. Open a new shell (or 'source ~/.zshrc') to pick up the PATH."

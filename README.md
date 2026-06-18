@@ -14,6 +14,18 @@ My dotfiles.
     /usr/bin/env ruby -e "$(curl -Ls https://raw.githubusercontent.com/\
     tklepzig/dotfiles/master/setup.rb)" -- --vim
 
+### Raspberry Pi (full bootstrap)
+
+On a fresh Raspberry Pi 5 (Raspberry Pi OS Bookworm, SSH on), `pi-setup.sh`
+provisions the whole box — apt packages, the dotfiles above and languages via
+asdf — in one idempotent step:
+
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/\
+    tklepzig/dotfiles/master/pi-setup.sh)"
+
+See `toolbox/docs/raspberrypi-os.md` for the SD-card / SSH / Wi-Fi prep that
+comes first.
+
 ## Migration from basic/full variants to vim/neovim
 
 The vim/neovim setup was restructured. If you are upgrading from the previous
