@@ -19,7 +19,14 @@ if [[ "$theme" =~ "light" ]]
 then
   kitty_theme="light"
 fi
-cat $HOME/.dotfiles/themes/kitty.$kitty_theme.conf > $HOME/.dotfiles/kitty/kitty.theme.conf
+# A theme may ship its own kitty palette (e.g. a custom background); prefer it
+# and fall back to the shared dark/light palette otherwise.
+if [[ -f $HOME/.dotfiles/themes/kitty.$theme.conf ]]
+then
+  cat $HOME/.dotfiles/themes/kitty.$theme.conf > $HOME/.dotfiles/kitty/kitty.theme.conf
+else
+  cat $HOME/.dotfiles/themes/kitty.$kitty_theme.conf > $HOME/.dotfiles/kitty/kitty.theme.conf
+fi
 
 rm -f $HOME/.dotfiles/colours.vim
 while read -r line
