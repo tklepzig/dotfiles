@@ -1,9 +1,21 @@
-Install package
+Install a new package (always upgrade the whole system in the same step)
 
-    sudo pacman -S
+    sudo pacman -Syu <package>
 
-> **Never use `-Sy` to avoid partial upgrades**  
-> Only upgrade the system at once with `-Syu`
+> Arch is rolling-release: mirrors only ever hold the _latest_ build of each
+> package, and your local db is just a cached snapshot of the last sync.
+> Installing against a stale db pulls dependency versions the mirrors no longer
+> have (→ 404) or that mismatch your installed libraries (→ breakage).
+>
+> - `pacman -Syu <pkg>` — the safe default: db + system + new pkg move together
+> - `pacman -S <pkg>` — fine **only** right after a full upgrade
+> - `pacman -Sy <pkg>` — **never**: refreshes the db but not the system, i.e. a
+>   partial upgrade (new pkg linked against old libs). This is what causes the
+>   404 / "invalid signature" mess on the next install.
+
+Upgrade the whole system
+
+    sudo pacman -Syu
 
 Remove packages
 

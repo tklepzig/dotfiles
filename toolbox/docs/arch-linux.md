@@ -482,6 +482,22 @@ the respective repositories.
 
 Checkout https://archlinux.org/news/ for any solutions to known issues.
 
+#### Packages return 404 ("failed retrieving file ... The requested URL returned error: 404") from mirrors
+
+Your sync db is stale: it references package versions the mirrors have already
+replaced with newer builds, so the old files are gone. Almost always caused by a
+partial upgrade (installing with `pacman -S <pkg>` or `-Sy <pkg>` against an
+out-of-date db instead of `-Syu`). Often shows up together with "invalid
+signature" errors (see below). Recover with a full upgrade, refreshing the
+keyring first:
+
+    sudo pacman -Sy archlinux-keyring && sudo pacman -Su
+
+> `-Sy archlinux-keyring` refreshes the db and updates the signing keyring (it's
+> signed by Arch master keys already trusted on your system, so it verifies even
+> when other packages don't). `-Su` then upgrades everything against the fresh
+> db. After this, install the package you originally wanted with `-Syu <pkg>`.
+
 #### File /var/cache/pacman/pkg/something.tar.xz is corrupted (invalid or corrupted package (PGP signature)).
 
 That means that the package integrity cannot be checked by its PGP signature.
