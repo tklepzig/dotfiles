@@ -29,8 +29,16 @@
 * [Upgrade System](#upgrade-system)
     * [Troubleshooting](#troubleshooting)
         * [Read the news](#read-the-news)
+        * [Packages return 404 ("failed retrieving file ... The requested URL returned error: 404") from mirrors](#packages-return-404-failed-retrieving-file--the-requested-url-returned-error-404-from-mirrors)
         * [File /var/cache/pacman/pkg/something.tar.xz is corrupted (invalid or corrupted package (PGP signature)).](#file-varcachepacmanpkgsomethingtarxz-is-corrupted-invalid-or-corrupted-package-pgp-signature)
         * [Restore all packages to a specific date](#restore-all-packages-to-a-specific-date)
+* [Printing and Scanning (HP Officejet 4630)](#printing-and-scanning-hp-officejet-4630)
+    * [Packages](#packages)
+    * [Enable mDNS discovery](#enable-mdns-discovery)
+    * [Configure the printer](#configure-the-printer)
+    * [Print a test page](#print-a-test-page)
+    * [Configure the scanner](#configure-the-scanner)
+    * [Gotchas](#gotchas)
 * [Bluetooth Troubleshooting](#bluetooth-troubleshooting)
 * [TODO (WIP)](#todo-wip)
 * [References](#references)
@@ -526,6 +534,93 @@ Then update the package database and force a downgrade:
 
 > See also
 > https://wiki.archlinux.org/title/Arch_Linux_Archive#How_to_restore_all_packages_to_a_specific_date
+
+## Printing and Scanning (HP Officejet 4630)
+
+Network all-in-one (print + scan) on the LAN. Setup that actually works on Arch:
+**hpcups** for printing, **sane-airscan** (driverless eSCL) for scanning. Do
+_not_ rely on HPLIP's `hpaio` or sane's built-in `escl` backend for scanning —
+both are broken for this model (see [Gotchas](#gotchas)).
+
+First find the printer's IP (from its own panel under Settings → Network, or via
+the router). Examples below use `192.168.178.58`.
+
+### Packages
+
+    sudo pacman -Syu hplip sane sane-airscan simple-scan nss-mdns
+
+> - `hplip` — print driver (hpcups) + `hp-setup`
+> - `sane` + `sane-airscan` — scanning framework + the driverless eSCL backend
+> - `simple-scan` — scan GUI
+> - `nss-mdns` — `.local` name resolution (also repairs the `mdns_minimal` entry
+>   in `/etc/nsswitch.conf`)
+
+### Enable mDNS discovery
+
+Avahi must be **enabled** (not just started), or the printer "vanishes" after a
+reboot:
+
+    sudo systemctl enable --now avahi-daemon.service
+
+### Configure the printer
+
+Run HP's setup tool against the IP. It detects the model, picks the driver, and
+creates the CUPS queue. **Note the `/usr/bin/python`** — it bypasses the asdf
+shim (see [Gotchas](#gotchas)):
+
+    sudo /usr/bin/python /usr/bin/hp-setup -i 192.168.178.58
+
+At the prompts: confirm it detected the Officejet 4630, press Enter to accept
+the auto-selected driver, and **skip the HP test page** (`hp-testpage` also
+breaks on asdf — we test below instead).
+
+Verify the queue was created:
+
+    lpstat -p -d
+    lpstat -v        # device URI should be hp:/net/Officejet_4630_series?ip=...
+
+### Print a test page
+
+Set it as the default printer (per-user, no sudo) and print a built-in test page
+(avoids HP's Python test tool):
+
+    lpoptions -d Officejet_4630
+    lp /usr/share/cups/data/default-testpage.pdf
+
+### Configure the scanner
+
+List SANE devices — an `airscan:` entry should appear:
+
+    scanimage -L
+    # device `airscan:e0:HP Officejet 4630 series [AA87B9]' is a eSCL ... scanner
+
+Disable sane's broken built-in `escl` backend so `simple-scan` auto-picks
+`sane-airscan` instead of failing on the wrong one:
+
+    sudo sed -i 's/^escl$/#escl/' /etc/sane.d/dll.conf
+
+Test scan from the CLI (blank platen is fine — proves the pipeline):
+
+    scanimage -d 'airscan:e0:HP Officejet 4630 series [AA87B9]' \
+        --mode Color --resolution 150 --format=png -o ~/scan-test.png
+
+Day-to-day, just use the **`simple-scan`** GUI and pick the eSCL/airscan device.
+
+### Gotchas
+
+- **asdf shadows system Python.** The `hp-*` tools (`hp-setup`, `hp-testpage`,
+  `hp-check`) have shebang `#!/usr/bin/env python`, which resolves to the asdf
+  shim → `No version is set for command python`. Always invoke them as
+  `sudo /usr/bin/python /usr/bin/hp-…`. Printing and scanning themselves are C
+  programs and are unaffected.
+- **Scan backends.** For this model `hpaio` (HPLIP) core-dumps on a network scan
+  (`libpng error: No IDATs written`) and the built-in `escl` backend misparses
+  the device and fails with `sane_start: Invalid argument`. `sane-airscan` is
+  the one that works — install it and disable built-in `escl` as above.
+- **Stale package db.** If `pacman -S hplip …` throws 404s / "invalid
+  signature", the system db is stale from a partial upgrade — fix with a full
+  `-Syu` first (see [pacman.md](pacman.md) and the troubleshooting section
+  above).
 
 ## Bluetooth Troubleshooting
 
