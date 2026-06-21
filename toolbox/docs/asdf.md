@@ -1,47 +1,79 @@
-Add plugin (e.g. nodejs)
+# asdf
+
+These notes cover the **Go rewrite** of asdf (0.16+), which is what `setup-asdf`
+installs (a self-contained prebuilt binary under `~/.asdf`). The CLI differs from
+the old shell-based asdf: there is no `asdf local` / `asdf global` (use
+`asdf set`), and `asdf update` no longer upgrades asdf itself.
+
+asdf and the core toolchains (node, python, neovim, …) are provisioned by the
+`setup-asdf` script — see `# setup-asdf` in the README. The commands below are
+for day-to-day use afterwards.
+
+Add a plugin (e.g. nodejs)
 
 ```
 asdf plugin add nodejs
 ```
 
-Install version and add it to `.tool-versions`
+List installable versions
 
 ```
-asdf install nodejs 14.17.1
+asdf list all nodejs
 ```
 
-Install version which is listed in `.tool-versions`
+Show the latest available version
+
+```
+asdf latest nodejs
+```
+
+Install a specific version (this only installs it — it does **not** touch
+`.tool-versions`)
+
+```
+asdf install nodejs 22.11.0
+```
+
+Record a version in `.tool-versions`. Without a flag this writes to the
+`.tool-versions` in the current directory (project-local); `-u` writes to the one
+in your home directory (the global default).
+
+```
+asdf set nodejs 22.11.0       # ./.tool-versions
+asdf set -u nodejs 22.11.0    # ~/.tool-versions
+```
+
+Install the version(s) already pinned in `.tool-versions` (run with no tool name
+to install everything listed)
 
 ```
 asdf install nodejs
+asdf install
 ```
 
-Set local version of plugin (`./.tool-versions`)
+Show the resolved versions for the current directory
 
 ```
-asdf local nodejs 14.17.1
+asdf current
 ```
 
-Set global version of plugin (`~/.tool-versions`)
-
-```
-asdf global nodejs 14.17.1
-```
-
-Reshim plugin to create shims for newly added executables (e.g. after a `pip install`)
+Reshim a plugin to create shims for newly added executables (e.g. after a
+`pip install`)
 
 ```
 asdf reshim python
 ```
 
-Update asdf itself to new version
+Update the list of available versions for a plugin
 
-    asdf update
+```
+asdf plugin update nodejs
+asdf plugin update --all
+```
 
-Update available versions of plugin ruby
+Update asdf itself — `asdf update` is disabled in the Go rewrite. Re-run
+`setup-asdf`, which downloads the latest asdf binary into `~/.asdf`.
 
-    asdf plugin update ruby
-
-Update available versions of all installed plugins
-
-    asdf plugin update --all
+```
+setup-asdf
+```
