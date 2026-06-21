@@ -2,18 +2,19 @@
 
 > **RESUME HERE (read this first).** Multi-week effort, done in small steps.
 > - **Branch:** `port-to-python`.
-> - **Current position:** Step 0 ✅. **Step 1 fully done** ✅ — golden harness,
->   `_info.toml` (JSON-equal to YAML), `_run.py` (all 21 golden cases
->   byte-identical), and the 6 runner call sites flipped to `_run.py`
->   (`toolbox/init.zsh` ×4, `_k`, `_ws`). `_run.rb`/`_info.yaml` stay until the
->   Step 9 cutover. Both runners exclude all six infra files so they coexist.
-> - **Next action:** Step 2 — setup skeleton (`Logger`, `OS`, arg parsing
->   `--local/--vim/--uninstall`). Different floor: `setup.py` runs on the fresh
->   box's python via `python3 -c "$(curl…)"`, so **stdlib-only, no tomllib,
->   3.8/3.9-safe**. Test in the Docker harness, never against real `$HOME`.
+> - **Current position:** Step 0 ✅. **Step 1 fully done** ✅. **Step 2 done** ✅
+>   — `setup.py` skeleton: env constants, `Logger` (context-manager nesting,
+>   verified byte-identical to Ruby's), `is_mac()`/`is_linux()`, arg dispatch
+>   (`--uninstall`/`--vim`/`--local`); `install`/`uninstall` are
+>   NotImplementedError stubs filled in Steps 3–9. Stdlib-only, 3.8-safe.
+> - **Next action:** Step 3 — program checks (`program_installed?`,
+>   `check_mandatory_installation`, `check_optional_installation`,
+>   `ensure_brew_package`). setup.rb:77–113. Shell-out to `command -v` / `which`
+>   (recurring fork: external tools stay subprocess). Append to `setup.py`.
+>   Still no Docker run until more of `install()` exists.
 > - **Working style:** one chunk at a time, keep each `.rb` until its `.py` is
 >   verified, flip call sites late, delete `.rb` last. Hand Thomas a "Learn by
->   Doing" contribution per chunk (next: arg-validation logic in `_run.py`).
+>   Doing" contribution per chunk (Step 2 was full-write-then-review by choice).
 > - **Source of truth:** this file. Tick the checkboxes in `## Steps` as we go.
 
 **Why:** `python3` is preinstalled on virtually every fresh system; `ruby` is not.
