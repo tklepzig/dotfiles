@@ -2,14 +2,15 @@
 
 > **RESUME HERE (read this first).** Multi-week effort, done in small steps.
 > - **Branch:** `port-to-python`.
-> - **Current position:** Step 0 ✅. Step 1 sub-steps 1 (golden harness) ✅,
->   2 (`_info.toml` migrated + JSON-equal to YAML; `_run.py` ported; **all 20
->   golden cases byte-identical**) ✅. Both `_run.rb` and `_run.py` now exclude
->   all six infra files so they coexist cleanly.
-> - **Next action:** Step 1, sub-step 3 — flip the 6 runner call sites from
->   `_run.rb` to `_run.py` (`toolbox/init.zsh` ×4, `zsh/completion/_k` ×1,
->   `zsh/completion/_ws` ×1). Leave `_run.rb`/`_info.yaml` in place (deleted in
->   Step 9). After flipping, reload the shell and smoke-test toolbox completion.
+> - **Current position:** Step 0 ✅. **Step 1 fully done** ✅ — golden harness,
+>   `_info.toml` (JSON-equal to YAML), `_run.py` (all 21 golden cases
+>   byte-identical), and the 6 runner call sites flipped to `_run.py`
+>   (`toolbox/init.zsh` ×4, `_k`, `_ws`). `_run.rb`/`_info.yaml` stay until the
+>   Step 9 cutover. Both runners exclude all six infra files so they coexist.
+> - **Next action:** Step 2 — setup skeleton (`Logger`, `OS`, arg parsing
+>   `--local/--vim/--uninstall`). Different floor: `setup.py` runs on the fresh
+>   box's python via `python3 -c "$(curl…)"`, so **stdlib-only, no tomllib,
+>   3.8/3.9-safe**. Test in the Docker harness, never against real `$HOME`.
 > - **Working style:** one chunk at a time, keep each `.rb` until its `.py` is
 >   verified, flip call sites late, delete `.rb` last. Hand Thomas a "Learn by
 >   Doing" contribution per chunk (next: arg-validation logic in `_run.py`).
@@ -103,10 +104,10 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
 - [x] **0. Prep** — format decided (TOML); install-path Ruby checked
       (`set-theme` is zsh ✓; `notify` is ruby but a runtime toolbox dep, out of
       core scope); create a working branch.
-- [ ] **1. `_run.rb` → `_run.py`** — migrate `_info.yaml`→`_info.toml`
-      (mechanical script); port validator/dispatcher using stdlib `tomllib`;
-      golden-diff all modes; flip `init.zsh` + `_ws` + `_k` to `_run.py`; keep
-      `.rb` until verified.
+- [x] **1. `_run.rb` → `_run.py`** — migrated `_info.yaml`→`_info.toml`
+      (JSON-equal); ported validator/dispatcher on stdlib `tomllib`;
+      golden-diff all 21 modes byte-identical; flipped `init.zsh` + `_ws` + `_k`
+      to `_run.py`. `.rb`/`.yaml` kept until Step 9.
 - [ ] **2. setup skeleton** — `Logger`, `OS`, arg parsing (`--local/--vim/--uninstall`).
 - [ ] **3. Program checks** — `program_installed?`, mandatory/optional/brew.
 - [ ] **4. Link helpers** — `find_override`, `merge`, `write_link`,

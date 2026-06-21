@@ -2,9 +2,9 @@
 
 scripts_path="$HOME/.dotfiles/toolbox/scripts"
 
-cmds=( $($scripts_path/_run.rb --list) )
+cmds=( $($scripts_path/_run.py --list) )
 # ${(f)...} --> parameter expansion, split at new lines
-descs=( ${(f)"$($scripts_path/_run.rb --details)"} )
+descs=( ${(f)"$($scripts_path/_run.py --details)"} )
 
 scripts_completion() {
 	#see also https://stackoverflow.com/a/73356136
@@ -14,7 +14,7 @@ scripts_completion() {
 		((CURRENT--))
 
 		# After the shift $words contains the current script name
-		completion=( ${(f)"$($scripts_path/_run.rb --completion $words)"} )
+		completion=( ${(f)"$($scripts_path/_run.py --completion $words)"} )
 		# TODO Allow completion per arg position, so a completion for the first arg, another one for the second arg, ...
 		if [ -n "$completion" ]
 		then
@@ -39,7 +39,7 @@ compdef scripts_completion \#
 		args=( $@ )
 	fi
 
-	cmd=$($scripts_path/_run.rb $args)
+	cmd=$($scripts_path/_run.py $args)
 	if [ $? -ne 0 ]
 	then
 		echo "$cmd"
