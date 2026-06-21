@@ -12,7 +12,7 @@ selected_branch=$(
         --preview='
           branch={}
           merge_base=$(git merge-base "$branch" "$GIT_BRANCH_DIFF_BASE")
-          git log --oneline --color=always "${merge_base}..${branch}"
+          git log --color=always --format="%C(auto)%h %C(green)%cd%C(reset) %s" --date=short "${merge_base}..${branch}"
           echo
           git diff --numstat "${merge_base}..${branch}" | awk '"'"'BEGIN{green="\033[32m"; red="\033[31m"; reset="\033[0m"} {printf "%s+%s%s %s-%s%s  %s\n", green, $1, reset, red, $2, reset, $3}'"'"'
           echo
