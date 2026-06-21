@@ -1,12 +1,4 @@
 #!/usr/bin/env python3
-"""Toolbox script runner: introspection, help, and dispatch.
-
-Reads per-script metadata from _info.toml. Python port of _run.rb. stdout is a
-parsed contract consumed by toolbox/init.zsh and the _ws/_k zsh completions, so
-output must stay byte-identical to the Ruby original (verified by
-toolbox/test/golden.py).
-"""
-
 import os
 import sys
 import tomllib
@@ -78,8 +70,7 @@ if argv and argv[0] == "--completion":
     script = argv[1] if len(argv) > 1 else None
     info = script_info(script) if script is not None else None
     if info is not None and "completion" in info:
-        for item in info["completion"]:
-            print(item)
+        print("\n".join(info["completion"]))
     sys.exit(0)
 
 if argv and argv[0] == "help":

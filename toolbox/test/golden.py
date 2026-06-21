@@ -68,7 +68,8 @@ CASES = [
     ("unknown-script", ["nonexistent"]),                       # Unknown script, exit 1
 ]
 
-# TODO(human): add the divergence-forcing edge cases here.
+# The divergence-forcing cases: Ruby #{nil} -> "" vs Python "None", and the
+# trailing-space `puts` behaviour. Kept separate from CASES for clarity.
 EDGE_CASES = [
     ("help-empty", ["help", ""]),
     ("help-nil", ["help"]),
