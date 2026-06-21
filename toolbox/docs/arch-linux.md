@@ -32,6 +32,7 @@
         * [Packages return 404 ("failed retrieving file ... The requested URL returned error: 404") from mirrors](#packages-return-404-failed-retrieving-file--the-requested-url-returned-error-404-from-mirrors)
         * [File /var/cache/pacman/pkg/something.tar.xz is corrupted (invalid or corrupted package (PGP signature)).](#file-varcachepacmanpkgsomethingtarxz-is-corrupted-invalid-or-corrupted-package-pgp-signature)
         * [Restore all packages to a specific date](#restore-all-packages-to-a-specific-date)
+        * [Missing terminal glyphs / icons after upgrade (kitty shows boxes)](#missing-terminal-glyphs--icons-after-upgrade-kitty-shows-boxes)
 * [Printing and Scanning (HP Officejet 4630)](#printing-and-scanning-hp-officejet-4630)
     * [Packages](#packages)
     * [Enable mDNS discovery](#enable-mdns-discovery)
@@ -238,8 +239,8 @@ Add kernel parameter to `GRUB_CMDLINE_LINUX` in `/etc/default/grub`
 
     cryptdevice=UUID=<UUID of encrypted partition>:cryptroot
 
-Add `keyboard`, `keymap` and `encrypt` hooks to `HOOKS` in `/etc/mkinitcpio.conf`
-(Add at the end)
+Add `keyboard`, `keymap` and `encrypt` hooks to `HOOKS` in
+`/etc/mkinitcpio.conf` (Add at the end)
 
     HOOKS=(... keyboard keymap encrypt)
 
@@ -531,6 +532,27 @@ Then update the package database and force a downgrade:
 
 > See also
 > https://wiki.archlinux.org/title/Arch_Linux_Archive#How_to_restore_all_packages_to_a_specific_date
+
+#### Missing terminal glyphs / icons after upgrade (kitty shows boxes)
+
+After a `-Syu` that bumps `fontconfig` (e.g. `2.17 → 2.18`, which changes the
+cache format), the per-user font cache can go stale. kitty then resolves glyphs
+against bad data and routes symbols — e.g. play `⏵` / pause `⏸` in the tmux
+statusline — to a font that can't render them, so they show as tofu boxes.
+
+Rebuild the font cache and restart kitty (close **all** windows — fallback is
+resolved at startup):
+
+    fc-cache -rf            # -r wipes stale cache dirs, -f forces a full rebuild
+
+Verify a symbol now resolves to a real font and not a stray `.woff2` web font:
+
+    for cp in 23F5 23F8 23EF; do printf "U+%s -> " "$cp"; fc-match ":charset=$cp"; done
+
+> `kitty/kitty.linux.conf` also pins the media-control block (`U+23E9–U+23FA`)
+> to _Noto Sans Symbols 2_ via `symbol_map`, making fallback deterministic. But
+> `fc-cache -rf` is the real safeguard, since `symbol_map` still resolves the
+> pinned family through fontconfig.
 
 ## Printing and Scanning (HP Officejet 4630)
 
