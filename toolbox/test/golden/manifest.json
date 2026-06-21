@@ -100,6 +100,13 @@
     ],
     "exit": 1
   },
+  "missing-some": {
+    "argv": [
+      "encrypt-clone",
+      "foo"
+    ],
+    "exit": 1
+  },
   "too-many-args": {
     "argv": [
       "colours",

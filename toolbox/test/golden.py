@@ -62,7 +62,8 @@ CASES = [
     ("dispatch-list-ports", ["list-ports"]),                   # no args declared
     ("dispatch-colours-ok", ["colours", "4"]),                 # optional arg supplied
     ("dispatch-git-search-ok", ["git-search", "foo"]),         # mandatory arg supplied
-    ("missing-arg", ["git-search"]),                           # mandatory missing, exit 1
+    ("missing-arg", ["git-search"]),                           # all mandatory missing, exit 1
+    ("missing-some", ["encrypt-clone", "foo"]),                # 1 of 2 mandatory given -> slice drops supplied prefix
     ("too-many-args", ["colours", "a", "b"]),                  # 2 given, 1 declared, exit 1
     ("unknown-script", ["nonexistent"]),                       # Unknown script, exit 1
 ]

@@ -15,7 +15,10 @@ end
 
 scripts = Dir.glob("#{SCRIPTS_PATH}/*").filter_map do |file|
   name = File.basename(file)
-  next if ['_info.yaml', 'info.additional.yaml', '_run.rb'].include?(name)
+  # During the Python port both runners and both config formats coexist in this
+  # directory; exclude all of them so neither runner lists the other's files.
+  next if ['_info.yaml', '_info.toml', 'info.additional.yaml',
+           'info.additional.toml', '_run.rb', '_run.py'].include?(name)
 
   name
 end

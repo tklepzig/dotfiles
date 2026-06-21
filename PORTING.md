@@ -2,13 +2,14 @@
 
 > **RESUME HERE (read this first).** Multi-week effort, done in small steps.
 > - **Branch:** `port-to-python`.
-> - **Current position:** Step 0 ✅ done. Step 1 **in progress** — sub-step 1
->   (golden-output harness) ✅ done.
-> - **Next action:** Step 1, sub-step 2 — migrate `_info.yaml`→`_info.toml`
->   (mechanical), then port `_run.py` against `tomllib`, run
->   `toolbox/test/golden.py verify` to diff byte-identical, flip call sites.
->   The "Learn by Doing" piece for the port = the arg-validation logic in
->   `_run.py`.
+> - **Current position:** Step 0 ✅. Step 1 sub-steps 1 (golden harness) ✅,
+>   2 (`_info.toml` migrated + JSON-equal to YAML; `_run.py` ported; **all 20
+>   golden cases byte-identical**) ✅. Both `_run.rb` and `_run.py` now exclude
+>   all six infra files so they coexist cleanly.
+> - **Next action:** Step 1, sub-step 3 — flip the 6 runner call sites from
+>   `_run.rb` to `_run.py` (`toolbox/init.zsh` ×4, `zsh/completion/_k` ×1,
+>   `zsh/completion/_ws` ×1). Leave `_run.rb`/`_info.yaml` in place (deleted in
+>   Step 9). After flipping, reload the shell and smoke-test toolbox completion.
 > - **Working style:** one chunk at a time, keep each `.rb` until its `.py` is
 >   verified, flip call sites late, delete `.rb` last. Hand Thomas a "Learn by
 >   Doing" contribution per chunk (next: arg-validation logic in `_run.py`).
@@ -119,6 +120,14 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
       TOML merge run under the modern interpreter (+ TOML writer).
 - [ ] **9. Tail + cutover** — fzf, git, docker, default-shell, post-install;
       `uninstall`; flip README/alias/Dockerfiles; delete `.rb` files.
+      - On deleting `_run.rb`: repoint `golden.py` `capture`'s default runner
+        from `_run.rb` to `_run.py` (self-snapshot) — capture breaks otherwise.
+        The harness then becomes a plain regression test, not a Ruby↔Python
+        differ. Also drop `_info.yaml`/`info.additional.yaml` from both runners'
+        exclusion lists once the YAML files are gone.
+      - Golden embeds live data (theme lists, script names, help text), so any
+        legitimate data change breaks it (jupiter-2 did). "golden failed" after
+        adding e.g. a theme = "re-capture needed", not a regression.
 
 ## Verification matrix
 
