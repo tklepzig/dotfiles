@@ -83,10 +83,24 @@ _volatile_ (`/run/log/journal`, wiped on reboot), so `-b -1` and "what happened
 before the last reboot" come up empty. Make it persistent once:
 
 ```sh
+# Option A: create the directory (journald auto-detects it on restart)
 sudo mkdir -p /var/log/journal
 sudo systemd-tmpfiles --create --prefix /var/log/journal
+
+# Option B: force it via config instead of relying on directory detection
+# sudo sed -i 's/#Storage=auto/Storage=persistent/' /etc/systemd/journald.conf
+
+# Either way:
 sudo systemctl restart systemd-journald
-# or set Storage=persistent in /etc/systemd/journald.conf
+```
+
+Revert to volatile (logs wiped on reboot):
+
+```sh
+sudo rm -rf /var/log/journal
+# if you used Option B, also undo the config change:
+# sudo sed -i 's/^Storage=persistent/#Storage=auto/' /etc/systemd/journald.conf
+sudo systemctl restart systemd-journald
 ```
 
 ## Timers (the cron replacement)
