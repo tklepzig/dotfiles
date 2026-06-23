@@ -10,7 +10,7 @@ const baseCache = [
   "/favicon.ico",
 ];
 
-const docsCache = [];
+const docsCache = ["/ai", "/android", "/anti-scam", "/arch-linux", "/asdf", "/bc", "/blender", "/cec", "/chat-gpt", "/colors", "/communication", "/cron", "/cvlc", "/docker", "/engineering-drawing", "/ffmpeg", "/francais", "/fs", "/git", "/github", "/gnome", "/gpg", "/i3", "/ip", "/js-snippets", "/keychron", "/kitty", "/latex", "/Linux", "/luks", "/macos", "/make", "/Manjaro", "/markdown", "/minidlna", "/neovim", "/npm", "/pacman", "/pulseaudio", "/python", "/ranger", "/raspberrypi-os", "/redshift", "/ruby", "/sailing", "/smart", "/ssh", "/systemd", "/tmux", "/vim", "/voice-prep", "/wemux", "/zsh"];
 
 self.addEventListener("install", function (event) {
   event.waitUntil(
