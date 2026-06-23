@@ -78,28 +78,67 @@ sudo journalctl --vacuum-time=7d   # drop entries older than 7 days
 sudo journalctl --vacuum-size=200M
 ```
 
-**Persistent logs.** Many systems (incl. Raspberry Pi OS) keep the journal
-_volatile_ (`/run/log/journal`, wiped on reboot), so `-b -1` and "what happened
-before the last reboot" come up empty. Make it persistent once:
+**Persistent logs.** The default is `Storage=auto`: journald uses
+`/var/log/journal` if that directory exists, else the _volatile_
+`/run/log/journal` (a tmpfs, wiped on every reboot — so `-b -1` and "what
+happened before the last reboot" come up empty).
+
+So the folklore fix is "just `mkdir /var/log/journal` and restart journald".
+**That is not always enough** — and on Raspberry Pi it silently does nothing.
+
+⚠️ **The Raspberry Pi gotcha.** Pi OS / the Pi cloud images ship a vendor
+drop-in `/usr/lib/systemd/journald.conf.d/40-rpi-volatile-storage.conf` that
+sets `Storage=volatile`. With that in force, journald **ignores
+`/var/log/journal` entirely** — the directory sits there empty forever and
+`mkdir` accomplishes nothing. It also defeats editing the main
+`/etc/systemd/journald.conf`, because **drop-ins always override the main config
+file**, regardless of which one you edited.
+
+Diagnose first — find anything forcing a `Storage=` and see where logs *actually* live:
 
 ```sh
-# Option A: create the directory (journald auto-detects it on restart)
-sudo mkdir -p /var/log/journal
-sudo systemd-tmpfiles --create --prefix /var/log/journal
-
-# Option B: force it via config instead of relying on directory detection
-# sudo sed -i 's/#Storage=auto/Storage=persistent/' /etc/systemd/journald.conf
-
-# Either way:
-sudo systemctl restart systemd-journald
+grep -rs Storage /etc/systemd/journald.conf /etc/systemd/journald.conf.d \
+  /run/systemd/journald.conf.d /usr/lib/systemd/journald.conf.d
+find /run/log/journal /var/log/journal -name '*.journal'   # /run = volatile, /var/log = persistent
 ```
 
-Revert to volatile (logs wiped on reboot):
+**Fix — beat the vendor drop-in with your own.** Don't edit the `/usr/lib` file
+(it's package-owned, clobbered on upgrade). Drop-in files from all the
+`journald.conf.d` dirs are merged **by filename in lexicographic order, last one
+wins**, and `/etc` outranks `/usr/lib` — so a `99-` prefix sorts after the
+vendor's `40-` and wins cleanly:
 
 ```sh
-sudo rm -rf /var/log/journal
-# if you used Option B, also undo the config change:
-# sudo sed -i 's/^Storage=persistent/#Storage=auto/' /etc/systemd/journald.conf
+sudo mkdir -p /etc/systemd/journald.conf.d
+sudo tee /etc/systemd/journald.conf.d/99-persistent-storage.conf >/dev/null <<'EOF'
+[Journal]
+Storage=persistent
+EOF
+
+sudo systemctl restart systemd-journald
+sudo journalctl --flush          # migrate the volatile /run logs into /var/log
+```
+
+`Storage=persistent` makes journald **create** `/var/log/journal/<machine-id>/`
+itself — no manual `mkdir` needed. Verify it adopted the dir:
+
+```sh
+ls -la /var/log/journal/                  # a <machine-id>/ subdir should now exist
+find /var/log/journal -name '*.journal'   # journals now live here, not /run
+```
+
+The directory existing this boot isn't the goal — surviving a reboot is. The
+real test:
+
+```sh
+sudo reboot
+journalctl --list-boots          # should now show MORE THAN ONE boot
+```
+
+Revert to volatile (the image's default):
+
+```sh
+sudo rm /etc/systemd/journald.conf.d/99-persistent-storage.conf
 sudo systemctl restart systemd-journald
 ```
 
