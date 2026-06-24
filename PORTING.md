@@ -21,12 +21,13 @@
 >   loader (dirs, 6 symlinks, force re-run, removals, missing-file no-op). `.rb`
 >   kept until Step 9. setup_vim() wired into install() but placed AFTER the
 >   zshrc edit — Step 8 config-linking lines must be inserted BEFORE it.
-> - **Next action:** Step 9 — tail + cutover: fzf install, `git/install`,
->   docker completion, default-shell (`chsh`), `~/.dotfiles-local/post-install`
->   script, "Setup done." tail; then `uninstall()`; then flip
->   README/alias/Dockerfiles to `setup.py` + delete the `.rb`/`.yaml` files.
->   First real end-to-end is a Docker run of `setup.py` (Dockerfiles still call
->   `setup.rb` until the cutover). (8c + 8d DONE — see below.)
+> - **Next action:** Step 10 — Ruby removal, DEFERRED ~months until the Python
+>   path proves out in the wild (Thomas's coexistence call). Nothing to do now;
+>   when ready: delete `setup.rb`/`_run.rb`/`_info.yaml`/`info.additional.yaml`,
+>   repoint `golden.py` capture to `_run.py`, drop the `.yaml`-fallback notes,
+>   + the deferred install() reorg & kitty/i3 mkdir cleanup. **The whole
+>   installer + runner are now ported and Python is the default** (Steps 0–9 ✅).
+>   This branch is ready to merge (Python default, Ruby retained as fallback).
 > - **Step 8c DONE** ✅ — toolbox includes ported. Decision resolved = **vendor
 >   `tomli-w` + soft-skip Plan B** (see `## Decisions`). New: `toolbox/_vendor/
 >   tomli_w` (1.2.0, MIT, verbatim); `toolbox/setup_includes.py` (modern-python
@@ -244,7 +245,20 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
         landed in 8c. Its search/None branch CANNOT be exercised on this Arch box
         (3.14 ≥ 3.11 → fast path); don't mark it "verified" here. NB: it finds an
         existing modern python, it does not provision one via asdf.
-- [ ] **9. Tail, then cutover to Python-default (Ruby kept as Plan B).**
+- [x] **9. Tail + cutover to Python-default — DONE.** install() tail
+      (fzf/git/docker/chsh/post-install/"Setup done.") + `uninstall()`
+      (`remove_links` + teardown) ported (commit 843dd52). Cutover (commit
+      87b7cc4): README install one-liners + `--vim` + uninstall, `dotfiles-update`
+      alias, both Dockerfiles → `python3 … setup.py`; setup.py +x; Ruby kept as a
+      documented fallback (README "Legacy Ruby installer" section); toolbox-include
+      README → `.toml` with `.yaml`-fallback note. Fallback mechanism = **docs-only**
+      (Thomas's call) — no env toggle. **VERIFIED via the official harness (now on
+      setup.py):** `Dockerfile.test` neovim built ("Setup done."), `--vim` built,
+      `Dockerfile.test-overrides` built + `run.sh` **7 passed / 0 failed** (vimrc/
+      plugin/lazy overrides exercised at real vim+nvim runtime). setup_test 19/19,
+      includes 8/8, golden 21/21. Ruby files (`setup.rb`,`_run.rb`,`_info.yaml`,
+      `info.additional.yaml`) intentionally RETAINED — removal is Step 10.
+      <details><summary>cutover strategy detail (kept)</summary>
       **CUTOVER STRATEGY (Thomas, 2026-06-24): do NOT delete the `.rb`/`.yaml`
       at cutover.** Merge this branch with the Python path as the *default* but
       Ruby retained as a *fallback* that co-exists for ~some months, so a
@@ -274,6 +288,10 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
         the full flip to `.toml`-only happens at Step 10. The runner-tied
         authoring docs (core `_info.toml`, `info.additional.toml`) were already
         flipped in 8c.
+      </details>
+      - **Resolved at implementation:** fallback switch = docs-only (no env
+        toggle); the `toolbox-include` README was flipped to `.toml` now with a
+        `.yaml`-fallback note (not left dual); golden stays a differ as planned.
 - [ ] **10. Ruby removal (after the coexistence period proves Python out, ~months).**
       - Delete `setup.rb`, `_run.rb`, `_info.yaml`, `info.additional.yaml`.
       - Repoint `golden.py` `capture`'s default runner `_run.rb`→`_run.py`
