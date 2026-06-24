@@ -22,6 +22,8 @@ def load_setup():
     # Load by path under a throwaway name so the `__main__` guard doesn't fire
     # (install() must not run on import).
     spec = importlib.util.spec_from_file_location("setup_under_test", SETUP_PATH)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Could not load setup module: {SETUP_PATH}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
