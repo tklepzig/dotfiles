@@ -9,6 +9,7 @@
   "codeLens.enable": false,
   "eslint.autoFixOnSave": true,
   "coc.preferences.formatOnSave": true,
+  "python.formatting.provider": "black",
   "javascript.suggestionActions.enabled": false,
   "solargraph.formatting": true,
   "solargraph.autoformat": true,
