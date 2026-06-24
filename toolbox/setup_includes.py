@@ -2,7 +2,7 @@
 """Toolbox-include processor.
 
 Runs ONLY under a python >= 3.11 — setup.py's `add_toolbox_includes` resolves a
-modern interpreter (`ensure_asdf_python`) and invokes this as a subprocess. It
+modern interpreter (`resolve_modern_python`) and invokes this as a subprocess. It
 reads `~/.dotfiles-local/toolbox-include.toml`, updates each included repo, links
 its `docs/`+`scripts/`, and merges its `scripts/_info.toml` into the core
 toolbox `_info.toml`.

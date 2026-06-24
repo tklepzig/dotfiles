@@ -32,8 +32,10 @@
 >   vendored writer + atomic write; vendored→pip→None import fallback; broad
 >   `except` around dump catches data errors; exit 2 = soft-skipped); `toolbox/
 >   migrate-info-to-toml.js` (throwaway Node yaml→toml converter for include
->   repos). setup.py: `ensure_asdf_python()` (fast-path `sys.executable` if
->   ≥3.11; PATH search else None — provision branch UNVERIFIED on this Arch box)
+>   repos). setup.py: `resolve_modern_python()` (fast-path `sys.executable` if
+>   ≥3.11; PATH search else None — search/None branch UNVERIFIED on this Arch box;
+>   finds an existing modern python, does NOT provision via asdf despite the
+>   original plan wording)
 >   + `add_toolbox_includes()` (guard → delegate to helper under modern python)
 >   wired into install() after `configure_ruby` (Ruby order, setup.rb:350–354).
 >   Verified: converter round-trips dict-equal to hand-authored `_info.toml` (41
@@ -208,16 +210,17 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
             default-gems + rubocop.yml). Functional-tested, 9 unit tests green.
       - [x] **8c** — toolbox includes DONE. Vendor `tomli-w` + soft-skip Plan B;
             `toolbox/setup_includes.py` modern-python helper; JS converter;
-            `ensure_asdf_python` + `add_toolbox_includes` in setup.py. 8c-pre
+            `resolve_modern_python` + `add_toolbox_includes` in setup.py. 8c-pre
             format migration turned out near-empty (Step 1 already did `_info`;
             only `toolbox-include` needed a format, chosen TOML). Verified:
             converter round-trip dict-equal (41), 5 include tests, golden 21/21,
             setup_test 9/9. See the RESUME-HERE 8c block for detail.
       - [ ] **8d** — remaining config blocks: tmux scheduler (launchd/systemd),
             kitty/ranger/mpv/i3/aerospace, behind `program_installed` gates.
-      - Conditional `ensure_asdf_python()` (only if system python < 3.11) lands
-        in 8c. Its provision branch CANNOT be exercised on this Arch box
-        (3.14 ≥ 3.11 → no-op); don't mark the provision path "verified" here.
+      - Conditional `resolve_modern_python()` (only if system python < 3.11)
+        landed in 8c. Its search/None branch CANNOT be exercised on this Arch box
+        (3.14 ≥ 3.11 → fast path); don't mark it "verified" here. NB: it finds an
+        existing modern python, it does not provision one via asdf.
 - [ ] **9. Tail + cutover** — fzf, git, docker, default-shell, post-install;
       `uninstall`; flip README/alias/Dockerfiles; delete `.rb` files.
       - **README `toolbox-include` section is still YAML on purpose** — it's

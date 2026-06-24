@@ -395,7 +395,7 @@ def configure_ruby():
         force_symlink(f"{DF_PATH}/ruby/rubocop.yml", f"{HOME}/.rubocop.yml")
 
 
-def ensure_asdf_python():
+def resolve_modern_python():
     """Return the path to a python >= 3.11 for the toolbox-include merge (it
     needs `tomllib` + the vendored TOML writer, both unavailable on setup.py's
     low bootstrap floor).
@@ -426,7 +426,7 @@ def add_toolbox_includes():
         return
 
     with Logger.log("Processing includes"):
-        modern_python = ensure_asdf_python()
+        modern_python = resolve_modern_python()
         if modern_python is None:
             Logger.error(
                 "Toolbox includes need python >= 3.11 (none found). Install one "
