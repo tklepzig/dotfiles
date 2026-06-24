@@ -14,6 +14,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SETUP_PATH = REPO_ROOT / "setup.py"
@@ -139,6 +140,88 @@ class ToolboxIncludesGlueTest(unittest.TestCase):
             self.assertIsNone(setup.add_toolbox_includes())
         finally:
             setup.DF_LOCAL_PATH, setup.resolve_modern_python = saved_local, saved_resolve
+
+
+class ConfigBlocksTest(unittest.TestCase):
+    """Step 8d config blocks. They're all gated (program_installed / mac-only)
+    so the Linux Docker harness skips them — these are their only coverage. Run
+    under a temp HOME/DF_PATH and a mocked subprocess so a real machine's
+    ~/.config and systemctl are never touched (kitty/ranger/mpv/i3 are actually
+    installed on the dev box)."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.home = os.path.join(self.tmp, "home")
+        self.df_path = os.path.join(self.tmp, "dotfiles")
+        os.makedirs(self.home)
+        os.makedirs(self.df_path)
+        self._patch("HOME", self.home)
+        self._patch("DF_PATH", self.df_path)
+        self._patch("DF_LOCAL_PATH", os.path.join(self.home, ".dotfiles-local"))
+
+    def _patch(self, attr, value):
+        patcher = mock.patch.object(setup, attr, value)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def _source(self, relative):
+        # Create a stub source file under DF_PATH so symlinks have a target.
+        path = os.path.join(self.df_path, relative)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        Path(path).write_text("stub\n")
+        return path
+
+    def test_configure_ranger_is_noop_when_absent(self):
+        self._patch("program_installed", lambda _name: False)
+        setup.configure_ranger()
+        self.assertFalse(os.path.exists(os.path.join(self.home, ".config/ranger")))
+
+    def test_configure_ranger_links_when_present(self):
+        self._patch("program_installed", lambda _name: True)
+        source = self._source("ranger/rc.conf")
+        setup.configure_ranger()
+        link = os.path.join(self.home, ".config/ranger/rc.conf")
+        self.assertTrue(os.path.islink(link))
+        self.assertEqual(os.readlink(link), source)
+
+    def test_configure_i3_links_all_components(self):
+        self._patch("program_installed", lambda _name: True)
+        for name in ("i3/config", "i3/i3blocks.config", "i3/dunst.config", "i3/picom.config"):
+            self._source(name)
+        os.makedirs(os.path.join(self.home, ".config/i3"))  # Ruby assumes it exists
+        setup.configure_i3()
+        self.assertTrue(os.path.islink(os.path.join(self.home, ".config/i3blocks/config")))
+        self.assertTrue(os.path.islink(os.path.join(self.home, ".config/dunst/dunstrc")))
+        self.assertTrue(os.path.islink(os.path.join(self.home, ".config/picom/picom.conf")))
+        # i3 main config is an `include` directive appended, not a symlink.
+        with open(os.path.join(self.home, ".config/i3/config")) as handle:
+            self.assertIn("include", handle.read())
+
+    def test_sync_vim_plugins_neovim_invokes_lazy_and_coc(self):
+        with mock.patch.object(setup.subprocess, "run") as run:
+            setup.sync_vim_plugins("neovim")
+        commands = [call.args[0] for call in run.call_args_list]
+        self.assertIn(["nvim", "--headless", "+Lazy! sync", "+qa"], commands)
+        self.assertIn(["nvim", "+CocUpdateSync", "+qall"], commands)
+
+    def test_sync_vim_plugins_vim_installs_plug_then_updates(self):
+        with mock.patch.object(setup.subprocess, "run") as run:
+            setup.sync_vim_plugins("vim")  # plug.vim absent under temp HOME -> installs
+        commands = [call.args[0] for call in run.call_args_list]
+        self.assertTrue(any(cmd[0] == "curl" for cmd in commands))
+        self.assertIn(["vim", "+PlugInstall", "+PlugUpdate", "+qall"], commands)
+
+    def test_scheduler_linux_links_units_and_reloads(self):
+        self._patch("is_mac", lambda: False)
+        self._patch("is_linux", lambda: True)
+        with mock.patch.object(setup.subprocess, "run") as run:
+            setup.install_tmux_snapshot_scheduler()
+        unit_dir = os.path.join(self.home, ".config/systemd/user")
+        self.assertTrue(os.path.islink(os.path.join(unit_dir, "tmux-snapshot.service")))
+        self.assertTrue(os.path.islink(os.path.join(unit_dir, "tmux-snapshot.timer")))
+        commands = [call.args[0] for call in run.call_args_list]
+        self.assertIn(["systemctl", "--user", "daemon-reload"], commands)
+        self.assertIn(["systemctl", "--user", "enable", "--now", "tmux-snapshot.timer"], commands)
 
 
 if __name__ == "__main__":

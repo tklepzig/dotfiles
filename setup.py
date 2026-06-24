@@ -539,6 +539,80 @@ def configure_tmux():
         install_tmux_snapshot_scheduler()
 
 
+def configure_kitty():
+    if not program_installed("kitty"):
+        return
+    # Ruby never mkdir's ~/.config/kitty here (unlike ranger/mpv/i3blocks);
+    # add_link_with_override only creates the file, not its parent dir, so this
+    # assumes ~/.config/kitty already exists. Kept faithful — see the deferred
+    # cleanup note in PORTING.md Step 9.
+    Logger.log("Configuring kitty")
+    add_link_with_override(
+        f"{DF_PATH}/kitty/kitty.conf", f"{HOME}/.config/kitty/kitty.conf", "include"
+    )
+    if is_mac():
+        Logger.log("Symlinking kitty variables for macOS")
+        add_link_with_override(
+            f"{DF_PATH}/kitty/kitty.macos.conf", f"{HOME}/.config/kitty/kitty.conf", "include"
+        )
+    else:
+        Logger.log("Symlinking kitty variables for Linux")
+        add_link_with_override(
+            f"{DF_PATH}/kitty/kitty.linux.conf", f"{HOME}/.config/kitty/kitty.conf", "include"
+        )
+    add_link_with_override(
+        f"{DF_PATH}/kitty/kitty.theme.conf", f"{HOME}/.config/kitty/kitty.conf", "include"
+    )
+
+
+def configure_ranger():
+    if not program_installed("ranger"):
+        return
+    Logger.log("Configuring ranger")
+    os.makedirs(f"{HOME}/.config/ranger", exist_ok=True)
+    force_symlink(f"{DF_PATH}/ranger/rc.conf", f"{HOME}/.config/ranger/rc.conf")
+
+
+def configure_mpv():
+    if not program_installed("mpv"):
+        return
+    Logger.log("Configuring mpv")
+    os.makedirs(f"{HOME}/.config/mpv", exist_ok=True)
+    force_symlink(f"{DF_PATH}/mpv/mpv.conf", f"{HOME}/.config/mpv/mpv.conf")
+    force_symlink(f"{DF_PATH}/mpv/input.conf", f"{HOME}/.config/mpv/input.conf")
+
+
+def configure_i3():
+    if not program_installed("i3"):
+        return
+    with Logger.log("Configuring i3"):
+        Logger.log("Symlinking i3 main configuration")
+        # Like kitty: ~/.config/i3 is not mkdir'd (faithful to Ruby).
+        add_link_with_override(f"{DF_PATH}/i3/config", f"{HOME}/.config/i3/config", "include")
+
+        Logger.log("Symlinking i3blocks configuration")
+        os.makedirs(f"{HOME}/.config/i3blocks", exist_ok=True)
+        force_symlink(f"{DF_PATH}/i3/i3blocks.config", f"{HOME}/.config/i3blocks/config")
+
+        Logger.log("Symlinking dunst configuration")
+        os.makedirs(f"{HOME}/.config/dunst", exist_ok=True)
+        force_symlink(f"{DF_PATH}/i3/dunst.config", f"{HOME}/.config/dunst/dunstrc")
+
+        Logger.log("Symlinking picom configuration")
+        os.makedirs(f"{HOME}/.config/picom", exist_ok=True)
+        force_symlink(f"{DF_PATH}/i3/picom.config", f"{HOME}/.config/picom/picom.conf")
+
+
+def configure_aerospace():
+    if not is_mac():
+        return
+    # UNVERIFIED on this Linux box — macOS-only.
+    Logger.log("Configuring aerospace for macOS")
+    force_symlink(f"{DF_PATH}/aerospace/config.toml", f"{HOME}/.aerospace.toml")
+    with Logger.log("Ensuring macOS dependencies"):
+        ensure_brew_package("nowplaying-cli")
+
+
 def install(variant=DF_VARIANT):
     check_mandatory_installation("git")
     check_mandatory_installation("zsh")
@@ -570,8 +644,14 @@ def install(variant=DF_VARIANT):
     sync_vim_plugins(variant)
     configure_tmux()
 
-    # Still to come: 8d-2 (kitty/ranger/mpv/i3/aerospace) + Step 9 (fzf, git,
-    # docker, default-shell, post-install, tail).
+    configure_kitty()
+    configure_ranger()
+    configure_mpv()
+    configure_i3()
+    configure_aerospace()
+
+    # Step 9 still to come: fzf, git, docker completion, default-shell, post-
+    # install script, "Setup done." tail; plus uninstall + cutover.
     raise NotImplementedError("setup.py install is being ported incrementally")
 
 

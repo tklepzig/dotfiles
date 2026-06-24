@@ -21,9 +21,12 @@
 >   loader (dirs, 6 symlinks, force re-run, removals, missing-file no-op). `.rb`
 >   kept until Step 9. setup_vim() wired into install() but placed AFTER the
 >   zshrc edit — Step 8 config-linking lines must be inserted BEFORE it.
-> - **Next action:** Step 8d — remaining config blocks (tmux scheduler
->   launchd/systemd, kitty/ranger/mpv/i3/aerospace), behind `program_installed`
->   gates. (8c DONE — see below.)
+> - **Next action:** Step 9 — tail + cutover: fzf install, `git/install`,
+>   docker completion, default-shell (`chsh`), `~/.dotfiles-local/post-install`
+>   script, "Setup done." tail; then `uninstall()`; then flip
+>   README/alias/Dockerfiles to `setup.py` + delete the `.rb`/`.yaml` files.
+>   First real end-to-end is a Docker run of `setup.py` (Dockerfiles still call
+>   `setup.rb` until the cutover). (8c + 8d DONE — see below.)
 > - **Step 8c DONE** ✅ — toolbox includes ported. Decision resolved = **vendor
 >   `tomli-w` + soft-skip Plan B** (see `## Decisions`). New: `toolbox/_vendor/
 >   tomli_w` (1.2.0, MIT, verbatim); `toolbox/setup_includes.py` (modern-python
@@ -215,8 +218,20 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
             only `toolbox-include` needed a format, chosen TOML). Verified:
             converter round-trip dict-equal (41), 5 include tests, golden 21/21,
             setup_test 9/9. See the RESUME-HERE 8c block for detail.
-      - [ ] **8d** — remaining config blocks: tmux scheduler (launchd/systemd),
-            kitty/ranger/mpv/i3/aerospace, behind `program_installed` gates.
+      - [x] **8d** — remaining config blocks DONE. **8d-1**: `sync_vim_plugins`
+            (headless Lazy!/coc or vim-plug, stdin=DEVNULL), `configure_tmux` +
+            `install_tmux_snapshot_scheduler` (launchd on mac [UNVERIFIED] /
+            systemd user timer on linux). **8d-2**: `configure_kitty/ranger/mpv/
+            i3/aerospace`, all behind `program_installed`/mac gates. Verified:
+            6 new tests in `setup_test.py` (gated app-config link creation +
+            no-op, sync_vim_plugins command shape, scheduler-linux unit links —
+            all under temp HOME + mocked subprocess so the real ~/.config and
+            systemctl are untouched; kitty/ranger/mpv/i3 ARE installed on the dev
+            box). NB: every 8d-2 block is gated, so the Linux Docker harness
+            skips them — faithfulness > CI here. FAITHFUL QUIRK kept: Ruby does
+            NOT mkdir ~/.config/kitty or ~/.config/i3 before `add_link_with_
+            override` (only i3blocks/dunst/picom/ranger/mpv get mkdir) → assumes
+            those dirs exist; see Step 9 cleanup.
       - Conditional `resolve_modern_python()` (only if system python < 3.11)
         landed in 8c. Its search/None branch CANNOT be exercised on this Arch box
         (3.14 ≥ 3.11 → fast path); don't mark it "verified" here. NB: it finds an
@@ -239,6 +254,11 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
       - Golden embeds live data (theme lists, script names, help text), so any
         legitimate data change breaks it (jupiter-2 did). "golden failed" after
         adding e.g. a theme = "re-capture needed", not a regression.
+      - **kitty + i3-main `add_link_with_override` assume their ~/.config/X dir
+        exists** (Ruby never mkdir'd them; ported faithfully in 8d-2). If a real
+        run ever hits a box where kitty/i3 are installed but the config dir is
+        absent, it raises. Consider adding the mkdir in the post-cutover cleanup
+        pass (alongside the deferred install() reorg below).
       - **Deferred `install()` reorganization (do as ONE pass, post-cutover —
         not piecemeal during the port).** setup.rb carried 5 sibling org-only
         TODOs (commit bbcd11e "Some todos", 2025-04-06): clean up / split into
