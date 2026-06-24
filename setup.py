@@ -395,6 +395,55 @@ def configure_ruby():
         force_symlink(f"{DF_PATH}/ruby/rubocop.yml", f"{HOME}/.rubocop.yml")
 
 
+def ensure_asdf_python():
+    """Return the path to a python >= 3.11 for the toolbox-include merge (it
+    needs `tomllib` + the vendored TOML writer, both unavailable on setup.py's
+    low bootstrap floor).
+
+    Fast path: the running interpreter already qualifies — true on every current
+    Linux and modern macOS. Otherwise look for a modern python already on PATH.
+    Returns None if none is found, so the caller can soft-skip with guidance.
+
+    UNVERIFIED below the fast path: this box runs 3.11+, so the search/None
+    branches are reasoned, not exercised. The whole include feature is off the
+    fresh-install path (guarded by toolbox-include.toml), so a user reaching here
+    is not on a bare box and most likely already has a modern python.
+    """
+    if sys.version_info >= (3, 11):
+        return sys.executable
+    for candidate in ("python3.14", "python3.13", "python3.12", "python3.11"):
+        found = shutil.which(candidate)
+        if found:
+            return found
+    return None
+
+
+def add_toolbox_includes():
+    # Off the fresh-install path: only users with a toolbox-include.toml are
+    # affected, so a bare box returns immediately and never needs modern python.
+    include_list = f"{DF_LOCAL_PATH}/toolbox-include.toml"
+    if not os.path.exists(include_list):
+        return
+
+    with Logger.log("Processing includes"):
+        modern_python = ensure_asdf_python()
+        if modern_python is None:
+            Logger.error(
+                "Toolbox includes need python >= 3.11 (none found). Install one "
+                "and re-run setup to finish linking includes."
+            )
+            return
+        # The merge needs tomllib + a TOML writer, so it runs in a separate
+        # process under the modern interpreter — setup.py's own imports stay
+        # stdlib-only/low-floor. Exit 2 = a merge was soft-skipped (Plan B).
+        result = subprocess.run([modern_python, f"{DF_PATH}/toolbox/setup_includes.py"])
+        if result.returncode != 0:
+            Logger.error(
+                "Toolbox-include merge incomplete (see above). Re-run setup once "
+                "resolved — it is idempotent and will finish the merge."
+            )
+
+
 def install(variant=DF_VARIANT):
     check_mandatory_installation("git")
     check_mandatory_installation("zsh")
@@ -418,8 +467,13 @@ def install(variant=DF_VARIANT):
     configure_bc()
     configure_ruby()
 
-    # Steps 8c–9 still to come: toolbox + python provisioning, remaining config
-    # blocks, tail + post-install.
+    with Logger.log("Initializing toolbox"):
+        # TODO (Ruby carryover): only when in full mode?
+        add_link_with_override(f"{DF_PATH}/toolbox/init.zsh", f"{HOME}/.zshrc")
+        add_toolbox_includes()
+
+    # Steps 8d–9 still to come: remaining config blocks (tmux scheduler,
+    # kitty/ranger/mpv/i3/aerospace), tail + post-install.
     raise NotImplementedError("setup.py install is being ported incrementally")
 
 

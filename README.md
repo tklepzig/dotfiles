@@ -224,36 +224,36 @@ shell completion.
    echo "hello"
    ```
 
-2. Register it in `toolbox/scripts/_info.yaml` (or in
-   `toolbox/scripts/info.additional.yaml` to avoid touching the base file):
+2. Register it in `toolbox/scripts/_info.toml` (or in
+   `toolbox/scripts/info.additional.toml` to avoid touching the base file):
 
-   ```yaml
-   your-script-name:
-     help: Brief description shown in completion
-     args:
-       - name: input file # required argument
-       - name: output format # required argument
-         optional: true
-         default: json # used when argument is omitted
-     completion: # optional: static completion candidates
-       - option-a
-       - option-b
+   ```toml
+   [your-script-name]
+   help = "Brief description shown in completion"
+   completion = ["option-a", "option-b"]   # optional: static completion candidates
+   [[your-script-name.args]]
+   name = "input file"                      # required argument
+   [[your-script-name.args]]
+   name = "output format"
+   optional = true
+   default = "json"                         # used when the argument is omitted
    ```
 
-   The `args` list defines both validation (setup.rb rejects calls with wrong
-   arity) and the completion hints shown in the shell.
+   Parent-level keys (`help`, `completion`) must come before the `[[…​.args]]`
+   tables. The `args` list defines both validation (the toolbox runner rejects
+   calls with wrong arity) and the completion hints shown in the shell.
 
-### info.additional.yaml
+### info.additional.toml
 
-`toolbox/scripts/info.additional.yaml` is an optional file that gets merged with
-`_info.yaml` at runtime. Use it in downstream repos or overrides to add script
+`toolbox/scripts/info.additional.toml` is an optional file that gets merged with
+`_info.toml` at runtime. Use it in downstream repos or overrides to add script
 metadata without modifying the base file:
 
-```yaml
-my-extra-script:
-  help: Does something project-specific
-  args:
-    - name: target
+```toml
+[my-extra-script]
+help = "Does something project-specific"
+[[my-extra-script.args]]
+name = "target"
 ```
 
 ### Toolbox includes

@@ -21,11 +21,31 @@
 >   loader (dirs, 6 symlinks, force re-run, removals, missing-file no-op). `.rb`
 >   kept until Step 9. setup_vim() wired into install() but placed AFTER the
 >   zshrc edit — Step 8 config-linking lines must be inserted BEFORE it.
-> - **Next action:** Step 8c — BLOCKED on a pending decision: how to do the one
->   `_info` merge write without a self-written TOML writer (leaning vendor
->   `tomli-w`; see **DECISION PENDING (8c)** in `## Decisions`). Resolve that
->   first, then: toolbox: `link_scripts` / `add_toolbox_includes`
->   / `link_docs` (setup.rb:184–215, 353–356). SCOUT FIRST: grep for
+> - **Next action:** Step 8d — remaining config blocks (tmux scheduler
+>   launchd/systemd, kitty/ranger/mpv/i3/aerospace), behind `program_installed`
+>   gates. (8c DONE — see below.)
+> - **Step 8c DONE** ✅ — toolbox includes ported. Decision resolved = **vendor
+>   `tomli-w` + soft-skip Plan B** (see `## Decisions`). New: `toolbox/_vendor/
+>   tomli_w` (1.2.0, MIT, verbatim); `toolbox/setup_includes.py` (modern-python
+>   helper: reads `toolbox-include.toml` `paths=[]`, git fetch/merge each repo,
+>   `link_docs`/`link_scripts`, merges include `_info.toml` into core via
+>   vendored writer + atomic write; vendored→pip→None import fallback; broad
+>   `except` around dump catches data errors; exit 2 = soft-skipped); `toolbox/
+>   migrate-info-to-toml.js` (throwaway Node yaml→toml converter for include
+>   repos). setup.py: `ensure_asdf_python()` (fast-path `sys.executable` if
+>   ≥3.11; PATH search else None — provision branch UNVERIFIED on this Arch box)
+>   + `add_toolbox_includes()` (guard → delegate to helper under modern python)
+>   wired into install() after `configure_ruby` (Ruby order, setup.rb:350–354).
+>   Verified: converter round-trips dict-equal to hand-authored `_info.toml` (41
+>   entries); `test/setup_includes_test.py` (5 tests: subprocess happy-path
+>   symlinks+merge+include-wins, no-op, Plan-B no-writer + dump-error both leave
+>   core `_info.toml` intact, expand_include_path); golden still 21/21;
+>   setup_test.py still 9/9. README authoring docs flipped to TOML for the
+>   RUNNER-tied bits only (core `_info.toml`, `info.additional.toml`); the
+>   INSTALLER-tied `toolbox-include` section stays YAML until Step 9 cutover
+>   (active `setup.rb` still reads `.yaml`).
+>   <details><summary>older Step 8c scouting (kept)</summary>
+>   SCOUT FIRST: grep for
 >   `_info.yaml` readers — porting these forces the YAML→TOML format migration
 >   (stdlib has no YAML reader) of `_info.yaml` + `toolbox-include.yaml`, plus a
 >   TOML *writer* (tomllib is read-only), plus re-exec under modern python.
@@ -33,6 +53,7 @@
 >   toolbox logic — two independent failure modes. `ensure_asdf_python()` lands
 >   here too (no-op on this Arch box; don't mark its provision path verified).
 >   Then 8d (remaining config blocks). See the Step 8 sub-chunk checklist below.
+>   </details>
 > - **Working style:** one chunk at a time, keep each `.rb` until its `.py` is
 >   verified, flip call sites late, delete `.rb` last. Hand Thomas a "Learn by
 >   Doing" contribution per chunk (Step 2 was full-write-then-review by choice).
@@ -185,13 +206,13 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
             a comment, NOT enacted) + `configure_bc()` (writes `scale=2\n` only
             if `.bc` absent) + `configure_ruby()` (`force_symlink` for
             default-gems + rubocop.yml). Functional-tested, 9 unit tests green.
-      - [ ] **8c** — toolbox: `link_scripts`/`add_toolbox_includes`/`link_docs`.
-            Forces the YAML→TOML format migration of `_info.yaml` +
-            `toolbox-include.yaml` (stdlib has no YAML reader) + a TOML *writer*
-            (tomllib is read-only) + re-exec under modern python. SCOUT FIRST:
-            grep for `_info.yaml` readers — migrating its format can break the
-            golden byte-contract, so split the format migration (8c-pre,
-            validate vs `golden.py`) from the new toolbox logic.
+      - [x] **8c** — toolbox includes DONE. Vendor `tomli-w` + soft-skip Plan B;
+            `toolbox/setup_includes.py` modern-python helper; JS converter;
+            `ensure_asdf_python` + `add_toolbox_includes` in setup.py. 8c-pre
+            format migration turned out near-empty (Step 1 already did `_info`;
+            only `toolbox-include` needed a format, chosen TOML). Verified:
+            converter round-trip dict-equal (41), 5 include tests, golden 21/21,
+            setup_test 9/9. See the RESUME-HERE 8c block for detail.
       - [ ] **8d** — remaining config blocks: tmux scheduler (launchd/systemd),
             kitty/ranger/mpv/i3/aerospace, behind `program_installed` gates.
       - Conditional `ensure_asdf_python()` (only if system python < 3.11) lands
@@ -199,6 +220,14 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
         (3.14 ≥ 3.11 → no-op); don't mark the provision path "verified" here.
 - [ ] **9. Tail + cutover** — fzf, git, docker, default-shell, post-install;
       `uninstall`; flip README/alias/Dockerfiles; delete `.rb` files.
+      - **README `toolbox-include` section is still YAML on purpose** — it's
+        installer-tied, and `setup.rb` (the active installer until this cutover)
+        reads `toolbox-include.yaml`. At cutover flip it to `toolbox-include.toml`
+        (`paths = [...]`), update the include-repo layout note (`scripts/` ships
+        `_info.toml`), change `setup.rb`→`setup` in the prose, and mention
+        `toolbox/migrate-info-to-toml.js` for include repos still on YAML. The
+        runner-tied authoring docs (core `_info.toml`, `info.additional.toml`)
+        were already flipped in 8c.
       - On deleting `_run.rb`: repoint `golden.py` `capture`'s default runner
         from `_run.rb` to `_run.py` (self-snapshot) — capture breaks otherwise.
         The harness then becomes a plain regression test, not a Ruby↔Python
