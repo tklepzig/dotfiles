@@ -176,6 +176,72 @@ def add_link_with_override(link, file, command="source"):
         write_link(override, file, command)
 
 
+def git_short_hash():
+    # Current short commit hash of the dotfiles repo.
+    return subprocess.run(
+        ["git", "rev-parse", "--short", "HEAD"],
+        cwd=DF_PATH, capture_output=True, text=True,
+    ).stdout.strip()
+
+
+def update_dotfiles_repo():
+    # Fast-forward an existing checkout to the remote tip. git is an external
+    # tool → subprocess; cwd=DF_PATH per call replaces Ruby's `Dir.chdir` block,
+    # so the process's own working directory is never mutated.
+    with Logger.log(f"Found existing dotfiles in {DF_PATH}, updating"):
+        current_hash = git_short_hash()
+
+        # Pin the remote to the requested branch, if one is set.
+        if DF_BRANCH:
+            subprocess.run(
+                ["git", "remote", "set-branches", "origin", DF_BRANCH], cwd=DF_PATH
+            )
+
+        # Fetch + hard-reset to the remote tip (output silenced, as in Ruby).
+        subprocess.run(
+            ["git", "fetch", "--depth=1"],
+            cwd=DF_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+        subprocess.run(
+            ["git", "reset", "--hard", f"origin/{DF_BRANCH or 'master'}"],
+            cwd=DF_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+
+        if DF_BRANCH:
+            Logger.success(f"Switching to branch {DF_BRANCH}")
+            subprocess.run(["git", "checkout", "--quiet", DF_BRANCH], cwd=DF_PATH)
+
+        Logger.success(f"Updated dotfiles from {current_hash} to {git_short_hash()}.")
+
+
+def clone_dotfiles_repo():
+    # Fresh shallow clone. The optional branch flag is a conditional list
+    # extension, not shell-string interpolation.
+    Logger.log(f"Cloning repo from {DF_REPO} to {DF_PATH}")
+    if DF_BRANCH:
+        Logger.success(f"Switching to branch {DF_BRANCH}")
+
+    clone_command = ["git", "clone", "--quiet", "--depth=1"]
+    if DF_BRANCH:
+        clone_command += ["-b", DF_BRANCH]
+    clone_command += [f"https://github.com/{DF_REPO}.git", DF_PATH]
+    subprocess.run(clone_command)
+
+    Logger.success(f"Installed dotfiles at {git_short_hash()}.")
+
+
+def sync_dotfiles_repo():
+    # --local installs straight from the working tree — nothing to clone/update.
+    if DF_LOCAL:
+        return
+
+    if not os.path.isdir(DF_PATH):
+        clone_dotfiles_repo()
+        return
+
+    update_dotfiles_repo()
+
+
 def install(variant=DF_VARIANT):
     check_mandatory_installation("git")
     check_mandatory_installation("zsh")
@@ -184,67 +250,7 @@ def install(variant=DF_VARIANT):
     check_optional_installation("tmux")
     check_optional_installation("lynx")
 
-    # Clone or update the dotfiles repo (skipped with --local, which installs
-    # straight from the working tree). git is an external tool → subprocess.
-    # Ruby scoped the cwd change with `Dir.chdir(DF_PATH) do … end`; we pass
-    # cwd=DF_PATH per command instead, so the process's own working directory
-    # is never mutated.
-    if not DF_LOCAL:
-        if os.path.isdir(DF_PATH):
-            with Logger.log(f"Found existing dotfiles in {DF_PATH}, updating"):
-                current_hash = subprocess.run(
-                    ["git", "rev-parse", "--short", "HEAD"],
-                    cwd=DF_PATH, capture_output=True, text=True
-                ).stdout.strip()
-
-                # Pin the remote to the requested branch, if one is set.
-                if DF_BRANCH:
-                    subprocess.run(
-                        ["git", "remote", "set-branches", "origin", DF_BRANCH],
-                        cwd=DF_PATH,
-                    )
-
-                # Fetch + hard-reset to the remote tip (output silenced, as in Ruby).
-                subprocess.run(
-                    ["git", "fetch", "--depth=1"],
-                    cwd=DF_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                )
-                subprocess.run(
-                    ["git", "reset", "--hard", f"origin/{DF_BRANCH or 'master'}"],
-                    cwd=DF_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                )
-
-                if DF_BRANCH:
-                    Logger.success(f"Switching to branch {DF_BRANCH}")
-                    subprocess.run(
-                        ["git", "checkout", "--quiet", DF_BRANCH], cwd=DF_PATH
-                    )
-
-                new_hash = subprocess.run(
-                    ["git", "rev-parse", "--short", "HEAD"],
-                    cwd=DF_PATH, capture_output=True, text=True
-                ).stdout.strip()
-                Logger.success(
-                    f"Updated dotfiles from {current_hash} to {new_hash}."
-                )
-        else:
-            Logger.log(f"Cloning repo from {DF_REPO} to {DF_PATH}")
-            if DF_BRANCH:
-                Logger.success(f"Switching to branch {DF_BRANCH}")
-
-            # Build the clone command as an argv list; the optional branch flag
-            # is just a conditional list extension (no shell-string quoting).
-            clone_command = ["git", "clone", "--quiet", "--depth=1"]
-            if DF_BRANCH:
-                clone_command += ["-b", DF_BRANCH]
-            clone_command += [f"https://github.com/{DF_REPO}.git", DF_PATH]
-            subprocess.run(clone_command)
-
-            installed_hash = subprocess.run(
-                ["git", "rev-parse", "--short", "HEAD"],
-                cwd=DF_PATH, capture_output=True, text=True
-            ).stdout.strip()
-            Logger.success(f"Installed dotfiles at {installed_hash}.")
+    sync_dotfiles_repo()
 
     # Steps 6–9 still to come: .zshrc variant edit, vim setup, configs + python
     # provisioning + toolbox-includes, tail + post-install.
