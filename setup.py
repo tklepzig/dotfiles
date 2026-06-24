@@ -325,6 +325,8 @@ def load_vim_routine(relative_path):
     # routines live in the cloned repo — the Python analog of Ruby's `require`.
     routine_path = f"{DF_PATH}/{relative_path}"
     spec = importlib.util.spec_from_file_location("dotfiles_vim_routine", routine_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Could not load vim routine: {routine_path}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     module.run(vim_routine_context())
