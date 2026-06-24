@@ -332,6 +332,29 @@ def load_vim_routine(relative_path):
     module.run(vim_routine_context())
 
 
+def setup_theme_and_colours():
+    os.makedirs(DF_LOCAL_PATH, exist_ok=True)
+
+    if DF_THEME:
+        Logger.log(f"Using theme {DF_THEME}")
+    # set-theme writes the active theme files; like Ruby's backticks we ignore
+    # its exit status (best-effort, no raise).
+    subprocess.run([f"{DF_PATH}/toolbox/scripts/set-theme"])
+
+    add_link_with_override(f"{DF_PATH}/colours.vim", f"{HOME}/.vimrc")
+    add_link_with_override(f"{DF_PATH}/colours.zsh", f"{HOME}/.zshrc")
+    add_link_with_override(f"{DF_PATH}/colours.tmux.conf", f"{HOME}/.tmux.conf")
+
+    local_plugins = f"{DF_LOCAL_PATH}/plugins.vim"
+    if not os.path.exists(local_plugins):
+        # Seed a placeholder so the user has a known spot for personal plugins.
+        # Byte-identical to setup.rb: a commented example, no trailing newline.
+        with open(local_plugins, "w") as plugins_file:
+            plugins_file.write("\"Plug 'any/vim-plugin'")
+
+    add_link_with_override(f"{DF_PATH}/vim/plugins.vim", f"{HOME}/.vimrc")
+
+
 def setup_vim(variant):
     with Logger.log(f"Setup {variant}"):
         link_vim_plugins()
@@ -368,8 +391,9 @@ def install(variant=DF_VARIANT):
     # Set the chosen variant in ~/.zshrc before the dotfiles source line.
     update_zshrc_variant(variant)
 
-    # NOTE: Step 8 config-linking (theme, colours.*, local plugins.vim) lands
-    # BEFORE this call in setup.rb; it will be inserted here in Step 8.
+    # Theme + colours + local plugins.vim must be linked before vim setup.
+    setup_theme_and_colours()
+
     setup_vim(variant)
 
     # Steps 8–9 still to come: configs + python provisioning + toolbox-includes,
