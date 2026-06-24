@@ -2,18 +2,18 @@
 
 > **RESUME HERE (read this first).** Multi-week effort, done in small steps.
 > - **Branch:** `port-to-python`.
-> - **Current position:** Step 0–4 ✅. **Step 5 done** ✅ — `install()` now opens
->   with the program checks (git/zsh mandatory, eza/tmux/lynx optional) and the
->   repo clone/update block. git via list-form `subprocess.run` (injection-safe),
->   `cwd=DF_PATH` per call instead of Ruby's `Dir.chdir` block (no global cwd
->   mutation), `DEVNULL` for the silenced fetch/reset, `capture_output`+`.strip()`
->   for the short-hash reporting. Clone command built as a conditional argv list
->   (`-b <branch>` only when `DF_BRANCH` set). install() still ends in
->   NotImplementedError (Steps 6–9). NOT run live (clones into real ~/.dotfiles —
->   Docker-only).
-> - **Next action:** Step 6 — `.zshrc` variant-export editing (the regex
->   insert/replace block, setup.rb:300+). Mix of file read/write + regex; native
->   Python (`re`, read/write). Builds on the `install()` body just started.
+> - **Current position:** Step 0–5 ✅ (Step 5 repo-sync also refactored into
+>   `sync_/clone_/update_dotfiles_repo` + `git_short_hash`, flat install()).
+>   **Step 6 done** ✅ — `update_zshrc_variant(variant)` ports the `.zshrc`
+>   variant-export block: replace-in-place / insert-above-source / append, 4
+>   cases tested (incl. missing ~/.zshrc → create, a robustness fix vs Ruby's
+>   File.read crash). Regex traps handled: `re.MULTILINE` (Ruby's `^` is per-line
+>   by default), `re.escape` on the path, lambda repl to dodge backref escaping.
+>   install() still ends in NotImplementedError (Steps 7–9). NOT run live.
+> - **Next action:** Step 7 — vim setup (`setup_vim`/`cleanup_vim`) + inline the
+>   4 vim `*.rb` files (`vim/{vim,neovim}/{install,uninstall}.rb`, 4–21 lines
+>   each) as Python functions taking context. setup.rb (search `setup_vim`).
+>   Mostly native file ops + a couple shell-outs; no plugin system.
 > - **Working style:** one chunk at a time, keep each `.rb` until its `.py` is
 >   verified, flip call sites late, delete `.rb` last. Hand Thomas a "Learn by
 >   Doing" contribution per chunk (Step 2 was full-write-then-review by choice).
@@ -118,7 +118,8 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
       `add_link_with_override` (native file ops). Functional-tested.
 - [x] **5. Repo clone/update** — git subprocess block (list-form, `cwd=`,
       `DEVNULL`, hash capture; conditional `-b` clone). + install() preamble.
-- [ ] **6. `.zshrc` variant-export editing** — the regex insert/replace block.
+- [x] **6. `.zshrc` variant-export editing** — `update_zshrc_variant`;
+      replace/insert/append, 4 cases tested; re.MULTILINE + re.escape traps.
 - [ ] **7. Vim setup** — `setup_vim`/`cleanup_vim` + inline the 4 vim `*.rb`.
 - [ ] **8. Config linking + python provisioning + toolbox-includes** —
       tmux/kitty/ranger/mpv/i3/aerospace + scheduler; conditional

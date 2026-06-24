@@ -242,6 +242,42 @@ def sync_dotfiles_repo():
     update_dotfiles_repo()
 
 
+def update_zshrc_variant(variant):
+    # Ensure $DOTFILES_VARIANT is exported in ~/.zshrc, ABOVE the dotfiles zsh
+    # source line (aliases sourced there depend on the variant being set first).
+    variant_export = f"export DOTFILES_VARIANT='{variant}'"
+    zshrc_path = f"{HOME}/.zshrc"
+    source_line = f"{DF_PATH}/zsh/zshrc"
+
+    # Ruby's File.read raises if ~/.zshrc is absent; default to empty so a fresh
+    # box appends cleanly and the write below creates the file.
+    zshrc = ""
+    if os.path.exists(zshrc_path):
+        with open(zshrc_path) as handle:
+            zshrc = handle.read()
+
+    if "DOTFILES_VARIANT" in zshrc:
+        # Already present: replace in place, preserving its position. `.` doesn't
+        # cross newlines, so `.*` stays line-bounded (matching Ruby's gsub!).
+        zshrc = re.sub(r"export DOTFILES_VARIANT=.*", variant_export, zshrc)
+    elif source_line in zshrc:
+        # Source line present: insert the export above it. re.MULTILINE makes ^
+        # match at each line start — Ruby's ^ is per-line by default, Python's
+        # is string-start-only without the flag.
+        zshrc = re.sub(
+            rf"^(.*{re.escape(source_line)}.*)",
+            lambda match: f"{variant_export}\n{match.group(1)}",
+            zshrc,
+            flags=re.MULTILINE,
+        )
+    else:
+        # First install, source line not added yet: append (it follows later).
+        zshrc += f"{variant_export}\n"
+
+    with open(zshrc_path, "w") as handle:
+        handle.write(zshrc)
+
+
 def install(variant=DF_VARIANT):
     check_mandatory_installation("git")
     check_mandatory_installation("zsh")
@@ -252,8 +288,11 @@ def install(variant=DF_VARIANT):
 
     sync_dotfiles_repo()
 
-    # Steps 6–9 still to come: .zshrc variant edit, vim setup, configs + python
-    # provisioning + toolbox-includes, tail + post-install.
+    # Set the chosen variant in ~/.zshrc before the dotfiles source line.
+    update_zshrc_variant(variant)
+
+    # Steps 7–9 still to come: vim setup, configs + python provisioning +
+    # toolbox-includes, tail + post-install.
     raise NotImplementedError("setup.py install is being ported incrementally")
 
 
