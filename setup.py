@@ -5,6 +5,8 @@
 # come later and run under a provisioned interpreter. Python port of setup.rb.
 
 import os
+import shutil
+import subprocess
 import sys
 from contextlib import contextmanager
 
@@ -75,6 +77,38 @@ def is_mac():
 
 def is_linux():
     return sys.platform.startswith("linux")
+
+
+def program_installed(program):
+    return shutil.which(program) is not None
+
+
+def ensure_brew_package(package, binary=None):
+    binary = binary or package
+    with Logger.log(f"Checking for {package}"):
+        if program_installed(binary):
+            Logger.success(f"Found: {shutil.which(binary)}.")
+        else:
+            Logger.log("Not found, installing via brew")
+            # Matches Ruby's `system(...)`: fire-and-forget, exit code ignored.
+            subprocess.run(["brew", "install", package])
+
+
+def check_mandatory_installation(program):
+    with Logger.log(f"Searching for {program}"):
+        if not program_installed(program):
+            Logger.error("Not found, aborting")
+            sys.exit(1)
+        Logger.success(f"Found: {shutil.which(program)}.")
+
+
+def check_optional_installation(program, install_name=None):
+    install_name = install_name or program
+    with Logger.log(f"Searching for {program}"):
+        if program_installed(program):
+            Logger.success(f"Found: {shutil.which(program)}.")
+        else:
+            Logger.error(f'Not Found. (Try "sudo pacman -S {install_name}")')
 
 
 def install(variant=DF_VARIANT):

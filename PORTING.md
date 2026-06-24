@@ -2,16 +2,17 @@
 
 > **RESUME HERE (read this first).** Multi-week effort, done in small steps.
 > - **Branch:** `port-to-python`.
-> - **Current position:** Step 0 ✅. **Step 1 fully done** ✅. **Step 2 done** ✅
->   — `setup.py` skeleton: env constants, `Logger` (context-manager nesting,
->   verified byte-identical to Ruby's), `is_mac()`/`is_linux()`, arg dispatch
->   (`--uninstall`/`--vim`/`--local`); `install`/`uninstall` are
->   NotImplementedError stubs filled in Steps 3–9. Stdlib-only, 3.8-safe.
-> - **Next action:** Step 3 — program checks (`program_installed?`,
->   `check_mandatory_installation`, `check_optional_installation`,
->   `ensure_brew_package`). setup.rb:77–113. Shell-out to `command -v` / `which`
->   (recurring fork: external tools stay subprocess). Append to `setup.py`.
->   Still no Docker run until more of `install()` exists.
+> - **Current position:** Step 0 ✅. Step 1 ✅. Step 2 ✅. **Step 3 done** ✅
+>   — program checks ported (`program_installed`, `ensure_brew_package`,
+>   `check_mandatory_installation`, `check_optional_installation`).
+>   `program_installed` chose the **stdlib route** (`shutil.which(program) is not
+>   None`) over a `sh -c 'command -v'` shell-out — no per-check fork, and it
+>   shares the same resolver as the `shutil.which` path-reporting in the helpers.
+>   Stdlib-only, 3.8-safe. Smoke-tested (git→True, bogus→False).
+> - **Next action:** Step 4 — link helpers (`find_override`, `merge`,
+>   `write_link`, `add_link_with_override`). setup.rb (search `add_link`). These
+>   are pure file ops → **native Python** (`os.symlink`, read/append), per the
+>   recurring fork. Still no Docker run until more of `install()` exists.
 > - **Working style:** one chunk at a time, keep each `.rb` until its `.py` is
 >   verified, flip call sites late, delete `.rb` last. Hand Thomas a "Learn by
 >   Doing" contribution per chunk (Step 2 was full-write-then-review by choice).
@@ -109,8 +110,9 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
       (JSON-equal); ported validator/dispatcher on stdlib `tomllib`;
       golden-diff all 21 modes byte-identical; flipped `init.zsh` + `_ws` + `_k`
       to `_run.py`. `.rb`/`.yaml` kept until Step 9.
-- [ ] **2. setup skeleton** — `Logger`, `OS`, arg parsing (`--local/--vim/--uninstall`).
-- [ ] **3. Program checks** — `program_installed?`, mandatory/optional/brew.
+- [x] **2. setup skeleton** — `Logger`, `OS`, arg parsing (`--local/--vim/--uninstall`).
+- [x] **3. Program checks** — `program_installed` (stdlib `shutil.which`),
+      mandatory/optional/brew. Smoke-tested.
 - [ ] **4. Link helpers** — `find_override`, `merge`, `write_link`,
       `add_link_with_override` (native file ops).
 - [ ] **5. Repo clone/update** — git subprocess block.
