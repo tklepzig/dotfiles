@@ -15,6 +15,7 @@ import tempfile
 import tomllib
 import unittest
 from pathlib import Path
+from unittest import mock
 
 REPO = Path(__file__).resolve().parent.parent
 HELPER = REPO / "toolbox" / "setup_includes.py"
@@ -97,6 +98,45 @@ class IntegrationTest(unittest.TestCase):
             merged = tomllib.loads((scripts / "_info.toml").read_text())
             self.assertIn("good-tool", merged)
 
+    def test_non_string_list_entry_does_not_sink_the_next(self):
+        # A fat-fingered list element (here an int) must soft-skip, not abort
+        # the whole loop before the good include is processed.
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            scripts = home / ".dotfiles/toolbox/scripts"
+            scripts.mkdir(parents=True)
+            (scripts / "_info.toml").write_text('[core]\nhelp = "core"\n')
+
+            good = home / "includes/good"
+            (good / "scripts").mkdir(parents=True)
+            (good / "scripts/good-tool").write_text("#!/bin/sh\n")
+            (good / "scripts/_info.toml").write_text('[good-tool]\nhelp = "good"\n')
+
+            local = home / ".dotfiles-local"
+            local.mkdir()
+            (local / "toolbox-include.toml").write_text(f'paths = [123, "{good}"]\n')
+
+            result = subprocess.run(
+                [sys.executable, str(HELPER)],
+                env={**os.environ, "HOME": str(home)},
+                capture_output=True, text=True,
+            )
+            self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+            self.assertTrue((scripts / "good-tool").is_symlink())
+            self.assertIn("good-tool", tomllib.loads((scripts / "_info.toml").read_text()))
+
+    def test_corrupt_include_list_soft_skips(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            local = Path(tmp) / ".dotfiles-local"
+            local.mkdir()
+            (local / "toolbox-include.toml").write_text("this is ] not toml")
+            result = subprocess.run(
+                [sys.executable, str(HELPER)],
+                env={**os.environ, "HOME": tmp},
+                capture_output=True, text=True,
+            )
+            self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+
     def test_missing_include_list_is_a_noop(self):
         with tempfile.TemporaryDirectory() as tmp:
             result = subprocess.run(
@@ -107,9 +147,17 @@ class IntegrationTest(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
 
+def patch_global(test_case, name, value):
+    # Set a setup_includes module global for the duration of one test and
+    # auto-restore it afterwards, so these in-process tests aren't order-coupled.
+    patcher = mock.patch.object(setup_includes, name, value)
+    patcher.start()
+    test_case.addCleanup(patcher.stop)
+
+
 class ExpandPathTest(unittest.TestCase):
     def test_expand_include_path(self):
-        setup_includes.DF_LOCAL_PATH = "/base"
+        patch_global(self, "DF_LOCAL_PATH", "/base")
         self.assertEqual(setup_includes.expand_include_path("/abs/path"), "/abs/path")
         self.assertEqual(setup_includes.expand_include_path("rel/path"), "/base/rel/path")
         self.assertEqual(setup_includes.expand_include_path("~"), os.path.expanduser("~"))
@@ -128,8 +176,8 @@ class PlanBTest(unittest.TestCase):
         include = home / "inc"
         (include / "scripts").mkdir(parents=True)
         (include / "scripts/_info.toml").write_text('[new]\nhelp = "new"\n')
-        setup_includes.DF_PATH = str(home / ".dotfiles")
-        setup_includes.CORE_INFO = str(core)
+        patch_global(self, "DF_PATH", str(home / ".dotfiles"))
+        patch_global(self, "CORE_INFO", str(core))
         return include, core, original
 
     def test_no_writer_soft_skips_and_preserves_core(self):

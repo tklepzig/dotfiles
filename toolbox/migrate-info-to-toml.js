@@ -12,6 +12,12 @@
 // Output need not byte-match a hand-authored file — it only has to be valid TOML
 // that Python's `tomllib` reads back to the same data. The setup merge
 // re-serializes anyway.
+//
+// Scope: verified round-trip dict-equal (via tomllib) against this repo's own
+// _info.yaml — strings, bools, int defaults, string arrays. Out of scope for a
+// one-off: float-precision fidelity (a YAML 1.0 round-trips as int 1, since JS
+// has no int/float split) and control chars in help text. Eyeball the output if
+// your include repo uses either.
 
 const fs = require("fs");
 const path = require("path");

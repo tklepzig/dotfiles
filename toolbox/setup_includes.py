@@ -117,7 +117,10 @@ def link_scripts(path, toml_writer):
         return True
 
     tmp_path = CORE_INFO + ".tmp"
-    with open(tmp_path, "w") as out_file:
+    # TOML is always UTF-8; pin it so a C/POSIX-locale box doesn't write in
+    # ASCII and choke on a non-ASCII help char (the read side is rb+tomllib,
+    # i.e. already UTF-8, so an unpinned write would be asymmetric).
+    with open(tmp_path, "w", encoding="utf-8") as out_file:
         out_file.write(text)
     os.replace(tmp_path, CORE_INFO)
     return False
@@ -132,40 +135,59 @@ def expand_include_path(raw_path):
     return os.path.abspath(expanded)
 
 
+def update_include_repo(path):
+    # Non-interactive git: a real install is unattended, so a non-fast-forward
+    # merge must not open $EDITOR and a private remote must not block on a
+    # credential prompt. Ruby's backticks inherited stdin and had neither guard.
+    log("Found git repo, updating", 1)
+    git_env = {**os.environ, "GIT_TERMINAL_PROMPT": "0"}
+    fetched = subprocess.run(
+        ["git", "fetch"], cwd=path, env=git_env,
+        stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+    )
+    if fetched.returncode == 0:  # Ruby's `git fetch && git merge`
+        subprocess.run(
+            ["git", "merge", "--no-edit"], cwd=path, env=git_env,
+            stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+
+
 def process_includes():
     include_list = os.path.join(DF_LOCAL_PATH, "toolbox-include.toml")
     if not os.path.isfile(include_list):
         return 0
-    with open(include_list, "rb") as list_file:
-        paths = tomllib.load(list_file).get("paths", [])
+    try:
+        with open(include_list, "rb") as list_file:
+            paths = tomllib.load(list_file).get("paths", [])
+    except tomllib.TOMLDecodeError as error:
+        log(f"Could not parse {include_list}: {error!r}")
+        log("Fix the include list, then re-run setup.")
+        return EXIT_MERGE_SKIPPED
+    if not isinstance(paths, list):
+        # A bare string would otherwise iterate character-by-character below.
+        log(f"`paths` in {include_list} must be an array of strings.")
+        return EXIT_MERGE_SKIPPED
 
     toml_writer = load_toml_writer()
     any_skipped = False
     for raw_path in paths:
-        path = expand_include_path(raw_path)
-        if not os.path.isdir(path):
-            continue
-        log(raw_path)
-        # Isolate each include: a malformed include _info.toml (or a flaky git
-        # repo) must not sink the others. Ruby let one bad YAML abort the loop;
-        # we log it as a soft-skip and carry on.
+        # Isolate each entry: one malformed list element (non-string), a flaky
+        # git repo, or a bad include _info.toml must not sink the others. Ruby
+        # let one bad entry abort the loop; we soft-skip it and carry on. The
+        # expand + isdir checks live inside the try too, since a non-string
+        # entry raises in expand_include_path.
         try:
+            path = expand_include_path(raw_path)
+            if not os.path.isdir(path):
+                continue
+            log(raw_path)
             if os.path.isdir(os.path.join(path, ".git")):
-                log("Found git repo, updating", 1)
-                fetched = subprocess.run(
-                    ["git", "fetch"], cwd=path,
-                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                )
-                if fetched.returncode == 0:  # Ruby's `git fetch && git merge`
-                    subprocess.run(
-                        ["git", "merge"], cwd=path,
-                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                    )
+                update_include_repo(path)
             link_docs(path)
             if link_scripts(path, toml_writer):
                 any_skipped = True
         except Exception as error:
-            log(f"Skipped — {error!r}", 1)
+            log(f"Skipped {raw_path!r} — {error!r}", 1)
             log("Fix this include, then re-run setup.", 1)
             any_skipped = True
 
