@@ -73,10 +73,21 @@ prerequisite for bootstrapping a fresh machine.
 - **DECISION PENDING (8c) — how to do that one merge write.** Confirmed it's the
   *only* structured write in the whole port (`configure_bc`/`configure_ruby`
   write plain text). Three options, by disruption to already-verified work:
-  1. **Vendor `tomli-w`** (single ~150-line MIT file) — LEANING THIS. 0 LOC
-     written, spec-correct, `_info` stays TOML, touches nothing verified.
-     `_run.py` untouched. Merge = `tomllib.load` → `{**base, **inc}` →
-     `tomli_w.dump`.
+  1. **Vendor `tomli-w`** (single MIT file, v1.2.0, pure-python, 0 deps, py3.9+)
+     — LEANING THIS + a soft-skip fallback (Plan B). 0 LOC written, spec-correct,
+     `_info` stays TOML, touches nothing verified, `_run.py` untouched. Merge =
+     `tomllib.load` → `{**base, **inc}` → atomic-write `tomli_w.dumps`.
+     **Plan B (vendor import/dump fails for any reason):** import vendored under
+     a distinct name (`_vendor/`) first, fall back to a pip-installed `tomli_w`;
+     if neither resolves, log the exact `<modern-python> -m pip install tomli-w`
+     command, **soft-skip only the merge** (do all other setup), and `exit 1` so
+     re-running setup completes it (setup.py is already idempotent → re-run IS
+     the resume, no state machine). Safe because: the whole include path is
+     behind the `~/.dotfiles-local/toolbox-include.yaml` guard (fresh box never
+     hits it), include scripts still get symlinked (plain `ln`, no TOML) so they
+     *work* — only their help/args/completion metadata is pending. Atomic write
+     (serialize-to-string then replace) is mandatory regardless, so a mid-dump
+     crash can't truncate the real `_info.toml`.
   2. **Hand-rolled dumper** — ~22 LOC happy-path for this exact shape (help
      str / `args` array-of-tables / `completion` str-array), ~45–55 LOC robust.
      Rejected reason isn't LOC, it's escaping corners (`'''` inside help,
