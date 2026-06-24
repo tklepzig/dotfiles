@@ -28,7 +28,7 @@ RUN cp /root/.dotfiles/test/overrides/fixtures/vim/vim/vimrc.override \
     cp /root/.dotfiles/test/overrides/fixtures/dotfiles-local/lazy-plugins.lua \
        /root/.dotfiles-local/lazy-plugins.lua
 
-RUN cd /root/.dotfiles && ruby setup.rb --local
+RUN cd /root/.dotfiles && python3 setup.py --local
 
 RUN /root/.dotfiles/test/overrides/run.sh
 

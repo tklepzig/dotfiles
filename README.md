@@ -6,13 +6,22 @@ My dotfiles.
 
 ### Neovim profile (default)
 
-    /usr/bin/env ruby -e "$(curl -Ls https://raw.githubusercontent.com/\
-    tklepzig/dotfiles/master/setup.rb)"
+    /usr/bin/env python3 -c "$(curl -Ls https://raw.githubusercontent.com/\
+    tklepzig/dotfiles/master/setup.py)"
 
 ### Vim profile
 
+    /usr/bin/env python3 -c "$(curl -Ls https://raw.githubusercontent.com/\
+    tklepzig/dotfiles/master/setup.py)" --vim
+
+### Legacy Ruby installer (fallback)
+
+The installer was ported from Ruby to Python so a fresh box no longer needs
+Ruby preinstalled (`python3` almost always is). The Ruby installer is kept as a
+fallback during the transition — if the Python one misbehaves, run:
+
     /usr/bin/env ruby -e "$(curl -Ls https://raw.githubusercontent.com/\
-    tklepzig/dotfiles/master/setup.rb)" -- --vim
+    tklepzig/dotfiles/master/setup.rb)"      # add `-- --vim` for the vim profile
 
 ### Raspberry Pi (full bootstrap)
 
@@ -103,7 +112,7 @@ The easiest way to clean all of this up in one step is to uninstall first, which
 removes all dotfiles source lines from local config files while leaving any
 manual customisations intact:
 
-    cd ~/.dotfiles && ./setup.rb --uninstall
+    cd ~/.dotfiles && ./setup.py --uninstall      # legacy fallback: ./setup.rb --uninstall
 
 ### Re-run setup
 
@@ -260,15 +269,21 @@ name = "target"
 ### Toolbox includes
 
 To pull in scripts and docs from an external directory or repository, create
-`~/.dotfiles-local/toolbox-include.yaml` listing paths to include:
+`~/.dotfiles-local/toolbox-include.toml` listing paths to include:
 
-```yaml
-- /absolute/path/to/extra-toolbox
-- relative/path/from/dotfiles-local # resolved relative to ~/.dotfiles-local
+```toml
+paths = [
+  "/absolute/path/to/extra-toolbox",
+  "relative/path/from/dotfiles-local",   # resolved relative to ~/.dotfiles-local
+]
 ```
 
+> If you fall back to the legacy Ruby installer, it reads the old
+> `~/.dotfiles-local/toolbox-include.yaml` (a bare YAML list) instead. Keep both
+> during the transition if you rely on the fallback.
+
 Each listed path may be a plain directory or a git repository. If it contains a
-`.git` directory, `setup.rb` will run `git fetch && git merge` on it
+`.git` directory, the installer runs `git fetch && git merge` on it
 automatically during installation to keep it up to date.
 
 The directory is expected to follow this layout (both subdirectories are
@@ -276,7 +291,8 @@ optional):
 
 ```
 extra-toolbox/
-  scripts/       # executables + optional _info.yaml
+  scripts/       # executables + optional _info.toml (use migrate-info-to-toml.js
+                 # to convert a legacy _info.yaml)
   docs/          # markdown files linked into the toolbox docs
 ```
 
