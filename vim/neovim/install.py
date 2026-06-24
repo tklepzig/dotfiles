@@ -8,17 +8,10 @@ Edit freely to change what the neovim install does. Entry point is
 import os
 
 
-def link(source, target):
-    # `ln -sf`: drop any existing target (file or symlink, incl. broken), then
-    # create the symlink.
-    if os.path.islink(target) or os.path.exists(target):
-        os.remove(target)
-    os.symlink(source, target)
-
-
 def run(context):
     home = context.home
     df_path = context.df_path
+    link = context.force_symlink  # shared `ln -sf` helper from setup.py
 
     context.check_optional_installation("rg", "ripgrep")
     context.check_optional_installation("ranger")

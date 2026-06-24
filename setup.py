@@ -178,6 +178,14 @@ def add_link_with_override(link, file, command="source"):
         write_link(override, file, command)
 
 
+def force_symlink(source, target):
+    # `ln -sf`: drop any existing target (file or symlink, incl. broken), then
+    # create the symlink. Single source of truth for every ported `ln -sf`.
+    if os.path.islink(target) or os.path.exists(target):
+        os.remove(target)
+    os.symlink(source, target)
+
+
 def git_short_hash():
     # Current short commit hash of the dotfiles repo.
     return subprocess.run(
@@ -307,6 +315,7 @@ def vim_routine_context():
         home=HOME,
         df_path=DF_PATH,
         check_optional_installation=check_optional_installation,
+        force_symlink=force_symlink,
     )
 
 
