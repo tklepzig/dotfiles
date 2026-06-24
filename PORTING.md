@@ -155,4 +155,9 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
   `help <script>`, `help <unknown>`, valid dispatch, missing-arg, too-many-args,
   unknown-script.
 - `setup.py`: full run in `Dockerfile.test` (both `--local` and `--local --vim`)
-  and `Dockerfile.test-overrides`; `test/overrides/run.sh` must pass.
+  and `Dockerfile.test-overrides`; `test/overrides/run.sh` must pass. PLUS
+  `test/setup_test.py` — stdlib unittest over the pure-logic helpers
+  (`find_override`, `update_zshrc_variant`, `merge`) covering the regex branches
+  the Docker run never hits. Run: `python3 test/setup_test.py`. `force_symlink`
+  is the single shared `ln -sf` helper (in setup.py, passed via
+  `vim_routine_context`) — reuse it for every ported `ln -sf` in Step 8.
