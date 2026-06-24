@@ -2,11 +2,11 @@
 
 > **RESUME HERE (read this first).** Multi-week effort, done in small steps.
 > - **Branch:** `port-to-python`.
-> - **Current position:** Step 0–7 ✅. **Step 8a done** ✅ —
->   `setup_theme_and_colours()` (theme/`set-theme`, 3 `colours.*` links,
->   byte-identical default `plugins.vim`, `vim/plugins.vim` link) now runs
->   BEFORE `setup_vim()` in `install()`. Functional-tested + 9 unit tests green.
->   See Step 8 sub-chunks below for what's next. Older Step 7 detail retained:
+> - **Current position:** Step 0–7 ✅. **Step 8a + 8b done** ✅ — `install()`
+>   now runs `setup_theme_and_colours()` → `setup_vim()` → zshrc link →
+>   `configure_bc()` → `configure_ruby()`, then hits the NotImplementedError
+>   stub (8c next). All functional-tested + 9 unit tests green. See Step 8
+>   sub-chunks below for what's next. Older Step 7 detail retained:
 >   **Step 7** — vim setup ported:
 >   `link_vim_plugins` (override merge + the `"pluginfile` sed, done natively),
 >   `setup_vim(variant)`, `cleanup_vim()`. DECISION CHANGE (Thomas): the 4 vim
@@ -21,13 +21,15 @@
 >   loader (dirs, 6 symlinks, force re-run, removals, missing-file no-op). `.rb`
 >   kept until Step 9. setup_vim() wired into install() but placed AFTER the
 >   zshrc edit — Step 8 config-linking lines must be inserted BEFORE it.
-> - **Next action:** Step 8b — zshrc link + `.bc` + ruby default-gems/rubocop
->   links (setup.rb:336–352). Port Ruby's ACTUAL order: the zshrc link runs
->   AFTER `setup_vim`; leave the "TODO: move before vim" as a comment, do NOT
->   enact it (faithfulness — a TODO is a behaviour change in cleanup costume).
->   Then 8c (toolbox + TOML writer + ensure_asdf_python) and 8d (config blocks).
->   See the Step 8 sub-chunk checklist below for the full breakdown + the 8c
->   scout-`_info.yaml`-first warning.
+> - **Next action:** Step 8c — toolbox: `link_scripts` / `add_toolbox_includes`
+>   / `link_docs` (setup.rb:184–215, 353–356). SCOUT FIRST: grep for
+>   `_info.yaml` readers — porting these forces the YAML→TOML format migration
+>   (stdlib has no YAML reader) of `_info.yaml` + `toolbox-include.yaml`, plus a
+>   TOML *writer* (tomllib is read-only), plus re-exec under modern python.
+>   Split the format migration (8c-pre, validate vs `golden.py`) from the new
+>   toolbox logic — two independent failure modes. `ensure_asdf_python()` lands
+>   here too (no-op on this Arch box; don't mark its provision path verified).
+>   Then 8d (remaining config blocks). See the Step 8 sub-chunk checklist below.
 > - **Working style:** one chunk at a time, keep each `.rb` until its `.py` is
 >   verified, flip call sites late, delete `.rb` last. Hand Thomas a "Learn by
 >   Doing" contribution per chunk (Step 2 was full-write-then-review by choice).
@@ -146,9 +148,11 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
             backticks], 3 `colours.*` links, byte-identical default
             `plugins.vim` [no trailing newline, idempotent], `vim/plugins.vim`
             link), called BEFORE `setup_vim()`. Functional-tested.
-      - [ ] **8b** — zshrc link + `.bc` + ruby default-gems/rubocop links. NOTE:
-            port Ruby's actual order (zshrc link runs AFTER `setup_vim`); leave
-            the "TODO: move before vim" as a comment, do NOT enact it.
+      - [x] **8b** — zshrc link (`add_link_with_override`, kept AFTER
+            `setup_vim` per Ruby's actual order; "move before vim" TODO left as
+            a comment, NOT enacted) + `configure_bc()` (writes `scale=2\n` only
+            if `.bc` absent) + `configure_ruby()` (`force_symlink` for
+            default-gems + rubocop.yml). Functional-tested, 9 unit tests green.
       - [ ] **8c** — toolbox: `link_scripts`/`add_toolbox_includes`/`link_docs`.
             Forces the YAML→TOML format migration of `_info.yaml` +
             `toolbox-include.yaml` (stdlib has no YAML reader) + a TOML *writer*

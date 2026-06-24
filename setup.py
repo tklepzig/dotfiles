@@ -378,6 +378,23 @@ def cleanup_vim():
         load_vim_routine("vim/neovim/uninstall.py")
 
 
+def configure_bc():
+    bc_config = f"{HOME}/.bc"
+    if not os.path.exists(bc_config):
+        Logger.log("Configuring bc")
+        # Default bc to 2 decimal places of precision.
+        with open(bc_config, "w") as bc_file:
+            bc_file.write("scale=2\n")
+
+
+def configure_ruby():
+    with Logger.log("Configuring ruby"):
+        Logger.log("Symlinking default gems configuration")
+        force_symlink(f"{DF_PATH}/ruby/default-gems", f"{HOME}/.default-gems")
+        Logger.log("Symlinking rubocop configuration")
+        force_symlink(f"{DF_PATH}/ruby/rubocop.yml", f"{HOME}/.rubocop.yml")
+
+
 def install(variant=DF_VARIANT):
     check_mandatory_installation("git")
     check_mandatory_installation("zsh")
@@ -396,8 +413,15 @@ def install(variant=DF_VARIANT):
 
     setup_vim(variant)
 
-    # Steps 8–9 still to come: configs + python provisioning + toolbox-includes,
-    # tail + post-install.
+    # TODO: move before vim setup (setup.rb has this TODO too; kept here to
+    # match Ruby's actual order — don't enact the move during the port).
+    add_link_with_override(f"{DF_PATH}/zsh/zshrc", f"{HOME}/.zshrc")
+
+    configure_bc()
+    configure_ruby()
+
+    # Steps 8c–9 still to come: toolbox + python provisioning, remaining config
+    # blocks, tail + post-install.
     raise NotImplementedError("setup.py install is being ported incrementally")
 
 
