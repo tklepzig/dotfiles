@@ -2,18 +2,26 @@
 
 > **RESUME HERE (read this first).** Multi-week effort, done in small steps.
 > - **Branch:** `port-to-python`.
-> - **Current position:** Step 0–5 ✅ (Step 5 repo-sync also refactored into
->   `sync_/clone_/update_dotfiles_repo` + `git_short_hash`, flat install()).
->   **Step 6 done** ✅ — `update_zshrc_variant(variant)` ports the `.zshrc`
->   variant-export block: replace-in-place / insert-above-source / append, 4
->   cases tested (incl. missing ~/.zshrc → create, a robustness fix vs Ruby's
->   File.read crash). Regex traps handled: `re.MULTILINE` (Ruby's `^` is per-line
->   by default), `re.escape` on the path, lambda repl to dodge backref escaping.
->   install() still ends in NotImplementedError (Steps 7–9). NOT run live.
-> - **Next action:** Step 7 — vim setup (`setup_vim`/`cleanup_vim`) + inline the
->   4 vim `*.rb` files (`vim/{vim,neovim}/{install,uninstall}.rb`, 4–21 lines
->   each) as Python functions taking context. setup.rb (search `setup_vim`).
->   Mostly native file ops + a couple shell-outs; no plugin system.
+> - **Current position:** Step 0–6 ✅. **Step 7 done** ✅ — vim setup ported:
+>   `link_vim_plugins` (override merge + the `"pluginfile` sed, done natively),
+>   `setup_vim(variant)`, `cleanup_vim()`. DECISION CHANGE (Thomas): the 4 vim
+>   `*.rb` files were NOT inlined — they became standalone `*.py` files
+>   (`vim/{vim,neovim}/{install,uninstall}.py`) so the routines stay easy to edit
+>   in isolation. Contract: each exposes `run(context)`; `context` =
+>   SimpleNamespace(home, df_path, check_optional_installation). setup.py loads
+>   them by absolute path from DF_PATH via importlib (Ruby `require` analog —
+>   setup.py is curl-piped, can't static-import). Routines use stdlib directly
+>   (os/pathlib/shutil) — `ln -sf`→remove+symlink, `rm -f`→unlink(missing_ok),
+>   `rm -rf`→rmtree(ignore_errors). All 4 routines functional-tested through the
+>   loader (dirs, 6 symlinks, force re-run, removals, missing-file no-op). `.rb`
+>   kept until Step 9. setup_vim() wired into install() but placed AFTER the
+>   zshrc edit — Step 8 config-linking lines must be inserted BEFORE it.
+> - **Next action:** Step 8 — config linking + python provisioning +
+>   toolbox-includes. setup.rb:317–354+ (theme, colours.* links, local
+>   plugins.vim, zsh/zshrc link, bc, ruby gems, toolbox init + add_toolbox_includes)
+>   PLUS conditional `ensure_asdf_python()` (only if system python < 3.11) and the
+>   toolbox-include TOML merge run under the modern interpreter (needs a TOML
+>   writer — see Decisions). Reorder so config-linking precedes setup_vim().
 > - **Working style:** one chunk at a time, keep each `.rb` until its `.py` is
 >   verified, flip call sites late, delete `.rb` last. Hand Thomas a "Learn by
 >   Doing" contribution per chunk (Step 2 was full-write-then-review by choice).
@@ -92,8 +100,11 @@ prerequisite for bootstrapping a fresh machine.
   existing Docker harness (`Dockerfile.test` + `test/overrides/run.sh`), never
   against the real `$HOME`.
 - **The 4 vim `*.rb` files** (`vim/{vim,neovim}/{install,uninstall}.rb`) are
-  `require`d into setup's scope (4–21 lines each). They become Python functions
-  taking context (HOME, DF_PATH, helpers) — inline, no plugin system.
+  `require`d into setup's scope (4–21 lines each). PORTED (Step 7) as standalone
+  `*.py` files (NOT inlined — Thomas's call, so they stay editable in isolation):
+  each exposes `run(context)` and is loaded by absolute path from DF_PATH via
+  importlib. `context` = SimpleNamespace(home, df_path,
+  check_optional_installation). `.rb` deleted in Step 9.
 
 ## Recurring learning fork
 
@@ -120,7 +131,8 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
       `DEVNULL`, hash capture; conditional `-b` clone). + install() preamble.
 - [x] **6. `.zshrc` variant-export editing** — `update_zshrc_variant`;
       replace/insert/append, 4 cases tested; re.MULTILINE + re.escape traps.
-- [ ] **7. Vim setup** — `setup_vim`/`cleanup_vim` + inline the 4 vim `*.rb`.
+- [x] **7. Vim setup** — `setup_vim`/`cleanup_vim`/`link_vim_plugins`; 4 vim
+      `*.rb` → standalone `*.py` (`run(context)`), loaded via importlib by path.
 - [ ] **8. Config linking + python provisioning + toolbox-includes** —
       tmux/kitty/ranger/mpv/i3/aerospace + scheduler; conditional
       `ensure_asdf_python()` (only if system python < 3.11); toolbox-include

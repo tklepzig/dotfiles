@@ -4,12 +4,14 @@
 # third-party imports. The modern-python-only bits (toolbox-include TOML merge)
 # come later and run under a provisioned interpreter. Python port of setup.rb.
 
+import importlib.util
 import os
 import re
 import shutil
 import subprocess
 import sys
 from contextlib import contextmanager
+from types import SimpleNamespace
 
 DF_REPO = os.environ.get("DOTFILES_REPO", "tklepzig/dotfiles")
 DF_BRANCH = os.environ.get("DOTFILES_BRANCH")  # None if unset
@@ -278,6 +280,70 @@ def update_zshrc_variant(variant):
         handle.write(zshrc)
 
 
+def link_vim_plugins():
+    # Apply the optional base-vim plugins override, then ensure each
+    # `"pluginfile` marker in vim/plugins.vim is preceded by a source line for
+    # the base plugins file (the Ruby sed, done natively). $HOME stays literal —
+    # vim expands it when it sources the file.
+    override = f"{DF_PATH}/vim/vim/plugins.override.vim"
+    if os.path.exists(override):
+        merge(f"{DF_PATH}/vim/vim/plugins.vim", override)
+
+    plugins_file = f"{DF_PATH}/vim/plugins.vim"
+    with open(plugins_file) as handle:
+        content = handle.read()
+    content = content.replace(
+        '"pluginfile',
+        'source $HOME/.dotfiles/vim/vim/plugins.vim\n"pluginfile',
+    )
+    with open(plugins_file, "w") as handle:
+        handle.write(content)
+
+
+def vim_routine_context():
+    # The handful of names the vim install/uninstall routine files are allowed
+    # to depend on. Passed as the single `context` argument to their run().
+    return SimpleNamespace(
+        home=HOME,
+        df_path=DF_PATH,
+        check_optional_installation=check_optional_installation,
+    )
+
+
+def load_vim_routine(relative_path):
+    # Load a standalone routine file from the deployed repo and call run(context).
+    # Loaded by absolute path (not import) because setup.py is curl-piped and the
+    # routines live in the cloned repo — the Python analog of Ruby's `require`.
+    routine_path = f"{DF_PATH}/{relative_path}"
+    spec = importlib.util.spec_from_file_location("dotfiles_vim_routine", routine_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.run(vim_routine_context())
+
+
+def setup_vim(variant):
+    with Logger.log(f"Setup {variant}"):
+        link_vim_plugins()
+        add_link_with_override(f"{DF_PATH}/vim/vim/vimrc", f"{HOME}/.vimrc")
+        load_vim_routine("vim/vim/install.py")
+
+        if variant != "neovim":
+            return
+
+        add_link_with_override(f"{DF_PATH}/vim/neovim/vimrc", f"{HOME}/.vimrc")
+        load_vim_routine("vim/neovim/install.py")
+
+
+def cleanup_vim():
+    with Logger.log("Cleanup vim"):
+        load_vim_routine("vim/vim/uninstall.py")
+
+        if DF_VARIANT != "neovim":
+            return
+
+        load_vim_routine("vim/neovim/uninstall.py")
+
+
 def install(variant=DF_VARIANT):
     check_mandatory_installation("git")
     check_mandatory_installation("zsh")
@@ -291,8 +357,12 @@ def install(variant=DF_VARIANT):
     # Set the chosen variant in ~/.zshrc before the dotfiles source line.
     update_zshrc_variant(variant)
 
-    # Steps 7–9 still to come: vim setup, configs + python provisioning +
-    # toolbox-includes, tail + post-install.
+    # NOTE: Step 8 config-linking (theme, colours.*, local plugins.vim) lands
+    # BEFORE this call in setup.rb; it will be inserted here in Step 8.
+    setup_vim(variant)
+
+    # Steps 8–9 still to come: configs + python provisioning + toolbox-includes,
+    # tail + post-install.
     raise NotImplementedError("setup.py install is being ported incrementally")
 
 
