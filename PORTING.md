@@ -175,6 +175,16 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
       - Golden embeds live data (theme lists, script names, help text), so any
         legitimate data change breaks it (jupiter-2 did). "golden failed" after
         adding e.g. a theme = "re-capture needed", not a regression.
+      - **Deferred `install()` reorganization (do as ONE pass, post-cutover —
+        not piecemeal during the port).** setup.rb carried 5 sibling org-only
+        TODOs (commit bbcd11e "Some todos", 2025-04-06): clean up / split into
+        smaller chunks (skip heavy steps for the basic variant); group the
+        vim-related links into the vim block; move the `zsh/zshrc` link up with
+        the other linking (verified behaviourally a no-op — `setup_vim` never
+        sources `~/.zshrc`); group all `add_link_with_override` linking into one
+        block. We dropped the stale comments from `setup.py` as we ported each
+        chunk (keeping Ruby's order); the actual regrouping is intentional
+        cleanup to do once, after the line-by-line port is verified.
 
 ## Verification matrix
 

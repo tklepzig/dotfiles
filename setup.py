@@ -413,8 +413,6 @@ def install(variant=DF_VARIANT):
 
     setup_vim(variant)
 
-    # TODO: move before vim setup (setup.rb has this TODO too; kept here to
-    # match Ruby's actual order — don't enact the move during the port).
     add_link_with_override(f"{DF_PATH}/zsh/zshrc", f"{HOME}/.zshrc")
 
     configure_bc()
