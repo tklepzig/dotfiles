@@ -10,6 +10,7 @@ Run: python3 test/setup_test.py
 """
 import importlib.util
 import os
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -115,6 +116,29 @@ class MergeTest(unittest.TestCase):
         Path(override).write_text("-beta\ndelta\n")
         setup.merge(base, override)
         self.assertEqual(Path(base).read_text(), "alpha\ngamma\ndelta\n")
+
+
+class ToolboxIncludesGlueTest(unittest.TestCase):
+    """The setup.py-side glue. The full install()->helper path needs a deployed
+    ~/.dotfiles clone, so only the guard + fast path are unit-testable here."""
+
+    def test_ensure_asdf_python_fast_path(self):
+        # This interpreter is >= 3.11, so it must be returned as-is (no search).
+        self.assertEqual(setup.ensure_asdf_python(), sys.executable)
+
+    def test_add_toolbox_includes_is_noop_without_list(self):
+        tmp = tempfile.mkdtemp()  # no toolbox-include.toml here
+        saved_local, saved_ensure = setup.DF_LOCAL_PATH, setup.ensure_asdf_python
+
+        def fail(*_args, **_kwargs):
+            raise AssertionError("guard must return before resolving python")
+
+        setup.DF_LOCAL_PATH = tmp
+        setup.ensure_asdf_python = fail
+        try:
+            self.assertIsNone(setup.add_toolbox_includes())
+        finally:
+            setup.DF_LOCAL_PATH, setup.ensure_asdf_python = saved_local, saved_ensure
 
 
 if __name__ == "__main__":

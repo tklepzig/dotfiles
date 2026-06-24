@@ -146,19 +146,27 @@ def process_includes():
         if not os.path.isdir(path):
             continue
         log(raw_path)
-        if os.path.isdir(os.path.join(path, ".git")):
-            log("Found git repo, updating", 1)
-            fetched = subprocess.run(
-                ["git", "fetch"], cwd=path,
-                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-            )
-            if fetched.returncode == 0:  # Ruby's `git fetch && git merge`
-                subprocess.run(
-                    ["git", "merge"], cwd=path,
+        # Isolate each include: a malformed include _info.toml (or a flaky git
+        # repo) must not sink the others. Ruby let one bad YAML abort the loop;
+        # we log it as a soft-skip and carry on.
+        try:
+            if os.path.isdir(os.path.join(path, ".git")):
+                log("Found git repo, updating", 1)
+                fetched = subprocess.run(
+                    ["git", "fetch"], cwd=path,
                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                 )
-        link_docs(path)
-        if link_scripts(path, toml_writer):
+                if fetched.returncode == 0:  # Ruby's `git fetch && git merge`
+                    subprocess.run(
+                        ["git", "merge"], cwd=path,
+                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                    )
+            link_docs(path)
+            if link_scripts(path, toml_writer):
+                any_skipped = True
+        except Exception as error:
+            log(f"Skipped — {error!r}", 1)
+            log("Fix this include, then re-run setup.", 1)
             any_skipped = True
 
     return EXIT_MERGE_SKIPPED if any_skipped else 0

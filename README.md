@@ -239,8 +239,9 @@ shell completion.
    default = "json"                         # used when the argument is omitted
    ```
 
-   Parent-level keys (`help`, `completion`) must come before the `[[…​.args]]`
-   tables. The `args` list defines both validation (the toolbox runner rejects
+   Parent-level keys (`help`, `completion`) must come before the
+   `[[<script>.args]]` tables. The `args` list defines both validation (the
+   toolbox runner rejects
    calls with wrong arity) and the completion hints shown in the shell.
 
 ### info.additional.toml

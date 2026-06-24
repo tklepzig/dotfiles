@@ -65,6 +65,38 @@ class IntegrationTest(unittest.TestCase):
             self.assertEqual(merged["core-script"]["help"], "overridden")
             self.assertEqual(merged["team-tool"]["help"], "team")
 
+    def test_one_broken_include_does_not_sink_the_next(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            scripts = home / ".dotfiles/toolbox/scripts"
+            scripts.mkdir(parents=True)
+            (scripts / "_info.toml").write_text('[core]\nhelp = "core"\n')
+
+            broken = home / "includes/broken"
+            (broken / "scripts").mkdir(parents=True)
+            (broken / "scripts/_info.toml").write_text("this = is not ] valid toml")
+            good = home / "includes/good"
+            (good / "scripts").mkdir(parents=True)
+            (good / "scripts/good-tool").write_text("#!/bin/sh\n")
+            (good / "scripts/_info.toml").write_text('[good-tool]\nhelp = "good"\n')
+
+            local = home / ".dotfiles-local"
+            local.mkdir()
+            (local / "toolbox-include.toml").write_text(
+                f'paths = ["{broken}", "{good}"]\n'
+            )
+
+            result = subprocess.run(
+                [sys.executable, str(HELPER)],
+                env={**os.environ, "HOME": str(home)},
+                capture_output=True, text=True,
+            )
+            # Broken include soft-skips (exit 2) but the good one still lands.
+            self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+            self.assertTrue((scripts / "good-tool").is_symlink())
+            merged = tomllib.loads((scripts / "_info.toml").read_text())
+            self.assertIn("good-tool", merged)
+
     def test_missing_include_list_is_a_noop(self):
         with tempfile.TemporaryDirectory() as tmp:
             result = subprocess.run(
