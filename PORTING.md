@@ -232,6 +232,14 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
             NOT mkdir ~/.config/kitty or ~/.config/i3 before `add_link_with_
             override` (only i3blocks/dunst/picom/ranger/mpv get mkdir) → assumes
             those dirs exist; see Step 9 cleanup.
+      - **8a–8d verified end-to-end (2026-06-24)** via a Docker smoke: built the
+        `Dockerfile.test` base (archlinux + deps) WITHOUT the `setup.rb` RUN, then
+        `docker run … python3 /root/.dotfiles/setup.py --local`. install() ran
+        faithfully through every block (checks → bc/ruby → toolbox guard → vim
+        plugin sync → tmux + systemd scheduler → ranger; kitty/mpv/i3 correctly
+        gate-skipped) and stopped exactly at the Step-9 `NotImplementedError`. No
+        unexpected crash. (Container-only noise: `systemctl --user` warns "systemd
+        not running" — harmless, faithful, exit ignored.)
       - Conditional `resolve_modern_python()` (only if system python < 3.11)
         landed in 8c. Its search/None branch CANNOT be exercised on this Arch box
         (3.14 ≥ 3.11 → fast path); don't mark it "verified" here. NB: it finds an
