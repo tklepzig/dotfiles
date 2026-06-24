@@ -8,7 +8,9 @@ once against a fresh ~/.zshrc, so only the append branch runs there.
 
 Run: python3 test/setup_test.py
 """
+import contextlib
 import importlib.util
+import io
 import os
 import sys
 import tempfile
@@ -232,6 +234,21 @@ class ConfigBlocksTest(unittest.TestCase):
         commands = [call.args[0] for call in run.call_args_list]
         self.assertTrue(any(cmd[0] == "curl" for cmd in commands))
         self.assertIn(["vim", "+PlugInstall", "+PlugUpdate", "+qall"], commands)
+
+    def test_run_post_install_logs_each_stdout_line(self):
+        local = os.path.join(self.home, ".dotfiles-local")
+        os.makedirs(local)
+        script = os.path.join(local, "post-install")
+        Path(script).write_text("#!/bin/sh\necho 'post-install ran'\n")
+        os.chmod(script, 0o755)
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            setup.run_post_install_script()
+        self.assertIn("post-install ran", buffer.getvalue())
+
+    def test_run_post_install_is_noop_when_absent(self):
+        # DF_LOCAL_PATH has no post-install script -> must not raise.
+        setup.run_post_install_script()
 
     def test_scheduler_linux_links_units_and_reloads(self):
         self._patch("is_mac", lambda: False)

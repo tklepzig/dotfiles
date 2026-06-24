@@ -623,10 +623,13 @@ def install_fzf():
         ["git", "clone", "--depth", "1", "https://github.com/junegunn/fzf.git", f"{HOME}/.fzf"],
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
     )
-    subprocess.run(
-        [f"{HOME}/.fzf/install", "--all"],
-        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-    )
+    # If the clone failed (network/rate-limit), the installer won't exist — skip
+    # rather than crash the whole setup at its last step (Ruby swallowed both).
+    if os.path.exists(f"{HOME}/.fzf/install"):
+        subprocess.run(
+            [f"{HOME}/.fzf/install", "--all"],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
 
 
 def install_docker_completion():
@@ -648,7 +651,13 @@ def set_default_shell_to_zsh():
     # Ruby read the login shell via `dscl`(mac) / `grep /etc/passwd`(linux); the
     # stdlib `pwd` module returns it portably in one call. chsh only if needed.
     zsh_path = shutil.which("zsh")
-    if pwd.getpwuid(os.getuid()).pw_shell != zsh_path:
+    try:
+        current_shell = pwd.getpwuid(os.getuid()).pw_shell
+    except KeyError:
+        # Ephemeral/injected UID with no passwd entry (e.g. `docker run --user
+        # 99999`): Ruby's grep degraded to "" and continued — mirror that.
+        current_shell = None
+    if current_shell != zsh_path:
         with Logger.log("Setting default shell to zsh"):
             subprocess.run(["chsh", "-s", zsh_path])
             Logger.log("Please notice: In order to use the new shell, you have to logout and back in.")
@@ -659,7 +668,9 @@ def run_post_install_script():
     if not (os.path.isfile(script) and os.access(script, os.X_OK)):
         return
     with Logger.log("Running post install script"):
-        result = subprocess.run([script], capture_output=True, text=True)
+        # stdout=PIPE (not capture_output) so the script's stderr still reaches
+        # the terminal, matching Ruby's backticks (which captured only stdout).
+        result = subprocess.run([script], stdout=subprocess.PIPE, text=True)
         for line in result.stdout.splitlines():  # splitlines drops the trailing empty
             Logger.log(line)
 
