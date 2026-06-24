@@ -5,6 +5,7 @@
 # come later and run under a provisioned interpreter. Python port of setup.rb.
 
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -109,6 +110,70 @@ def check_optional_installation(program, install_name=None):
             Logger.success(f"Found: {shutil.which(program)}.")
         else:
             Logger.error(f'Not Found. (Try "sudo pacman -S {install_name}")')
+
+
+def find_override(file_path):
+    # Whole-file override lookup. Prefer `<path>.override`; else insert
+    # `.override` before the final extension (foo.vim -> foo.override.vim).
+    # Returns the override path if it exists on disk, else None.
+    suffixed = f"{file_path}.override"
+    if os.path.exists(suffixed):
+        return suffixed
+
+    # re.sub leaves the string unchanged when the pattern doesn't match; the
+    # `!= file_path` guard stops us from returning the original file as its own
+    # "override" in that no-extension case (a latent bug in the Ruby original).
+    before_extension = re.sub(r"(.*)(\..+)$", r"\1.override\2", file_path)
+    if before_extension != file_path and os.path.exists(before_extension):
+        return before_extension
+
+    return None
+
+
+def merge(base_path, override_path):
+    """Apply a line-level override file onto a base file, in place.
+
+    The override is a small patch: a line `-<exact base line>` deletes that line
+    from the base; every other override line is appended.
+    """
+    with open(base_path) as base_file:
+        base_lines = base_file.readlines()
+    with open(override_path) as override_file:
+        override_lines = override_file.readlines()
+
+    # Your removal filter (kept as-is): drop base lines the override marks for
+    # deletion with a leading "-". Then append the override's own additions —
+    # every override line that ISN'T a "-" removal marker.
+    kept = [line for line in base_lines if f"-{line}" not in override_lines]
+    additions = [line for line in override_lines if not line.startswith("-")]
+
+    with open(base_path, "w") as base_file:
+        base_file.write("".join(kept + additions))
+
+
+def write_link(link, file, command="source"):
+    # Idempotent append: skip if `link` is already referenced anywhere in the
+    # file (Ruby used `grep -q`; substring presence is the same intent).
+    if os.path.exists(file):
+        with open(file) as handle:
+            if link in handle.read():
+                return
+
+    with open(file, "a") as handle:
+        handle.write(f"{command} {link}\n")
+
+
+def add_link_with_override(link, file, command="source"):
+    # Ensure the target exists (create empty; never truncate an existing file),
+    # add the base link, then add its whole-file override if one exists.
+    if not os.path.exists(file):
+        open(file, "w").close()
+
+    write_link(link, file, command)
+
+    override = find_override(link)
+    if override:
+        write_link(override, file, command)
 
 
 def install(variant=DF_VARIANT):

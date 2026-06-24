@@ -2,17 +2,17 @@
 
 > **RESUME HERE (read this first).** Multi-week effort, done in small steps.
 > - **Branch:** `port-to-python`.
-> - **Current position:** Step 0 ✅. Step 1 ✅. Step 2 ✅. **Step 3 done** ✅
->   — program checks ported (`program_installed`, `ensure_brew_package`,
->   `check_mandatory_installation`, `check_optional_installation`).
->   `program_installed` chose the **stdlib route** (`shutil.which(program) is not
->   None`) over a `sh -c 'command -v'` shell-out — no per-check fork, and it
->   shares the same resolver as the `shutil.which` path-reporting in the helpers.
->   Stdlib-only, 3.8-safe. Smoke-tested (git→True, bogus→False).
-> - **Next action:** Step 4 — link helpers (`find_override`, `merge`,
->   `write_link`, `add_link_with_override`). setup.rb (search `add_link`). These
->   are pure file ops → **native Python** (`os.symlink`, read/append), per the
->   recurring fork. Still no Docker run until more of `install()` exists.
+> - **Current position:** Step 0–3 ✅. **Step 4 done** ✅ — link helpers ported
+>   as native file ops (no `grep`/`sed` shell-out): `find_override` (whole-file
+>   `.override` lookup via `re.sub`, with a guard against the Ruby latent bug of
+>   returning the file as its own override), `merge` (line-level patch:
+>   `-<line>` removes, others append — Thomas's Learn-by-Doing), `write_link`
+>   (idempotent substring-guarded append), `add_link_with_override`. Functional
+>   test of `merge` passed (remove + add). Not yet called by `install()`.
+> - **Next action:** Step 5 — repo clone/update (git subprocess block). setup.rb
+>   (search the `git clone`/`git pull` section). **Shell-out** (git is an
+>   external tool, per the fork). First chunk that lets `install()` start doing
+>   real work — but still no full Docker run until more of `install()` exists.
 > - **Working style:** one chunk at a time, keep each `.rb` until its `.py` is
 >   verified, flip call sites late, delete `.rb` last. Hand Thomas a "Learn by
 >   Doing" contribution per chunk (Step 2 was full-write-then-review by choice).
@@ -113,8 +113,8 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
 - [x] **2. setup skeleton** — `Logger`, `OS`, arg parsing (`--local/--vim/--uninstall`).
 - [x] **3. Program checks** — `program_installed` (stdlib `shutil.which`),
       mandatory/optional/brew. Smoke-tested.
-- [ ] **4. Link helpers** — `find_override`, `merge`, `write_link`,
-      `add_link_with_override` (native file ops).
+- [x] **4. Link helpers** — `find_override`, `merge`, `write_link`,
+      `add_link_with_override` (native file ops). Functional-tested.
 - [ ] **5. Repo clone/update** — git subprocess block.
 - [ ] **6. `.zshrc` variant-export editing** — the regex insert/replace block.
 - [ ] **7. Vim setup** — `setup_vim`/`cleanup_vim` + inline the 4 vim `*.rb`.
