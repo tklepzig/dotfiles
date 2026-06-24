@@ -444,6 +444,101 @@ def add_toolbox_includes():
             )
 
 
+def sync_vim_plugins(variant):
+    # TODO (Ruby carryover): part of vim setup. Can't rely on zsh aliases — the
+    # subprocess shell is sh and doesn't know them, so call the binary directly.
+    # stdin=DEVNULL on every editor call (port-time hardening, like the git
+    # calls): a headless editor must never block waiting on input. Ruby piped
+    # `echo |` into the coc/plug calls for the same reason.
+    vim_binary = "nvim" if variant == "neovim" else "vim"
+    if variant == "neovim":
+        Logger.log("Installing and syncing neovim plugins")
+        subprocess.run(
+            [vim_binary, "--headless", "+Lazy! sync", "+qa"],
+            stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+        Logger.log("Updating coc extensions")
+        subprocess.run(
+            [vim_binary, "+CocUpdateSync", "+qall"],
+            stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+    else:
+        plug_file = f"{HOME}/.vim/autoload/plug.vim"
+        if not os.path.exists(plug_file):
+            Logger.log("Installing vim-plug")
+            subprocess.run(
+                ["curl", "-fLo", plug_file, "--create-dirs",
+                 "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
+        Logger.log("Installing and updating vim plugins")
+        subprocess.run(
+            [vim_binary, "+PlugInstall", "+PlugUpdate", "+qall"],
+            stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+
+
+def install_tmux_snapshot_scheduler():
+    # Periodic tmux snapshots: a LaunchAgent on macOS, a systemd user timer on
+    # Linux. The plist/units reference DF_PATH (= ~/.dotfiles), the installed
+    # clone — never the dev checkout.
+    os.makedirs(f"{DF_LOCAL_PATH}/tmux-snapshot", exist_ok=True)
+
+    if is_mac():
+        # UNVERIFIED on this Linux box — the launchd branch isn't exercised here.
+        Logger.log("Installing tmux-snapshot LaunchAgent")
+        launch_agents = f"{HOME}/Library/LaunchAgents"
+        os.makedirs(launch_agents, exist_ok=True)
+        plist_src = f"{DF_PATH}/tmux/scheduler/dev.dotfiles.tmux-snapshot.plist"
+        plist_dst = f"{launch_agents}/dev.dotfiles.tmux-snapshot.plist"
+        with open(plist_src, encoding="utf-8") as source:
+            rendered = source.read().replace("__DF_PATH__", DF_PATH).replace("__HOME__", HOME)
+        existing = None
+        if os.path.exists(plist_dst):
+            with open(plist_dst, encoding="utf-8") as current:
+                existing = current.read()
+        # Only reload when the rendered content actually changed.
+        if rendered != existing:
+            with open(plist_dst, "w", encoding="utf-8") as destination:
+                destination.write(rendered)
+            uid = os.getuid()
+            # bootout is best-effort (fails if not loaded); ignore its result.
+            subprocess.run(
+                ["launchctl", "bootout", f"gui/{uid}/dev.dotfiles.tmux-snapshot"],
+                stderr=subprocess.DEVNULL,
+            )
+            subprocess.run(["launchctl", "bootstrap", f"gui/{uid}", plist_dst])
+    elif is_linux():
+        Logger.log("Installing tmux-snapshot systemd user units")
+        unit_dir = f"{HOME}/.config/systemd/user"
+        os.makedirs(unit_dir, exist_ok=True)
+        force_symlink(
+            f"{DF_PATH}/tmux/scheduler/tmux-snapshot.service",
+            f"{unit_dir}/tmux-snapshot.service",
+        )
+        force_symlink(
+            f"{DF_PATH}/tmux/scheduler/tmux-snapshot.timer",
+            f"{unit_dir}/tmux-snapshot.timer",
+        )
+        subprocess.run(["systemctl", "--user", "daemon-reload"])
+        subprocess.run(["systemctl", "--user", "enable", "--now", "tmux-snapshot.timer"])
+
+
+def configure_tmux():
+    with Logger.log("Configuring tmux"):
+        # TODO (Ruby carryover): move up into one linking block.
+        if is_mac():
+            Logger.log("Symlinking tmux variables for macOS")
+            add_link_with_override(f"{DF_PATH}/tmux/vars.osx.conf", f"{HOME}/.tmux.conf")
+        else:
+            Logger.log("Symlinking tmux variables for Linux")
+            add_link_with_override(f"{DF_PATH}/tmux/vars.linux.conf", f"{HOME}/.tmux.conf")
+        Logger.log("Symlinking tmux main configuration")
+        add_link_with_override(f"{DF_PATH}/tmux/tmux.conf", f"{HOME}/.tmux.conf")
+
+        install_tmux_snapshot_scheduler()
+
+
 def install(variant=DF_VARIANT):
     check_mandatory_installation("git")
     check_mandatory_installation("zsh")
@@ -472,8 +567,11 @@ def install(variant=DF_VARIANT):
         add_link_with_override(f"{DF_PATH}/toolbox/init.zsh", f"{HOME}/.zshrc")
         add_toolbox_includes()
 
-    # Steps 8d–9 still to come: remaining config blocks (tmux scheduler,
-    # kitty/ranger/mpv/i3/aerospace), tail + post-install.
+    sync_vim_plugins(variant)
+    configure_tmux()
+
+    # Still to come: 8d-2 (kitty/ranger/mpv/i3/aerospace) + Step 9 (fzf, git,
+    # docker, default-shell, post-install, tail).
     raise NotImplementedError("setup.py install is being ported incrementally")
 
 
