@@ -236,39 +236,58 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
         landed in 8c. Its search/None branch CANNOT be exercised on this Arch box
         (3.14 ≥ 3.11 → fast path); don't mark it "verified" here. NB: it finds an
         existing modern python, it does not provision one via asdf.
-- [ ] **9. Tail + cutover** — fzf, git, docker, default-shell, post-install;
-      `uninstall`; flip README/alias/Dockerfiles; delete `.rb` files.
-      - **README `toolbox-include` section is still YAML on purpose** — it's
-        installer-tied, and `setup.rb` (the active installer until this cutover)
-        reads `toolbox-include.yaml`. At cutover flip it to `toolbox-include.toml`
-        (`paths = [...]`), update the include-repo layout note (`scripts/` ships
-        `_info.toml`), change `setup.rb`→`setup` in the prose, and mention
-        `toolbox/migrate-info-to-toml.js` for include repos still on YAML. The
-        runner-tied authoring docs (core `_info.toml`, `info.additional.toml`)
-        were already flipped in 8c.
-      - On deleting `_run.rb`: repoint `golden.py` `capture`'s default runner
-        from `_run.rb` to `_run.py` (self-snapshot) — capture breaks otherwise.
-        The harness then becomes a plain regression test, not a Ruby↔Python
-        differ. Also drop `_info.yaml`/`info.additional.yaml` from both runners'
-        exclusion lists once the YAML files are gone.
-      - Golden embeds live data (theme lists, script names, help text), so any
-        legitimate data change breaks it (jupiter-2 did). "golden failed" after
-        adding e.g. a theme = "re-capture needed", not a regression.
-      - **kitty + i3-main `add_link_with_override` assume their ~/.config/X dir
-        exists** (Ruby never mkdir'd them; ported faithfully in 8d-2). If a real
-        run ever hits a box where kitty/i3 are installed but the config dir is
-        absent, it raises. Consider adding the mkdir in the post-cutover cleanup
-        pass (alongside the deferred install() reorg below).
-      - **Deferred `install()` reorganization (do as ONE pass, post-cutover —
-        not piecemeal during the port).** setup.rb carried 5 sibling org-only
-        TODOs (commit bbcd11e "Some todos", 2025-04-06): clean up / split into
-        smaller chunks (skip heavy steps for the basic variant); group the
-        vim-related links into the vim block; move the `zsh/zshrc` link up with
-        the other linking (verified behaviourally a no-op — `setup_vim` never
-        sources `~/.zshrc`); group all `add_link_with_override` linking into one
-        block. We dropped the stale comments from `setup.py` as we ported each
-        chunk (keeping Ruby's order); the actual regrouping is intentional
-        cleanup to do once, after the line-by-line port is verified.
+- [ ] **9. Tail, then cutover to Python-default (Ruby kept as Plan B).**
+      **CUTOVER STRATEGY (Thomas, 2026-06-24): do NOT delete the `.rb`/`.yaml`
+      at cutover.** Merge this branch with the Python path as the *default* but
+      Ruby retained as a *fallback* that co-exists for ~some months, so a
+      real-world problem with the Python installer/runner can be worked around
+      by reverting to Ruby. Ruby deletion is a separate later step (Step 10),
+      after Python has proven itself in the wild.
+      - **Tail:** port the rest of `install()` — fzf clone+install, `git/install`,
+        docker completion (curl), default-shell (`chsh`), `~/.dotfiles-local/
+        post-install` script, "Setup done." Then port `uninstall()`.
+      - **Cutover (flip call sites to default Python, keep Ruby runnable):**
+        README install one-liner + `--vim` variant, `zsh/alias` `dotfiles-update`,
+        `Dockerfile.test`/`-overrides`, README uninstall → all point at
+        `setup.py`/`_run.py`. `setup.rb`/`_run.rb` stay in the tree, runnable.
+        **DESIGN TBD:** the fallback switch — likely a documented manual
+        `ruby setup.rb` escape hatch + (for the runner) an env toggle
+        (e.g. `DOTFILES_RUNNER=ruby` in `init.zsh`) defaulting to Python. Decide
+        when implementing.
+      - **Golden STAYS a Ruby↔Python differ during coexistence** — do NOT
+        repoint `capture` yet; it keeps proving the Python path matches Ruby
+        while both ship. Golden embeds live data (theme lists, script names, help
+        text), so a legitimate data change breaks it (jupiter-2 did): "golden
+        failed" after adding e.g. a theme = "re-capture needed", not a regression.
+      - **`toolbox-include` coexistence wrinkle:** Python default reads
+        `toolbox-include.toml`, Ruby fallback reads `toolbox-include.yaml`. An
+        includes user who falls back to Ruby needs the `.yaml` too. Document both
+        during coexistence (keep the README section dual, or note the caveat);
+        the full flip to `.toml`-only happens at Step 10. The runner-tied
+        authoring docs (core `_info.toml`, `info.additional.toml`) were already
+        flipped in 8c.
+- [ ] **10. Ruby removal (after the coexistence period proves Python out, ~months).**
+      - Delete `setup.rb`, `_run.rb`, `_info.yaml`, `info.additional.yaml`.
+      - Repoint `golden.py` `capture`'s default runner `_run.rb`→`_run.py`
+        (self-snapshot) — capture breaks otherwise; the harness becomes a plain
+        regression test, not a differ. Drop `_info.yaml`/`info.additional.yaml`
+        from both runners' exclusion lists once the YAML is gone.
+      - Flip the README `toolbox-include` section to `.toml`-only (`paths=[...]`),
+        update the include-repo layout note (`scripts/` ships `_info.toml`),
+        change `setup.rb`→`setup` in the prose, mention
+        `toolbox/migrate-info-to-toml.js`. Remove the Ruby fallback switch.
+      - **`add_link_with_override` mkdir gap:** kitty + i3-main assume their
+        `~/.config/X` dir exists (Ruby never mkdir'd them; ported faithfully in
+        8d-2). Add the mkdir here.
+      - **Deferred `install()` reorganization (ONE pass).** setup.rb carried 5
+        sibling org-only TODOs (commit bbcd11e "Some todos", 2025-04-06): clean
+        up / split into smaller chunks (skip heavy steps for the basic variant);
+        group the vim-related links into the vim block; move the `zsh/zshrc` link
+        up with the other linking (verified behaviourally a no-op — `setup_vim`
+        never sources `~/.zshrc`); group all `add_link_with_override` linking into
+        one block. We dropped the stale comments from `setup.py` while porting
+        (keeping Ruby's order); the regrouping is intentional cleanup to do once,
+        now that the line-by-line port is verified.
 
 ## Verification matrix
 
