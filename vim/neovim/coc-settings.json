@@ -6,7 +6,6 @@
   "list.insertMappings": {
     "<C-c>": "do:exit"
   },
-  "python.jediEnabled": false,
   "codeLens.enable": false,
   "eslint.autoFixOnSave": true,
   "coc.preferences.formatOnSave": true,
