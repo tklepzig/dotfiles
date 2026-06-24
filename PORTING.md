@@ -21,7 +21,10 @@
 >   loader (dirs, 6 symlinks, force re-run, removals, missing-file no-op). `.rb`
 >   kept until Step 9. setup_vim() wired into install() but placed AFTER the
 >   zshrc edit — Step 8 config-linking lines must be inserted BEFORE it.
-> - **Next action:** Step 8c — toolbox: `link_scripts` / `add_toolbox_includes`
+> - **Next action:** Step 8c — BLOCKED on a pending decision: how to do the one
+>   `_info` merge write without a self-written TOML writer (leaning vendor
+>   `tomli-w`; see **DECISION PENDING (8c)** in `## Decisions`). Resolve that
+>   first, then: toolbox: `link_scripts` / `add_toolbox_includes`
 >   / `link_docs` (setup.rb:184–215, 353–356). SCOUT FIRST: grep for
 >   `_info.yaml` readers — porting these forces the YAML→TOML format migration
 >   (stdlib has no YAML reader) of `_info.yaml` + `toolbox-include.yaml`, plus a
@@ -67,6 +70,24 @@ prerequisite for bootstrapping a fresh machine.
   that merge under the modern interpreter so `setup.py`'s own imports stay
   stdlib-only. Needs a TOML *writer* (tomllib is read-only): ~15-line dumper or
   vendor single-file `tomli-w`. Step 8.
+- **DECISION PENDING (8c) — how to do that one merge write.** Confirmed it's the
+  *only* structured write in the whole port (`configure_bc`/`configure_ruby`
+  write plain text). Three options, by disruption to already-verified work:
+  1. **Vendor `tomli-w`** (single ~150-line MIT file) — LEANING THIS. 0 LOC
+     written, spec-correct, `_info` stays TOML, touches nothing verified.
+     `_run.py` untouched. Merge = `tomllib.load` → `{**base, **inc}` →
+     `tomli_w.dump`.
+  2. **Hand-rolled dumper** — ~22 LOC happy-path for this exact shape (help
+     str / `args` array-of-tables / `completion` str-array), ~45–55 LOC robust.
+     Rejected reason isn't LOC, it's escaping corners (`'''` inside help,
+     `"`/`\\` in basic strings) → malformed TOML crashes `_run.py`'s tomllib on
+     the include path, found late.
+  3. **JSON `_info` + a manage-script** — most disruptive: re-migrate files,
+     flip `_run.py` reader tomllib→json, re-golden all 21 modes, downstream
+     repos' authoring workflow changes. The manage-script only earns its keep
+     IF we switch to JSON (TOML stays hand-editable). Defer it to a nice-to-have.
+  Thomas deferred the pick (2026-06-24, "in a few hours"). Resolve before
+  writing 8c code.
 - **`_run.py` shebang** = `#!/usr/bin/env python3` (resolves through asdf shims
   once on PATH — same shell-reload requirement every toolbox alias already has).
 
