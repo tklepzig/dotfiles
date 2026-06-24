@@ -6,11 +6,13 @@
 
 import importlib.util
 import os
+import pwd
 import re
 import shutil
 import subprocess
 import sys
 from contextlib import contextmanager
+from pathlib import Path
 from types import SimpleNamespace
 
 DF_REPO = os.environ.get("DOTFILES_REPO", "tklepzig/dotfiles")
@@ -613,6 +615,55 @@ def configure_aerospace():
         ensure_brew_package("nowplaying-cli")
 
 
+def install_fzf():
+    if os.path.exists(f"{HOME}/.fzf"):
+        return
+    Logger.log("Installing fzf")
+    subprocess.run(
+        ["git", "clone", "--depth", "1", "https://github.com/junegunn/fzf.git", f"{HOME}/.fzf"],
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+    )
+    subprocess.run(
+        [f"{HOME}/.fzf/install", "--all"],
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+    )
+
+
+def install_docker_completion():
+    if not program_installed("docker"):
+        return
+    Logger.log("Installing docker completion")
+    completion_dir = f"{HOME}/.zsh/completion"
+    os.makedirs(completion_dir, exist_ok=True)
+    completions = {
+        "_docker": "https://raw.githubusercontent.com/docker/cli/master/contrib/completion/zsh/_docker",
+        "_docker-compose": "https://raw.githubusercontent.com/docker/compose/master/contrib/completion/zsh/_docker-compose",
+    }
+    for name, url in completions.items():
+        # `curl -L URL > file 2>/dev/null` → -o writes the file, stderr silenced.
+        subprocess.run(["curl", "-L", "-o", f"{completion_dir}/{name}", url], stderr=subprocess.DEVNULL)
+
+
+def set_default_shell_to_zsh():
+    # Ruby read the login shell via `dscl`(mac) / `grep /etc/passwd`(linux); the
+    # stdlib `pwd` module returns it portably in one call. chsh only if needed.
+    zsh_path = shutil.which("zsh")
+    if pwd.getpwuid(os.getuid()).pw_shell != zsh_path:
+        with Logger.log("Setting default shell to zsh"):
+            subprocess.run(["chsh", "-s", zsh_path])
+            Logger.log("Please notice: In order to use the new shell, you have to logout and back in.")
+
+
+def run_post_install_script():
+    script = f"{DF_LOCAL_PATH}/post-install"
+    if not (os.path.isfile(script) and os.access(script, os.X_OK)):
+        return
+    with Logger.log("Running post install script"):
+        result = subprocess.run([script], capture_output=True, text=True)
+        for line in result.stdout.splitlines():  # splitlines drops the trailing empty
+            Logger.log(line)
+
+
 def install(variant=DF_VARIANT):
     check_mandatory_installation("git")
     check_mandatory_installation("zsh")
@@ -650,14 +701,68 @@ def install(variant=DF_VARIANT):
     configure_i3()
     configure_aerospace()
 
-    # Step 9 still to come: fzf, git, docker completion, default-shell, post-
-    # install script, "Setup done." tail; plus uninstall + cutover.
-    raise NotImplementedError("setup.py install is being ported incrementally")
+    install_fzf()
+
+    Logger.log("Configuring Git")
+    subprocess.run([f"{DF_PATH}/git/install"])
+
+    install_docker_completion()
+    set_default_shell_to_zsh()
+    run_post_install_script()
+
+    Logger.success("Setup done.")
+
+
+def remove_links(pattern, file):
+    # Drop every line matching `pattern` (a regex) from `file`. Ruby shelled out
+    # to `sed "/pattern/d"`; we filter natively.
+    # FAITHFUL QUIRK: Ruby's callers pass CWD-relative paths (".zshrc", not
+    # f"{HOME}/.zshrc"), so this only touches the real dotfiles if uninstall runs
+    # from $HOME. Likely a latent Ruby bug; replicated as-is, flagged for Step 10.
+    if not os.path.exists(file):
+        return
+    Logger.log(f"Removing pattern '{pattern}' from {file}")
+    matcher = re.compile(pattern)
+    with open(file) as handle:
+        kept = [line for line in handle if not matcher.search(line)]
+    with open(file, "w") as handle:
+        handle.write("".join(kept))
 
 
 def uninstall():
-    # Step 9.
-    raise NotImplementedError("setup.py uninstall is being ported incrementally")
+    remove_links(r"\.dotfiles", ".zshrc")
+    remove_links(r"\.fzf", ".zshrc")
+    remove_links(r"\.dotfiles", ".vimrc")
+    remove_links(r"\.dotfiles", ".tmux.conf")
+    remove_links(r"\.dotfiles", ".config/kitty/kitty.conf")
+
+    # Remove fzf wholesale so install re-adds its include AFTER the dotfiles zsh
+    # includes next time.
+    Logger.log("Removing fzf")
+    shutil.rmtree(f"{HOME}/.fzf", ignore_errors=True)
+
+    Logger.log("Removing vim-plug and vim plugins")
+    Path(f"{HOME}/.vim/autoload/plug.vim").unlink(missing_ok=True)
+    shutil.rmtree(f"{HOME}/.vim/vim-plug", ignore_errors=True)
+
+    cleanup_vim()
+
+    Logger.log("Removing bc configuration")
+    Path(f"{HOME}/.bc").unlink(missing_ok=True)
+
+    Logger.log("Removing default gems configuration")
+    Path(f"{HOME}/.default-gems").unlink(missing_ok=True)
+
+    Logger.log("Removing rubocop configuration")
+    Path(f"{HOME}/.rubocop.yml").unlink(missing_ok=True)
+
+    Logger.log("Removing git configuration")
+    subprocess.run([f"{DF_PATH}/git/uninstall"])
+
+    Logger.log("Removing dotfiles")
+    shutil.rmtree(DF_PATH, ignore_errors=True)
+
+    Logger.success("Successfully uninstalled dotfiles")
 
 
 if __name__ == "__main__":

@@ -142,6 +142,28 @@ class ToolboxIncludesGlueTest(unittest.TestCase):
             setup.DF_LOCAL_PATH, setup.resolve_modern_python = saved_local, saved_resolve
 
 
+class RemoveLinksTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+
+    def test_drops_only_matching_lines(self):
+        target = os.path.join(self.tmp, "zshrc")
+        Path(target).write_text(
+            "source ~/.dotfiles/zsh/zshrc\n"
+            "alias ll='ls -la'\n"
+            "source ~/.fzf.zsh\n"
+        )
+        setup.remove_links(r"\.dotfiles", target)
+        remaining = Path(target).read_text()
+        self.assertNotIn(".dotfiles", remaining)
+        self.assertIn("alias ll", remaining)        # untouched
+        self.assertIn(".fzf.zsh", remaining)         # different pattern, kept
+
+    def test_missing_file_is_a_noop(self):
+        # No raise when the (CWD-relative, in Ruby) target doesn't exist.
+        setup.remove_links(r"\.dotfiles", os.path.join(self.tmp, "absent"))
+
+
 class ConfigBlocksTest(unittest.TestCase):
     """Step 8d config blocks. They're all gated (program_installed / mac-only)
     so the Linux Docker harness skips them — these are their only coverage. Run
