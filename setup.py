@@ -463,6 +463,8 @@ def install_tmux_snapshot_scheduler():
 
 
 def configure_tmux():
+    if not program_installed("tmux"):
+        return
     with Logger.log("Configuring tmux"):
         if is_mac():
             Logger.log("Symlinking tmux variables for macOS")
