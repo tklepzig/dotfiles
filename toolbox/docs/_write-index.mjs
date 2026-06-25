@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { readdir, readFile, writeFile, rm } from "fs/promises";
+import { readdir, readFile, writeFile, rm, stat } from "fs/promises";
 import { fileURLToPath } from "url";
 import path from "path";
 
@@ -16,16 +16,43 @@ const localeIndependentCompare = (first, second) =>
 const caseInsensitiveCompare = (first, second) =>
   localeIndependentCompare(first.toLowerCase(), second.toLowerCase());
 
+// Toolbox includes are symlinked into the docs tree by setup_includes.py, so we
+// must resolve the symlink target's type rather than rely on Dirent (which uses
+// lstat semantics and reports every symlink as neither file nor directory).
+// stat() follows the link; a broken/vanished link rejects, which we treat as a
+// non-match. Resolving the target also routes a symlinked .md *file* to the
+// Toolbox section instead of letting readdir() crash on it as a fake subdir.
+const isFile = async (entryPath) => {
+  try {
+    return (await stat(entryPath)).isFile();
+  } catch {
+    return false;
+  }
+};
+
+const isDirectory = async (entryPath) => {
+  try {
+    return (await stat(entryPath)).isDirectory();
+  } catch {
+    return false;
+  }
+};
+
 const createSection = async (dirPath, name) => {
-  const dirEntries = await readdir(dirPath, { withFileTypes: true });
-  const entries = dirEntries
-    .filter(
-      (entry) =>
-        entry.isFile() &&
-        !entry.name.startsWith(".") &&
-        entry.name.endsWith(".md"),
-    )
-    .map((entry) => path.basename(entry.name, path.extname(entry.name)))
+  const dirEntries = await readdir(dirPath);
+  const markdownFiles = await Promise.all(
+    dirEntries
+      .filter(
+        (entryName) => !entryName.startsWith(".") && entryName.endsWith(".md"),
+      )
+      .map(async (entryName) => ({
+        entryName,
+        file: await isFile(path.join(dirPath, entryName)),
+      })),
+  );
+  const entries = markdownFiles
+    .filter(({ file }) => file)
+    .map(({ entryName }) => path.basename(entryName, path.extname(entryName)))
     .sort(caseInsensitiveCompare);
 
   return { name, entries };
@@ -36,15 +63,20 @@ const collectSections = async () => {
 
   const toolbox = await createSection(docsDir, "Toolbox");
 
-  const dirEntries = await readdir(docsDir, { withFileTypes: true });
-  const subDirNames = dirEntries
-    .filter(
-      (entry) =>
-        entry.isDirectory() &&
-        !entry.name.startsWith("_") &&
-        !entry.name.startsWith("."),
-    )
-    .map((entry) => entry.name)
+  const dirEntries = await readdir(docsDir);
+  const subDirs = await Promise.all(
+    dirEntries
+      .filter(
+        (entryName) => !entryName.startsWith("_") && !entryName.startsWith("."),
+      )
+      .map(async (entryName) => ({
+        entryName,
+        directory: await isDirectory(path.join(docsDir, entryName)),
+      })),
+  );
+  const subDirNames = subDirs
+    .filter(({ directory }) => directory)
+    .map(({ entryName }) => entryName)
     .sort(localeIndependentCompare);
 
   const subSections = await Promise.all(
