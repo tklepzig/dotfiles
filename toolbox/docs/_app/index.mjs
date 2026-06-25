@@ -25,9 +25,9 @@ const port = process.env.PORT || 3001;
 const sslPort = process.env.SSL_PORT || 3002;
 
 app.use(express.static(relativePath("public")));
-app.get("/:name*?", async ({ params }, response) => {
+app.get("/{*splat}", async ({ params }, response) => {
   const file = relativePath(
-    params.name ? `../${params.name}${params[0]}.md` : "../index.md"
+    params.splat ? `../${params.splat.join("/")}.md` : "../index.md"
   );
   if (!existsSync(file)) return response.sendStatus(404);
 

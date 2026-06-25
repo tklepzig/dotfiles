@@ -3,10 +3,10 @@
     "minify": "npx --yes minify github.css > public/github.min.css"
   },
   "dependencies": {
-    "ejs": "*",
-    "express": "*",
-    "markdown-it": "*",
-    "markdown-it-named-headings": "*",
-    "opener": "*"
+    "ejs": "^6",
+    "express": "^5",
+    "markdown-it": "^14",
+    "markdown-it-named-headings": "^1",
+    "opener": "^1"
   }
 }
