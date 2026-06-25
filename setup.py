@@ -685,12 +685,59 @@ def remove_links(pattern, file):
         handle.write("".join(kept))
 
 
+def remove_tmux_snapshot_scheduler():
+    # Mirror install_tmux_snapshot_scheduler(). Must run BEFORE DF_PATH is
+    # removed: otherwise the timer/agent keeps firing on a script that's gone.
+    if is_mac():
+        Logger.log("Removing tmux-snapshot LaunchAgent")
+        uid = os.getuid()
+        # bootout is best-effort (fails if not loaded); ignore its result.
+        subprocess.run(
+            ["launchctl", "bootout", f"gui/{uid}/dev.dotfiles.tmux-snapshot"],
+            stderr=subprocess.DEVNULL,
+        )
+        plist_dst = f"{HOME}/Library/LaunchAgents/dev.dotfiles.tmux-snapshot.plist"
+        Path(plist_dst).unlink(missing_ok=True)
+    elif is_linux():
+        Logger.log("Removing tmux-snapshot systemd user units")
+        subprocess.run(
+            ["systemctl", "--user", "disable", "--now", "tmux-snapshot.timer"],
+            stderr=subprocess.DEVNULL,
+        )
+        unit_dir = f"{HOME}/.config/systemd/user"
+        Path(f"{unit_dir}/tmux-snapshot.timer").unlink(missing_ok=True)
+        Path(f"{unit_dir}/tmux-snapshot.service").unlink(missing_ok=True)
+        subprocess.run(["systemctl", "--user", "daemon-reload"])
+
+
+def remove_symlinks():
+    # Symlinks install points into DF_PATH; left dangling once DF_PATH is removed.
+    Logger.log("Removing config symlinks")
+    targets = [
+        f"{HOME}/.config/ranger/rc.conf",
+        f"{HOME}/.config/mpv/mpv.conf",
+        f"{HOME}/.config/mpv/input.conf",
+        f"{HOME}/.config/i3blocks/config",
+        f"{HOME}/.config/dunst/dunstrc",
+        f"{HOME}/.config/picom/picom.conf",
+        f"{HOME}/.config/nvim/lua/tkdf/lazy-init.lua",
+        f"{HOME}/.config/nvim/lua/tkdf/lazy-plugins.lua",
+        f"{HOME}/.aerospace.toml",
+        f"{HOME}/.zsh/completion/_docker",
+        f"{HOME}/.zsh/completion/_docker-compose",
+    ]
+    for target in targets:
+        Path(target).unlink(missing_ok=True)
+
+
 def uninstall():
     remove_links(r"\.dotfiles", f"{HOME}/.zshrc")
     remove_links(r"\.fzf", f"{HOME}/.zshrc")
+    remove_links(r"DOTFILES_VARIANT", f"{HOME}/.zshrc")
     remove_links(r"\.dotfiles", f"{HOME}/.vimrc")
     remove_links(r"\.dotfiles", f"{HOME}/.tmux.conf")
     remove_links(r"\.dotfiles", f"{HOME}/.config/kitty/kitty.conf")
+    remove_links(r"\.dotfiles", f"{HOME}/.config/i3/config")
 
     # Remove fzf wholesale so install re-adds its include AFTER the dotfiles zsh
     # includes next time.
@@ -702,6 +749,9 @@ def uninstall():
     shutil.rmtree(f"{HOME}/.vim/vim-plug", ignore_errors=True)
 
     cleanup_vim()
+
+    remove_tmux_snapshot_scheduler()
+    remove_symlinks()
 
     Logger.log("Removing bc configuration")
     Path(f"{HOME}/.bc").unlink(missing_ok=True)
