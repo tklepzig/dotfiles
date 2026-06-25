@@ -411,7 +411,12 @@ def resolve_modern_python():
     fresh-install path (guarded by toolbox-include.toml), so a user reaching here
     is not on a bare box and most likely already has a modern python.
     """
-    if sys.version_info >= (3, 11):
+    # `minimum` is a variable, not a literal, on purpose: pyright constant-folds
+    # `sys.version_info >= (3, 11)` against the interpreter it runs under (modern),
+    # then flags the search/None fallback as unreachable. The fallback is real on
+    # an old bootstrap python — the indirection keeps it from being grayed out.
+    minimum = (3, 11)
+    if sys.version_info >= minimum:
         return sys.executable
     for candidate in ("python3.14", "python3.13", "python3.12", "python3.11"):
         found = shutil.which(candidate)
@@ -651,6 +656,9 @@ def set_default_shell_to_zsh():
     # Ruby read the login shell via `dscl`(mac) / `grep /etc/passwd`(linux); the
     # stdlib `pwd` module returns it portably in one call. chsh only if needed.
     zsh_path = shutil.which("zsh")
+    if zsh_path is None:
+        Logger.error("zsh not found on PATH — skipping default-shell change.")
+        return
     try:
         current_shell = pwd.getpwuid(os.getuid()).pw_shell
     except KeyError:
