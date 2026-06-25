@@ -399,8 +399,8 @@ def configure_ruby():
 
 def resolve_modern_python():
     """Return the path to a python >= 3.11 for the toolbox-include merge (it
-    needs `tomllib` + the vendored TOML writer, both unavailable on setup.py's
-    low bootstrap floor).
+    needs `tomllib` to read the include list + validate each include's
+    `_info.toml`, unavailable on setup.py's low bootstrap floor).
 
     Fast path: the running interpreter already qualifies — true on every current
     Linux and modern macOS. Otherwise look for a modern python already on PATH.

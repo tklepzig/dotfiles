@@ -291,8 +291,7 @@ optional):
 
 ```
 extra-toolbox/
-  scripts/       # executables + optional _info.toml (use migrate-info-to-toml.js
-                 # to convert a legacy _info.yaml)
+  scripts/       # executables + optional _info.toml
   docs/          # markdown files linked into the toolbox docs
 ```
 

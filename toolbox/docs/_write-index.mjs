@@ -19,18 +19,16 @@ const serviceWorkerPath = path.join(docsDir, "_app", "public", "sw.js");
 // (e.g. a compound name), so it must survive the "- becomes space" pass below.
 const NON_BREAKING_HYPHEN = "‑";
 
-// Compare by UTF-16 code-unit order (the default for `<` on strings) rather
-// than locale-aware collation (localeCompare), which would reorder some
-// entries. This matches Ruby's String#<=> across the entire BMP — the two only
-// diverge on astral-plane code points, which never appear in doc slugs.
+// Stable code-unit order (the default for `<` on strings), not locale-aware
+// collation (localeCompare), which would reorder some entries.
 const codePointCompare = (first, second) =>
   first < second ? -1 : first > second ? 1 : 0;
 
 const caseInsensitiveCompare = (first, second) =>
   codePointCompare(first.toLowerCase(), second.toLowerCase());
 
-// A section: its display name and its sorted entry slugs (basename, no ext).
-// Ruby sorted entries case-insensitively (sort_by(&:downcase)).
+// A section: its display name and its entry slugs (basename, no ext), sorted
+// case-insensitively.
 const createSection = async (dirPath, name) => {
   const dirEntries = await readdir(dirPath, { withFileTypes: true });
   const entries = dirEntries
@@ -53,9 +51,8 @@ const collectSections = async () => {
 
   const toolbox = await createSection(docsDir, "Toolbox");
 
-  // Sub-directories only, skipping "_"-prefixed (infra) and dot-dirs, mirroring
-  // Ruby's Dir.glob("*/"). Sorted by name (case-sensitive, matching Ruby's byte
-  // order) — distinct from the case-insensitive entry sort above.
+  // Sub-directories only, skipping "_"-prefixed (infra) and dot-dirs. Sorted by
+  // name case-sensitively — distinct from the case-insensitive entry sort above.
   const dirEntries = await readdir(docsDir, { withFileTypes: true });
   const subDirNames = dirEntries
     .filter(
@@ -117,11 +114,10 @@ const writeCache = async (sections) => {
   );
 
   const content = await readFile(serviceWorkerPath, "utf-8");
-  // Match Ruby's Array#to_s for string arrays: double-quoted, ", "-separated,
-  // "[]" when empty (JSON.stringify alone omits the spaces). Pass a function as
-  // the replacement so "$" / "\" in the array text aren't read as replacement
-  // patterns. The regex has no /s flag, so "." won't span the single line; the
-  // /g flag mirrors Ruby's gsub (replace every occurrence, not just the first).
+  // Build the array by hand for ", "-separated entries — JSON.stringify on the
+  // whole array omits the spaces. Pass a function as the replacement so "$"/"\"
+  // in the array text aren't read as replacement patterns. No /s flag, so "."
+  // won't span past the single docsCache line.
   const cacheArray = `[${cacheEntries.map((entry) => JSON.stringify(entry)).join(", ")}]`;
   const replacement = `const docsCache = ${cacheArray};`;
   const updatedContent = content.replace(

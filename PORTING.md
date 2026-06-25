@@ -36,9 +36,8 @@
 >   `tomllib` then symlinks it into `scripts/info.d/NN-<name>.toml`; rebuilds
 >   `info.d/` each run so dropped includes un-register; exit 2 = soft-skipped).
 >   `_run.py` globs `info.d/*.toml` (sorted; `NN-` prefix = list order, later wins)
->   and merges them before `info.additional.toml`. `toolbox/
->   migrate-info-to-toml.js` (throwaway Node yaml→toml converter for include
->   repos). setup.py: `resolve_modern_python()` (fast-path `sys.executable` if
+>   and merges them before `info.additional.toml`. setup.py:
+>   `resolve_modern_python()` (fast-path `sys.executable` if
 >   ≥3.11; PATH search else None — search/None branch UNVERIFIED on this Arch box;
 >   finds an existing modern python, does NOT provision via asdf despite the
 >   original plan wording)
@@ -308,8 +307,7 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
         from both runners' exclusion lists once the YAML is gone.
       - Flip the README `toolbox-include` section to `.toml`-only (`paths=[...]`),
         update the include-repo layout note (`scripts/` ships `_info.toml`),
-        change `setup.rb`→`setup` in the prose, mention
-        `toolbox/migrate-info-to-toml.js`. Remove the Ruby fallback switch.
+        change `setup.rb`→`setup` in the prose. Remove the Ruby fallback switch.
       - **`add_link_with_override` mkdir gap:** kitty + i3-main assume their
         `~/.config/X` dir exists (Ruby never mkdir'd them; ported faithfully in
         8d-2). Add the mkdir here.
