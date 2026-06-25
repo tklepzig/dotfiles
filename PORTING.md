@@ -28,13 +28,15 @@
 >   + the deferred install() reorg & kitty/i3 mkdir cleanup. **The whole
 >   installer + runner are now ported and Python is the default** (Steps 0–9 ✅).
 >   This branch is ready to merge (Python default, Ruby retained as fallback).
-> - **Step 8c DONE** ✅ — toolbox includes ported. Decision resolved = **vendor
->   `tomli-w` + soft-skip Plan B** (see `## Decisions`). New: `toolbox/_vendor/
->   tomli_w` (1.2.0, MIT, verbatim); `toolbox/setup_includes.py` (modern-python
->   helper: reads `toolbox-include.toml` `paths=[]`, git fetch/merge each repo,
->   `link_docs`/`link_scripts`, merges include `_info.toml` into core via
->   vendored writer + atomic write; vendored→pip→None import fallback; broad
->   `except` around dump catches data errors; exit 2 = soft-skipped); `toolbox/
+> - **Step 8c DONE** ✅ — toolbox includes ported. Decision **superseded**: the
+>   vendored `tomli-w` writer was removed in favour of a **read-time merge** — no
+>   TOML is written at all (see `## Decisions`). `toolbox/setup_includes.py`
+>   (modern-python helper: reads `toolbox-include.toml` `paths=[]`, git fetch/merge
+>   each repo, `link_docs`/`link_scripts`; validates each include `_info.toml` with
+>   `tomllib` then symlinks it into `scripts/info.d/NN-<name>.toml`; rebuilds
+>   `info.d/` each run so dropped includes un-register; exit 2 = soft-skipped).
+>   `_run.py` globs `info.d/*.toml` (sorted; `NN-` prefix = list order, later wins)
+>   and merges them before `info.additional.toml`. `toolbox/
 >   migrate-info-to-toml.js` (throwaway Node yaml→toml converter for include
 >   repos). setup.py: `resolve_modern_python()` (fast-path `sys.executable` if
 >   ≥3.11; PATH search else None — search/None branch UNVERIFIED on this Arch box;
@@ -97,9 +99,15 @@ prerequisite for bootstrapping a fresh machine.
   that merge under the modern interpreter so `setup.py`'s own imports stay
   stdlib-only. Needs a TOML *writer* (tomllib is read-only): ~15-line dumper or
   vendor single-file `tomli-w`. Step 8.
-- **DECISION PENDING (8c) — how to do that one merge write.** Confirmed it's the
-  *only* structured write in the whole port (`configure_bc`/`configure_ruby`
-  write plain text). Three options, by disruption to already-verified work:
+- **DECISION RESOLVED (8c) — eliminate the merge write entirely.** First shipped
+  as a vendored `tomli-w` writer; later removed. There is now **no structured
+  write in the whole port** — instead of merging include `_info.toml`s into the
+  core file at setup time, each is symlinked into `scripts/info.d/` and `_run.py`
+  merges them at read time (the trick it already used for `info.additional.toml`).
+  This drops `_vendor/tomli_w`, the writer-import fallback dance, and the
+  side effect of leaving the deployed clone's committed `_info.toml` git-dirty.
+  Setup-time `tomllib` validation of each include preserves the soft-skip so a
+  bad include can't poison `_run.py` at runtime. Original options, for the record:
   1. **Vendor `tomli-w`** (single MIT file, v1.2.0, pure-python, 0 deps, py3.9+)
      — LEANING THIS + a soft-skip fallback (Plan B). 0 LOC written, spec-correct,
      `_info` stays TOML, touches nothing verified, `_run.py` untouched. Merge =

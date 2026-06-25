@@ -4,9 +4,11 @@
 Nothing else exercises this path: it's behind the toolbox-include.toml guard, so
 golden.py and the Docker harness both skip it. Run: python3 test/setup_includes_test.py
 
-- The happy path runs the helper as a real subprocess (so _vendor resolution and
-  the modern-python invocation are covered end-to-end).
-- Plan B is tested at function level by overriding the module's path globals.
+- The happy path runs the helper as a real subprocess (so the modern-python
+  invocation is covered end-to-end), then merges info.d/ the way _run.py does to
+  assert the runner will see the right metadata.
+- Soft-skip paths assert the bad include drops out while the good one still lands
+  and the committed core _info.toml is left untouched.
 """
 import os
 import subprocess
@@ -24,8 +26,18 @@ sys.path.insert(0, str(REPO / "toolbox"))
 import setup_includes  # noqa: E402
 
 
+def read_time_merge(scripts_dir):
+    """Reproduce _run.py's read-time merge: core, then info.d/*.toml sorted."""
+    merged = tomllib.loads((scripts_dir / "_info.toml").read_text())
+    info_d = scripts_dir / "info.d"
+    if info_d.is_dir():
+        for slot in sorted(info_d.glob("*.toml")):
+            merged.update(tomllib.loads(slot.read_text()))
+    return merged
+
+
 class IntegrationTest(unittest.TestCase):
-    def test_links_scripts_docs_and_merges_info(self):
+    def test_links_scripts_docs_and_registers_info(self):
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             scripts = home / ".dotfiles/toolbox/scripts"
@@ -33,7 +45,8 @@ class IntegrationTest(unittest.TestCase):
             scripts.mkdir(parents=True)
             docs.mkdir(parents=True)
             core_info = scripts / "_info.toml"
-            core_info.write_text('[core-script]\nhelp = "core"\n')
+            original_core = '[core-script]\nhelp = "core"\n'
+            core_info.write_text(original_core)
 
             include = home / "includes/team-toolbox"
             (include / "scripts").mkdir(parents=True)
@@ -55,23 +68,61 @@ class IntegrationTest(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-            # Scripts symlinked; the include's own _info.toml is NOT linked.
+            # Scripts symlinked; the include's own _info.toml is NOT symlinked
+            # into the scripts dir itself.
             self.assertTrue((scripts / "team-tool").is_symlink())
             self.assertFalse((scripts / "_info.toml").is_symlink())
             # Docs symlinked.
             self.assertTrue((docs / "team-tool.md").is_symlink())
-            # Merge: both entries present, include wins on the colliding key.
-            merged = tomllib.loads(core_info.read_text())
+            # The include's _info.toml is registered as an info.d slot pointing
+            # back at the include, and the committed core file is left untouched.
+            slot = scripts / "info.d" / "000-team-toolbox.toml"
+            self.assertTrue(slot.is_symlink())
+            self.assertEqual(os.path.realpath(slot), str(include / "scripts/_info.toml"))
+            self.assertEqual(core_info.read_text(), original_core)
+            # Read-time merge: both entries present, include wins the collision.
+            merged = read_time_merge(scripts)
             self.assertEqual(set(merged), {"core-script", "team-tool"})
             self.assertEqual(merged["core-script"]["help"], "overridden")
             self.assertEqual(merged["team-tool"]["help"], "team")
+
+    def test_later_include_wins_on_a_colliding_key(self):
+        # Two includes define the same key; the one later in the list must win,
+        # which the NN- slot prefix + sorted glob preserves.
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            scripts = home / ".dotfiles/toolbox/scripts"
+            scripts.mkdir(parents=True)
+            (scripts / "_info.toml").write_text('[shared]\nhelp = "core"\n')
+
+            first = home / "includes/aaa-first"
+            (first / "scripts").mkdir(parents=True)
+            (first / "scripts/_info.toml").write_text('[shared]\nhelp = "first"\n')
+            second = home / "includes/zzz-second"
+            (second / "scripts").mkdir(parents=True)
+            (second / "scripts/_info.toml").write_text('[shared]\nhelp = "second"\n')
+
+            local = home / ".dotfiles-local"
+            local.mkdir()
+            (local / "toolbox-include.toml").write_text(
+                f'paths = ["{first}", "{second}"]\n'
+            )
+
+            result = subprocess.run(
+                [sys.executable, str(HELPER)],
+                env={**os.environ, "HOME": str(home)},
+                capture_output=True, text=True,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual(read_time_merge(scripts)["shared"]["help"], "second")
 
     def test_one_broken_include_does_not_sink_the_next(self):
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             scripts = home / ".dotfiles/toolbox/scripts"
             scripts.mkdir(parents=True)
-            (scripts / "_info.toml").write_text('[core]\nhelp = "core"\n')
+            original_core = '[core]\nhelp = "core"\n'
+            (scripts / "_info.toml").write_text(original_core)
 
             broken = home / "includes/broken"
             (broken / "scripts").mkdir(parents=True)
@@ -93,10 +144,13 @@ class IntegrationTest(unittest.TestCase):
                 capture_output=True, text=True,
             )
             # Broken include soft-skips (exit 2) but the good one still lands.
+            # The broken one is never registered, so it can't poison _run.py.
             self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
             self.assertTrue((scripts / "good-tool").is_symlink())
-            merged = tomllib.loads((scripts / "_info.toml").read_text())
-            self.assertIn("good-tool", merged)
+            self.assertFalse((scripts / "info.d" / "000-broken.toml").exists())
+            self.assertTrue((scripts / "info.d" / "001-good.toml").is_symlink())
+            self.assertEqual((scripts / "_info.toml").read_text(), original_core)
+            self.assertIn("good-tool", read_time_merge(scripts))
 
     def test_non_string_list_entry_does_not_sink_the_next(self):
         # A fat-fingered list element (here an int) must soft-skip, not abort
@@ -123,7 +177,63 @@ class IntegrationTest(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
             self.assertTrue((scripts / "good-tool").is_symlink())
-            self.assertIn("good-tool", tomllib.loads((scripts / "_info.toml").read_text()))
+            self.assertIn("good-tool", read_time_merge(scripts))
+
+    def test_dropped_include_is_unregistered_on_rerun(self):
+        # info.d is rebuilt each run, so removing an include from the list must
+        # stop it being merged — the old in-place rewrite never un-merged.
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            scripts = home / ".dotfiles/toolbox/scripts"
+            scripts.mkdir(parents=True)
+            (scripts / "_info.toml").write_text('[core]\nhelp = "core"\n')
+
+            include = home / "includes/team-toolbox"
+            (include / "scripts").mkdir(parents=True)
+            (include / "scripts/_info.toml").write_text('[team-tool]\nhelp = "team"\n')
+
+            local = home / ".dotfiles-local"
+            local.mkdir()
+            include_list = local / "toolbox-include.toml"
+
+            env = {**os.environ, "HOME": str(home)}
+            include_list.write_text(f'paths = ["{include}"]\n')
+            subprocess.run([sys.executable, str(HELPER)], env=env, capture_output=True)
+            self.assertIn("team-tool", read_time_merge(scripts))
+
+            # Drop the include and re-run: its slot must be gone.
+            include_list.write_text("paths = []\n")
+            subprocess.run([sys.executable, str(HELPER)], env=env, capture_output=True)
+            self.assertNotIn("team-tool", read_time_merge(scripts))
+
+    def test_deleted_include_list_unregisters_stale_slots(self):
+        # Deleting toolbox-include.toml entirely (not just emptying paths) is the
+        # natural way to drop your last include — it must still wipe info.d, even
+        # though process_includes early-returns on the absent file.
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            scripts = home / ".dotfiles/toolbox/scripts"
+            scripts.mkdir(parents=True)
+            (scripts / "_info.toml").write_text('[core]\nhelp = "core"\n')
+
+            include = home / "includes/team-toolbox"
+            (include / "scripts").mkdir(parents=True)
+            (include / "scripts/_info.toml").write_text('[team-tool]\nhelp = "team"\n')
+
+            local = home / ".dotfiles-local"
+            local.mkdir()
+            include_list = local / "toolbox-include.toml"
+
+            env = {**os.environ, "HOME": str(home)}
+            include_list.write_text(f'paths = ["{include}"]\n')
+            subprocess.run([sys.executable, str(HELPER)], env=env, capture_output=True)
+            self.assertIn("team-tool", read_time_merge(scripts))
+
+            # Remove the list file entirely and re-run: the stale slot must go.
+            include_list.unlink()
+            subprocess.run([sys.executable, str(HELPER)], env=env, capture_output=True)
+            self.assertFalse((scripts / "info.d").is_dir())
+            self.assertNotIn("team-tool", read_time_merge(scripts))
 
     def test_corrupt_include_list_soft_skips(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -161,42 +271,6 @@ class ExpandPathTest(unittest.TestCase):
         self.assertEqual(setup_includes.expand_include_path("/abs/path"), "/abs/path")
         self.assertEqual(setup_includes.expand_include_path("rel/path"), "/base/rel/path")
         self.assertEqual(setup_includes.expand_include_path("~"), os.path.expanduser("~"))
-
-
-class PlanBTest(unittest.TestCase):
-    """A failed merge must soft-skip AND leave the real _info.toml untouched."""
-
-    def _fixture(self, tmp):
-        home = Path(tmp)
-        df_scripts = home / ".dotfiles/toolbox/scripts"
-        df_scripts.mkdir(parents=True)
-        core = df_scripts / "_info.toml"
-        original = '[core]\nhelp = "core"\n'
-        core.write_text(original)
-        include = home / "inc"
-        (include / "scripts").mkdir(parents=True)
-        (include / "scripts/_info.toml").write_text('[new]\nhelp = "new"\n')
-        patch_global(self, "DF_PATH", str(home / ".dotfiles"))
-        patch_global(self, "CORE_INFO", str(core))
-        return include, core, original
-
-    def test_no_writer_soft_skips_and_preserves_core(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            include, core, original = self._fixture(tmp)
-            skipped = setup_includes.link_scripts(str(include), toml_writer=None)
-            self.assertTrue(skipped)
-            self.assertEqual(core.read_text(), original)
-
-    def test_dump_error_soft_skips_and_preserves_core(self):
-        class FailingWriter:
-            def dumps(self, _data):
-                raise ValueError("no null type in TOML")
-
-        with tempfile.TemporaryDirectory() as tmp:
-            include, core, original = self._fixture(tmp)
-            skipped = setup_includes.link_scripts(str(include), FailingWriter())
-            self.assertTrue(skipped)
-            self.assertEqual(core.read_text(), original)
 
 
 if __name__ == "__main__":

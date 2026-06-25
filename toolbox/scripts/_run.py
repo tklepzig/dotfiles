@@ -15,6 +15,7 @@ NON_SCRIPTS = {
     "_info.toml",
     "info.additional.yaml",
     "info.additional.toml",
+    "info.d",
     "_run.rb",
     "_run.py",
 }
@@ -23,6 +24,19 @@ ESC = "\x1b"
 
 with open(SCRIPTS_PATH / "_info.toml", "rb") as info_file:
     infos = tomllib.load(info_file)
+
+# Toolbox-include metadata: setup_includes.py symlinks each include's _info.toml
+# into info.d/NN-<name>.toml, where NN is the include's list position. Sorted, so
+# the prefix preserves "later include wins". Each load is isolated — an include
+# whose _info.toml went bad after setup must not break every toolbox command.
+info_d = SCRIPTS_PATH / "info.d"
+if info_d.is_dir():
+    for slot in sorted(info_d.glob("*.toml")):
+        try:
+            with open(slot, "rb") as slot_file:
+                infos.update(tomllib.load(slot_file))
+        except (OSError, tomllib.TOMLDecodeError):
+            continue
 
 additional_path = SCRIPTS_PATH / "info.additional.toml"
 if additional_path.exists():

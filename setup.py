@@ -440,14 +440,15 @@ def add_toolbox_includes():
                 "and re-run setup to finish linking includes."
             )
             return
-        # The merge needs tomllib + a TOML writer, so it runs in a separate
-        # process under the modern interpreter — setup.py's own imports stay
-        # stdlib-only/low-floor. Exit 2 = a merge was soft-skipped (Plan B).
+        # The helper needs tomllib to read the include list + validate each
+        # include's _info.toml, so it runs in a separate process under the modern
+        # interpreter — setup.py's own imports stay stdlib-only/low-floor. Exit 2
+        # = an include was soft-skipped (bad data).
         result = subprocess.run([modern_python, f"{DF_PATH}/toolbox/setup_includes.py"])
         if result.returncode != 0:
             Logger.error(
-                "Toolbox-include merge incomplete (see above). Re-run setup once "
-                "resolved — it is idempotent and will finish the merge."
+                "Some toolbox includes were skipped (see above). Re-run setup once "
+                "resolved — it is idempotent and will finish them."
             )
 
 

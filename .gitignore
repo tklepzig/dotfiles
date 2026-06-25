@@ -3,3 +3,4 @@ colours.tmux.conf
 colours.vim
 .claude/settings.local.json
 __pycache__/
+toolbox/scripts/info.d/
