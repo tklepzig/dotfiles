@@ -103,7 +103,7 @@ let g:coc_global_extensions = [
       \'https://github.com/akamud/vscode-javascript-snippet-pack',
       \'@yaegassy/coc-tailwindcss3',
       \'coc-emmet',
-      \'coc-python',
+      \'coc-pyright',
       \'coc-emoji',
       \'coc-dictionary',
       \'coc-word',

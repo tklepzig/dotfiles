@@ -6,13 +6,13 @@ My dotfiles.
 
 ### Neovim profile (default)
 
-    /usr/bin/env ruby -e "$(curl -Ls https://raw.githubusercontent.com/\
-    tklepzig/dotfiles/master/setup.rb)"
+    /usr/bin/env python3 -c "$(curl -Ls https://raw.githubusercontent.com/\
+    tklepzig/dotfiles/master/setup.py)"
 
 ### Vim profile
 
-    /usr/bin/env ruby -e "$(curl -Ls https://raw.githubusercontent.com/\
-    tklepzig/dotfiles/master/setup.rb)" -- --vim
+    /usr/bin/env python3 -c "$(curl -Ls https://raw.githubusercontent.com/\
+    tklepzig/dotfiles/master/setup.py)" --vim
 
 ### Raspberry Pi (full bootstrap)
 
@@ -30,7 +30,7 @@ comes first.
 
 The vim/neovim setup was restructured. If you are upgrading from the previous
 version (where the variants were called `basic` and `full`), follow the steps
-below before re-running `setup.rb`.
+below before re-running `setup.py`.
 
 ### Renamed directories
 
@@ -90,7 +90,7 @@ set explicitly:
 
 ### Local config files (`.vimrc`, `.tmux.conf`)
 
-`setup.rb` only ever appends source lines to local config files — it never
+`setup.py` only ever appends source lines to local config files — it never
 removes old ones. After upgrading, stale lines pointing to the old paths will
 remain and cause errors on startup:
 
@@ -103,7 +103,7 @@ The easiest way to clean all of this up in one step is to uninstall first, which
 removes all dotfiles source lines from local config files while leaving any
 manual customisations intact:
 
-    cd ~/.dotfiles && ./setup.rb --uninstall
+    cd ~/.dotfiles && ./setup.py --uninstall
 
 ### Re-run setup
 
@@ -133,7 +133,7 @@ Two naming conventions are supported:
 - `<file>.override` — e.g. `zsh/zshrc.override`
 - `<name>.override.<ext>` — e.g. `zsh/zshrc.override.zsh`
 
-`setup.rb` detects the override file automatically and sources/includes it after
+`setup.py` detects the override file automatically and sources/includes it after
 the base file in the relevant dotfile.
 
 The following sections list all files that support this mechanism.
@@ -182,7 +182,7 @@ matching line from the base; all other lines are appended:
 Plug 'my-org/my-plugin'      " add a plugin
 ```
 
-`setup.rb` merges this into `vim/vim/plugins.vim` at setup time.
+`setup.py` merges this into `vim/vim/plugins.vim` at setup time.
 
 ### Plugins — neovim profile (lazy.nvim)
 
@@ -206,7 +206,7 @@ For changes that should only apply to one machine and not be committed:
 | ----------------- | ------------------------------------------------------------------------- |
 | vim plugins       | `~/.dotfiles-local/plugins.vim` (vim-plug format, sourced at startup)     |
 | neovim plugins    | `~/.dotfiles-local/lazy-plugins.lua` (lazy.nvim specs, loaded at startup) |
-| post-install hook | `~/.dotfiles-local/post-install` (shell script, run by `setup.rb`)        |
+| post-install hook | `~/.dotfiles-local/post-install` (shell script, run by `setup.py`)        |
 
 ## Toolbox
 
@@ -224,50 +224,53 @@ shell completion.
    echo "hello"
    ```
 
-2. Register it in `toolbox/scripts/_info.yaml` (or in
-   `toolbox/scripts/info.additional.yaml` to avoid touching the base file):
+2. Register it in `toolbox/scripts/_info.toml` (or in
+   `toolbox/scripts/info.additional.toml` to avoid touching the base file):
 
-   ```yaml
-   your-script-name:
-     help: Brief description shown in completion
-     args:
-       - name: input file # required argument
-       - name: output format # required argument
-         optional: true
-         default: json # used when argument is omitted
-     completion: # optional: static completion candidates
-       - option-a
-       - option-b
+   ```toml
+   [your-script-name]
+   help = "Brief description shown in completion"
+   completion = ["option-a", "option-b"]   # optional: static completion candidates
+   [[your-script-name.args]]
+   name = "input file"                      # required argument
+   [[your-script-name.args]]
+   name = "output format"
+   optional = true
+   default = "json"                         # used when the argument is omitted
    ```
 
-   The `args` list defines both validation (setup.rb rejects calls with wrong
-   arity) and the completion hints shown in the shell.
+   Parent-level keys (`help`, `completion`) must come before the
+   `[[<script>.args]]` tables. The `args` list defines both validation (the
+   toolbox runner rejects
+   calls with wrong arity) and the completion hints shown in the shell.
 
-### info.additional.yaml
+### info.additional.toml
 
-`toolbox/scripts/info.additional.yaml` is an optional file that gets merged with
-`_info.yaml` at runtime. Use it in downstream repos or overrides to add script
+`toolbox/scripts/info.additional.toml` is an optional file that gets merged with
+`_info.toml` at runtime. Use it in downstream repos or overrides to add script
 metadata without modifying the base file:
 
-```yaml
-my-extra-script:
-  help: Does something project-specific
-  args:
-    - name: target
+```toml
+[my-extra-script]
+help = "Does something project-specific"
+[[my-extra-script.args]]
+name = "target"
 ```
 
 ### Toolbox includes
 
 To pull in scripts and docs from an external directory or repository, create
-`~/.dotfiles-local/toolbox-include.yaml` listing paths to include:
+`~/.dotfiles-local/toolbox-include.toml` listing paths to include:
 
-```yaml
-- /absolute/path/to/extra-toolbox
-- relative/path/from/dotfiles-local # resolved relative to ~/.dotfiles-local
+```toml
+paths = [
+  "/absolute/path/to/extra-toolbox",
+  "relative/path/from/dotfiles-local",   # resolved relative to ~/.dotfiles-local
+]
 ```
 
 Each listed path may be a plain directory or a git repository. If it contains a
-`.git` directory, `setup.rb` will run `git fetch && git merge` on it
+`.git` directory, the installer runs `git fetch && git merge` on it
 automatically during installation to keep it up to date.
 
 The directory is expected to follow this layout (both subdirectories are
@@ -275,7 +278,7 @@ optional):
 
 ```
 extra-toolbox/
-  scripts/       # executables + optional _info.yaml
+  scripts/       # executables + optional _info.toml
   docs/          # markdown files linked into the toolbox docs
 ```
 
@@ -311,7 +314,7 @@ The build places fixture override files for every supported override mechanism,
 runs setup, then executes `test/overrides/run.sh` automatically. The build fails
 if any test fails. The tested mechanisms are:
 
-- `vim/vim/vimrc.override` — wired into `~/.vimrc` by setup.rb (grep check)
+- `vim/vim/vimrc.override` — wired into `~/.vimrc` by setup.py (grep check)
 - `vim/neovim/vimrc.override` — applied at runtime (headless nvim check)
 - `vim/vim/plugins.override.vim` — plugin removed from merged plugins.vim (grep
   check)

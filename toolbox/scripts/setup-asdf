@@ -83,9 +83,9 @@ for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
 done
 
 # zsh completion: drop the generated _asdf into the dotfiles' completion dir,
-# which zsh/zshrc already has on fpath *before* compinit (the same dir setup.rb
+# which zsh/zshrc already has on fpath *before* compinit (the same dir setup.py
 # uses for the docker completions). Assumes the dotfiles are installed (true here: on the Pi,
-# setup.rb runs before this script; standalone, you're running a dotfiles script
+# setup.py runs before this script; standalone, you're running a dotfiles script
 # so the repo is present). Regenerated each run so it tracks the asdf version.
 # Write via .tmp + mv so a failed generation never leaves a broken _asdf that
 # would trip compinit.
@@ -119,9 +119,9 @@ install_latest() {
 plugins=(nodejs python neovim)
 
 # Dev-workstation tools — skipped with --minimal (e.g. a Pi appliance doesn't
-# need a container-top, an HTTP benchmarker, or git/GitHub TUIs).
+# need a container-top, an HTTP benchmarker, git/GitHub TUIs, or uv).
 if [ "$minimal" -eq 0 ]; then
-  plugins+=(ctop wrk github-cli gitui)
+  plugins+=(ctop wrk github-cli gitui uv)
 fi
 
 for plugin in "${plugins[@]}"; do
@@ -134,6 +134,27 @@ if [ "$want_ruby" -eq 1 ]; then
   # current stable ruby resolves.
   export ASDF_RUBY_BUILD_VERSION=master
   install_latest ruby
+fi
+
+# Python CLI dev tools (via uv) ----------------------------------------------
+# Editor-facing Python CLIs (black, which neovim's coc-pyright runs on save)
+# install into isolated uv-managed environments, NOT `pip install --user`: a
+# user pip install hard-wires the tool's launcher to the asdf python that
+# installed it, so the command dies (bad-interpreter ENOENT) the moment that
+# python version is pruned. `uv tool install` gives each tool its own venv on a
+# uv-managed python, surviving asdf churn (refresh with `uv tool upgrade --all`).
+# update-shell puts uv's bin dir (~/.local/bin) on PATH so the editor finds
+# them. Skipped with --minimal (an appliance isn't editing code).
+#
+# TODO: if more uv tools accumulate here, split this block into its own script
+# (e.g. `setup-uv`) so setup-asdf stays "toolchains + uv" and the tool installs
+# live separately. Overkill for a single tool today.
+if [ "$minimal" -eq 0 ] && command -v uv >/dev/null 2>&1; then
+  for tool in black; do
+    echo ">> uv tool: $tool"
+    uv tool install "$tool" || echo "WARNING: 'uv tool install $tool' failed — skipping." >&2
+  done
+  uv tool update-shell 2>/dev/null || true
 fi
 
 echo "asdf provisioning complete. Open a new shell (or 'source ~/.zshrc') to pick up the PATH."

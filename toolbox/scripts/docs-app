@@ -7,6 +7,6 @@ then
 	cd -
 fi
 
-$dotfiles_path/toolbox/docs/_write-index
+$dotfiles_path/toolbox/docs/_write-index.mjs
 $dotfiles_path/toolbox/docs/_app/index.mjs
 

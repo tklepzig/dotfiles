@@ -1,0 +1,136 @@
+#!/usr/bin/env python3
+import os
+import sys
+import tomllib
+from pathlib import Path
+
+HOME = os.environ["HOME"]
+SCRIPTS_PATH = Path(HOME) / ".dotfiles" / "toolbox" / "scripts"
+
+NON_SCRIPTS = {
+    "_info.toml",
+    "info.additional.toml",
+    "info.d",
+    "_run.py",
+}
+
+ESC = "\x1b"
+
+with open(SCRIPTS_PATH / "_info.toml", "rb") as info_file:
+    infos = tomllib.load(info_file)
+
+# Toolbox-include metadata: setup_includes.py symlinks each include's _info.toml
+# into info.d/NN-<name>.toml, where NN is the include's list position. Sorted, so
+# the prefix preserves "later include wins". Each load is isolated — an include
+# whose _info.toml went bad after setup must not break every toolbox command.
+info_d = SCRIPTS_PATH / "info.d"
+if info_d.is_dir():
+    for slot in sorted(info_d.glob("*.toml")):
+        try:
+            with open(slot, "rb") as slot_file:
+                infos.update(tomllib.load(slot_file))
+        except (OSError, tomllib.TOMLDecodeError):
+            continue
+
+additional_path = SCRIPTS_PATH / "info.additional.toml"
+if additional_path.exists():
+    with open(additional_path, "rb") as additional_file:
+        additional = tomllib.load(additional_file)
+    if additional:
+        infos.update(additional)
+
+scripts = sorted(
+    entry.name for entry in SCRIPTS_PATH.glob("*") if entry.name not in NON_SCRIPTS
+)
+
+argv = sys.argv[1:]
+
+
+def script_info(name):
+    info = infos.get(name)
+    return info if isinstance(info, dict) else None
+
+
+if argv and argv[0] == "--details":
+    print(f"help:{ESC}[0;32;2mShow help for given command{ESC}[0m")
+    for script in scripts:
+        info = script_info(script)
+        if info is not None and "help" in info:
+            description = f":{ESC}[0;32;2m{info['help'].split(chr(10))[0]}{ESC}[0m"
+        else:
+            description = f":{ESC}[0;15;2mNo help for {script}{ESC}[0m"
+        print(f"{script}{description}")
+    sys.exit(0)
+
+if argv and argv[0] == "--list":
+    print("help")
+    for script in scripts:
+        print(script)
+    sys.exit(0)
+
+if argv and argv[0] == "--completion":
+    if len(argv) > 1 and argv[1] == "help":
+        for script in scripts:
+            print(script)
+    script = argv[1] if len(argv) > 1 else None
+    info = script_info(script) if script is not None else None
+    if info is not None and "completion" in info:
+        print("\n".join(info["completion"]))
+    sys.exit(0)
+
+if argv and argv[0] == "help":
+    script_name = argv[1] if len(argv) > 1 else None
+
+    if script_name not in scripts:
+        print(f"Unknown script {script_name or ''}")
+        sys.exit(1)
+
+    info = script_info(script_name)
+    args_help = ""
+    if info is not None and "args" in info:
+        parts = []
+        for arg in info["args"]:
+            default_value = arg.get("default")
+            default = (
+                f" = {default_value}"
+                if default_value is not None and default_value is not False
+                else ""
+            )
+            parts.append(
+                f"[{arg['name']}{default}]"
+                if arg.get("optional")
+                else f"<{arg['name']}>"
+            )
+        args_help = " ".join(parts)
+    print(f"Usage: {script_name} {args_help}")
+
+    if info is not None and "help" in info:
+        print("")
+        print(info["help"])
+
+    sys.exit(1)
+
+script_name = argv[0] if argv else None
+
+if script_name not in scripts:
+    print(f"Unknown script {script_name or ''}")
+    sys.exit(1)
+
+info = script_info(script_name)
+if info is not None and "args" in info:
+    args = info["args"]
+    cmd_args = argv[1:]
+
+    mandatory_args = [arg for arg in args if not arg.get("optional")]
+
+    if len(cmd_args) < len(mandatory_args):
+        print("Error: Missing args:")
+        missing = [arg["name"] for arg in mandatory_args][len(cmd_args) :]
+        print("\n".join(missing))
+        sys.exit(1)
+
+    if len(cmd_args) > len(args):
+        print("Error: Too many args")
+        sys.exit(1)
+
+print(script_name)

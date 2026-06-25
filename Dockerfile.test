@@ -16,9 +16,9 @@ COPY . /root/.dotfiles
 ARG VARIANT=neovim
 RUN cd /root/.dotfiles && \
     if [ "$VARIANT" = "vim" ]; then \
-      ruby setup.rb --local --vim; \
+      python3 setup.py --local --vim; \
     else \
-      ruby setup.rb --local; \
+      python3 setup.py --local; \
     fi
 
 CMD ["zsh", "-l"]
