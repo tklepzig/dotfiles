@@ -368,6 +368,11 @@ def add_toolbox_includes():
 def sync_vim_plugins(variant):
     # We can't rely on aliases since the subshell from ruby spawns a sh and has no idea about zsh aliases
     vim_binary = "nvim" if variant == "neovim" else "vim"
+    if not program_installed(vim_binary):
+        Logger.error(
+            f"{vim_binary} not found — skipping {vim_binary} step."
+        )
+        return
     if variant == "neovim":
         Logger.log("Installing and syncing neovim plugins")
         subprocess.run(
