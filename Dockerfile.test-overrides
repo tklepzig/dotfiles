@@ -12,7 +12,7 @@ ENV HOME=/root
 
 COPY . /root/.dotfiles
 
-# Place test fixture override files before running setup so that setup.rb
+# Place test fixture override files before running setup so that setup.py
 # picks up the file-based overrides (vimrc, plugins.override.vim) correctly.
 RUN cp /root/.dotfiles/test/overrides/fixtures/vim/vim/vimrc.override \
        /root/.dotfiles/vim/vim/vimrc.override && \

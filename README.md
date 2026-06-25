@@ -14,15 +14,6 @@ My dotfiles.
     /usr/bin/env python3 -c "$(curl -Ls https://raw.githubusercontent.com/\
     tklepzig/dotfiles/master/setup.py)" --vim
 
-### Legacy Ruby installer (fallback)
-
-The installer was ported from Ruby to Python so a fresh box no longer needs
-Ruby preinstalled (`python3` almost always is). The Ruby installer is kept as a
-fallback during the transition — if the Python one misbehaves, run:
-
-    /usr/bin/env ruby -e "$(curl -Ls https://raw.githubusercontent.com/\
-    tklepzig/dotfiles/master/setup.rb)"      # add `-- --vim` for the vim profile
-
 ### Raspberry Pi (full bootstrap)
 
 On a fresh Raspberry Pi 5 (Raspberry Pi OS Bookworm, SSH on), `pi-setup.sh`
@@ -39,7 +30,7 @@ comes first.
 
 The vim/neovim setup was restructured. If you are upgrading from the previous
 version (where the variants were called `basic` and `full`), follow the steps
-below before re-running `setup.rb`.
+below before re-running `setup.py`.
 
 ### Renamed directories
 
@@ -99,7 +90,7 @@ set explicitly:
 
 ### Local config files (`.vimrc`, `.tmux.conf`)
 
-`setup.rb` only ever appends source lines to local config files — it never
+`setup.py` only ever appends source lines to local config files — it never
 removes old ones. After upgrading, stale lines pointing to the old paths will
 remain and cause errors on startup:
 
@@ -112,7 +103,7 @@ The easiest way to clean all of this up in one step is to uninstall first, which
 removes all dotfiles source lines from local config files while leaving any
 manual customisations intact:
 
-    cd ~/.dotfiles && ./setup.py --uninstall      # legacy fallback: ./setup.rb --uninstall
+    cd ~/.dotfiles && ./setup.py --uninstall
 
 ### Re-run setup
 
@@ -142,7 +133,7 @@ Two naming conventions are supported:
 - `<file>.override` — e.g. `zsh/zshrc.override`
 - `<name>.override.<ext>` — e.g. `zsh/zshrc.override.zsh`
 
-`setup.rb` detects the override file automatically and sources/includes it after
+`setup.py` detects the override file automatically and sources/includes it after
 the base file in the relevant dotfile.
 
 The following sections list all files that support this mechanism.
@@ -191,7 +182,7 @@ matching line from the base; all other lines are appended:
 Plug 'my-org/my-plugin'      " add a plugin
 ```
 
-`setup.rb` merges this into `vim/vim/plugins.vim` at setup time.
+`setup.py` merges this into `vim/vim/plugins.vim` at setup time.
 
 ### Plugins — neovim profile (lazy.nvim)
 
@@ -215,7 +206,7 @@ For changes that should only apply to one machine and not be committed:
 | ----------------- | ------------------------------------------------------------------------- |
 | vim plugins       | `~/.dotfiles-local/plugins.vim` (vim-plug format, sourced at startup)     |
 | neovim plugins    | `~/.dotfiles-local/lazy-plugins.lua` (lazy.nvim specs, loaded at startup) |
-| post-install hook | `~/.dotfiles-local/post-install` (shell script, run by `setup.rb`)        |
+| post-install hook | `~/.dotfiles-local/post-install` (shell script, run by `setup.py`)        |
 
 ## Toolbox
 
@@ -278,10 +269,6 @@ paths = [
 ]
 ```
 
-> If you fall back to the legacy Ruby installer, it reads the old
-> `~/.dotfiles-local/toolbox-include.yaml` (a bare YAML list) instead. Keep both
-> during the transition if you rely on the fallback.
-
 Each listed path may be a plain directory or a git repository. If it contains a
 `.git` directory, the installer runs `git fetch && git merge` on it
 automatically during installation to keep it up to date.
@@ -327,7 +314,7 @@ The build places fixture override files for every supported override mechanism,
 runs setup, then executes `test/overrides/run.sh` automatically. The build fails
 if any test fails. The tested mechanisms are:
 
-- `vim/vim/vimrc.override` — wired into `~/.vimrc` by setup.rb (grep check)
+- `vim/vim/vimrc.override` — wired into `~/.vimrc` by setup.py (grep check)
 - `vim/neovim/vimrc.override` — applied at runtime (headless nvim check)
 - `vim/vim/plugins.override.vim` — plugin removed from merged plugins.vim (grep
   check)

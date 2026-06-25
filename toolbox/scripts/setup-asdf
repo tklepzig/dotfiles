@@ -83,9 +83,9 @@ for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
 done
 
 # zsh completion: drop the generated _asdf into the dotfiles' completion dir,
-# which zsh/zshrc already has on fpath *before* compinit (the same dir setup.rb
+# which zsh/zshrc already has on fpath *before* compinit (the same dir setup.py
 # uses for the docker completions). Assumes the dotfiles are installed (true here: on the Pi,
-# setup.rb runs before this script; standalone, you're running a dotfiles script
+# setup.py runs before this script; standalone, you're running a dotfiles script
 # so the repo is present). Regenerated each run so it tracks the asdf version.
 # Write via .tmp + mv so a failed generation never leaves a broken _asdf that
 # would trip compinit.

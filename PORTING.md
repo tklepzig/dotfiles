@@ -21,13 +21,17 @@
 >   loader (dirs, 6 symlinks, force re-run, removals, missing-file no-op). `.rb`
 >   kept until Step 9. setup_vim() wired into install() but placed AFTER the
 >   zshrc edit — Step 8 config-linking lines must be inserted BEFORE it.
-> - **Next action:** Step 10 — Ruby removal, DEFERRED ~months until the Python
->   path proves out in the wild (Thomas's coexistence call). Nothing to do now;
->   when ready: delete `setup.rb`/`_run.rb`/`_info.yaml`/`info.additional.yaml`,
->   repoint `golden.py` capture to `_run.py`, drop the `.yaml`-fallback notes,
->   + the deferred install() reorg & kitty/i3 mkdir cleanup. **The whole
->   installer + runner are now ported and Python is the default** (Steps 0–9 ✅).
->   This branch is ready to merge (Python default, Ruby retained as fallback).
+> - **Next action:** Step 10 Ruby removal DONE ✅ (coexistence cut short by
+>   Thomas — single Python path, git history is the record). Deleted `setup.rb`,
+>   `_run.rb`, `_info.yaml`, the 4 vim `*.rb` routines; dropped the `.rb`/`.yaml`
+>   entries from `_run.py`'s exclusion list; stripped the README "Legacy Ruby
+>   installer" + toolbox-include `.yaml`-fallback notes; flipped prose
+>   `setup.rb`→`setup.py`; fixed stale `setup.rb` comments in the test harness.
+>   (`golden.py` was already removed in the "Clean up" commit; `info.additional.yaml`
+>   never existed.) **The whole installer + runner are ported, Python is the only
+>   path** (Steps 0–10 ✅). This branch is ready to merge.
+>   NOT done (deliberately out of scope — separate cleanup commit): the deferred
+>   install() reorg & the kitty/i3 `add_link_with_override` mkdir gap.
 > - **Step 8c DONE** ✅ — toolbox includes ported. Decision **superseded**: the
 >   vendored `tomli-w` writer was removed in favour of a **read-time merge** — no
 >   TOML is written at all (see `## Decisions`). `toolbox/setup_includes.py`
@@ -299,15 +303,15 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
       - **Resolved at implementation:** fallback switch = docs-only (no env
         toggle); the `toolbox-include` README was flipped to `.toml` now with a
         `.yaml`-fallback note (not left dual); golden stays a differ as planned.
-- [ ] **10. Ruby removal (after the coexistence period proves Python out, ~months).**
-      - Delete `setup.rb`, `_run.rb`, `_info.yaml`, `info.additional.yaml`.
-      - Repoint `golden.py` `capture`'s default runner `_run.rb`→`_run.py`
-        (self-snapshot) — capture breaks otherwise; the harness becomes a plain
-        regression test, not a differ. Drop `_info.yaml`/`info.additional.yaml`
-        from both runners' exclusion lists once the YAML is gone.
-      - Flip the README `toolbox-include` section to `.toml`-only (`paths=[...]`),
-        update the include-repo layout note (`scripts/` ships `_info.toml`),
-        change `setup.rb`→`setup` in the prose. Remove the Ruby fallback switch.
+- [x] **10. Ruby removal (coexistence cut short — single Python path now).** DONE.
+      - Deleted `setup.rb`, `_run.rb`, `_info.yaml`, the 4 vim `*.rb` routines.
+        (`golden.py` already gone via "Clean up"; `info.additional.yaml` never existed.)
+      - Dropped `_info.yaml`/`_run.rb`/`info.additional.yaml` from `_run.py`'s
+        exclusion list (kept `_info.toml`/`info.additional.toml`/`info.d`/`_run.py`).
+      - README: removed "Legacy Ruby installer (fallback)" section + toolbox-include
+        `.yaml`-fallback note; flipped prose `setup.rb`→`setup.py`. Test-harness
+        stale `setup.rb` comments fixed.
+      - **STILL OPEN (split to a separate cleanup commit, NOT part of removal):**
       - **`add_link_with_override` mkdir gap:** kitty + i3-main assume their
         `~/.config/X` dir exists (Ruby never mkdir'd them; ported faithfully in
         8d-2). Add the mkdir here.

@@ -25,7 +25,7 @@ echo "=============="
 echo ""
 echo "-- vimrc overrides"
 
-# setup.rb wires the override by appending a source line to ~/.vimrc.
+# setup.py wires the override by appending a source line to ~/.vimrc.
 check "vim  vimrc.override wired into ~/.vimrc" \
   grep -q "vim/vim/vimrc.override" ~/.vimrc
 
@@ -48,8 +48,8 @@ check "nvim nvim-lazy-plugins.override.lua loaded at runtime" \
 echo ""
 echo "-- user-level local overrides"
 
-# Confirm setup.rb always wires dotfiles-local/plugins.vim and that our
-# fixture content was not overwritten by setup.rb's default file creation.
+# Confirm setup.py always wires dotfiles-local/plugins.vim and that our
+# fixture content was not overwritten by setup.py's default file creation.
 check "vim  ~/.dotfiles-local/plugins.vim sourced from vim/plugins.vim" \
   grep -q ".dotfiles-local/plugins.vim" ~/.dotfiles/vim/plugins.vim
 

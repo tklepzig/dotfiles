@@ -7,16 +7,11 @@ from pathlib import Path
 HOME = os.environ["HOME"]
 SCRIPTS_PATH = Path(HOME) / ".dotfiles" / "toolbox" / "scripts"
 
-# Infra files that are not toolbox scripts. Covers both config formats and both
-# runners so the listing stays identical while .rb/.yaml and .py/.toml coexist
-# during the port (deleted once the Ruby files go).
+# Infra files that are not toolbox scripts, so they stay out of the listing.
 NON_SCRIPTS = {
-    "_info.yaml",
     "_info.toml",
-    "info.additional.yaml",
     "info.additional.toml",
     "info.d",
-    "_run.rb",
     "_run.py",
 }
 
