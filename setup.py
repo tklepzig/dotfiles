@@ -153,7 +153,9 @@ def force_symlink(source, target):
 def git_short_hash():
     return subprocess.run(
         ["git", "rev-parse", "--short", "HEAD"],
-        cwd=DF_PATH, capture_output=True, text=True,
+        cwd=DF_PATH,
+        capture_output=True,
+        text=True,
     ).stdout.strip()
 
 
@@ -168,11 +170,15 @@ def update_dotfiles_repo():
 
         subprocess.run(
             ["git", "fetch", "--depth=1"],
-            cwd=DF_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            cwd=DF_PATH,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
         subprocess.run(
             ["git", "reset", "--hard", f"origin/{DF_BRANCH or 'master'}"],
-            cwd=DF_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            cwd=DF_PATH,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
 
         if DF_BRANCH:
@@ -369,34 +375,44 @@ def sync_vim_plugins(variant):
     # We can't rely on aliases since the subshell from ruby spawns a sh and has no idea about zsh aliases
     vim_binary = "nvim" if variant == "neovim" else "vim"
     if not program_installed(vim_binary):
-        Logger.error(
-            f"{vim_binary} not found — skipping {vim_binary} step."
-        )
+        Logger.error(f"{vim_binary} not found — skipping {vim_binary} step.")
         return
     if variant == "neovim":
         Logger.log("Installing and syncing neovim plugins")
         subprocess.run(
             [vim_binary, "--headless", "+Lazy! sync", "+qa"],
-            stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
         Logger.log("Updating coc extensions")
         subprocess.run(
             [vim_binary, "+CocUpdateSync", "+qall"],
-            stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
     else:
         plug_file = f"{HOME}/.vim/autoload/plug.vim"
         if not os.path.exists(plug_file):
             Logger.log("Installing vim-plug")
             subprocess.run(
-                ["curl", "-fLo", plug_file, "--create-dirs",
-                 "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"],
-                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                [
+                    "curl",
+                    "-fLo",
+                    plug_file,
+                    "--create-dirs",
+                    "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim",
+                ],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
             )
         Logger.log("Installing and updating vim plugins")
         subprocess.run(
             [vim_binary, "+PlugInstall", "+PlugUpdate", "+qall"],
-            stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
 
 
@@ -410,7 +426,9 @@ def install_tmux_snapshot_scheduler():
         plist_src = f"{DF_PATH}/tmux/scheduler/dev.dotfiles.tmux-snapshot.plist"
         plist_dst = f"{launch_agents}/dev.dotfiles.tmux-snapshot.plist"
         with open(plist_src, encoding="utf-8") as source:
-            rendered = source.read().replace("__DF_PATH__", DF_PATH).replace("__HOME__", HOME)
+            rendered = (
+                source.read().replace("__DF_PATH__", DF_PATH).replace("__HOME__", HOME)
+            )
         existing = None
         if os.path.exists(plist_dst):
             with open(plist_dst, encoding="utf-8") as current:
@@ -439,17 +457,23 @@ def install_tmux_snapshot_scheduler():
             f"{unit_dir}/tmux-snapshot.timer",
         )
         subprocess.run(["systemctl", "--user", "daemon-reload"])
-        subprocess.run(["systemctl", "--user", "enable", "--now", "tmux-snapshot.timer"])
+        subprocess.run(
+            ["systemctl", "--user", "enable", "--now", "tmux-snapshot.timer"]
+        )
 
 
 def configure_tmux():
     with Logger.log("Configuring tmux"):
         if is_mac():
             Logger.log("Symlinking tmux variables for macOS")
-            add_link_with_override(f"{DF_PATH}/tmux/vars.osx.conf", f"{HOME}/.tmux.conf")
+            add_link_with_override(
+                f"{DF_PATH}/tmux/vars.osx.conf", f"{HOME}/.tmux.conf"
+            )
         else:
             Logger.log("Symlinking tmux variables for Linux")
-            add_link_with_override(f"{DF_PATH}/tmux/vars.linux.conf", f"{HOME}/.tmux.conf")
+            add_link_with_override(
+                f"{DF_PATH}/tmux/vars.linux.conf", f"{HOME}/.tmux.conf"
+            )
         Logger.log("Symlinking tmux main configuration")
         add_link_with_override(f"{DF_PATH}/tmux/tmux.conf", f"{HOME}/.tmux.conf")
 
@@ -466,15 +490,21 @@ def configure_kitty():
     if is_mac():
         Logger.log("Symlinking kitty variables for macOS")
         add_link_with_override(
-            f"{DF_PATH}/kitty/kitty.macos.conf", f"{HOME}/.config/kitty/kitty.conf", "include"
+            f"{DF_PATH}/kitty/kitty.macos.conf",
+            f"{HOME}/.config/kitty/kitty.conf",
+            "include",
         )
     else:
         Logger.log("Symlinking kitty variables for Linux")
         add_link_with_override(
-            f"{DF_PATH}/kitty/kitty.linux.conf", f"{HOME}/.config/kitty/kitty.conf", "include"
+            f"{DF_PATH}/kitty/kitty.linux.conf",
+            f"{HOME}/.config/kitty/kitty.conf",
+            "include",
         )
     add_link_with_override(
-        f"{DF_PATH}/kitty/kitty.theme.conf", f"{HOME}/.config/kitty/kitty.conf", "include"
+        f"{DF_PATH}/kitty/kitty.theme.conf",
+        f"{HOME}/.config/kitty/kitty.conf",
+        "include",
     )
 
 
@@ -500,11 +530,15 @@ def configure_i3():
         return
     with Logger.log("Configuring i3"):
         Logger.log("Symlinking i3 main configuration")
-        add_link_with_override(f"{DF_PATH}/i3/config", f"{HOME}/.config/i3/config", "include")
+        add_link_with_override(
+            f"{DF_PATH}/i3/config", f"{HOME}/.config/i3/config", "include"
+        )
 
         Logger.log("Symlinking i3blocks configuration")
         os.makedirs(f"{HOME}/.config/i3blocks", exist_ok=True)
-        force_symlink(f"{DF_PATH}/i3/i3blocks.config", f"{HOME}/.config/i3blocks/config")
+        force_symlink(
+            f"{DF_PATH}/i3/i3blocks.config", f"{HOME}/.config/i3blocks/config"
+        )
 
         Logger.log("Symlinking dunst configuration")
         os.makedirs(f"{HOME}/.config/dunst", exist_ok=True)
@@ -529,13 +563,22 @@ def install_fzf():
         return
     Logger.log("Installing fzf")
     subprocess.run(
-        ["git", "clone", "--depth", "1", "https://github.com/junegunn/fzf.git", f"{HOME}/.fzf"],
-        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        [
+            "git",
+            "clone",
+            "--depth",
+            "1",
+            "https://github.com/junegunn/fzf.git",
+            f"{HOME}/.fzf",
+        ],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
     if os.path.exists(f"{HOME}/.fzf/install"):
         subprocess.run(
             [f"{HOME}/.fzf/install", "--all"],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
 
 
@@ -550,7 +593,10 @@ def install_docker_completion():
         "_docker-compose": "https://raw.githubusercontent.com/docker/compose/master/contrib/completion/zsh/_docker-compose",
     }
     for name, url in completions.items():
-        subprocess.run(["curl", "-L", "-o", f"{completion_dir}/{name}", url], stderr=subprocess.DEVNULL)
+        subprocess.run(
+            ["curl", "-L", "-o", f"{completion_dir}/{name}", url],
+            stderr=subprocess.DEVNULL,
+        )
 
 
 def set_default_shell_to_zsh():
@@ -565,7 +611,9 @@ def set_default_shell_to_zsh():
     if current_shell != zsh_path:
         with Logger.log("Setting default shell to zsh"):
             subprocess.run(["chsh", "-s", zsh_path])
-            Logger.log("Please notice: In order to use the new shell, you have to logout and back in.")
+            Logger.log(
+                "Please notice: In order to use the new shell, you have to logout and back in."
+            )
 
 
 def run_post_install_script():
