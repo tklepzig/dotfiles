@@ -622,11 +622,6 @@ def install(variant=DF_VARIANT):
 
 
 def remove_links(pattern, file):
-    # Drop every line matching `pattern` (a regex) from `file`. Ruby shelled out
-    # to `sed "/pattern/d"`; we filter natively.
-    # FAITHFUL QUIRK: Ruby's callers pass CWD-relative paths (".zshrc", not
-    # f"{HOME}/.zshrc"), so this only touches the real dotfiles if uninstall runs
-    # from $HOME. Likely a latent Ruby bug; replicated as-is, flagged for Step 10.
     if not os.path.exists(file):
         return
     Logger.log(f"Removing pattern '{pattern}' from {file}")
@@ -638,11 +633,11 @@ def remove_links(pattern, file):
 
 
 def uninstall():
-    remove_links(r"\.dotfiles", ".zshrc")
-    remove_links(r"\.fzf", ".zshrc")
-    remove_links(r"\.dotfiles", ".vimrc")
-    remove_links(r"\.dotfiles", ".tmux.conf")
-    remove_links(r"\.dotfiles", ".config/kitty/kitty.conf")
+    remove_links(r"\.dotfiles", f"{HOME}/.zshrc")
+    remove_links(r"\.fzf", f"{HOME}/.zshrc")
+    remove_links(r"\.dotfiles", f"{HOME}/.vimrc")
+    remove_links(r"\.dotfiles", f"{HOME}/.tmux.conf")
+    remove_links(r"\.dotfiles", f"{HOME}/.config/kitty/kitty.conf")
 
     # Remove fzf wholesale so install re-adds its include AFTER the dotfiles zsh
     # includes next time.
