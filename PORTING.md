@@ -316,16 +316,30 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
         ported faithfully in 8d-2). Fixed at the helper: `add_link_with_override`
         now `os.makedirs(dirname, exist_ok=True)` before creating the file, so no
         caller can hit it. Stale "faithful to Ruby" comments removed.
-      - **STILL OPEN (separate cleanup commit):**
-      - **Deferred `install()` reorganization (ONE pass).** setup.rb carried 5
-        sibling org-only TODOs (commit bbcd11e "Some todos", 2025-04-06): clean
-        up / split into smaller chunks (skip heavy steps for the basic variant);
-        group the vim-related links into the vim block; move the `zsh/zshrc` link
-        up with the other linking (verified behaviourally a no-op — `setup_vim`
-        never sources `~/.zshrc`); group all `add_link_with_override` linking into
-        one block. We dropped the stale comments from `setup.py` while porting
-        (keeping Ruby's order); the regrouping is intentional cleanup to do once,
-        now that the line-by-line port is verified.
+      - **`install()` reorganization — mostly MOOT, reassessed against the code.**
+        setup.rb carried 5 org-only TODOs (commit bbcd11e "Some todos",
+        2025-04-06) written against the Ruby *monolith*. The port already
+        decomposed `install()` into named functions, which is exactly what most
+        of them asked for:
+        - "split into smaller chunks" → DONE by the function decomposition.
+        - "group the vim-related links into the vim block" → DONE; vim links live
+          in `setup_vim`, colours in `setup_theme_and_colours`, tmux in
+          `configure_tmux`.
+        - "move the `zsh/zshrc` link up with the other linking" → DONE here:
+          relocated to right after `setup_theme_and_colours`, before `setup_vim`
+          (which only touches `~/.vimrc`), so the `.zshrc` append order is
+          unchanged. Verified no-op.
+        - "group all `add_link_with_override` into one block" → DELIBERATELY NOT
+          DONE — now an anti-pattern. Post-decomposition each link belongs with
+          the function that owns its concern; pulling them into one block splits
+          link from configure step and lowers cohesion.
+        - NOT touched: `sync_vim_plugins` placement — it's a headless-editor
+          plugin install (not a link), reads `~/.vimrc`, and currently runs after
+          `configure_ruby`; moving it is a runtime-ordering change Docker can't
+          verify (lazy bootstraps on first real `nvim` launch). Left as-is.
+      - **STILL OPEN — behavioral, Thomas's decision (NOT done):** "skip heavy
+        steps for the basic/vim variant." Underspecified (which steps are
+        "heavy"?) and a real behavior change, not cleanup. Decide separately.
 
 ## Verification matrix
 

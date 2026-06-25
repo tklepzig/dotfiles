@@ -697,9 +697,12 @@ def install(variant=DF_VARIANT):
     # Theme + colours + local plugins.vim must be linked before vim setup.
     setup_theme_and_colours()
 
-    setup_vim(variant)
-
+    # Grouped with the other ~/.zshrc linking. Sits before setup_vim, which only
+    # touches ~/.vimrc, so the .zshrc append order (colours.zsh -> zshrc ->
+    # toolbox/init.zsh) is unchanged.
     add_link_with_override(f"{DF_PATH}/zsh/zshrc", f"{HOME}/.zshrc")
+
+    setup_vim(variant)
 
     configure_bc()
     configure_ruby()
