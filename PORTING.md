@@ -311,10 +311,12 @@ read/append). External tools (`git`, `launchctl`, `systemctl`, `chsh`,
       - README: removed "Legacy Ruby installer (fallback)" section + toolbox-include
         `.yaml`-fallback note; flipped prose `setup.rb`→`setup.py`. Test-harness
         stale `setup.rb` comments fixed.
-      - **STILL OPEN (split to a separate cleanup commit, NOT part of removal):**
-      - **`add_link_with_override` mkdir gap:** kitty + i3-main assume their
-        `~/.config/X` dir exists (Ruby never mkdir'd them; ported faithfully in
-        8d-2). Add the mkdir here.
+      - **`add_link_with_override` mkdir gap — FIXED.** kitty + i3-main wrote to
+        `~/.config/X` without ensuring the dir existed (Ruby never mkdir'd them;
+        ported faithfully in 8d-2). Fixed at the helper: `add_link_with_override`
+        now `os.makedirs(dirname, exist_ok=True)` before creating the file, so no
+        caller can hit it. Stale "faithful to Ruby" comments removed.
+      - **STILL OPEN (separate cleanup commit):**
       - **Deferred `install()` reorganization (ONE pass).** setup.rb carried 5
         sibling org-only TODOs (commit bbcd11e "Some todos", 2025-04-06): clean
         up / split into smaller chunks (skip heavy steps for the basic variant);

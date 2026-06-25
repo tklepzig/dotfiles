@@ -168,9 +168,11 @@ def write_link(link, file, command="source"):
 
 
 def add_link_with_override(link, file, command="source"):
-    # Ensure the target exists (create empty; never truncate an existing file),
-    # add the base link, then add its whole-file override if one exists.
+    # Ensure the target exists (create its parent dir + an empty file; never
+    # truncate an existing file), add the base link, then add its whole-file
+    # override if one exists.
     if not os.path.exists(file):
+        os.makedirs(os.path.dirname(file), exist_ok=True)
         open(file, "w").close()
 
     write_link(link, file, command)
@@ -550,10 +552,6 @@ def configure_tmux():
 def configure_kitty():
     if not program_installed("kitty"):
         return
-    # Ruby never mkdir's ~/.config/kitty here (unlike ranger/mpv/i3blocks);
-    # add_link_with_override only creates the file, not its parent dir, so this
-    # assumes ~/.config/kitty already exists. Kept faithful — see the deferred
-    # cleanup note in PORTING.md Step 9.
     Logger.log("Configuring kitty")
     add_link_with_override(
         f"{DF_PATH}/kitty/kitty.conf", f"{HOME}/.config/kitty/kitty.conf", "include"
@@ -595,7 +593,6 @@ def configure_i3():
         return
     with Logger.log("Configuring i3"):
         Logger.log("Symlinking i3 main configuration")
-        # Like kitty: ~/.config/i3 is not mkdir'd (faithful to Ruby).
         add_link_with_override(f"{DF_PATH}/i3/config", f"{HOME}/.config/i3/config", "include")
 
         Logger.log("Symlinking i3blocks configuration")
