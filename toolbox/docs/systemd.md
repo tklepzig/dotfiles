@@ -8,6 +8,27 @@ package-provided units in `/lib/systemd/system/` (don't hand-edit those).
 **After editing a unit file, run `sudo systemctl daemon-reload`** or systemd
 keeps using the old definition.
 
+```ini
+# /etc/systemd/system/myapp.service
+[Unit]
+Description=Toolbox docs app
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/path/to/node /home/thomas/myapp/index.js
+# If node (or whatever runner) is under asdf, you need to resolve the absolute path once
+# and hardcode it:
+#   asdf which node  ->  /home/thomas/.asdf/installs/nodejs/22.21.1/bin/node
+Environment=SOME_ENV=blubb
+WorkingDirectory=/home/thomas/myapp
+Restart=on-failure
+User=thomas
+
+[Install]
+WantedBy=multi-user.target
+```
+
 ## Service lifecycle
 
 ```sh
@@ -94,7 +115,8 @@ sets `Storage=volatile`. With that in force, journald **ignores
 `/etc/systemd/journald.conf`, because **drop-ins always override the main config
 file**, regardless of which one you edited.
 
-Diagnose first — find anything forcing a `Storage=` and see where logs *actually* live:
+Diagnose first — find anything forcing a `Storage=` and see where logs
+_actually_ live:
 
 ```sh
 grep -rs Storage /etc/systemd/journald.conf /etc/systemd/journald.conf.d \
