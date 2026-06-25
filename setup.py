@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-# Bootstrap installer. Runs on a FRESH box's python via `python3 -c "$(curl …)"`,
-# so it must stay STDLIB-ONLY and low-floor (3.8/3.9-safe) — no tomllib, no
-# third-party imports. The modern-python-only bits (toolbox-include TOML merge)
-# come later and run under a provisioned interpreter. Python port of setup.rb.
-
 import importlib.util
 import os
 import pwd
@@ -16,10 +11,10 @@ from pathlib import Path
 from types import SimpleNamespace
 
 DF_REPO = os.environ.get("DOTFILES_REPO", "tklepzig/dotfiles")
-DF_BRANCH = os.environ.get("DOTFILES_BRANCH")  # None if unset
+DF_BRANCH = os.environ.get("DOTFILES_BRANCH")
 HOME = os.environ["HOME"]
 DF_VARIANT = os.environ.get("DOTFILES_VARIANT", "neovim")
-DF_THEME = os.environ.get("DOTFILES_THEME")  # None if unset
+DF_THEME = os.environ.get("DOTFILES_THEME")
 DF_PATH = f"{HOME}/.dotfiles"
 DF_LOCAL_PATH = f"{HOME}/.dotfiles-local"
 DF_LOCAL = "--local" in sys.argv
@@ -28,23 +23,10 @@ ARROW = "❯"
 
 
 class Logger:
-    """Indented ANSI logging. `Logger.log(msg)` prints a line; used as a
-    `with` block it also indents everything logged inside it by two spaces:
-
-        with Logger.log("Setting up vim"):
-            Logger.log("Linking plugins")   # indented one level
-        Logger.log("done")                  # back at top level
-
-    A bare `Logger.log(msg)` (no `with`) just prints — the returned context
-    manager is harmlessly discarded, so the indent only moves when entered.
-    """
-
     _level = 0
 
     @classmethod
     def _format_line(cls, message, color):
-        # Only the top level gets the bold arrow prefix; deeper levels are
-        # indented two spaces per level instead.
         prefix = f"\x1b[1;38;5;{color}m{ARROW} " if cls._level == 0 else ""
         indent = " " * (2 * cls._level)
         return f"{prefix}\x1b[0;38;5;{color}m{indent}{message}\x1b[0m"
@@ -95,7 +77,6 @@ def ensure_brew_package(package, binary=None):
             Logger.success(f"Found: {shutil.which(binary)}.")
         else:
             Logger.log("Not found, installing via brew")
-            # Matches Ruby's `system(...)`: fire-and-forget, exit code ignored.
             subprocess.run(["brew", "install", package])
 
 
@@ -117,16 +98,10 @@ def check_optional_installation(program, install_name=None):
 
 
 def find_override(file_path):
-    # Whole-file override lookup. Prefer `<path>.override`; else insert
-    # `.override` before the final extension (foo.vim -> foo.override.vim).
-    # Returns the override path if it exists on disk, else None.
     suffixed = f"{file_path}.override"
     if os.path.exists(suffixed):
         return suffixed
 
-    # re.sub leaves the string unchanged when the pattern doesn't match; the
-    # `!= file_path` guard stops us from returning the original file as its own
-    # "override" in that no-extension case (a latent bug in the Ruby original).
     before_extension = re.sub(r"(.*)(\..+)$", r"\1.override\2", file_path)
     if before_extension != file_path and os.path.exists(before_extension):
         return before_extension
@@ -135,19 +110,11 @@ def find_override(file_path):
 
 
 def merge(base_path, override_path):
-    """Apply a line-level override file onto a base file, in place.
-
-    The override is a small patch: a line `-<exact base line>` deletes that line
-    from the base; every other override line is appended.
-    """
     with open(base_path) as base_file:
         base_lines = base_file.readlines()
     with open(override_path) as override_file:
         override_lines = override_file.readlines()
 
-    # Your removal filter (kept as-is): drop base lines the override marks for
-    # deletion with a leading "-". Then append the override's own additions —
-    # every override line that ISN'T a "-" removal marker.
     kept = [line for line in base_lines if f"-{line}" not in override_lines]
     additions = [line for line in override_lines if not line.startswith("-")]
 
@@ -156,8 +123,6 @@ def merge(base_path, override_path):
 
 
 def write_link(link, file, command="source"):
-    # Idempotent append: skip if `link` is already referenced anywhere in the
-    # file (Ruby used `grep -q`; substring presence is the same intent).
     if os.path.exists(file):
         with open(file) as handle:
             if link in handle.read():
@@ -168,9 +133,6 @@ def write_link(link, file, command="source"):
 
 
 def add_link_with_override(link, file, command="source"):
-    # Ensure the target exists (create its parent dir + an empty file; never
-    # truncate an existing file), add the base link, then add its whole-file
-    # override if one exists.
     if not os.path.exists(file):
         os.makedirs(os.path.dirname(file), exist_ok=True)
         open(file, "w").close()
@@ -183,15 +145,12 @@ def add_link_with_override(link, file, command="source"):
 
 
 def force_symlink(source, target):
-    # `ln -sf`: drop any existing target (file or symlink, incl. broken), then
-    # create the symlink. Single source of truth for every ported `ln -sf`.
     if os.path.islink(target) or os.path.exists(target):
         os.remove(target)
     os.symlink(source, target)
 
 
 def git_short_hash():
-    # Current short commit hash of the dotfiles repo.
     return subprocess.run(
         ["git", "rev-parse", "--short", "HEAD"],
         cwd=DF_PATH, capture_output=True, text=True,
@@ -199,19 +158,14 @@ def git_short_hash():
 
 
 def update_dotfiles_repo():
-    # Fast-forward an existing checkout to the remote tip. git is an external
-    # tool → subprocess; cwd=DF_PATH per call replaces Ruby's `Dir.chdir` block,
-    # so the process's own working directory is never mutated.
     with Logger.log(f"Found existing dotfiles in {DF_PATH}, updating"):
         current_hash = git_short_hash()
 
-        # Pin the remote to the requested branch, if one is set.
         if DF_BRANCH:
             subprocess.run(
                 ["git", "remote", "set-branches", "origin", DF_BRANCH], cwd=DF_PATH
             )
 
-        # Fetch + hard-reset to the remote tip (output silenced, as in Ruby).
         subprocess.run(
             ["git", "fetch", "--depth=1"],
             cwd=DF_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
@@ -229,8 +183,6 @@ def update_dotfiles_repo():
 
 
 def clone_dotfiles_repo():
-    # Fresh shallow clone. The optional branch flag is a conditional list
-    # extension, not shell-string interpolation.
     Logger.log(f"Cloning repo from {DF_REPO} to {DF_PATH}")
     if DF_BRANCH:
         Logger.success(f"Switching to branch {DF_BRANCH}")
@@ -263,21 +215,14 @@ def update_zshrc_variant(variant):
     zshrc_path = f"{HOME}/.zshrc"
     source_line = f"{DF_PATH}/zsh/zshrc"
 
-    # Ruby's File.read raises if ~/.zshrc is absent; default to empty so a fresh
-    # box appends cleanly and the write below creates the file.
     zshrc = ""
     if os.path.exists(zshrc_path):
         with open(zshrc_path) as handle:
             zshrc = handle.read()
 
     if "DOTFILES_VARIANT" in zshrc:
-        # Already present: replace in place, preserving its position. `.` doesn't
-        # cross newlines, so `.*` stays line-bounded (matching Ruby's gsub!).
         zshrc = re.sub(r"export DOTFILES_VARIANT=.*", variant_export, zshrc)
     elif source_line in zshrc:
-        # Source line present: insert the export above it. re.MULTILINE makes ^
-        # match at each line start — Ruby's ^ is per-line by default, Python's
-        # is string-start-only without the flag.
         zshrc = re.sub(
             rf"^(.*{re.escape(source_line)}.*)",
             lambda match: f"{variant_export}\n{match.group(1)}",
@@ -285,7 +230,6 @@ def update_zshrc_variant(variant):
             flags=re.MULTILINE,
         )
     else:
-        # First install, source line not added yet: append (it follows later).
         zshrc += f"{variant_export}\n"
 
     with open(zshrc_path, "w") as handle:
@@ -293,10 +237,6 @@ def update_zshrc_variant(variant):
 
 
 def link_vim_plugins():
-    # Apply the optional base-vim plugins override, then ensure each
-    # `"pluginfile` marker in vim/plugins.vim is preceded by a source line for
-    # the base plugins file (the Ruby sed, done natively). $HOME stays literal —
-    # vim expands it when it sources the file.
     override = f"{DF_PATH}/vim/vim/plugins.override.vim"
     if os.path.exists(override):
         merge(f"{DF_PATH}/vim/vim/plugins.vim", override)
@@ -313,8 +253,6 @@ def link_vim_plugins():
 
 
 def vim_routine_context():
-    # The handful of names the vim install/uninstall routine files are allowed
-    # to depend on. Passed as the single `context` argument to their run().
     return SimpleNamespace(
         home=HOME,
         df_path=DF_PATH,
@@ -324,9 +262,6 @@ def vim_routine_context():
 
 
 def load_vim_routine(relative_path):
-    # Load a standalone routine file from the deployed repo and call run(context).
-    # Loaded by absolute path (not import) because setup.py is curl-piped and the
-    # routines live in the cloned repo — the Python analog of Ruby's `require`.
     routine_path = f"{DF_PATH}/{relative_path}"
     spec = importlib.util.spec_from_file_location("dotfiles_vim_routine", routine_path)
     if spec is None or spec.loader is None:
@@ -341,8 +276,6 @@ def setup_theme_and_colours():
 
     if DF_THEME:
         Logger.log(f"Using theme {DF_THEME}")
-    # set-theme writes the active theme files; like Ruby's backticks we ignore
-    # its exit status (best-effort, no raise).
     subprocess.run([f"{DF_PATH}/toolbox/scripts/set-theme"])
 
     add_link_with_override(f"{DF_PATH}/colours.vim", f"{HOME}/.vimrc")
@@ -351,8 +284,6 @@ def setup_theme_and_colours():
 
     local_plugins = f"{DF_LOCAL_PATH}/plugins.vim"
     if not os.path.exists(local_plugins):
-        # Seed a placeholder so the user has a known spot for personal plugins.
-        # Byte-identical to setup.rb: a commented example, no trailing newline.
         with open(local_plugins, "w") as plugins_file:
             plugins_file.write("\"Plug 'any/vim-plugin'")
 
@@ -386,7 +317,6 @@ def configure_bc():
     bc_config = f"{HOME}/.bc"
     if not os.path.exists(bc_config):
         Logger.log("Configuring bc")
-        # Default bc to 2 decimal places of precision.
         with open(bc_config, "w") as bc_file:
             bc_file.write("scale=2\n")
 
@@ -400,19 +330,6 @@ def configure_ruby():
 
 
 def resolve_modern_python():
-    """Return the path to a python >= 3.11 for the toolbox-include merge (it
-    needs `tomllib` to read the include list + validate each include's
-    `_info.toml`, unavailable on setup.py's low bootstrap floor).
-
-    Fast path: the running interpreter already qualifies — true on every current
-    Linux and modern macOS. Otherwise look for a modern python already on PATH.
-    Returns None if none is found, so the caller can soft-skip with guidance.
-
-    UNVERIFIED below the fast path: this box runs 3.11+, so the search/None
-    branches are reasoned, not exercised. The whole include feature is off the
-    fresh-install path (guarded by toolbox-include.toml), so a user reaching here
-    is not on a bare box and most likely already has a modern python.
-    """
     # `minimum` is a variable, not a literal, on purpose: pyright constant-folds
     # `sys.version_info >= (3, 11)` against the interpreter it runs under (modern),
     # then flags the search/None fallback as unreachable. The fallback is real on
@@ -428,8 +345,6 @@ def resolve_modern_python():
 
 
 def add_toolbox_includes():
-    # Off the fresh-install path: only users with a toolbox-include.toml are
-    # affected, so a bare box returns immediately and never needs modern python.
     include_list = f"{DF_LOCAL_PATH}/toolbox-include.toml"
     if not os.path.exists(include_list):
         return
@@ -442,10 +357,6 @@ def add_toolbox_includes():
                 "and re-run setup to finish linking includes."
             )
             return
-        # The helper needs tomllib to read the include list + validate each
-        # include's _info.toml, so it runs in a separate process under the modern
-        # interpreter — setup.py's own imports stay stdlib-only/low-floor. Exit 2
-        # = an include was soft-skipped (bad data).
         result = subprocess.run([modern_python, f"{DF_PATH}/toolbox/setup_includes.py"])
         if result.returncode != 0:
             Logger.error(
@@ -455,11 +366,7 @@ def add_toolbox_includes():
 
 
 def sync_vim_plugins(variant):
-    # TODO (Ruby carryover): part of vim setup. Can't rely on zsh aliases — the
-    # subprocess shell is sh and doesn't know them, so call the binary directly.
-    # stdin=DEVNULL on every editor call (port-time hardening, like the git
-    # calls): a headless editor must never block waiting on input. Ruby piped
-    # `echo |` into the coc/plug calls for the same reason.
+    # We can't rely on aliases since the subshell from ruby spawns a sh and has no idea about zsh aliases
     vim_binary = "nvim" if variant == "neovim" else "vim"
     if variant == "neovim":
         Logger.log("Installing and syncing neovim plugins")
@@ -489,13 +396,9 @@ def sync_vim_plugins(variant):
 
 
 def install_tmux_snapshot_scheduler():
-    # Periodic tmux snapshots: a LaunchAgent on macOS, a systemd user timer on
-    # Linux. The plist/units reference DF_PATH (= ~/.dotfiles), the installed
-    # clone — never the dev checkout.
     os.makedirs(f"{DF_LOCAL_PATH}/tmux-snapshot", exist_ok=True)
 
     if is_mac():
-        # UNVERIFIED on this Linux box — the launchd branch isn't exercised here.
         Logger.log("Installing tmux-snapshot LaunchAgent")
         launch_agents = f"{HOME}/Library/LaunchAgents"
         os.makedirs(launch_agents, exist_ok=True)
@@ -536,7 +439,6 @@ def install_tmux_snapshot_scheduler():
 
 def configure_tmux():
     with Logger.log("Configuring tmux"):
-        # TODO (Ruby carryover): move up into one linking block.
         if is_mac():
             Logger.log("Symlinking tmux variables for macOS")
             add_link_with_override(f"{DF_PATH}/tmux/vars.osx.conf", f"{HOME}/.tmux.conf")
@@ -611,7 +513,6 @@ def configure_i3():
 def configure_aerospace():
     if not is_mac():
         return
-    # UNVERIFIED on this Linux box — macOS-only.
     Logger.log("Configuring aerospace for macOS")
     force_symlink(f"{DF_PATH}/aerospace/config.toml", f"{HOME}/.aerospace.toml")
     with Logger.log("Ensuring macOS dependencies"):
@@ -626,8 +527,6 @@ def install_fzf():
         ["git", "clone", "--depth", "1", "https://github.com/junegunn/fzf.git", f"{HOME}/.fzf"],
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
     )
-    # If the clone failed (network/rate-limit), the installer won't exist — skip
-    # rather than crash the whole setup at its last step (Ruby swallowed both).
     if os.path.exists(f"{HOME}/.fzf/install"):
         subprocess.run(
             [f"{HOME}/.fzf/install", "--all"],
@@ -646,13 +545,10 @@ def install_docker_completion():
         "_docker-compose": "https://raw.githubusercontent.com/docker/compose/master/contrib/completion/zsh/_docker-compose",
     }
     for name, url in completions.items():
-        # `curl -L URL > file 2>/dev/null` → -o writes the file, stderr silenced.
         subprocess.run(["curl", "-L", "-o", f"{completion_dir}/{name}", url], stderr=subprocess.DEVNULL)
 
 
 def set_default_shell_to_zsh():
-    # Ruby read the login shell via `dscl`(mac) / `grep /etc/passwd`(linux); the
-    # stdlib `pwd` module returns it portably in one call. chsh only if needed.
     zsh_path = shutil.which("zsh")
     if zsh_path is None:
         Logger.error("zsh not found on PATH — skipping default-shell change.")
@@ -660,8 +556,6 @@ def set_default_shell_to_zsh():
     try:
         current_shell = pwd.getpwuid(os.getuid()).pw_shell
     except KeyError:
-        # Ephemeral/injected UID with no passwd entry (e.g. `docker run --user
-        # 99999`): Ruby's grep degraded to "" and continued — mirror that.
         current_shell = None
     if current_shell != zsh_path:
         with Logger.log("Setting default shell to zsh"):
@@ -675,7 +569,7 @@ def run_post_install_script():
         return
     with Logger.log("Running post install script"):
         # stdout=PIPE (not capture_output) so the script's stderr still reaches
-        # the terminal, matching Ruby's backticks (which captured only stdout).
+        # the terminal
         result = subprocess.run([script], stdout=subprocess.PIPE, text=True)
         for line in result.stdout.splitlines():  # splitlines drops the trailing empty
             Logger.log(line)
@@ -691,15 +585,10 @@ def install(variant=DF_VARIANT):
 
     sync_dotfiles_repo()
 
-    # Set the chosen variant in ~/.zshrc before the dotfiles source line.
     update_zshrc_variant(variant)
 
-    # Theme + colours + local plugins.vim must be linked before vim setup.
     setup_theme_and_colours()
 
-    # Grouped with the other ~/.zshrc linking. Sits before setup_vim, which only
-    # touches ~/.vimrc, so the .zshrc append order (colours.zsh -> zshrc ->
-    # toolbox/init.zsh) is unchanged.
     add_link_with_override(f"{DF_PATH}/zsh/zshrc", f"{HOME}/.zshrc")
 
     setup_vim(variant)
@@ -708,7 +597,6 @@ def install(variant=DF_VARIANT):
     configure_ruby()
 
     with Logger.log("Initializing toolbox"):
-        # TODO (Ruby carryover): only when in full mode?
         add_link_with_override(f"{DF_PATH}/toolbox/init.zsh", f"{HOME}/.zshrc")
         add_toolbox_includes()
 

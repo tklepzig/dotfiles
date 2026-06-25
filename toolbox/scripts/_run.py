@@ -7,7 +7,6 @@ from pathlib import Path
 HOME = os.environ["HOME"]
 SCRIPTS_PATH = Path(HOME) / ".dotfiles" / "toolbox" / "scripts"
 
-# Infra files that are not toolbox scripts, so they stay out of the listing.
 NON_SCRIPTS = {
     "_info.toml",
     "info.additional.toml",
@@ -40,8 +39,6 @@ if additional_path.exists():
     if additional:
         infos.update(additional)
 
-# Ruby's Dir.glob is sorted since 3.0; pathlib's glob is not, so sort explicitly.
-# Both skip dotfiles for a bare "*" pattern, matching Ruby.
 scripts = sorted(
     entry.name for entry in SCRIPTS_PATH.glob("*") if entry.name not in NON_SCRIPTS
 )
@@ -50,7 +47,6 @@ argv = sys.argv[1:]
 
 
 def script_info(name):
-    """The metadata dict for a script name, or None if absent/not a table."""
     info = infos.get(name)
     return info if isinstance(info, dict) else None
 
@@ -95,15 +91,15 @@ if argv and argv[0] == "help":
         parts = []
         for arg in info["args"]:
             default_value = arg.get("default")
-            # Ruby treats only nil/false as falsy, so a default of 0 would still
-            # render. Gate on identity, not bare truthiness, to stay faithful.
             default = (
                 f" = {default_value}"
                 if default_value is not None and default_value is not False
                 else ""
             )
             parts.append(
-                f"[{arg['name']}{default}]" if arg.get("optional") else f"<{arg['name']}>"
+                f"[{arg['name']}{default}]"
+                if arg.get("optional")
+                else f"<{arg['name']}>"
             )
         args_help = " ".join(parts)
     print(f"Usage: {script_name} {args_help}")
@@ -129,7 +125,7 @@ if info is not None and "args" in info:
 
     if len(cmd_args) < len(mandatory_args):
         print("Error: Missing args:")
-        missing = [arg["name"] for arg in mandatory_args][len(cmd_args):]
+        missing = [arg["name"] for arg in mandatory_args][len(cmd_args) :]
         print("\n".join(missing))
         sys.exit(1)
 

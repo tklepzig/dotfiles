@@ -1,17 +1,11 @@
 #!/usr/bin/env python3
-"""Neovim install routine — loaded by setup.py via load_vim_routine.
-
-Edit freely to change what the neovim install does. Entry point is
-`run(context)`; `context` provides `.home`, `.df_path`, and
-`.check_optional_installation`.
-"""
 import os
 
 
 def run(context):
     home = context.home
     df_path = context.df_path
-    link = context.force_symlink  # shared `ln -sf` helper from setup.py
+    link = context.force_symlink
 
     context.check_optional_installation("rg", "ripgrep")
     context.check_optional_installation("ranger")
