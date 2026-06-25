@@ -1,0 +1,28 @@
+#!/usr/bin/env zsh
+
+modes_dir="$HOME/.dotfiles-local/tmux-modes"
+persisted_vars=(statusMode sessionListMode windowMode)
+
+command="$1"
+
+case "$command" in
+    save)
+        var="$2"
+        value="$(tmux showenv -g "$var" 2>/dev/null | cut -d= -f2-)"
+        [[ -z "$value" ]] && exit 0
+        mkdir -p "$modes_dir"
+        echo "$value" > "$modes_dir/$var"
+        ;;
+    load)
+        for var in "${persisted_vars[@]}"
+        do
+            file="$modes_dir/$var"
+            [[ -r "$file" ]] || continue
+            tmux setenv -g "$var" "$(cat "$file")"
+        done
+        ;;
+    *)
+        echo "usage: persist-mode save <var> | load" >&2
+        exit 1
+        ;;
+esac
