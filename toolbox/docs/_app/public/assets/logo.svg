@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Toolbox icon, full-bleed (purpose: any). Dark plate + green hex nut filling
+       the canvas. The masked variant lives in logo-maskable.svg (scaled to 0.70
+       so Android's adaptive crop can't shave the hex corners). -->
+  <rect width="100" height="100" fill="#15160e"/>
+  <path fill="#99cc66" fill-rule="evenodd"
+    d="M95 50 L72.5 89 L27.5 89 L5 50 L27.5 11 L72.5 11 Z
+       M27 50 a23 23 0 1 0 46 0 a23 23 0 1 0 -46 0 Z"/>
+</svg>

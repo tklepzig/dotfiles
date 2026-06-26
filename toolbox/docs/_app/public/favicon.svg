@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Toolbox favicon: green hex nut, transparent background + transparent bore
+       so it sits cleanly on any browser-tab colour. -->
+  <path fill="#99cc66" fill-rule="evenodd"
+    d="M94 50 L72 88.1 L28 88.1 L6 50 L28 11.9 L72 11.9 Z
+       M27 50 a23 23 0 1 0 46 0 a23 23 0 1 0 -46 0 Z"/>
+</svg>

@@ -1,4 +1,4 @@
-const CACHE_NAME = "docs-cache-2026-01-02";
+const CACHE_NAME = "docs-cache-2026-06-26f";
 const baseCache = [
   "/",
   "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs",
@@ -8,15 +8,42 @@ const baseCache = [
   "/theme.js",
   "/manifest.json",
   "/favicon.ico",
+  "/favicon.svg",
+  "/favicon-32.png",
+  "/apple-touch-icon.png",
 ];
 
-const docsCache = ["/ai", "/android", "/anti-scam", "/arch-linux", "/asdf", "/bc", "/blender", "/cec", "/chat-gpt", "/colors", "/communication", "/cron", "/cvlc", "/docker", "/engineering-drawing", "/ffmpeg", "/francais", "/fs", "/git", "/github", "/gnome", "/gpg", "/i3", "/ip", "/js-snippets", "/keychron", "/kitty", "/latex", "/Linux", "/luks", "/macos", "/make", "/Manjaro", "/markdown", "/minidlna", "/neovim", "/npm", "/pacman", "/pulseaudio", "/python", "/ranger", "/raspberrypi-os", "/redshift", "/ruby", "/sailing", "/smart", "/ssh", "/systemd", "/tmux", "/vim", "/voice-prep", "/wemux", "/zsh"];
+const docsCache = [];
 
 self.addEventListener("install", function (event) {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(function (cache) {
       return cache.addAll([...baseCache, ...docsCache]);
     }),
+  );
+});
+
+// Drop stale caches so a new icon/asset isn't pinned by an old cache name, then
+// take control of open clients immediately (matches the install skipWaiting).
+self.addEventListener("activate", function (event) {
+  event.waitUntil(
+    caches
+      .keys()
+      .then(function (cacheNames) {
+        return Promise.all(
+          cacheNames
+            .filter(function (cacheName) {
+              return cacheName !== CACHE_NAME;
+            })
+            .map(function (cacheName) {
+              return caches.delete(cacheName);
+            }),
+        );
+      })
+      .then(function () {
+        return self.clients.claim();
+      }),
   );
 });
 
