@@ -185,6 +185,7 @@ FREESPACE_STATE='' FREESPACE_VALUE=''
 WIFI_STATE=''     WIFI_VALUE=''
 NETWORK_LABEL=''
 MEDIA_STATE=''    MEDIA_TITLE=''
+CPUTEMP_STATE=''  CPUTEMP_VALUE=''
 
 read_widget_data() {
     BATTERY_STATE=''; BATTERY_VALUE=''
@@ -199,6 +200,14 @@ read_widget_data() {
     fout=$("$HOME/.dotfiles/tmux/free-space.zsh" 2>/dev/null)
     FREESPACE_STATE=$(sed -n 1p <<< "$fout")
     FREESPACE_VALUE=$(sed -n 2p <<< "$fout")
+
+    CPUTEMP_STATE=''; CPUTEMP_VALUE=''
+    if [[ -f "$HOME/.dotfiles/tmux/cpu-temp.$OS.zsh" ]]; then
+        local tout
+        tout=$("$HOME/.dotfiles/tmux/cpu-temp.$OS.zsh" 2>/dev/null)
+        CPUTEMP_STATE=$(sed -n 1p <<< "$tout")
+        CPUTEMP_VALUE=$(sed -n 2p <<< "$tout")
+    fi
 
     WIFI_STATE=''; WIFI_VALUE=''
     if [[ -f "$HOME/.dotfiles/tmux/wifi-signal.$OS.zsh" ]]; then
@@ -284,6 +293,14 @@ battery_value_color() {
 
 freespace_value_color() {
     case "$FREESPACE_STATE" in
+        critical) echo "$critical_color" ;;
+        warning)  echo "$warning_color" ;;
+        *)        echo "$value_color" ;;
+    esac
+}
+
+cputemp_value_color() {
+    case "$CPUTEMP_STATE" in
         critical) echo "$critical_color" ;;
         warning)  echo "$warning_color" ;;
         *)        echo "$value_color" ;;
@@ -536,6 +553,9 @@ render() {
     system_lines=()
     if [[ -n "$FREESPACE_VALUE" ]]; then
         system_lines+=("$(ansi $label_color)Disk $(reset)$(ansi $(freespace_value_color))${FREESPACE_VALUE}$(reset)")
+    fi
+    if [[ -n "$CPUTEMP_VALUE" ]]; then
+        system_lines+=("$(ansi $label_color)CPU $(reset)$(ansi $(cputemp_value_color))${CPUTEMP_VALUE}°C$(reset)")
     fi
     if [[ -n "$WIFI_STATE" ]]; then
         wifi_extra=''
