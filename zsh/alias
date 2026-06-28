@@ -34,8 +34,6 @@ alias ta='tmux a'
 alias dotfiles-update='/usr/bin/env python3 -c "$(curl -Ls https://raw.githubusercontent.com/$dotfilesRepo/$dotfilesBranch/setup.py)"'
 alias dfu='dotfiles-update'
 
-alias notify="$dotfilesDir/notify.rb"
-alias battery-monitor="$dotfilesDir/battery-monitor.rb"
 if isOS linux
 then
     alias n='nautilus .'

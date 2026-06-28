@@ -1,13 +1,17 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require "#{ENV['dotfiles_path']}/setup"
+DF_LOCAL_PATH = "#{ENV['HOME']}/.dotfiles-local".freeze
 
-player = if OS.mac?
-           'afplay -v 0.2'
-         else
-           'aplay'
-         end
+def mac?
+  (/darwin/ =~ RUBY_PLATFORM) != nil
+end
+
+def program_installed?(program)
+  system("command -v #{program} > /dev/null 2>&1")
+end
+
+player = mac? ? 'afplay -v 0.2' : 'aplay'
 exit(false) unless program_installed? player.split(/\s/).first
 
 sound_path = "#{DF_LOCAL_PATH}/sounds/notify.wav"
