@@ -42,11 +42,18 @@ Usage: ffmpeg-extract-frames <input> <output-dir> [--fps 1|source_fps] [--start 
 completion = ["--fps", "--start", "--end", "--accurate"]
 
 [generate-password]
-help = "Generate a random password, using letters, numbers and special chars"
+help = "Generate a strong random password — letters, digits & punctuation, ~6.44 bits/char (default 20 ≈ 129 bits). Need a URL-safe value? use generate-token."
 [[generate-password.args]]
 name = "length"
 optional = true
-default = 16
+default = 20
+
+[generate-token]
+help = "Generate a URL-safe random token — base64url charset, 6.0 bits/char (default 22 ≈ 132 bits). Safe in a URL path, no encoding. For a password use generate-password."
+[[generate-token.args]]
+name = "length"
+optional = true
+default = 22
 
 [git-branch-diff]
 help = "List branches and preview/view their diff against the default branch (main/master)"
