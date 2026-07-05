@@ -33,6 +33,8 @@ source $dotfilesDir/zsh/alias
 
 # Add completions from .zsh/completion and dotfiles
 fpath=($HOME/.zsh/completion $dotfilesDir/zsh/completion $fpath)
+# ava ships its own completion in-repo so it syncs across machines
+[[ -d "$HOME/ava/completions" ]] && fpath=($HOME/ava/completions $fpath)
 
 autoload -Uz colors compinit promptinit edit-command-line vcs_info
 colors

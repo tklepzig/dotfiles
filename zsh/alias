@@ -172,6 +172,8 @@ alias clr="claude --resume"
 alias clrs="claude --resume --model sonnet"
 alias clro="claude --resume --model opus"
 
+[[ -x "$HOME/ava/bin/ava" ]] && alias ava="$HOME/ava/bin/ava"
+
 devpad-hdmi() {
     # --auto disableds the output if disconnected but mode would be invalid, so call it twice
     xrandr --output HDMI-2 --auto &>/dev/null
