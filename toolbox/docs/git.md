@@ -6,6 +6,7 @@
 * [Change base branch](#change-base-branch)
 * [Interactive Rebase and preserve merge commits](#interactive-rebase-and-preserve-merge-commits)
 * [Push existing branch of old repo into new created repo](#push-existing-branch-of-old-repo-into-new-created-repo)
+* [Mirror one repo to multiple remotes (GitHub + n)](#mirror-one-repo-to-multiple-remotes-github--n)
 * [Ignore files/dirs when doing git log](#ignore-filesdirs-when-doing-git-log)
 * [Find reason why a file is gitignored](#find-reason-why-a-file-is-gitignored)
 
@@ -54,6 +55,30 @@ https://git-scm.com/docs/git-rebase#Documentation/git-rebase.txt---rebase-merges
 > When there should be no history at all, create a orphaned branch in the
 > old-repo, see
 > https://git-scm.com/docs/git-checkout#Documentation/git-checkout.txt---orphanltnew-branchgt
+
+## Mirror one repo to multiple remotes (GitHub + n)
+
+Keep `origin` fetching from GitHub, but make a single `git push` fan out to all
+hosts. Create the empty repos on any other providers first and add an SSH key to
+each host — SSH push does not auto-create the repo.
+
+Gotcha: the moment you add the first `pushurl`, the fetch URL stops being an
+implicit push target — so re-add GitHub as a pushurl explicitly.
+
+    git remote set-url --add --push origin git@github.com:USER/REPO.git
+    git remote set-url --add --push origin git@another-one.com:USER/REPO.git
+
+Optional: separate named remotes if you ever want to fetch from a mirror.
+
+    git remote add another-one git@another-one.com:USER/REPO.git
+
+Then push (goes to all three at once):
+
+    git push origin master
+
+Inspect the result:
+
+    git config --get-regexp '^remote\.'
 
 ## Ignore files/dirs when doing git log
 
