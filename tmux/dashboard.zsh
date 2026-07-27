@@ -96,7 +96,7 @@ kmh_to_knots() {
     printf '%.0f' "$(( kmh * 0.539957 ))"
 }
 
-# Returns "code|tempC|feelsC|humidity|windKmh" from j1, or empty.
+# Returns "code|tempC|feelsC|humidity|windKmh|windDir" from j1, or empty.
 read_weather_current() {
     [[ ! -f "$forecast_cache" ]] && return
     local json
@@ -109,12 +109,13 @@ read_weather_current() {
             (.temp_C // "?") + "|" +
             (.FeelsLikeC // "?") + "|" +
             (.humidity // "?") + "|" +
-            (.windspeedKmph // "0")
+            (.windspeedKmph // "0") + "|" +
+            (.winddir16Point // "?")
         end
     ' <<< "$json" 2>/dev/null
 }
 
-# Returns up to 3 lines: "date|max|min|code|rain%|wind_kmh"
+# Returns up to 3 lines: "date|max|min|code|rain%|wind_kmh|windDir"
 # All values come from the midday hourly slice (.hourly[4]) — best representative
 # of the day's daytime conditions.
 read_forecast() {
@@ -129,7 +130,8 @@ read_forecast() {
             (.mintempC) + "|" +
             (.hourly[4].weatherCode // .hourly[0].weatherCode // "113") + "|" +
             (.hourly[4].chanceofrain // "0") + "|" +
-            (.hourly[4].windspeedKmph // "0")
+            (.hourly[4].windspeedKmph // "0") + "|" +
+            (.hourly[4].winddir16Point // "?")
         ) | .[]
     ' <<< "$json" 2>/dev/null
 }
@@ -449,8 +451,8 @@ render() {
     # `local` appears inside a loop body followed by an assignment.
     local terminal_width terminal_height clock_left top mode
     local date_str date_colored current rest line wline fl clear_prefix
-    local cur_code cur_temp cur_feels cur_humidity cur_wind cur_icon knots
-    local date_part max_part min_part code_part rain_part wind_part icon day_label
+    local cur_code cur_temp cur_feels cur_humidity cur_wind cur_wind_dir cur_icon knots
+    local date_part max_part min_part code_part rain_part wind_part wind_dir_part icon day_label
     local wifi_extra top_cell bot_cell forecast_top_line forecast_bot_line
     local media_title media_line
     local -i media_budget
@@ -494,17 +496,18 @@ render() {
         cur_code="${current%%|*}";  rest="${current#*|}"
         cur_temp="${rest%%|*}";     rest="${rest#*|}"
         cur_feels="${rest%%|*}";    rest="${rest#*|}"
-        cur_humidity="${rest%%|*}"; cur_wind="${rest#*|}"
+        cur_humidity="${rest%%|*}"; rest="${rest#*|}"
+        cur_wind="${rest%%|*}";     cur_wind_dir="${rest#*|}"
         cur_icon=$(emoji_for_code "$cur_code")
         knots=$(kmh_to_knots "$cur_wind")
         weather_lines+=("${cur_icon}$(ansi $(temp_color $cur_temp))${cur_temp}°C$(reset)")
         weather_lines+=("$(ansi $value_color)💧 ${cur_humidity}%$(reset)")
-        weather_lines+=("$(ansi $value_color)💨 ${cur_wind} km/h (${knots} kn)$(reset)")
+        weather_lines+=("$(ansi $value_color)💨 ${knots} kn (${cur_wind_dir})$(reset)")
     fi
 
     # ── Forecast: two stacked lines per day ───────────────────────────────
     # Top:    "Day  icon  max°/min°"
-    # Bottom: "💧 rain%  💨 wind km/h"
+    # Bottom: "💧 rain%  💨 wind_kn dir"
     # Each day becomes a fixed-width cell (the wider of its two lines) so the
     # rain/wind line sits directly under the matching day card.
     forecast_top=(); forecast_bot=(); forecast_cw=()
@@ -514,14 +517,15 @@ render() {
         max_part="${rest%%|*}";  rest="${rest#*|}"
         min_part="${rest%%|*}";  rest="${rest#*|}"
         code_part="${rest%%|*}"; rest="${rest#*|}"
-        rain_part="${rest%%|*}"; wind_part="${rest#*|}"
+        rain_part="${rest%%|*}"; rest="${rest#*|}"
+        wind_part="${rest%%|*}"; wind_dir_part="${rest#*|}"
         icon=$(emoji_for_code "$code_part")
         day_label=$(date -j -f "%Y-%m-%d" "$date_part" "+%a" 2>/dev/null \
             || date -d "$date_part" "+%a" 2>/dev/null \
             || echo "$date_part")
         knots=$(kmh_to_knots "$wind_part")
         top_cell="$(ansi $forecast_color)${day_label}$(reset) ${icon}$(ansi $(temp_color $max_part))${max_part}°$(reset)$(ansi $forecast_color)/$(reset)$(ansi $(temp_color $min_part))${min_part}°$(reset)"
-        bot_cell="$(ansi $value_color)💧 ${rain_part}%  💨 ${wind_part} km/h (${knots} kn)$(reset)"
+        bot_cell="$(ansi $value_color)💧 ${rain_part}%  💨 ${knots} kn (${wind_dir_part})$(reset)"
         top_w=$(disp_width "$top_cell")
         bot_w=$(disp_width "$bot_cell")
         forecast_top+=("$top_cell")
