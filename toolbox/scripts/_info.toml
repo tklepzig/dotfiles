@@ -28,7 +28,10 @@ For the GPG key ID, you can obtain it by running:
 
 Ensure the necessary filetypes are correctly configured in .gitattributes for your desired files:
   # encrypt markdown files
-  *.md filter=encrypt'''
+  *.md filter=encrypt diff=encrypt
+  # binary files need -text to block EOL normalization
+  # (not `binary` — that implies -diff and kills diff=encrypt)
+  *.png filter=encrypt diff=encrypt -text'''
 [[encrypt-clone.args]]
 name = "URL to repository"
 [[encrypt-clone.args]]

@@ -10,6 +10,10 @@ git config diff.encrypt.cachetextconv true
 git checkout
 if [ ! -f .gitattributes ]
 then
-	echo "*.md filter=encrypt diff=encrypt" > .gitattributes
+	cat > .gitattributes <<-'EOF'
+	*.md filter=encrypt diff=encrypt
+	# binary files need -text (not `binary` — it implies -diff, killing diff=encrypt), e.g.:
+	# *.png filter=encrypt diff=encrypt -text
+	EOF
 fi
 

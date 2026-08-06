@@ -1,9 +1,17 @@
 #!/usr/bin/env zsh
+# Binary-safe: buffer to temp file, never through shell variables/echo
+set -e -o pipefail
 
-stdin=$(cat -)
-if [[ $(echo $stdin | sed -n '/BEGIN PGP MESSAGE/p;q') ]]
+# prefer XDG_RUNTIME_DIR (tmpfs, mode 700) so plaintext never hits persistent storage
+buffer_file=$(mktemp -p "${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}")
+# signals listed too — zsh skips the EXIT trap on untrapped signals
+trap 'rm -f "$buffer_file"' EXIT INT TERM HUP
+cat - > "$buffer_file"
+
+# anchored at byte 0 (27 = header length) — a mere mention further in must still be encrypted
+if [[ "$(head -c 27 "$buffer_file")" == '-----BEGIN PGP MESSAGE-----' ]]
 then
-  echo $stdin
+  cat "$buffer_file"
 else
-  echo $stdin | gpg --encrypt --armor -r "$1" 
+  gpg --encrypt --armor -r "$1" < "$buffer_file"
 fi
