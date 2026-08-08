@@ -1,0 +1,15 @@
+#!/usr/bin/env zsh
+
+sensor="$HOME/.dotfiles/tmux/cpu-temp.linux.zsh"
+[[ -f "$sensor" ]] || exit 0
+
+{
+    read -r state
+    read -r value
+} <<< "$(source $sensor)"
+
+[[ "$state" = "critical" ]] || exit 0
+
+dunstify -i dialog-warning-symbolic -h string:x-dunst-stack-tag:tkdf-cputemp-critical -u critical "CPU temperature critical" "CPU is at $value°C"
+
+echo "<span background='#b92500' color='white' weight='bold'> $value°C </span>"
