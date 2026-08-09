@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
-default_branch=$(git rev-parse --verify --quiet refs/heads/master > /dev/null && echo master || echo main)
-export GIT_BRANCH_DIFF_BASE="$default_branch"
+# exported: fzf runs the preview in a subshell
+export GIT_BRANCH_DIFF_BASE=$(git rev-parse --verify --quiet refs/heads/master > /dev/null && echo master || echo main)
 
 selected_branch=$(
   git branch --format='%(refname:short)' \
@@ -10,18 +10,17 @@ selected_branch=$(
         --ansi \
         --prompt="branch> " \
         --preview='
-          branch={}
-          merge_base=$(git merge-base "$branch" "$GIT_BRANCH_DIFF_BASE")
-          git log --color=always --format="%C(auto)%h %C(green)%cd%C(reset) %s" --date=short "${merge_base}..${branch}"
+          # log takes two dots; three would be the symmetric difference and pull in base commits
+          git log --color=always --format="%C(auto)%h %C(green)%cd%C(reset) %s" --date=short "${GIT_BRANCH_DIFF_BASE}..{}"
           echo
-          git diff --numstat "${merge_base}..${branch}" | awk '"'"'BEGIN{green="\033[32m"; red="\033[31m"; reset="\033[0m"} {printf "%s+%s%s %s-%s%s  %s\n", green, $1, reset, red, $2, reset, $3}'"'"'
+          git diff --numstat "${GIT_BRANCH_DIFF_BASE}...{}" | awk '"'"'BEGIN{green="\033[32m"; red="\033[31m"; reset="\033[0m"} {printf "%s+%s%s %s-%s%s  %s\n", green, $1, reset, red, $2, reset, $3}'"'"'
           echo
-          git diff "${merge_base}..${branch}" | delta --side-by-side --width="$FZF_PREVIEW_COLUMNS"
+          # explicit width: delta cannot detect the fzf preview pane
+          git diff "${GIT_BRANCH_DIFF_BASE}...{}" | delta --width="$FZF_PREVIEW_COLUMNS"
         ' \
         --preview-window=right:80%
 )
 
 [[ -z "$selected_branch" ]] && exit 0
 
-merge_base=$(git merge-base "$selected_branch" "$GIT_BRANCH_DIFF_BASE")
-git diff "$merge_base".."$selected_branch" | delta --side-by-side --width="$(tput cols)" | less -R
+git diff "${GIT_BRANCH_DIFF_BASE}...${selected_branch}"
