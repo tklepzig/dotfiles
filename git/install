@@ -55,6 +55,8 @@ git config --global alias.d "diff"
 git config --global alias.ds "diff --staged"
 git config --global alias.di "-c delta.features=inline diff"
 git config --global alias.dsi "-c delta.features=inline diff --staged"
+git config --global alias.db "!f() { $setDefaultBranch; git diff \$defaultBranch...HEAD; }; f"
+git config --global alias.dbi "!f() { $setDefaultBranch; git -c delta.features=inline diff \$defaultBranch...HEAD; }; f"
 
 git config --global alias.l "$withLess log --graph --date=human --format='$logFormat' --all"
 git config --global alias.ln "$withLess log --graph --date=human --format='$logFormat' --name-status --all"
