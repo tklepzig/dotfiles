@@ -103,7 +103,24 @@ fi
 # any path containing a space. Paired with --no-renames (the "{old => new}" form is
 # not a valid pathspec) and quotePath=false (else non-ASCII arrives as
 # "\303\274ni.txt"); all three are needed or the selected file diffs to nothing.
-export numstatFormat='BEGIN{FS="\t"; green="\033[32m"; red="\033[31m"; reset="\033[0m"} {printf "%s+%s%s %s-%s%s\t%s\n", green, $1, reset, red, $2, reset, $3}'
+# Buffered to END so the counts can be right-aligned to the widest in this diff:
+# a ragged counts column pushes the separating tab onto different tab stops, which
+# is what made the paths jump around. The trailing space before \t plus fzf's
+# --tabstop=1 pins the gap at exactly two columns -- the default tabstop of 8 threw
+# away eight columns of path.
+export numstatFormat='
+  BEGIN{FS="\t"; green="\033[32m"; red="\033[31m"; reset="\033[0m"}
+  {
+    adds[NR]=$1; dels[NR]=$2; path[NR]=$3
+    if (length($1) > aw) aw = length($1)
+    if (length($2) > dw) dw = length($2)
+  }
+  END{
+    for (i = 1; i <= NR; i++)
+      printf "%*s%s+%s%s %*s%s-%s%s \t%s\n",
+        aw - length(adds[i]), "", green, adds[i], reset,
+        dw - length(dels[i]), "", red, dels[i], reset, path[i]
+  }'
 
 branchQuery=""
 
@@ -116,6 +133,7 @@ do
         | grep -v "^${GIT_BRANCH_DIFF_BASE}$" \
         | fzf \
             --ansi \
+            --tabstop=1 \
             --prompt="branch> " \
             --print-query \
             --expect=ctrl-v \
@@ -163,6 +181,7 @@ do
         | awk "$numstatFormat" \
         | fzf \
             --ansi \
+            --tabstop=1 \
             --prompt="${selectedBranch}> " \
             --delimiter=$'\t' \
             --nth=2 \
