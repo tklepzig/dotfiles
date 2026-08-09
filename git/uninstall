@@ -19,7 +19,8 @@ git config --global --unset diff.colorMoved
 git config --global --unset merge.conflictstyle
 git config --global --unset interactive.diffFilter
 git config --global --unset delta.navigate
-git config --global --unset delta.side-by-side
+git config --global --unset delta.features
+git config --global --unset include.path
 git config --global --unset delta.line-numbers
 
 git config --global --remove-section alias

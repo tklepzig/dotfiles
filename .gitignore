@@ -1,6 +1,7 @@
 colours.zsh
 colours.tmux.conf
 colours.vim
+delta.theme.gitconfig
 .claude/settings.local.json
 __pycache__/
 toolbox/scripts/info.d/

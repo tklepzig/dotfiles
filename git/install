@@ -28,8 +28,16 @@ git config --global diff.colorMoved default
 git config --global merge.conflictstyle diff3
 git config --global interactive.diffFilter "delta --color-only"
 git config --global delta.navigate true
-git config --global delta.side-by-side true
 git config --global delta.line-numbers true
+# side-by-side lives in a feature, not the main [delta] section: the main section
+# outranks features, so a top-level `side-by-side = true` could never be switched
+# off. `DELTA_FEATURES=<name>` without a leading + *replaces* this list, so any
+# undefined name (we use "inline") drops side-by-side and yields the unified view.
+git config --global delta.features side-by-side
+
+# Diff colours are theme-dependent (dark vs light), so they live in a generated
+# file that set-theme rewrites; delta's defaults are near-black and unreadable.
+git config --global include.path '~/.dotfiles/delta.theme.gitconfig'
 
 setDefaultBranch="defaultBranch=\$(git rev-parse --verify --quiet refs/heads/master > /dev/null && echo master || echo main)"
 
