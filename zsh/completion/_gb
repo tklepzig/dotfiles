@@ -1,0 +1,16 @@
+#compdef gb
+
+_gb() {
+  # exactly one argument is accepted: either -a/--all or a branch, never both
+  (( CURRENT == 2 )) || return
+
+  local -a options branches
+  options=( ${(f)"$($dotfilesDir/toolbox/scripts/_run.py --completion git-branch-diff)"} )
+  # local refs only: the picker lists those, and a remote ref has no local branch to diff
+  branches=( ${(f)"$(git for-each-ref --format='%(refname:strip=2)' refs/heads/ 2>/dev/null)"} )
+
+  _describe -t options 'options' options
+  _describe -t branches 'branches' branches
+}
+
+_gb

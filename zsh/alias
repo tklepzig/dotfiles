@@ -59,6 +59,9 @@ fi
 
 alias git='LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 git'
 alias g='git'
+
+gb() { $dotfilesDir/toolbox/scripts/git-branch-diff "$@" }
+
 gcln() { source $HOME/.dotfiles/toolbox/scripts/git-clone-cd $1 }
 
 # k — git worktree helper (delegates to git-worktree-list Ruby script)
