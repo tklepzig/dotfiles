@@ -1,15 +1,34 @@
 #!/usr/bin/env zsh
+#
+# Short spikes past 90°C are normal; only alert once it stays there.
+# i3blocks polls every 5s → 3 ticks ≈ 15s sustained.
 
 sensor="$HOME/.dotfiles/tmux/cpu-temp.linux.zsh"
 [[ -f "$sensor" ]] || exit 0
+
+required_ticks=3
+tick_file="${XDG_RUNTIME_DIR:-/tmp}/tkdf-cputemp.ticks"
 
 {
     read -r state
     read -r value
 } <<< "$(source $sensor)"
 
-[[ "$state" = "critical" ]] || exit 0
+if [[ "$state" != "critical" ]]; then
+    rm -f "$tick_file"
+    exit 0
+fi
 
-dunstify -i dialog-warning-symbolic -h string:x-dunst-stack-tag:tkdf-cputemp-critical -u critical "CPU temperature critical" "CPU is at $value°C"
+ticks=0
+[[ -r "$tick_file" ]] && ticks=$(<"$tick_file")
+(( ticks++ ))
+print -r -- "$ticks" > "$tick_file"
+
+(( ticks >= required_ticks )) || exit 0
+
+# Rising edge only — don't re-popup every tick while it stays hot.
+if (( ticks == required_ticks )); then
+    dunstify -i dialog-warning-symbolic -h string:x-dunst-stack-tag:tkdf-cputemp-critical -u critical "CPU temperature critical" "CPU is at $value°C"
+fi
 
 echo "<span background='#b92500' color='white' weight='bold'> $value°C </span>"
