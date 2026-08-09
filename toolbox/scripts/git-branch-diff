@@ -1,26 +1,197 @@
 #!/usr/bin/env zsh
 
-# exported: fzf runs the preview in a subshell
+# Three nested screens: branches -> files -> diff.
+# esc backs out one level (quits from the branch list), q leaves the pager.
+
+if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1
+then
+  print -u2 "not inside a git work tree"
+  exit 1
+fi
+
+# exported: fzf runs previews in a subshell
 export GIT_BRANCH_DIFF_BASE=$(git rev-parse --verify --quiet refs/heads/master > /dev/null && echo master || echo main)
 
-selected_branch=$(
-  git branch --format='%(refname:short)' \
-    | grep -v "^${GIT_BRANCH_DIFF_BASE}$" \
-    | fzf \
-        --ansi \
-        --prompt="branch> " \
-        --preview='
-          # log takes two dots; three would be the symmetric difference and pull in base commits
-          git log --color=always --format="%C(auto)%h %C(green)%cd%C(reset) %s" --date=short "${GIT_BRANCH_DIFF_BASE}..{}"
-          echo
-          git diff --numstat "${GIT_BRANCH_DIFF_BASE}...{}" | awk '"'"'BEGIN{green="\033[32m"; red="\033[31m"; reset="\033[0m"} {printf "%s+%s%s %s-%s%s  %s\n", green, $1, reset, red, $2, reset, $3}'"'"'
-          echo
-          # explicit width: delta cannot detect the fzf preview pane
-          git diff "${GIT_BRANCH_DIFF_BASE}...{}" | delta --width="$FZF_PREVIEW_COLUMNS"
-        ' \
-        --preview-window=right:80%
-)
+# the fallback above assumes main when master is absent; without either, every range
+# would be invalid and the screens would just come up empty with no explanation
+if ! git rev-parse --verify --quiet "refs/heads/$GIT_BRANCH_DIFF_BASE" > /dev/null
+then
+  print -u2 "no master or main branch to diff against"
+  exit 1
+fi
 
-[[ -z "$selected_branch" ]] && exit 0
+# delta reads DELTA_FEATURES from the environment. Any name not in delta.features
+# replaces the configured list (side-by-side), leaving the unified view; a leading
+# + would merely add, and an empty value counts as unset.
+viewMode=side
 
-git diff "${GIT_BRANCH_DIFF_BASE}...${selected_branch}"
+applyViewMode() {
+  if [[ $viewMode == inline ]]
+  then
+    export DELTA_FEATURES=inline
+  else
+    unset DELTA_FEATURES
+  fi
+}
+
+# fzf cannot assign to the parent shell, so ctrl-v aborts and we relaunch with the
+# mode flipped -- which also carries it into the pager without extra plumbing
+toggleViewMode() {
+  if [[ $viewMode == inline ]]
+  then
+    viewMode=side
+  else
+    viewMode=inline
+  fi
+  applyViewMode
+}
+
+applyViewMode
+
+startAtPicker=false
+branchArg=""
+
+while [[ $# -gt 0 ]]
+do
+  case $1 in
+    -a|--all)
+      startAtPicker=true
+      ;;
+    -*)
+      print -u2 "unknown option: $1"
+      exit 1
+      ;;
+    *)
+      # reject rather than silently keeping the last: discarding an argument the
+      # user explicitly typed is worse than telling them
+      if [[ -n $branchArg ]]
+      then
+        print -u2 "only one branch may be given"
+        exit 1
+      fi
+      branchArg=$1
+      ;;
+  esac
+  shift
+done
+
+if [[ $startAtPicker == true && -n $branchArg ]]
+then
+  # -- : the message starts with a dash, which print would otherwise read as a flag
+  print -u2 -- "--all cannot be combined with a branch"
+  exit 1
+fi
+
+# Default to the current branch so the common case needs no argument; esc out of
+# the file list clears this and falls through to the picker, which is the same
+# back-navigation that already existed.
+selectedBranch=""
+if [[ $startAtPicker == false ]]
+then
+  selectedBranch=${branchArg:-$(git rev-parse --abbrev-ref HEAD)}
+  # nothing to diff when detached (reports "HEAD") or already on the base branch;
+  # an unknown argument would only produce an empty file list
+  if [[ $selectedBranch == HEAD || $selectedBranch == $GIT_BRANCH_DIFF_BASE ]] \
+    || ! git rev-parse --verify --quiet "$selectedBranch" > /dev/null
+  then
+    selectedBranch=""
+  fi
+fi
+
+# FS="\t" lives inside the program rather than as -F so previews can reuse this
+# verbatim: numstat is tab-separated and awk's default whitespace FS would truncate
+# any path containing a space. Paired with --no-renames (the "{old => new}" form is
+# not a valid pathspec) and quotePath=false (else non-ASCII arrives as
+# "\303\274ni.txt"); all three are needed or the selected file diffs to nothing.
+export numstatFormat='BEGIN{FS="\t"; green="\033[32m"; red="\033[31m"; reset="\033[0m"} {printf "%s+%s%s %s-%s%s\t%s\n", green, $1, reset, red, $2, reset, $3}'
+
+branchQuery=""
+
+while true
+do
+  if [[ -z $selectedBranch ]]
+  then
+    branchOutput=$(
+      git branch --format='%(refname:short)' \
+        | grep -v "^${GIT_BRANCH_DIFF_BASE}$" \
+        | fzf \
+            --ansi \
+            --prompt="branch> " \
+            --print-query \
+            --expect=ctrl-v \
+            --query="$branchQuery" \
+            --header="C-v: $viewMode | esc: quit" \
+            --preview='
+              # {} arrives already shell-quoted, so the range must NOT be wrapped in
+              # quotes here -- that would make those quotes part of the argument.
+              # log takes two dots; three would be the symmetric difference and pull in base commits
+              git log --color=always --format="%C(auto)%h %C(green)%cd%C(reset) %s" --date=short ${GIT_BRANCH_DIFF_BASE}..{}
+              echo
+              git -c core.quotePath=false diff --numstat --no-renames ${GIT_BRANCH_DIFF_BASE}...{} | awk "$numstatFormat"
+              echo
+              # explicit width: delta cannot detect the fzf preview pane
+              git diff ${GIT_BRANCH_DIFF_BASE}...{} | delta --width="$FZF_PREVIEW_COLUMNS"
+            ' \
+            --preview-window=right:60%
+    )
+    fzfStatus=$?
+    branchLines=("${(@f)branchOutput}")
+    branchQuery=${branchLines[1]}
+    branchKey=${branchLines[2]}
+    selectedBranch=${branchLines[3]}
+
+    # 130 == aborted (esc / ctrl-c), 1 == no match (benign, keeps the query editable).
+    # Anything else is a real fzf failure and must not fall through to the retry
+    # below, or the loop spins at full CPU relaunching a command that cannot work.
+    (( fzfStatus == 130 )) && exit 0
+    (( fzfStatus >= 2 )) && { print -u2 "fzf failed ($fzfStatus)"; exit $fzfStatus }
+    # --expect also reports the highlighted item, so the selection must be cleared
+    # or the picker below would be skipped on the way back round
+    [[ $branchKey == ctrl-v ]] && { toggleViewMode; selectedBranch=""; continue }
+    [[ -z $selectedBranch ]] && continue
+  fi
+
+  # exported, not interpolated: the preview below stays single-quoted, so a branch
+  # name containing $ or a backtick cannot be expanded by the shell fzf runs it in
+  export GIT_BRANCH_DIFF_RANGE="${GIT_BRANCH_DIFF_BASE}...${selectedBranch}"
+
+  fileQuery=""
+  while true
+  do
+    fileOutput=$(
+      git -c core.quotePath=false diff --numstat --no-renames "$GIT_BRANCH_DIFF_RANGE" \
+        | awk "$numstatFormat" \
+        | fzf \
+            --ansi \
+            --prompt="${selectedBranch}> " \
+            --delimiter=$'\t' \
+            --nth=2 \
+            --print-query \
+            --expect=ctrl-v \
+            --query="$fileQuery" \
+            --header="C-v: $viewMode | esc: branches" \
+            --preview='git -c core.quotePath=false diff --no-renames "$GIT_BRANCH_DIFF_RANGE" -- {2} | delta --width="$FZF_PREVIEW_COLUMNS"' \
+            --preview-window=right:60%
+    )
+    fzfStatus=$?
+    fileLines=("${(@f)fileOutput}")
+    fileQuery=${fileLines[1]}
+    fileKey=${fileLines[2]}
+    # the selection is "+N -M<tab>path"; keep everything after the tab
+    selectedFile=${fileLines[3]#*$'\t'}
+
+    (( fzfStatus == 130 )) && break
+    (( fzfStatus >= 2 )) && { print -u2 "fzf failed ($fzfStatus)"; exit $fzfStatus }
+    [[ $fileKey == ctrl-v ]] && { toggleViewMode; continue }
+    [[ -z $selectedFile ]] && continue
+
+    # paging=always: delta's auto mode quits on a one-screen diff, which would
+    # flash the file list back over a short diff before it could be read
+    # --no-renames here too, so the diff matches the entry the list showed
+    git -c core.quotePath=false diff --no-renames "$GIT_BRANCH_DIFF_RANGE" -- "$selectedFile" \
+      | delta --paging=always
+  done
+
+  # leaving the file list always lands on the picker, never exits directly
+  selectedBranch=""
+done

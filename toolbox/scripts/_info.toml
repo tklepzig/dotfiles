@@ -59,7 +59,18 @@ optional = true
 default = 22
 
 [git-branch-diff]
-help = "List branches and preview/view their diff against the default branch (main/master)"
+help = '''
+Browse a branch's diff against the default branch (main/master), file by file.
+Starts on the current branch; esc steps back to the branch list, esc again quits.
+ctrl-v switches between side-by-side and inline diffs.
+Pass -a/--all to start at the branch list instead; it cannot be combined with a branch.'''
+completion = ["-a", "--all"]
+[[git-branch-diff.args]]
+name = "-a|--all"
+optional = true
+[[git-branch-diff.args]]
+name = "branch"
+optional = true
 
 [git-checkout-fuzzy]
 help = "Use git checkout with fzf's fuzzy search"
