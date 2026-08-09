@@ -1,3 +1,32 @@
+-- diffview: same key closes its own view, a different key switches straight to it.
+-- The open kind is tracked here because the view object can't tell worktree from
+-- staged apart — both carry rev_arg = nil. Reconciled against the live view on every
+-- press, so a manual :DiffviewClose can't leave this stale.
+local diffview_open_kind = nil
+
+local function diffview_toggle(kind, args)
+  local is_open = require("diffview.lib").get_current_view() ~= nil
+
+  if is_open and diffview_open_kind == kind then
+    vim.cmd("DiffviewClose")
+    diffview_open_kind = nil
+    return
+  end
+
+  if is_open then vim.cmd("DiffviewClose") end
+  -- args may be a function so the branch probe only runs when actually opening
+  vim.cmd("DiffviewOpen " .. (type(args) == "function" and args() or args or ""))
+  diffview_open_kind = kind
+end
+
+-- branch vs its base
+local function diffview_branch_args()
+  vim.fn.system("git rev-parse --verify --quiet refs/heads/master")
+  local base = vim.v.shell_error == 0 and "master" or "main"
+  -- imply-local: right-hand side is the editable working-tree file
+  return base .. "...HEAD --imply-local"
+end
+
 return {
   -- base (shared with vim profile)
   { "tomasiser/vim-code-dark" },
@@ -102,6 +131,31 @@ return {
   { "tpope/vim-fugitive" },
   { "junegunn/gv.vim" },
   { "airblade/vim-gitgutter" },
+  {
+    "sindrets/diffview.nvim",
+    cmd = { "DiffviewOpen", "DiffviewFileHistory" },
+    keys = {
+      {
+        "<leader>gd",
+        function() diffview_toggle("worktree") end,
+        desc = "Toggle diffview: uncommitted changes",
+      },
+      {
+        "<leader>gi",
+        function() diffview_toggle("staged", "--staged") end,
+        desc = "Toggle diffview: staged (index vs HEAD)",
+      },
+      {
+        "<leader>gb",
+        function() diffview_toggle("branch", diffview_branch_args) end,
+        desc = "Toggle diffview: branch vs base",
+      },
+    },
+    opts = {
+      -- nvim-web-devicons isn't installed; adding it would also change nvim-tree
+      use_icons = false,
+    },
+  },
   { "scrooloose/nerdcommenter" },
   { "sheerun/vim-polyglot",           commit = "4d4aa5fe553a47ef5c5c6d0a97bb487fdfda2d5b" },
   { "tpope/vim-surround" },

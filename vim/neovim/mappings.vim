@@ -75,8 +75,9 @@ nmap <expr> <S-Left> &diff? '<Plug>(MergetoolDiffExchangeLeft)' : '<S-Left>'
 
 " vim-fugitive & gv
 nnoremap <leader>gs :G<CR>
-nnoremap <leader>gd :Gvdiffsplit<CR>
-nnoremap <leader>gb :execute 'Gvdiffsplit! ' . $DOTFILES_GIT_DEFAULT_BRANCH . ' \| wincmd p'<CR>
+"Disabled in favor of :DiffviewOpen of sindrets/diffview.nvim, see nvim-lazy-plugins.lua
+"nnoremap <leader>gd :Gvdiffsplit<CR>
+"nnoremap <leader>gb :execute 'Gvdiffsplit! ' . $DOTFILES_GIT_DEFAULT_BRANCH . ' \| wincmd p'<CR>
 nnoremap <leader>gl :GV<CR>
 nnoremap <leader>gf :GV!<CR>
 nmap <leader>k <Plug>(GitGutterPrevHunk)
