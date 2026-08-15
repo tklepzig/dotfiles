@@ -81,6 +81,13 @@ if argv and argv[0] == "--completion":
 if argv and argv[0] == "help":
     script_name = argv[1] if len(argv) > 1 else None
 
+    # "help" is a command in --list, so the picker previews it like any other
+    if script_name == "help":
+        print("Usage: help <command>")
+        print("")
+        print("Show help for given command")
+        sys.exit(1)
+
     if script_name not in scripts:
         print(f"Unknown script {script_name or ''}")
         sys.exit(1)
