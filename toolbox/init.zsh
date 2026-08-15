@@ -8,7 +8,7 @@ descs=( ${(f)"$($scripts_path/_run.py --details)"} )
 
 scripts_completion() {
 	#see also https://stackoverflow.com/a/73356136
-	if [[ $CURRENT > 2 ]]
+	if (( CURRENT > 2 ))
 	then
 		shift words
 		((CURRENT--))
