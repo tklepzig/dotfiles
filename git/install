@@ -7,6 +7,8 @@ stashCommon="-c core.pager='less -SRF' stash list --date=human --format='%C(yell
 # general config
 git config --global credential.helper store
 git config --global push.default simple
+# `git p` works on a branch that has no upstream yet, which is all `pn` did
+git config --global push.autoSetupRemote true
 git config --global fetch.prune true
 git config --global pull.rebase true
 git config --global diff.tool vimdiff
@@ -87,7 +89,8 @@ git config --global alias.aco "!f() { git add --all && git commit -m \"\$1\"; };
 git config --global alias.acop "!f() { git add --all && git commit -m \"\$1\" && git push --follow-tags; }; f"
 
 git config --global alias.p "push --follow-tags"
-git config --global alias.pn "!f() { currentBranch=\$(git rev-parse --abbrev-ref HEAD); git push -u \${1:-origin} \$currentBranch; }; f"
+# Superseded by push.autoSetupRemote; drop it from machines that already have it
+git config --global --unset alias.pn
 git config --global alias.pf "push --force-with-lease"
 
 git config --global alias.c "checkout"

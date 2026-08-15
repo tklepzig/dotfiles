@@ -2,6 +2,7 @@
 
 git config --global --unset credential.helper
 git config --global --unset push.default
+git config --global --unset push.autoSetupRemote
 git config --global --unset fetch.prune
 git config --global --unset pull.rebase
 git config --global --unset diff.tool
