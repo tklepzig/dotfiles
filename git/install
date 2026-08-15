@@ -11,6 +11,9 @@ git config --global push.default simple
 git config --global push.autoSetupRemote true
 git config --global fetch.prune true
 git config --global pull.rebase true
+# Cleaner hunk boundaries on reordered blocks, which is also what diff.colorMoved
+# below has to work with
+git config --global diff.algorithm histogram
 git config --global diff.tool vimdiff
 git config --global merge.tool vimdiff
 git config --global core.editor vim

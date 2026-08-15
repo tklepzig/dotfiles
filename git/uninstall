@@ -5,6 +5,7 @@ git config --global --unset push.default
 git config --global --unset push.autoSetupRemote
 git config --global --unset fetch.prune
 git config --global --unset pull.rebase
+git config --global --unset diff.algorithm
 git config --global --unset diff.tool
 git config --global --unset merge.tool
 git config --global --unset core.editor
