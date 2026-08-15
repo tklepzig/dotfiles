@@ -51,6 +51,21 @@ def script_info(name):
     return info if isinstance(info, dict) else None
 
 
+def usage_line(name, info):
+    parts = []
+    for arg in (info or {}).get("args", []):
+        default_value = arg.get("default")
+        default = (
+            f" = {default_value}"
+            if default_value is not None and default_value is not False
+            else ""
+        )
+        parts.append(
+            f"[{arg['name']}{default}]" if arg.get("optional") else f"<{arg['name']}>"
+        )
+    return f"Usage: {name} {' '.join(parts)}".rstrip()
+
+
 if argv and argv[0] == "--details":
     print(f"help:{ESC}[0;32;2mShow help for given command{ESC}[0m")
     for script in scripts:
@@ -93,23 +108,7 @@ if argv and argv[0] == "help":
         sys.exit(1)
 
     info = script_info(script_name)
-    args_help = ""
-    if info is not None and "args" in info:
-        parts = []
-        for arg in info["args"]:
-            default_value = arg.get("default")
-            default = (
-                f" = {default_value}"
-                if default_value is not None and default_value is not False
-                else ""
-            )
-            parts.append(
-                f"[{arg['name']}{default}]"
-                if arg.get("optional")
-                else f"<{arg['name']}>"
-            )
-        args_help = " ".join(parts)
-    print(f"Usage: {script_name} {args_help}")
+    print(usage_line(script_name, info))
 
     if info is not None and "help" in info:
         print("")
@@ -131,13 +130,14 @@ if info is not None and "args" in info:
     mandatory_args = [arg for arg in args if not arg.get("optional")]
 
     if len(cmd_args) < len(mandatory_args):
-        print("Error: Missing args:")
         missing = [arg["name"] for arg in mandatory_args][len(cmd_args) :]
-        print("\n".join(missing))
+        print(f"Error: Missing args: {', '.join(missing)}")
+        print(usage_line(script_name, info))
         sys.exit(1)
 
     if len(cmd_args) > len(args):
-        print("Error: Too many args")
+        print(f"Error: Too many args, expected at most {len(args)}")
+        print(usage_line(script_name, info))
         sys.exit(1)
 
 print(script_name)
