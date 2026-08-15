@@ -13,6 +13,9 @@ git config --global --unset color.status
 git config --global --unset grep.extendedRegexp
 git config --global --unset help.autoCorrect
 git config --global --unset rerere.enabled
+git config --global --unset branch.sort
+git config --global --unset tag.sort
+git config --global --unset column.ui
 
 
 # delta stuff (https://dandavison.github.io/delta)

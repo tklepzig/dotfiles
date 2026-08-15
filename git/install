@@ -22,6 +22,12 @@ git config --global grep.extendedRegexp true
 git config --global help.autoCorrect prompt
 git config --global rerere.enabled true
 
+# `git b` and `git tl` list most-recent first, in columns instead of one per line
+git config --global branch.sort -committerdate
+git config --global tag.sort -version:refname
+git config --global column.ui auto
+
+
 # Global ignore file, e.g. for system specific ignores
 touch ~/.gitignore
 git config --global core.excludesfile ~/.gitignore
