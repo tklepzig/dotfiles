@@ -124,6 +124,22 @@ autoload -U down-line-or-beginning-search
 zle -N down-line-or-beginning-search
 bindkey "$ZSH_HISTORY_KEY_DOWN" down-line-or-beginning-search
 
+# ~/.fzf.zsh is written by the fzf installer that setup.py runs. Sourced here
+# rather than from ~/.zshrc so it lands after `bindkey -v`, as fzf binds into
+# whichever keymap is active.
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Selected line mirrors the prompt's primary tile, matches use the accent.
+# Colours only: several scripts pass their own --reverse/--height, and popups
+# would shrink if a height were forced here.
+if isProgramInstalled fzf
+then
+  export FZF_DEFAULT_OPTS="\
+--color=fg+:$primaryFg,bg+:$primaryBg,hl:$accentText,hl+:$accentText \
+--color=pointer:$accentText,marker:$accentText,prompt:$primaryText \
+--color=info:$secondaryText,spinner:$accentText,header:$secondaryText,border:$secondaryText"
+fi
+
 
 export ASDF_RUBY_BUILD_VERSION=master
 # Don't do that, some gems don't care about frozen and will crash with this set as default
