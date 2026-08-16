@@ -7,12 +7,11 @@ stashCommon="-c core.pager='less -SRF' stash list --date=human --format='%C(yell
 # general config
 git config --global credential.helper store
 git config --global push.default simple
-# `git p` works on a branch that has no upstream yet, which is all `pn` did
+# git push works also on a branch that has no upstream yet
 git config --global push.autoSetupRemote true
 git config --global fetch.prune true
 git config --global pull.rebase true
-# Cleaner hunk boundaries on reordered blocks, which is also what diff.colorMoved
-# below has to work with
+# Cleaner hunk boundaries on reordered blocks
 git config --global diff.algorithm histogram
 git config --global diff.tool vimdiff
 git config --global merge.tool vimdiff
@@ -22,7 +21,7 @@ git config --global grep.extendedRegexp true
 git config --global help.autoCorrect prompt
 git config --global rerere.enabled true
 
-# `git b` and `git tl` list most-recent first, in columns instead of one per line
+# list branches and tags most-recent first, in columns instead of one per line
 git config --global branch.sort -committerdate
 git config --global tag.sort -version:refname
 git config --global column.ui auto
@@ -98,8 +97,6 @@ git config --global alias.aco "!f() { git add --all && git commit -m \"\$1\"; };
 git config --global alias.acop "!f() { git add --all && git commit -m \"\$1\" && git push --follow-tags; }; f"
 
 git config --global alias.p "push --follow-tags"
-# Superseded by push.autoSetupRemote; drop it from machines that already have it
-git config --global --unset alias.pn
 git config --global alias.pf "push --force-with-lease"
 
 git config --global alias.c "checkout"
