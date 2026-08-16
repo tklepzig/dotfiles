@@ -35,24 +35,47 @@ Two mechanisms that look interchangeable and are not — **systemd** reading the
 values, or the **app** reading a file systemd knows nothing about:
 
 ```ini
-# systemd reads these: they appear in `systemctl show -p Environment <unit>`
+# systemd reads these
 Environment=FOO=bar                       # inline, one key per line
 EnvironmentFile=/home/thomas/app/.env     # parse the file, then exec
-EnvironmentFile=-/home/thomas/app/.env    # same, but a missing file is not an error
+EnvironmentFile=-/home/thomas/app/.env    # same, but ANY error reading it
+                                          # (missing, unreadable, malformed) is
+                                          # silently ignored
 
 # the app reads this one; systemd just passes the flag along
 ExecStart=/path/node --env-file /home/thomas/app/.env /home/thomas/app/index.js
 ```
 
-With the `--env-file` form (node's own), `systemctl show -p Environment` is
-empty even though the app is fully configured, and the file's syntax rules are
-node's, not systemd's. Most "why isn't my env var set" hunts are someone
-debugging the mechanism the unit isn't using — `systemctl show -p Environment`
-tells you which one you're on in one command.
+⚠️ **`Environment=` is split on whitespace before anything else.** Each fragment
+is then parsed as its own `KEY=VALUE`, so a value containing spaces must have
+**the whole assignment quoted**:
+
+```ini
+Environment=GIT_SSH_COMMAND=ssh -i /key -o BatchMode=yes    # WRONG
+# → GIT_SSH_COMMAND=ssh, plus junk vars named BatchMode etc., and
+#   "Invalid environment assignment, ignoring: -i" in the journal
+Environment="GIT_SSH_COMMAND=ssh -i /key -o BatchMode=yes"  # right
+```
+
+It still starts — you get a truncated value, not a failure. `systemd-analyze
+verify` reports the ignored fragments as warnings only.
+
+**Which mechanism is a unit on?** Two properties, and they are not the same one:
+
+```sh
+systemctl show -p Environment <unit>       # Environment= values (inline only)
+systemctl show -p EnvironmentFiles <unit>  # EnvironmentFile= PATHS, never values
+```
+
+`EnvironmentFile` contents never appear in `-p Environment` — they're read at
+exec time and land only in the process. So an empty `Environment` proves
+nothing on its own; **both** properties empty is the tell that the app is
+reading the file itself (node's `--env-file`), where the syntax rules are node's,
+not systemd's.
 
 systemd's `EnvironmentFile` parser is **not a shell**: no `$VAR` expansion, no
-command substitution, no `export`. A value that works in `.bashrc` may not
-survive.
+command substitution, no `export` (that line is rejected as an invalid
+assignment). A value that works in `.bashrc` may not survive.
 
 **Secrets.** An env file holding tokens should be `chmod 600` and owned by the
 unit's `User=`. A system unit's `EnvironmentFile` is read by PID 1 as root
@@ -259,22 +282,38 @@ nowhere to go.
 What it needs:
 
 - A **passphrase-less** key. There's no interactive terminal to unlock one.
-- The key named explicitly, so it doesn't depend on `~/.ssh/config` lookups that
-  may resolve differently outside a login shell:
+- The key and the `known_hosts` file named **absolutely**, so nothing depends on
+  `~` resolving or on a `~/.ssh/config` lookup outside a login shell. Note the
+  quotes — without them systemd splits this on spaces and you silently get
+  `GIT_SSH_COMMAND=ssh` with every option dropped (see the env-var section):
 
   ```ini
-  Environment=GIT_SSH_COMMAND=ssh -i /home/thomas/.ssh/id_backup -o IdentitiesOnly=yes -o BatchMode=yes
+  Environment="GIT_SSH_COMMAND=ssh -i /home/thomas/.ssh/id_backup -o IdentitiesOnly=yes -o BatchMode=yes -o UserKnownHostsFile=/home/thomas/.ssh/known_hosts"
   ```
 
-  `BatchMode=yes` makes it fail fast instead of hanging on any prompt.
-- The **host key already in `known_hosts`** for the unit's `User=`. A
-  first-connection "authenticity of host … can't be established" prompt is a
-  hang, not an error.
+  `$HOME` *is* normally set for a unit with `User=`, but only while
+  `SetLoginEnvironment=` is unset/true and `DynamicUser=` is off — absolute
+  paths sidestep the question.
+- The **host key already trusted**. Without `BatchMode=yes` a first-connection
+  "authenticity of host … can't be established" prompt hangs until the unit
+  times out; with it you get an immediate `Host key verification failed` (rc
+  255). Either way the key must already be in that `known_hosts` file.
 
-Test it the way systemd will run it, not the way your shell does:
+Test it the way systemd will run it, not the way your shell does — a bare
+`ssh -T git@github.com` proves nothing, because it picks up your agent and any
+default `~/.ssh/id_*` key, and `sudo -u` keeps a TTY so prompts *appear* instead
+of hanging. Run the same option string the unit uses:
 
 ```sh
-sudo -u thomas env -i HOME=/home/thomas ssh -T git@github.com   # no agent, no session env
+sudo -u thomas env -i HOME=/home/thomas \
+  ssh -i /home/thomas/.ssh/id_backup -o IdentitiesOnly=yes -o BatchMode=yes \
+      -o UserKnownHostsFile=/home/thomas/.ssh/known_hosts -T git@github.com
+```
+
+Closer still — actually let PID 1 launch it, with the unit's own environment:
+
+```sh
+sudo systemd-run -p User=thomas --wait --pipe /home/thomas/app/backup.sh
 sudo systemctl start mybackup.service && journalctl -xeu mybackup.service
 ```
 
