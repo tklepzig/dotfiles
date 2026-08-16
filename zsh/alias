@@ -28,7 +28,7 @@ alias rmr='rm -rf'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
-alias t='tmux new-session -n ""'
+alias t='tmux new-session \; rename-window ""' # see tmux.conf: `-n ""` is dropped since 3.7
 alias ta='tmux a'
 
 alias dotfiles-update='/usr/bin/env python3 -c "$(curl -Ls https://raw.githubusercontent.com/$dotfilesRepo/$dotfilesBranch/setup.py)"'
