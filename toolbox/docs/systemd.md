@@ -29,6 +29,34 @@ User=thomas
 WantedBy=multi-user.target
 ```
 
+## Environment variables and secrets
+
+Three mechanisms that look interchangeable and are not:
+
+```ini
+Environment=FOO=bar                       # inline, one key per line
+EnvironmentFile=/home/thomas/app/.env     # systemd parses the file, then execs
+EnvironmentFile=-/home/thomas/app/.env    # leading '-': a missing file is not an error
+ExecStart=/path/node --env-file /home/thomas/app/.env /home/thomas/app/index.js
+```
+
+The first two are **systemd** reading the values — they show up in
+`systemctl show -p Environment <unit>`. The last is the **app** reading the file
+itself (node's own `--env-file`); systemd knows nothing about it, so
+`systemctl show` is empty and the syntax rules are node's, not systemd's. Most
+"why isn't my env var set" hunts are someone debugging the mechanism the unit
+isn't using. `systemctl show -p Environment` tells you which one you're on in
+one command.
+
+systemd's `EnvironmentFile` parser is **not a shell**: no `$VAR` expansion, no
+command substitution, no `export`. A value that works in `.bashrc` may not
+survive.
+
+**Secrets.** An env file holding tokens should be `chmod 600` and owned by the
+unit's `User=`. A system unit's `EnvironmentFile` is read by PID 1 as root
+*before* dropping to `User=`, so 600 costs nothing. Anything in `Environment=`
+is world-readable via `systemctl show` — put secrets in a file, not inline.
+
 ## Service lifecycle
 
 ```sh
@@ -216,6 +244,36 @@ OnCalendar=*-*-* 04:00:00
 Persistent=true
 [Install]
 WantedBy=timers.target
+```
+
+## A unit that pushes to git (there is no ssh-agent)
+
+A `Type=oneshot` backup ending in `git push git@github.com:…` runs from PID 1,
+not from your login session, so **`SSH_AUTH_SOCK` is unset** — the agent you
+unlocked when you ssh'd in does not exist for it. Symptoms: `Permission denied
+(publickey)`, or the unit hanging until timeout on a passphrase prompt with
+nowhere to go.
+
+What it needs:
+
+- A **passphrase-less** key. There's no interactive terminal to unlock one.
+- The key named explicitly, so it doesn't depend on `~/.ssh/config` lookups that
+  may resolve differently outside a login shell:
+
+  ```ini
+  Environment=GIT_SSH_COMMAND=ssh -i /home/thomas/.ssh/id_backup -o IdentitiesOnly=yes -o BatchMode=yes
+  ```
+
+  `BatchMode=yes` makes it fail fast instead of hanging on any prompt.
+- The **host key already in `known_hosts`** for the unit's `User=`. A
+  first-connection "authenticity of host … can't be established" prompt is a
+  hang, not an error.
+
+Test it the way systemd will run it, not the way your shell does:
+
+```sh
+sudo -u thomas env -i HOME=/home/thomas ssh -T git@github.com   # no agent, no session env
+sudo systemctl start mybackup.service && journalctl -xeu mybackup.service
 ```
 
 ## Debugging a unit
