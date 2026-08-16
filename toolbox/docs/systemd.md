@@ -31,22 +31,24 @@ WantedBy=multi-user.target
 
 ## Environment variables and secrets
 
-Three mechanisms that look interchangeable and are not:
+Two mechanisms that look interchangeable and are not — **systemd** reading the
+values, or the **app** reading a file systemd knows nothing about:
 
 ```ini
+# systemd reads these: they appear in `systemctl show -p Environment <unit>`
 Environment=FOO=bar                       # inline, one key per line
-EnvironmentFile=/home/thomas/app/.env     # systemd parses the file, then execs
-EnvironmentFile=-/home/thomas/app/.env    # leading '-': a missing file is not an error
+EnvironmentFile=/home/thomas/app/.env     # parse the file, then exec
+EnvironmentFile=-/home/thomas/app/.env    # same, but a missing file is not an error
+
+# the app reads this one; systemd just passes the flag along
 ExecStart=/path/node --env-file /home/thomas/app/.env /home/thomas/app/index.js
 ```
 
-The first two are **systemd** reading the values — they show up in
-`systemctl show -p Environment <unit>`. The last is the **app** reading the file
-itself (node's own `--env-file`); systemd knows nothing about it, so
-`systemctl show` is empty and the syntax rules are node's, not systemd's. Most
-"why isn't my env var set" hunts are someone debugging the mechanism the unit
-isn't using. `systemctl show -p Environment` tells you which one you're on in
-one command.
+With the `--env-file` form (node's own), `systemctl show -p Environment` is
+empty even though the app is fully configured, and the file's syntax rules are
+node's, not systemd's. Most "why isn't my env var set" hunts are someone
+debugging the mechanism the unit isn't using — `systemctl show -p Environment`
+tells you which one you're on in one command.
 
 systemd's `EnvironmentFile` parser is **not a shell**: no `$VAR` expansion, no
 command substitution, no `export`. A value that works in `.bashrc` may not
