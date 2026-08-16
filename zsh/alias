@@ -132,6 +132,10 @@ alias vclean='vim -u /dev/null'
 # See also https://unix.stackexchange.com/a/570812 and https://github.com/ranger/ranger/blob/master/ranger.py
 alias r='. ranger'
 
+# History by time: pick from the timestamped history and put it on the next
+# prompt; the date is part of the line, so a query like 2026-08-16 filters by day
+alias ht="f(){ local selected; selected=\$(fc -rli 1 | fzf --query=\"\$1\" --header=\"' prefix = exact match, e.g. '2026-08-16\" | sed -E 's/^ *[0-9]+ +[0-9-]+ +[0-9:]+ +//'); [ -n \"\$selected\" ] && print -z \"\$selected\"; unset -f f }; f"
+
 alias q='exit'
 alias cf="cd \$(find * -type d | fzf)"
 alias ..='cd ..'
