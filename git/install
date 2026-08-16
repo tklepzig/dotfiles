@@ -7,8 +7,12 @@ stashCommon="-c core.pager='less -SRF' stash list --date=human --format='%C(yell
 # general config
 git config --global credential.helper store
 git config --global push.default simple
+# git push works also on a branch that has no upstream yet
+git config --global push.autoSetupRemote true
 git config --global fetch.prune true
 git config --global pull.rebase true
+# Cleaner hunk boundaries on reordered blocks
+git config --global diff.algorithm histogram
 git config --global diff.tool vimdiff
 git config --global merge.tool vimdiff
 git config --global core.editor vim
@@ -16,6 +20,12 @@ git config --global color.status always
 git config --global grep.extendedRegexp true
 git config --global help.autoCorrect prompt
 git config --global rerere.enabled true
+
+# list branches and tags most-recent first, in columns instead of one per line
+git config --global branch.sort -committerdate
+git config --global tag.sort -version:refname
+git config --global column.ui auto
+
 
 # Global ignore file, e.g. for system specific ignores
 touch ~/.gitignore
@@ -87,7 +97,6 @@ git config --global alias.aco "!f() { git add --all && git commit -m \"\$1\"; };
 git config --global alias.acop "!f() { git add --all && git commit -m \"\$1\" && git push --follow-tags; }; f"
 
 git config --global alias.p "push --follow-tags"
-git config --global alias.pn "!f() { currentBranch=\$(git rev-parse --abbrev-ref HEAD); git push -u \${1:-origin} \$currentBranch; }; f"
 git config --global alias.pf "push --force-with-lease"
 
 git config --global alias.c "checkout"

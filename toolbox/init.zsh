@@ -8,7 +8,7 @@ descs=( ${(f)"$($scripts_path/_run.py --details)"} )
 
 scripts_completion() {
 	#see also https://stackoverflow.com/a/73356136
-	if [[ $CURRENT > 2 ]]
+	if (( CURRENT > 2 ))
 	then
 		shift words
 		((CURRENT--))
@@ -34,7 +34,12 @@ compdef scripts_completion \#
 \#() {
 	if [ $# -eq 0 ]
 	then
-		args=$(printf "%s\n" "${cmds[@]}" | fzf | awk '{print $1}')
+		# Usage line and help text come from _info.toml, which the picker
+		# otherwise never shows.
+		args=$(printf "%s\n" "${cmds[@]}" \
+			| fzf --preview "$scripts_path/_run.py help {}" \
+			      --preview-window=right:55%:wrap \
+			| awk '{print $1}')
 	else
 		args=( $@ )
 	fi
