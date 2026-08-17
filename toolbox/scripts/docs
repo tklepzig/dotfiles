@@ -1,5 +1,0 @@
-#!/usr/bin/env zsh
-
-cd $dotfiles_path/toolbox/docs
-vim $(fzf)
-cd -

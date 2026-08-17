@@ -23,9 +23,6 @@ asdf — in one idempotent step:
     bash -c "$(curl -fsSL https://raw.githubusercontent.com/\
     tklepzig/dotfiles/master/pi-setup.sh)"
 
-See `toolbox/docs/raspberrypi-os.md` for the SD-card / SSH / Wi-Fi prep that
-comes first.
-
 ## Migration from basic/full variants to vim/neovim
 
 The vim/neovim setup was restructured. If you are upgrading from the previous
@@ -241,8 +238,8 @@ shell completion.
 
    Parent-level keys (`help`, `completion`) must come before the
    `[[<script>.args]]` tables. The `args` list defines both validation (the
-   toolbox runner rejects
-   calls with wrong arity) and the completion hints shown in the shell.
+   toolbox runner rejects calls with wrong arity) and the completion hints shown
+   in the shell.
 
 ### info.additional.toml
 
@@ -259,7 +256,7 @@ name = "target"
 
 ### Toolbox includes
 
-To pull in scripts and docs from an external directory or repository, create
+To pull in scripts from an external directory or repository, create
 `~/.dotfiles-local/toolbox-include.toml` listing paths to include:
 
 ```toml
@@ -273,13 +270,11 @@ Each listed path may be a plain directory or a git repository. If it contains a
 `.git` directory, the installer runs `git fetch && git merge` on it
 automatically during installation to keep it up to date.
 
-The directory is expected to follow this layout (both subdirectories are
-optional):
+The directory is expected to follow this layout:
 
 ```
 extra-toolbox/
   scripts/       # executables + optional _info.toml
-  docs/          # markdown files linked into the toolbox docs
 ```
 
 ## Testing

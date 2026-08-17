@@ -13,12 +13,6 @@ name = "number of columns"
 optional = true
 default = 4
 
-[docs]
-help = "Opens toolbox docs in vim"
-
-[docs-serve]
-help = "Opens toolbox docs in browser"
-
 [encrypt-clone]
 help = '''
 Clone a repository and run setup to support encryption

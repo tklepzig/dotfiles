@@ -6,7 +6,7 @@
 # Invoke (post-merge, from master):
 #   bash -c "$(curl -fsSL https://raw.githubusercontent.com/tklepzig/dotfiles/master/pi-setup.sh)"
 #
-# i3 needs X11 (Bookworm defaults to Wayland) — see toolbox/docs/raspberrypi-os.md.
+# i3 needs X11 (Bookworm defaults to Wayland).
 
 set -euo pipefail
 
@@ -77,7 +77,7 @@ DOTFILES_BRANCH="$DOTFILES_BRANCH" python3 -c "$installer"
 # <uid>) that per-user PipeWire audio relies on. Idempotent.
 #
 # Audio output itself (picking the USB DAC as the default PipeWire sink) is
-# hardware-specific and left manual — see toolbox/docs/raspberrypi-os.md.
+# hardware-specific and left manual.
 sudo loginctl enable-linger "$(whoami)"
 
 # --- 4. asdf + languages (LAST: slowest + most fragile) ----------------------
@@ -86,4 +86,4 @@ bash "$DF_PATH/toolbox/scripts/setup-asdf" --minimal
 echo
 echo "pi-setup complete. setup.py already set zsh as the login shell — log out and"
 echo "back in (or 'exec zsh') to load everything."
-echo "Audio (USB DAC) is set up manually — see toolbox/docs/raspberrypi-os.md."
+echo "Audio (USB DAC) is set up manually."

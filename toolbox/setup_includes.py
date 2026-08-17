@@ -37,11 +37,6 @@ def link_dir(source_dir, dest_dir, skip=()):
     return True
 
 
-def link_docs(path):
-    if link_dir(os.path.join(path, "docs"), os.path.join(DF_PATH, "toolbox", "docs")):
-        log("Linking docs", 1)
-
-
 def link_scripts(path, slot_index):
     """Symlink the include's scripts (except its `_info.toml`) and register that
     `_info.toml` for the runner by symlinking it into `info.d/NN-<name>.toml`.
@@ -128,7 +123,6 @@ def process_includes():
             log(raw_path)
             if os.path.isdir(os.path.join(path, ".git")):
                 update_include_repo(path)
-            link_docs(path)
             if link_scripts(path, slot_index):
                 any_skipped = True
         except Exception as error:
