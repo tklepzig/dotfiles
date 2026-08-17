@@ -132,6 +132,16 @@ rescue Errno::EPIPE
   []
 end
 
+# tmux 3.7 ignores an empty `-n` at creation and names the window after its
+# command; only rename-window accepts one. See tmux/tmux.conf.
+def create_unnamed_window(session, path)
+  window_id, = Open3.capture3('tmux', 'new-window', '-t', session, '-c', path, '-P', '-F', '#{window_id}')
+  # An empty id means creation failed; renaming '' would hit the current window
+  return if window_id.chomp.empty?
+
+  system('tmux', 'rename-window', '-t', window_id.chomp, '')
+end
+
 # --- subcommands ---------------------------------------------------------------
 
 abort_if_no_repo
@@ -249,7 +259,7 @@ when 'tmux'
 
   unless system('tmux', 'has-session', '-t', session, out: '/dev/null', err: '/dev/null')
     system('tmux', 'new-session', '-d', '-s', session, '-c', Dir.home, '-n', '__init__')
-    worktrees.each { |wt| system('tmux', 'new-window', '-t', session, '-c', wt[:path], '-n', '') }
+    worktrees.each { |wt| create_unnamed_window(session, wt[:path]) }
     system('tmux', 'kill-window', '-t', "#{session}:__init__")
     puts "Created tmux session '#{session}' with #{worktrees.size} window(s)."
   end

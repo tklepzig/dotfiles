@@ -75,6 +75,17 @@ def sanitize_session_name(name)
   name.gsub(/[.:\s]/, '-')
 end
 
+# tmux 3.7 ignores an empty `-n` at creation and names the window after its
+# command; only rename-window accepts one. See tmux/tmux.conf.
+def create_unnamed_window(session_name, path)
+  window_id, _err, _status = Open3.capture3('tmux', 'new-window', '-t', session_name, '-c', path,
+                                            '-P', '-F', '#{window_id}')
+  # An empty id means creation failed; renaming '' would hit the current window
+  return if window_id.chomp.empty?
+
+  system('tmux', 'rename-window', '-t', window_id.chomp, '')
+end
+
 def open_session(session_name, windows)
   return true if system('tmux', 'has-session', '-t', session_name, out: '/dev/null', err: '/dev/null')
 
@@ -83,7 +94,7 @@ def open_session(session_name, windows)
   created_count = 0
   windows.each do |path|
     if File.directory?(path)
-      system('tmux', 'new-window', '-t', session_name, '-c', path, '-n', '')
+      create_unnamed_window(session_name, path)
       created_count += 1
     else
       warn "  Skipping missing path: #{path}"

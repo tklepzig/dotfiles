@@ -27,11 +27,22 @@ def session_filename(session_name:, window_index:, pane_index:)
 end
 
 def add_window(session_name, name, dir, active: false)
-  `tmux new-window #{active ? '' : '-d'} -t "#{session_name}:" -n "#{name}" -c "#{dir}"`
+  window_id = `tmux new-window #{active ? '' : '-d'} -t "#{session_name}:" -n "#{name}" -c "#{dir}" -P -F "#\{window_id\}"`.chomp
+  restore_empty_name(window_id, name)
 end
 
 def new_session(session_name, window_name)
   `tmux new-session -d -s "#{session_name}" -n "#{window_name}"`
+  restore_empty_name("#{session_name}:", window_name)
+end
+
+# tmux 3.7 ignores an empty `-n` at creation and names the window after its
+# command; only rename-window accepts one. See tmux/tmux.conf.
+def restore_empty_name(target, name)
+  # An empty target means creation failed; renaming '' would hit the current window
+  return unless name.empty? && !target.empty?
+
+  `tmux rename-window -t "#{target}" ''`
 end
 
 def split_window(session_name, window_index, dir, active: false)
