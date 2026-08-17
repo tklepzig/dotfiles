@@ -7,6 +7,20 @@ hi CursorColumn ctermbg=238
 hi diffAdded ctermfg=41
 hi diffRemoved ctermfg=Red
 
+" Diff mode (:diffsplit, mergetool, diffview.nvim): background tints only.
+" A ctermfg here wins over syntax and flattens every changed line to one colour.
+if dotfilesTheme =~ '-light$'
+  hi DiffAdd    ctermfg=NONE ctermbg=194
+  hi DiffChange ctermfg=NONE ctermbg=153
+  hi DiffText   ctermfg=NONE ctermbg=117
+  hi DiffDelete ctermfg=NONE ctermbg=224
+else
+  hi DiffAdd    ctermfg=NONE ctermbg=22
+  hi DiffChange ctermfg=NONE ctermbg=24
+  hi DiffText   ctermfg=NONE ctermbg=26
+  hi DiffDelete ctermfg=NONE ctermbg=52
+endif
+
 hi diffFile cterm=NONE ctermfg=39
 hi gitcommitDiff cterm=NONE ctermfg=39
 hi diffIndexLine cterm=NONE ctermfg=39

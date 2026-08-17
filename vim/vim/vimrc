@@ -133,6 +133,8 @@ if dotfilesTheme =~ '-light$'
   set background=light
   if !has('nvim')
     colorscheme onehalflight
+    " Re-apply the overrides the colorscheme just reset, same as nvim-lazy-init.lua
+    source $HOME/.dotfiles/vim/vim/highlight-overrides.vim
     hi CursorLine ctermbg=251
   endif
 endif
