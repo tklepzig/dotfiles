@@ -13,6 +13,7 @@ SHOW_CLOSED = !ARGV.delete('--show-closed').nil?
 RESET   = "\e[0m"
 DIM     = "\e[2m"
 BOLD    = "\e[1m"
+RED     = "\e[31m"
 GREEN   = "\e[32m"
 YELLOW  = "\e[33m"
 CYAN    = "\e[36m"
@@ -21,6 +22,53 @@ MAGENTA = "\e[35m"
 module OS
   def self.linux? = (/linux/ =~ RUBY_PLATFORM) != nil
   def self.open_cmd = linux? ? 'xdg-open' : 'open'
+end
+
+OUTAGE_HINT = 'GitHub may be down (https://www.githubstatus.com) or the network is unreachable.'
+
+def wait_for_key
+  return unless $stdin.tty?
+
+  warn "#{DIM}Press Enter to close.#{RESET}"
+  $stdin.gets
+end
+
+# gh's own stderr is the best diagnosis available ("HTTP 502", "gh auth login",
+# "dial tcp: no such host") — show its last line rather than guessing a cause.
+def gh_error_message(error_output)
+  error_output.to_s.lines.map(&:chomp).reject(&:empty?).last || 'gh exited with an error'
+end
+
+# Failure output depends on who is listening: the statusline caches whatever it
+# gets, fzf's reload would show an empty list, and the popup closes on exit.
+def report_failure(error_output)
+  message = gh_error_message(error_output)
+  exit 0 if ARGV[0] == 'tile'
+
+  if ARGV.include?('--rows')
+    puts "_  _  #{RED}#{message}#{RESET}  #{DIM}#{OUTAGE_HINT}#{RESET}"
+    exit 0
+  end
+
+  warn "#{RED}GitHub request failed#{RESET}"
+  warn "  #{message}"
+  warn "#{DIM}#{OUTAGE_HINT}#{RESET}"
+  wait_for_key
+  exit($stdin.tty? ? 0 : 1)
+end
+
+def gh_api(*args)
+  output, error_output, status = Open3.capture3('gh', 'api', *CACHE.split, *args)
+  report_failure(error_output) unless status.success?
+
+  output
+end
+
+# A 200 carrying something other than JSON happens during partial outages.
+def parse_json(output)
+  JSON.parse(output)
+rescue JSON::ParserError => error
+  report_failure("unexpected response from GitHub (#{error.message})")
 end
 
 def fetch_notifications(all: false)
@@ -33,9 +81,7 @@ def fetch_notifications(all: false)
     results = []
     page = 1
     loop do
-      output = `gh api #{CACHE} 'notifications?all=true&page=#{page}'`
-      exit 1 unless $CHILD_STATUS.success?
-      batch = JSON.parse(output)
+      batch = parse_json(gh_api("notifications?all=true&page=#{page}"))
       results.concat(batch)
       break if results.size >= 200 || batch.size < 50
 
@@ -45,9 +91,7 @@ def fetch_notifications(all: false)
   else
     # Unread only: paginate to ensure every unread notification is returned.
     # --jq '.[]' flattens each page's array so output is one JSON object per line.
-    output = `gh api --paginate #{CACHE} --jq '.[]' 'notifications'`
-    exit 1 unless $CHILD_STATUS.success?
-    output.lines.map { |line| JSON.parse(line) }
+    gh_api('--paginate', '--jq', '.[]', 'notifications').lines.map { |line| parse_json(line) }
   end
 end
 
@@ -114,7 +158,7 @@ end
 
 def execute_graphql_query(query)
   command = %w[gh api graphql] + CACHE.split + ['-f', "query=#{query}"]
-  output, status = Open3.capture2(*command)
+  output, _error_output, status = Open3.capture3(*command)
   return nil unless status.success?
 
   JSON.parse(output)
@@ -122,26 +166,30 @@ rescue JSON::ParserError
   nil
 end
 
+# Returns [statuses, degraded]. A failed query is not fatal, but it silently
+# disables the draft/closed filters and blanks the author column, so the caller
+# has to be able to say so.
 def fetch_pull_request_statuses(pr_notifications)
-  return {} if pr_notifications.empty?
+  return [{}, false] if pr_notifications.empty?
 
   query_parts, id_by_alias = build_pr_graphql_query(pr_notifications)
-  return {} if query_parts.empty?
+  return [{}, false] if query_parts.empty?
 
   parsed = execute_graphql_query("query { #{query_parts.join(' ')} }")
-  return {} unless parsed.is_a?(Hash)
+  return [{}, true] unless parsed.is_a?(Hash)
 
   data = parsed['data'] || {}
-  id_by_alias.each_with_object({}) do |(alias_key, notification_id), statuses|
+  statuses = id_by_alias.each_with_object({}) do |(alias_key, notification_id), collected|
     pull_request = data.dig(alias_key, 'pullRequest')
     next unless pull_request
 
-    statuses[notification_id] = {
+    collected[notification_id] = {
       is_draft: pull_request['isDraft'] == true,
       state: pull_request['state'],
       author: pull_request.dig('author', 'login')
     }
   end
+  [statuses, false]
 end
 
 def hide_pr?(status, show_drafts:, show_closed:)
@@ -206,16 +254,24 @@ end
 MAX_REPO  = 35
 MAX_TITLE = 55
 
-def rate_limit_line
+def rate_limit_text
   output = `gh api rate_limit --jq '.rate | "\\(.remaining) \\(.limit)"' 2>/dev/null`
-  return "_  _  #{DIM}API: ?#{RESET}" unless $CHILD_STATUS.success?
+  return "#{DIM}API: ?#{RESET}" unless $CHILD_STATUS.success?
 
   remaining, limit = output.chomp.split.map(&:to_i)
-  return "_  _  #{DIM}API: ?#{RESET}" if limit.zero?
+  return "#{DIM}API: ?#{RESET}" if limit.zero?
 
   used = limit - remaining
   percentage = (used * 100.0 / limit).round
-  "_  _  #{DIM}API: #{used}/#{limit} (#{percentage}%)#{RESET}"
+  "#{DIM}API: #{used}/#{limit} (#{percentage}%)#{RESET}"
+end
+
+# The first line becomes fzf's --header-lines=1; the two leading fields are the
+# ones --with-nth=3.. hides, and '_' keeps it inert if it ever gets selected.
+def status_line(pr_details_missing)
+  parts = [rate_limit_text]
+  parts << "#{YELLOW}⚠ PR details unavailable — draft/closed filters and authors off#{RESET}" if pr_details_missing
+  "_  _  #{parts.join('  ')}"
 end
 
 def row_for(notification, pr_statuses)
@@ -292,7 +348,11 @@ PREVIEW_CMD = <<~'SH'.chomp
     reviews=$(gh api --cache 120s "${notifurl}/reviews" 2>/dev/null)
     [ -z "$reviews" ] && reviews='[]'
   esac
-  gh api --cache 120s {2} 2>/dev/null | jq -r \
+  details=$(gh api --cache 120s {2} 2>&1) || {
+    printf '%s\n' "${red}Details unavailable${reset}" "${dim}${details}${reset}"
+    exit 0
+  }
+  printf '%s' "$details" | jq -r \
     --arg reset "$reset" \
     --arg dim "$dim" \
     --arg bold "$bold" \
@@ -352,7 +412,7 @@ PREVIEW_CMD = <<~'SH'.chomp
     end'
 SH
 
-def fzf_pick(rows)
+def fzf_pick(rows, header)
   script = File.expand_path(__FILE__)
   mark_read_cmd = "printf '%s\\n' {+1} | xargs -I{} gh api --method PATCH notifications/threads/{}"
   refresh_prompt = "transform-prompt(#{script} --prompt)"
@@ -376,7 +436,7 @@ def fzf_pick(rows)
            '--with-nth=3..']
 
   (IO.popen(flags, 'r+') do |io|
-    io.puts rate_limit_line
+    io.puts header
     rows.each { |row| io.puts row[:line] }
     io.close_write
     io.read.lines.map { |line| line.chomp.split('  ', 3)[1] }.compact
@@ -439,24 +499,31 @@ if ARGV[0] == 'tile'
 end
 
 pr_notifications = notifications.select { |notification| notification['subject']['type'] == 'PullRequest' }
-pr_statuses = fetch_pull_request_statuses(pr_notifications)
+pr_statuses, pr_details_missing = fetch_pull_request_statuses(pr_notifications)
 
 notifications = filter_pull_requests(notifications, pr_statuses, show_drafts:, show_closed:)
 
 if ARGV.include?('--rows')
-  puts rate_limit_line
+  puts status_line(pr_details_missing)
   build_rows(notifications, pr_statuses).each { |row| puts row[:line] }
   exit 0
 end
 
 rows = build_rows(notifications, pr_statuses)
-selected = fzf_pick(rows)
+selected = fzf_pick(rows, status_line(pr_details_missing))
 
-selected.each do |path|
-  next if path == '_'
+def open_notification(path)
+  html_url, = Open3.capture3('gh', 'api', *CACHE.split, path, '--jq', '.html_url')
+  return false if html_url.chomp.empty?
 
-  html_url = `gh api #{CACHE} #{path} --jq .html_url`.chomp
-  next if html_url.empty?
+  system(OS.open_cmd, html_url.chomp)
+end
 
-  system(OS.open_cmd, html_url)
+unresolved = selected.reject { |path| path == '_' }.reject { |path| open_notification(path) }
+
+unless unresolved.empty?
+  warn "#{RED}Could not open #{unresolved.size} notification#{unresolved.size == 1 ? '' : 's'}#{RESET}"
+  unresolved.each { |path| warn "  #{path}" }
+  warn "#{DIM}#{OUTAGE_HINT}#{RESET}"
+  wait_for_key
 end
