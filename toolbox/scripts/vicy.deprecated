@@ -1,3 +1,0 @@
-#!/usr/bin/env zsh
-
-$dotfiles_path/toolbox/apps/vicy/vicy.sh $@
