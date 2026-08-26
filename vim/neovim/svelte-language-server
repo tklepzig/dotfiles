@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Starts svelte-language-server with a TypeScript it can actually use.
+#
+# The server needs the classic TS compiler API; typescript 7 (the native port)
+# dropped it, and the server's own dependency range is '*', so it must be told
+# which one to take. Prefer the project's version so editor diagnostics match
+# what `tsc`/`svelte-check` report in CI.
+set -euo pipefail
+
+server_version=0.18.4
+fallback_typescript=5.9.3
+
+typescript_version=$(node -p "require('typescript/package.json').version" 2>/dev/null || true)
+
+case "$typescript_version" in
+    5.*) ;;
+    *) typescript_version=$fallback_typescript ;;
+esac
+
+exec npx -y \
+    --package "svelte-language-server@$server_version" \
+    --package "typescript@$typescript_version" \
+    svelteserver "$@"

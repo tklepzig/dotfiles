@@ -46,8 +46,15 @@
   "tailwindCSS.experimental.classRegex": [
     ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
   ],
-  "svelte.enable-ts-plugin": true,
   "emmet.includeLanguages": { "svelte": "html" },
+  "languageserver": {
+    "svelte": {
+      "command": "~/.dotfiles/vim/neovim/svelte-language-server",
+      "args": ["--stdio"],
+      "filetypes": ["svelte"],
+      "rootPatterns": ["svelte.config.js", "package.json", ".git"]
+    }
+  },
   "sumneko-lua.enableNvimLuaDev": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
