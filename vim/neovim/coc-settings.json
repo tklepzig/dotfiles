@@ -8,6 +8,21 @@
   },
   "codeLens.enable": false,
   "eslint.autoFixOnSave": true,
+  "eslint.probe": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "svelte",
+    "astro",
+    "civet",
+    "html",
+    "mdx",
+    "vue",
+    "markdown",
+    "json",
+    "jsonc"
+  ],
   "coc.preferences.formatOnSave": true,
   "python.formatting.provider": "black",
   "javascript.suggestionActions.enabled": false,
@@ -18,6 +33,7 @@
   "solargraph.transport": "stdio",
   "prettier.formatterPriority": 1,
   "prettier.proseWrap": "always",
+  "prettier.documentSelectors": ["**/*.svelte"],
   "json.schemas": [
     {
       "fileMatch": ["manifest.json"],
@@ -30,6 +46,8 @@
   "tailwindCSS.experimental.classRegex": [
     ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
   ],
+  "svelte.enable-ts-plugin": true,
+  "emmet.includeLanguages": { "svelte": "html" },
   "sumneko-lua.enableNvimLuaDev": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
