@@ -175,6 +175,7 @@ augroup END
 let g:conflict_marker_highlight_group = ''
 
 
+let g:vim_svelte_plugin_use_typescript = 1
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.tsx,*.jsx,*.svelte'
 let test#strategy = "vimux"
 let g:test#echo_command = 0
