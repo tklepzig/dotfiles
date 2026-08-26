@@ -19,6 +19,23 @@ local function diffview_toggle(kind, args)
   diffview_open_kind = kind
 end
 
+-- GitHub's "Hide whitespace changes" equivalent. Diffview's panes are plain
+-- `diffthis` buffers, so this is 'diffopt' (iwhiteall = git's -w), not a plugin
+-- setting -- and it applies to every diff, fugitive's included. diffupdate is
+-- what makes open panes re-highlight instead of keeping the stale hunks.
+local function toggle_diff_whitespace()
+  local ignoring = vim.tbl_contains(vim.opt.diffopt:get(), "iwhiteall")
+
+  if ignoring then
+    vim.opt.diffopt:remove("iwhiteall")
+  else
+    vim.opt.diffopt:append("iwhiteall")
+  end
+
+  vim.cmd("diffupdate")
+  vim.notify(ignoring and "diff: whitespace shown" or "diff: whitespace ignored")
+end
+
 -- branch vs its base
 local function diffview_branch_args()
   vim.fn.system("git rev-parse --verify --quiet refs/heads/master")
@@ -149,6 +166,11 @@ return {
         "<leader>gb",
         function() diffview_toggle("branch", diffview_branch_args) end,
         desc = "Toggle diffview: branch vs base",
+      },
+      {
+        "<leader>gw",
+        toggle_diff_whitespace,
+        desc = "Toggle whitespace changes in diffs",
       },
     },
     opts = {
