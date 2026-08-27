@@ -158,11 +158,6 @@ return {
         desc = "Toggle diffview: uncommitted changes",
       },
       {
-        "<leader>gi",
-        function() diffview_toggle("staged", "--staged") end,
-        desc = "Toggle diffview: staged (index vs HEAD)",
-      },
-      {
         "<leader>gb",
         function() diffview_toggle("branch", diffview_branch_args) end,
         desc = "Toggle diffview: branch vs base",
