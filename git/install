@@ -118,6 +118,7 @@ git config --global alias.bf "!f() { $setDefaultBranch; git diff --name-only \$(
 git config --global alias.bfp "!f() { $setDefaultBranch; git diff -p --word-diff \$(git merge-base \${1:-\$defaultBranch} HEAD); }; f"
 
 git config --global alias.f "fetch"
+git config --global alias.fa "fetch --all"
 git config --global alias.fm "!f() { . ~/.dotfiles/toolbox/scripts/git-fetch-merge; }; f"
 git config --global alias.fm-all "!f() { . ~/.dotfiles/toolbox/scripts/git-fetch-merge --all; }; f"
 
