@@ -23,6 +23,29 @@ asdf — in one idempotent step:
     bash -c "$(curl -fsSL https://raw.githubusercontent.com/\
     tklepzig/dotfiles/master/pi-setup.sh)"
 
+### Mirrors
+
+Two env vars point install and update at any mirror of this repo — no host is
+hardcoded, so any other one works just as well in case of an outage:
+
+| Variable             | What it is                  |
+| -------------------- | --------------------------- |
+| `DOTFILES_SETUP_URL` | raw-file URL of `setup.py`  |
+| `DOTFILES_CLONE_URL` | `git clone` URL of the repo |
+
+Both default to GitHub. Export them in `~/.zshrc` next to `DOTFILES_BRANCH` and
+open a new shell; `dotfiles-update` then uses the mirror end to end. On a
+machine with no dotfiles yet, pass them inline instead:
+
+    DOTFILES_CLONE_URL=<repo .git> /usr/bin/env python3 -c "$(curl -Ls \
+    <raw setup.py>)"
+
+The raw-file path shape differs per forge — copy it from the forge's own "raw"
+link for `setup.py` rather than guessing.
+
+This covers the dotfiles repo itself. A _fresh_ install still pulls asdf, fzf
+and the neovim plugins from GitHub; an update on a provisioned machine does not.
+
 ## Migration from basic/full variants to vim/neovim
 
 The vim/neovim setup was restructured. If you are upgrading from the previous

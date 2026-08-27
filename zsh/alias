@@ -2,6 +2,10 @@
 
 dotfilesRepo=${DOTFILES_REPO:-"tklepzig/dotfiles"}
 dotfilesBranch=${DOTFILES_BRANCH:-"master"}
+# Where dotfiles-update fetches setup.py from. Override with a mirror's raw-file
+# URL to keep installing/updating during an outage; setup.py takes the
+# matching clone URL from $DOTFILES_CLONE_URL, which it inherits from here.
+dotfilesSetupUrl=${DOTFILES_SETUP_URL:-"https://raw.githubusercontent.com/$dotfilesRepo/$dotfilesBranch/setup.py"}
 
 alias mkcd='function __mkcd() { mkdir "$1"; cd "$1"; unset -f __mkcd; }; __mkcd'
 
@@ -31,7 +35,7 @@ alias egrep='egrep --color=auto'
 alias t='tmux new-session \; rename-window ""' # see tmux.conf: `-n ""` is dropped since 3.7
 alias ta='tmux a'
 
-alias dotfiles-update='/usr/bin/env python3 -c "$(curl -Ls https://raw.githubusercontent.com/$dotfilesRepo/$dotfilesBranch/setup.py)"'
+alias dotfiles-update='/usr/bin/env python3 -c "$(curl -Ls "$dotfilesSetupUrl")"'
 alias dfu='dotfiles-update'
 
 if isOS linux

@@ -6,6 +6,12 @@
 # Invoke (post-merge, from master):
 #   bash -c "$(curl -fsSL https://raw.githubusercontent.com/tklepzig/dotfiles/master/pi-setup.sh)"
 #
+# During an outage, fetch this script from a mirror's raw-file URL and
+# set DOTFILES_SETUP_URL / DOTFILES_CLONE_URL so the dotfiles install below uses
+# the same mirror:
+#   DOTFILES_SETUP_URL=<raw setup.py> DOTFILES_CLONE_URL=<repo .git> \
+#     bash -c "$(curl -fsSL <raw pi-setup.sh>)"
+#
 # i3 needs X11 (Bookworm defaults to Wayland).
 
 set -euo pipefail
@@ -63,9 +69,10 @@ sudo apt-get install -y eza \
 # Fetch to a var and verify it's non-empty FIRST: if the curl 404s (wrong
 # branch, transient hiccup) the naive `python3 -c "$(curl ...)"` form would run
 # an empty program — exit 0 under `set -e` — and silently skip provisioning.
-installer="$(curl -fsSL "https://raw.githubusercontent.com/$DOTFILES_REPO/$DOTFILES_BRANCH/setup.py")"
+setup_url="${DOTFILES_SETUP_URL:-https://raw.githubusercontent.com/$DOTFILES_REPO/$DOTFILES_BRANCH/setup.py}"
+installer="$(curl -fsSL "$setup_url")"
 if [ -z "$installer" ]; then
-  echo "ERROR: failed to fetch setup.py from $DOTFILES_REPO@$DOTFILES_BRANCH." >&2
+  echo "ERROR: failed to fetch setup.py from $setup_url." >&2
   exit 1
 fi
 DOTFILES_BRANCH="$DOTFILES_BRANCH" python3 -c "$installer"

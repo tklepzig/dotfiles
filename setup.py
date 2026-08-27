@@ -19,6 +19,14 @@ DF_PATH = f"{HOME}/.dotfiles"
 DF_LOCAL_PATH = f"{HOME}/.dotfiles-local"
 DF_LOCAL = "--local" in sys.argv
 
+# Where the repo is cloned from and updated against. Point this at a mirror to
+# keep working during an outage; zsh/alias holds the matching raw-file
+# URL used to fetch this script in the first place. Prefer HTTPS — a fresh
+# machine mid-outage has neither a key nor a known_hosts entry for a new host.
+DF_CLONE_URL = (
+    os.environ.get("DOTFILES_CLONE_URL") or f"https://github.com/{DF_REPO}.git"
+)
+
 ARROW = "❯"
 
 
@@ -163,17 +171,35 @@ def update_dotfiles_repo():
     with Logger.log(f"Found existing dotfiles in {DF_PATH}, updating"):
         current_hash = git_short_hash()
 
+        # Repoint origin, so the reset below can keep targeting origin/<branch>.
+        # Without this, switching DOTFILES_CLONE_URL would fetch the mirror and
+        # then reset to the stale old ref — reporting success while changing
+        # nothing. Safe because DF_PATH is a deployment-only clone: hard-reset on
+        # every update, never pushed from.
+        subprocess.run(
+            ["git", "remote", "set-url", "origin", DF_CLONE_URL], cwd=DF_PATH
+        )
+
         if DF_BRANCH:
             subprocess.run(
                 ["git", "remote", "set-branches", "origin", DF_BRANCH], cwd=DF_PATH
             )
 
-        subprocess.run(
+        # A failed fetch must abort: resetting to the (now stale) origin ref
+        # would report "Updated from <hash> to <same hash>" and exit 0 — the
+        # exact lie you do not want while a host is unreachable.
+        fetch = subprocess.run(
             ["git", "fetch", "--depth=1"],
             cwd=DF_PATH,
             stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            text=True,
         )
+        if fetch.returncode != 0:
+            Logger.error(f"Fetch from {DF_CLONE_URL} failed:")
+            Logger.error(fetch.stderr.strip())
+            sys.exit(1)
+
         subprocess.run(
             ["git", "reset", "--hard", f"origin/{DF_BRANCH or 'master'}"],
             cwd=DF_PATH,
@@ -189,14 +215,14 @@ def update_dotfiles_repo():
 
 
 def clone_dotfiles_repo():
-    Logger.log(f"Cloning repo from {DF_REPO} to {DF_PATH}")
+    Logger.log(f"Cloning repo from {DF_CLONE_URL} to {DF_PATH}")
     if DF_BRANCH:
         Logger.success(f"Switching to branch {DF_BRANCH}")
 
     clone_command = ["git", "clone", "--quiet", "--depth=1"]
     if DF_BRANCH:
         clone_command += ["-b", DF_BRANCH]
-    clone_command += [f"https://github.com/{DF_REPO}.git", DF_PATH]
+    clone_command += [DF_CLONE_URL, DF_PATH]
     subprocess.run(clone_command)
 
     Logger.success(f"Installed dotfiles at {git_short_hash()}.")
