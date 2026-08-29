@@ -4,7 +4,7 @@
 -- press, so a manual :DiffviewClose can't leave this stale.
 local diffview_open_kind = nil
 
-local function diffview_toggle(kind, args)
+local function diffview_toggle(kind, command)
   local is_open = require("diffview.lib").get_current_view() ~= nil
 
   if is_open and diffview_open_kind == kind then
@@ -14,8 +14,8 @@ local function diffview_toggle(kind, args)
   end
 
   if is_open then vim.cmd("DiffviewClose") end
-  -- args may be a function so the branch probe only runs when actually opening
-  vim.cmd("DiffviewOpen " .. (type(args) == "function" and args() or args or ""))
+  -- command may be a function so the branch probe only runs when actually opening
+  vim.cmd(type(command) == "function" and command() or command)
   diffview_open_kind = kind
 end
 
@@ -36,12 +36,21 @@ local function toggle_diff_whitespace()
   vim.notify(ignoring and "diff: whitespace shown" or "diff: whitespace ignored")
 end
 
--- branch vs its base
-local function diffview_branch_args()
+local function git_base_branch()
   vim.fn.system("git rev-parse --verify --quiet refs/heads/master")
-  local base = vim.v.shell_error == 0 and "master" or "main"
+  return vim.v.shell_error == 0 and "master" or "main"
+end
+
+-- branch vs its base
+local function diffview_branch_command()
   -- imply-local: right-hand side is the editable working-tree file
-  return base .. "...HEAD --imply-local"
+  return "DiffviewOpen " .. git_base_branch() .. "...HEAD --imply-local"
+end
+
+-- the branch's own commits, one at a time; --range goes to `git log`, so two dots
+-- (three-dot log = symmetric difference and would pull in base-only commits)
+local function diffview_commits_command()
+  return "DiffviewFileHistory --range=" .. git_base_branch() .. "..HEAD"
 end
 
 return {
@@ -154,13 +163,18 @@ return {
     keys = {
       {
         "<leader>gd",
-        function() diffview_toggle("worktree") end,
+        function() diffview_toggle("worktree", "DiffviewOpen") end,
         desc = "Toggle diffview: uncommitted changes",
       },
       {
         "<leader>gb",
-        function() diffview_toggle("branch", diffview_branch_args) end,
+        function() diffview_toggle("branch", diffview_branch_command) end,
         desc = "Toggle diffview: branch vs base",
+      },
+      {
+        "<leader>gc",
+        function() diffview_toggle("commits", diffview_commits_command) end,
+        desc = "Toggle diffview: branch commits, one at a time",
       },
       {
         "<leader>gw",
