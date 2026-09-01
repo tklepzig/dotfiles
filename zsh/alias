@@ -183,6 +183,12 @@ alias clr="claude --resume"
 alias clrs="claude --resume --model sonnet"
 alias clro="claude --resume --model opus"
 
+claude() {
+  local -a extraSettings=()
+  [[ -n "$CLAUDE_EXTRA_SETTINGS" ]] && extraSettings=(--settings "$CLAUDE_EXTRA_SETTINGS")
+  command claude "${extraSettings[@]}" "$@"
+}
+
 [[ -x "$HOME/ava/bin/ava" ]] && alias ava="$HOME/ava/bin/ava"
 
 devpad-hdmi() {
