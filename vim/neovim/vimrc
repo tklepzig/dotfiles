@@ -91,6 +91,18 @@ command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organize
 
 let g:coc_snippet_next = '<tab>'
 
+" coc needs Node >= 24.4 (vm moduleRequests); use the newest installed asdf node
+" instead of inheriting the project's pin (asdf list sorts lexically, hence sort -V)
+let s:newestNodeVersion = get(systemlist('ls ~/.asdf/installs/nodejs 2>/dev/null | sort -V | tail -1'), 0, '')
+let s:cocNode = expand('~/.asdf/installs/nodejs/' . s:newestNodeVersion . '/bin/node')
+if !empty(s:newestNodeVersion) && executable(s:cocNode)
+  let g:coc_node_path = s:cocNode
+else
+  echohl WarningMsg
+  echomsg 'coc: no node install under ~/.asdf/installs/nodejs, using $PATH node (coc-prettier needs >= 24.4)'
+  echohl None
+endif
+
 "coc-emoji is triggered when typing ':'
 let g:coc_global_extensions = [
       \'coc-snippets',
