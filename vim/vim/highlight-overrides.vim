@@ -41,6 +41,20 @@ execute 'highlight MarkdownNavigatorH4 ctermfg='.secondaryText
 execute 'highlight MarkdownNavigatorH5 ctermfg='.secondaryText
 execute 'highlight MarkdownNavigatorH6 ctermfg='.secondaryText
 
+" Svelte attributes that neovim's HTML4-era htmlArg keyword list doesn't know
+" (oninput, onclick, …). vim-svelte-plugin matches them as htmlAttr but leaves
+" the group uncoloured, so every Svelte 5 event handler renders as plain text.
+hi link htmlAttr htmlArg
+hi link htmlAttrEqual htmlTag
+
+" A Svelte `{…}` attribute expression is code, but the plugin links svelteValue
+" — the fallthrough for everything its tiny JS cluster doesn't match — to
+" String, so a whole event handler renders in the same orange as a class value.
+" Adding @TypeScript to that cluster would tokenise it properly but breaks real
+" files (see the svelte-html-attr-highlighting memory); this just stops it
+" reading as a string.
+hi link svelteValue Normal
+
 " GitGutter
 hi GitGutterAdd    ctermfg=2
 hi GitGutterChange ctermfg=3

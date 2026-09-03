@@ -188,6 +188,20 @@ let g:conflict_marker_highlight_group = ''
 
 
 let g:vim_svelte_plugin_use_typescript = 1
+
+" Colour compound attributes (data-*, aria-*, class:*) as a whole. `data`,
+" `prompt` and `class` are htmlArg keywords, and a keyword always wins over a
+" match at the same start column — so `data-my-tooltip-prompt` renders in three
+" colours and `class:active` in two. Matching from the separator dodges the
+" keyword. An after/syntax file cannot do this: lazy.nvim drops ~/.vim/after
+" from the runtimepath.
+augroup compoundHtmlAttrs
+  autocmd!
+  autocmd Syntax html,svelte
+        \ syn match htmlArg "\%([0-9A-Za-z]\)\@<=\%([-:][-.:0-9_A-Za-z]\+\)\+"
+        \ contained containedin=htmlTag
+augroup END
+
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.tsx,*.jsx,*.svelte'
 let test#strategy = "vimux"
 let g:test#echo_command = 0
