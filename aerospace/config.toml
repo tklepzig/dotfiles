@@ -16,6 +16,11 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 [workspace-to-monitor-force-assignment]
 6 = 'Built-in'
 
+# VLC opens floating by default; force it into the tiling tree.
+[[on-window-detected]]
+if.app-id = 'org.videolan.vlc'
+run = 'layout tiling'
+
 [mode.main.binding]
 # See: https://nikitabobko.github.io/AeroSpace/goodness#open-a-new-window-with-applescript
 alt-enter = "exec-and-forget osascript $HOME/.dotfiles/aerospace/kitty.scpt"
