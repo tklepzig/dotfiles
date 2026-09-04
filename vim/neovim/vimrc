@@ -23,6 +23,47 @@ let g:NERDCustomDelimiters = {
       \ 'css': { 'left': '/*', 'right': '*/' }
       \ }
 
+" NERDCommenter derives its delimiters from &filetype, so a markup buffer always
+" comments as markup, even inside a <script> or <style> block. Swap the filetype
+" for the duration of the call to get the embedded language's delimiters.
+let s:embeddedTagFiletypes = { 'script': 'javascript', 'style': 'css' }
+let s:markupFiletypes = ['html', 'svelte', 'vue']
+let s:embeddedTagPattern = '<\/\?\%(' . join(keys(s:embeddedTagFiletypes), '\|') . '\)\>'
+
+function! s:EmbeddedFiletype() abort
+  for line in range(line('.') - 1, 1, -1)
+    let tag = matchstr(getline(line), s:embeddedTagPattern)
+    if tag ==# ''
+      continue
+    endif
+    if tag =~# '^<\/'
+      return ''
+    endif
+    return s:embeddedTagFiletypes[matchstr(tag, '\w\+')]
+  endfor
+  return ''
+endfunction
+
+function! NERDCommenter_before() abort
+  if index(s:markupFiletypes, &filetype) < 0 || exists('b:nerd_outer_filetype')
+    return
+  endif
+  let embedded_filetype = s:EmbeddedFiletype()
+  if embedded_filetype ==# ''
+    return
+  endif
+  let b:nerd_outer_filetype = &filetype
+  noautocmd execute 'setlocal filetype=' . embedded_filetype
+endfunction
+
+function! NERDCommenter_after() abort
+  if !exists('b:nerd_outer_filetype')
+    return
+  endif
+  noautocmd execute 'setlocal filetype=' . b:nerd_outer_filetype
+  unlet b:nerd_outer_filetype
+endfunction
+
 let g:vim_ai_chat = {
 \  "options": {
 \    "model": "gpt-4",
