@@ -10,6 +10,8 @@ enable-normalization-opposite-orientation-for-nested-containers = false
 
 start-at-login = true
 
+config-version = 2
+
 # Mouse follows focus when focused monitor changes
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
@@ -66,18 +68,12 @@ alt-4 = 'workspace 4'
 alt-5 = 'workspace 5'
 alt-6 = 'workspace 6'
 
-#alt-right = 'workspace next'
-#alt-left = 'workspace prev'
-
 alt-shift-1 = 'move-node-to-workspace 1'
 alt-shift-2 = 'move-node-to-workspace 2'
 alt-shift-3 = 'move-node-to-workspace 3'
 alt-shift-4 = 'move-node-to-workspace 4'
 alt-shift-5 = 'move-node-to-workspace 5'
 alt-shift-6 = 'move-node-to-workspace 6'
-
-alt-shift-right = 'move-node-to-workspace next'
-alt-shift-left = 'move-node-to-workspace prev'
 
 alt-shift-c = 'reload-config'
 alt-shift-r = 'flatten-workspace-tree'
