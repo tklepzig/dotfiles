@@ -4,8 +4,14 @@
 -- press, so a manual :DiffviewClose can't leave this stale.
 local diffview_open_kind = nil
 
+-- pcall: the gn/gN mappings exist before the plugin is loaded.
+local function is_diffview_open()
+  local ok, lib = pcall(require, "diffview.lib")
+  return ok and lib.get_current_view() ~= nil
+end
+
 local function diffview_toggle(kind, command)
-  local is_open = require("diffview.lib").get_current_view() ~= nil
+  local is_open = is_diffview_open()
 
   if is_open and diffview_open_kind == kind then
     vim.cmd("DiffviewClose")
@@ -51,6 +57,20 @@ end
 -- (three-dot log = symmetric difference and would pull in base-only commits)
 local function diffview_commits_command()
   return "DiffviewFileHistory --range=" .. git_base_branch() .. "..HEAD"
+end
+
+-- last N commits of HEAD, base branch irrelevant; count1 is count-or-1.
+-- First-parent walk, so N steps across a merge span more than `git log -N`.
+local function last_commits_range()
+  local count = vim.v.count1
+  vim.fn.system("git rev-parse --verify --quiet HEAD~" .. count)
+
+  if vim.v.shell_error ~= 0 then
+    vim.notify("diffview: fewer than " .. count .. " commits on HEAD", vim.log.levels.WARN)
+    return nil
+  end
+
+  return "HEAD~" .. count .. "..HEAD", count
 end
 
 return {
@@ -160,6 +180,33 @@ return {
   {
     "sindrets/diffview.nvim",
     cmd = { "DiffviewOpen", "DiffviewFileHistory" },
+    -- gn/gN can't live in `keys`: lazy re-feeds only the lhs, losing the typed
+    -- count on the first press. `cmd` above still lazy-loads on the command.
+    init = function()
+      local function open_last_commits(kind_prefix, build_command)
+        return function()
+          local range, count = last_commits_range()
+          if not range then return end
+
+          -- count is part of the kind so 3<leader>gn after 1<leader>gn switches, not closes
+          diffview_toggle(kind_prefix .. count, build_command(range))
+        end
+      end
+
+      vim.keymap.set(
+        "n",
+        "<leader>gn",
+        open_last_commits("last-cumulative:", function(range) return "DiffviewOpen " .. range end),
+        { silent = true, desc = "Toggle diffview: last N commits, cumulative" }
+      )
+
+      vim.keymap.set(
+        "n",
+        "<leader>gN",
+        open_last_commits("last-history:", function(range) return "DiffviewFileHistory --range=" .. range end),
+        { silent = true, desc = "Toggle diffview: last N commits, one at a time" }
+      )
+    end,
     keys = {
       {
         "<leader>gd",
