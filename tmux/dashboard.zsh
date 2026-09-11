@@ -211,12 +211,13 @@ read_widget_data() {
         CPUTEMP_VALUE=$(sed -n 2p <<< "$tout")
     fi
 
-    WIFI_STATE=''; WIFI_VALUE=''
     if [[ -f "$HOME/.dotfiles/tmux/wifi-signal.$OS.zsh" ]]; then
         local wout
-        wout=$("$HOME/.dotfiles/tmux/wifi-signal.$OS.zsh" 2>/dev/null)
-        WIFI_STATE=$(sed -n 1p <<< "$wout")
-        WIFI_VALUE=$(sed -n 2p <<< "$wout")
+        # Non-zero exit = RSSI momentarily unavailable; keep the previous values.
+        if wout=$("$HOME/.dotfiles/tmux/wifi-signal.$OS.zsh" 2>/dev/null); then
+            WIFI_STATE=$(sed -n 1p <<< "$wout")
+            WIFI_VALUE=$(sed -n 2p <<< "$wout")
+        fi
     fi
 
     NETWORK_LABEL='Offline'
