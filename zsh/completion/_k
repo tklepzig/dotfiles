@@ -15,10 +15,13 @@ _k() {
       branches=( $local_branches[@] $remote_branches[@] )
       # (u) deduplicates; ${...:#HEAD} removes the remote HEAD entry
       branches=( ${(u)branches[@]:#HEAD} )
+      local -a tags
+      tags=( ${(f)"$(git for-each-ref --format='%(refname:strip=2)' refs/tags/ 2>/dev/null)"} )
       _describe -t branches 'branches' branches
+      _describe -t tags 'tags' tags
     elif (( CURRENT >= 4 )); then
       local -a options
-      options=('--no-cd:skip cd into new worktree')
+      options=('--no-cd:skip cd into new worktree' '--detach:check out detached, on no branch')
       _describe -t options 'options' options
     fi
   fi

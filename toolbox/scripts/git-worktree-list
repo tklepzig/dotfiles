@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 # git-worktree-list - git worktree helper
-# Usage: k [add <branch> [path] [--no-cd] | rm | tmux]
+# Usage: k [add <ref> [path] [--detach] [--no-cd] | rm | rm-self | tmux]
 # No args: fzf picker to switch (cd) into a worktree
 #
 # When switching, the selected path is printed to stdout so the calling
@@ -50,6 +50,19 @@ def symlink_ignored_files(main_repo, worktree)
        File.symlink(src, dst)
        warn "  linked: #{item}"
      end
+end
+
+# --- naming -------------------------------------------------------------------
+
+def worktree_dirname(ref, resolved, detach:)
+  return ref.tr('/', '-') unless detach
+
+  # Name it after the ref HEAD/@/HEAD~n resolve to; those spellings would otherwise
+  # each claim one directory for every commit they ever point at
+  full = run('git', 'rev-parse', '--symbolic-full-name', ref || 'HEAD').to_s
+  return "detached-#{resolved[0, 7]}" unless full.start_with?('refs/')
+
+  "detached-#{full.sub(%r{\Arefs/(heads|tags|remotes)/}, '').tr('/', '-')}"
 end
 
 # --- worktree data -------------------------------------------------------------
@@ -138,31 +151,46 @@ abort_if_no_repo
 case ARGV[0]
 
 when 'add'
-  args     = ARGV[1..].reject { |arg| arg == '--no-cd' }
+  args     = ARGV[1..].reject { |arg| ['--no-cd', '--detach'].include?(arg) }
   cd_after = !ARGV.include?('--no-cd')
-  branch   = args[0] or abort 'Usage: k add <branch> [<path>] [--no-cd]'
+  detach   = ARGV.include?('--detach')
+  ref      = args[0]
+  abort 'Usage: k add <ref> [<path>] [--detach] [--no-cd]' if ref.nil? && !detach
 
   main_worktree = worktrees.first[:path]
   repo_name     = File.basename(main_worktree)
-  new_path      = args[1] || File.join(File.dirname(main_worktree), "#{repo_name}-worktrees", branch.gsub('/', '-'))
 
-  existing = worktrees.find { |wt| wt[:path] == new_path || wt[:branch] == branch }
+  local_exists  = ref && system('git', 'show-ref', '--verify', '--quiet', "refs/heads/#{ref}",          out: '/dev/null', err: '/dev/null')
+  remote_exists = ref && system('git', 'show-ref', '--verify', '--quiet', "refs/remotes/origin/#{ref}", out: '/dev/null', err: '/dev/null')
+
+  # A ref that resolves to a commit but names no branch is a tag/sha/HEAD~n — detach
+  # there instead of inventing a branch at HEAD. ^{commit} peels annotated tag objects.
+  resolved = run('git', 'rev-parse', '--verify', '--quiet', "#{ref || 'HEAD'}^{commit}")
+  detach ||= !local_exists && !remote_exists && !resolved.nil?
+  abort "k: '#{ref}' is not a valid ref" if detach && resolved.nil?
+
+  new_path = args[1] || File.join(File.dirname(main_worktree), "#{repo_name}-worktrees",
+                                  worktree_dirname(ref, resolved, detach:))
+
+  # Detaching deliberately ignores a branch match — a second worktree for a branch
+  # already checked out elsewhere is the point of the flag
+  existing = worktrees.find { |wt| wt[:path] == new_path || (!detach && wt[:branch] == ref) }
   if existing
     warn "Worktree already exists at #{existing[:path]}, switching to it"
     puts existing[:path] if cd_after
     exit 0
   end
 
-  local_exists  = system('git', 'show-ref', '--verify', '--quiet', "refs/heads/#{branch}",          out: '/dev/null', err: '/dev/null')
-  remote_exists = system('git', 'show-ref', '--verify', '--quiet', "refs/remotes/origin/#{branch}", out: '/dev/null', err: '/dev/null')
-
-  worktree_cmd = if local_exists
-                   ['git', 'worktree', 'add', new_path, branch]
+  worktree_cmd = if detach
+                   ['git', 'worktree', 'add', '--detach', new_path, *ref]
+                 elsif local_exists
+                   ['git', 'worktree', 'add', new_path, ref]
                  elsif remote_exists
-                   ['git', 'worktree', 'add', '--track', '-b', branch, new_path, "origin/#{branch}"]
+                   ['git', 'worktree', 'add', '--track', '-b', ref, new_path, "origin/#{ref}"]
                  else
-                   ['git', 'worktree', 'add', '-b', branch, new_path]
+                   ['git', 'worktree', 'add', '-b', ref, new_path]
                  end
+  warn "Detaching at #{ref || 'HEAD'} (#{resolved[0, 7]})" if detach
   system(*worktree_cmd, out: :err)
 
   warn 'Linking ignored files...'
@@ -262,9 +290,10 @@ when 'tmux'
 
 else
   if ARGV[0]
-    branch = ARGV[0]
-    found = worktrees.find { |wt| wt[:branch] == branch }
-    abort "k: no worktree for branch '#{branch}'" unless found
+    name  = ARGV[0]
+    found = worktrees.find { |wt| wt[:branch] == name } ||
+            worktrees.find { |wt| File.basename(wt[:path]) == name }
+    abort "k: no worktree for '#{name}'" unless found
 
     puts found[:path]
   else
