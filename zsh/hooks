@@ -20,6 +20,31 @@ function zle-line-init zle-keymap-select {
 zle -N zle-line-init
 zle -N zle-keymap-select
 
+# Host/alias as typed on an `ssh` command line, for the tmux window label.
+# Locals are declared up front: `local` inside a loop body prints `var=value`.
+sshTargetFromCommand() {
+  emulate -L zsh
+  local -a words
+  local word target
+  local skipNext=0
+
+  words=(${(z)1})
+  [[ $words[1] == ssh ]] || return 1
+  shift words
+
+  for word in $words; do
+    if (( skipNext )); then skipNext=0; continue; fi
+    case $word in
+      -[BbcDEeFIiJLlmOopQRSWw]) skipNext=1 ;;  # flags that consume the next word
+      -*) ;;                                   # boolean flags, and -p2222 / -oFoo=bar
+      *) target=$word; break ;;
+    esac
+  done
+
+  [[ -n $target ]] || return 1
+  print -r -- "${target##*@}"
+}
+
 # Start timer for evaluating in precmd
 preexec() {
   if isOS darwin
@@ -32,10 +57,22 @@ preexec() {
   if [ -n "$TMUX_PANE" ] && [ -d "${HOME}/.dotfiles-local/tmux-snapshot" ]; then
     print -r -- "$1" > "${HOME}/.dotfiles-local/tmux-snapshot/pane-cmd-${TMUX_PANE}"
   fi
+
+  # $3 is the fully expanded line, so `alias pi='ssh pi'` still resolves.
+  if [ -n "$TMUX_PANE" ]; then
+    sshWindowTarget=$(sshTargetFromCommand "$3")
+    [[ -n $sshWindowTarget ]] && tmux set -w @sshTarget "$sshWindowTarget" \; refresh-client -S
+  fi
 }
 
 precmd() {
   lastExitCode=$?
+
+  # Must stay below lastExitCode: anything above it would eat $?.
+  if [[ -n $sshWindowTarget ]]; then
+    tmux set -wu @sshTarget \; refresh-client -S
+    unset sshWindowTarget
+  fi
 
   if [ $timer ]; then
     if isOS darwin
