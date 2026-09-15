@@ -317,29 +317,5 @@ return {
     end,
   },
 
-  {
-    "olimorris/codecompanion.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-      "ravitemer/mcphub.nvim",
-    },
-    config = function()
-      require("codecompanion").setup({
-        extensions = {
-          mcphub = {
-            callback = "mcphub.extensions.codecompanion",
-            opts = {
-              --make_vars = true,
-              --temp. workaround, see https://github.com/ravitemer/mcphub.nvim/issues/275
-              make_vars = false,
-              make_slash_commands = true,
-              show_result_in_chat = true
-            }
-          }
-        }
-      })
-    end,
-  },
   { dir = vim.fn.expand("$HOME/.dotfiles/vim/neovim/local-plugins/claude-code"), name = "claude-code" },
 }
