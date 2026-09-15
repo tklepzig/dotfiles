@@ -20,4 +20,4 @@ fi
 icon="${${weather%%|*}// /}"
 temp="${${weather##*|}//+/}"
 
-echo "#[fg=$statusDateTimeFg] $icon $temp#[default]"
+echo "#[fg=$statusInactiveFg] $icon $temp#[default]"
