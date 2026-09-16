@@ -383,6 +383,9 @@ PREVIEW_CMD = <<~'SH'.chomp
           approvers: $approvers, requesters: $requesters }) as $review |
       ($bold + (.title // .name // "(untitled)") + $reset),
       ($state + (if .number then "  #\(.number | tostring)" else "" end) + "  " + $cyan + "@" + (.user.login // .author.login // "unknown") + $reset),
+      (if .created_at then
+        ($dim + "Opened:" + $reset + "    " + (.created_at | strptime("%Y-%m-%dT%H:%M:%SZ") | strftime("%d.%m.%Y %H:%M")))
+      else empty end),
       (if .updated_at then
         ((.updated_at | strptime("%Y-%m-%dT%H:%M:%SZ") | mktime) as $updated_ts |
         (now - $updated_ts) as $diff |
