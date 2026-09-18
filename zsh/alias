@@ -29,6 +29,25 @@ then
 fi
 
 alias rmr='rm -rf'
+
+# Delete the directory you are standing in and land in its parent
+rmr-self() {
+    local target=${PWD:A}
+    local parent=${target:h}
+    local confirmation
+
+    if [[ $target == / || $target == $HOME || $parent == $target ]]
+    then
+        echo "rmr-self: refusing to delete $target" >&2
+        return 1
+    fi
+
+    read "confirmation?Delete $target? [y/N] " || { echo; return 1 }
+    [[ ${confirmation:l} == (y|yes) ]] || return 1
+
+    cd "$parent" && rm -rf "$target"
+}
+
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
