@@ -60,8 +60,8 @@ preexec() {
 
   # $3 is the fully expanded line, so `alias pi='ssh pi'` still resolves.
   if [ -n "$TMUX_PANE" ]; then
-    sshWindowTarget=$(sshTargetFromCommand "$3")
-    [[ -n $sshWindowTarget ]] && tmux set -w @sshTarget "$sshWindowTarget" \; refresh-client -S
+    sshPaneTarget=$(sshTargetFromCommand "$3")
+    [[ -n $sshPaneTarget ]] && tmux set -p -t "$TMUX_PANE" @sshTarget "$sshPaneTarget" \; refresh-client -S
   fi
 }
 
@@ -69,9 +69,9 @@ precmd() {
   lastExitCode=$?
 
   # Must stay below lastExitCode: anything above it would eat $?.
-  if [[ -n $sshWindowTarget ]]; then
-    tmux set -wu @sshTarget \; refresh-client -S
-    unset sshWindowTarget
+  if [[ -n $sshPaneTarget ]]; then
+    tmux set -pu -t "$TMUX_PANE" @sshTarget \; refresh-client -S
+    unset sshPaneTarget
   fi
 
   if [ $timer ]; then
