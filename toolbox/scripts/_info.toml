@@ -138,6 +138,15 @@ completion = ["add", "rm", "rm-self", "tmux"]
 name = "subcommand"
 optional = true
 
+[github-inbox-cleanup]
+help = '''
+Marks unread GitHub notifications as done whose issue or PR is closed or merged. Mentions are kept.
+Dry run by default: lists what would go. Pass --yes to actually mark them done (not undoable via API).'''
+completion = ["--yes"]
+[[github-inbox-cleanup.args]]
+name = "--yes"
+optional = true
+
 [gpg-add-subkey]
 help = "Add a new subkey to an existing GPG key"
 [[gpg-add-subkey.args]]

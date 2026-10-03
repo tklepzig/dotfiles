@@ -1,0 +1,149 @@
+#!/usr/bin/env python3
+
+# Marks inbox notifications as done when their issue/PR is closed or merged.
+# Mentions are left for manual handling.
+# "Done" (DELETE) removes a thread from the inbox; "read" (PATCH) only greys it.
+# Done cannot be undone through the API, hence dry-run unless --yes.
+
+import json
+import re
+import subprocess
+import sys
+
+# Aliases per GraphQL query; keeps each request well under node/size limits.
+CHUNK_SIZE = 50
+SUBJECT_URL = re.compile(r"^https://api\.github\.com/repos/([^/]+)/([^/]+)/(?:pulls|issues)/(\d+)$")
+FINISHED_STATES = {"CLOSED", "MERGED"}
+
+DIM = "\033[2m"
+RED = "\033[31m"
+GREEN = "\033[32m"
+MAGENTA = "\033[35m"
+RESET = "\033[0m"
+STATE_COLOURS = {"MERGED": MAGENTA, "CLOSED": RED}
+
+
+def gh(*args):
+    return subprocess.run(["gh", *args], capture_output=True, text=True)
+
+
+def fetch_notifications():
+    result = gh("api", "--paginate", "--jq", ".[]", "notifications?per_page=50")
+    if result.returncode != 0:
+        sys.exit(f"{RED}Fetching notifications failed:{RESET} {result.stderr.strip()}")
+    return [json.loads(line) for line in result.stdout.splitlines() if line]
+
+
+def subject_reference(notification):
+    match = SUBJECT_URL.match(notification["subject"].get("url") or "")
+    if not match:
+        return None
+    owner, name, number = match.groups()
+    return {"owner": owner, "name": name, "number": int(number)}
+
+
+def state_query(references):
+    fields = [
+        f"n{index}: repository(owner: {json.dumps(reference['owner'])}, name: {json.dumps(reference['name'])}) "
+        f"{{ issueOrPullRequest(number: {reference['number']}) {{ ... on Issue {{ state }} ... on PullRequest {{ state }} }} }}"
+        for index, reference in enumerate(references)
+    ]
+    return "query { " + " ".join(fields) + " }"
+
+
+# gh exits non-zero when any alias errors (no access, deleted repo), yet still
+# prints the data for the others — so parse stdout regardless of the exit code.
+def fetch_states(references):
+    result = gh("api", "graphql", "-f", f"query={state_query(references)}")
+    try:
+        data = json.loads(result.stdout).get("data") or {}
+    except json.JSONDecodeError:
+        data = {}
+    return [
+        ((data.get(f"n{index}") or {}).get("issueOrPullRequest") or {}).get("state")
+        for index in range(len(references))
+    ]
+
+
+def chunks(items, size):
+    return [items[start:start + size] for start in range(0, len(items), size)]
+
+
+def classify(notifications):
+    candidates = [
+        (notification, reference)
+        for notification in notifications
+        if (reference := subject_reference(notification))
+    ]
+    states = [
+        state
+        for chunk in chunks(candidates, CHUNK_SIZE)
+        for state in fetch_states([reference for _, reference in chunk])
+    ]
+    return [(notification, state) for (notification, _), state in zip(candidates, states)]
+
+
+def describe(notification, state):
+    colour = STATE_COLOURS.get(state, DIM)
+    repository = notification["repository"]["full_name"]
+    return f"  {colour}{(state or '?').ljust(6)}{RESET}  {repository}  {DIM}{notification['subject']['title']}{RESET}"
+
+
+def mark_done(notification):
+    return gh("api", "--method", "DELETE", f"notifications/threads/{notification['id']}").returncode == 0
+
+
+def show_progress(done, total):
+    if sys.stderr.isatty():
+        end = "\n" if done == total else ""
+        print(f"\r{DIM}Marking done… {done}/{total} ({done * 100 // total}%){RESET}", end=end, file=sys.stderr, flush=True)
+
+
+def mark_all_done(notifications):
+    def mark_with_progress(position, notification):
+        succeeded = mark_done(notification)
+        show_progress(position, len(notifications))
+        return succeeded
+
+    return [
+        notification
+        for position, notification in enumerate(notifications, start=1)
+        if not mark_with_progress(position, notification)
+    ]
+
+
+def main():
+    confirmed = "--yes" in sys.argv[1:]
+    notifications = fetch_notifications()
+    classified = classify(notifications)
+    finished = [
+        (notification, state)
+        for notification, state in classified
+        if state in FINISHED_STATES and notification["reason"] != "mention"
+    ]
+    unknown = [notification for notification, state in classified if state is None]
+
+    for notification, state in finished:
+        print(describe(notification, state))
+
+    print(
+        f"\n{len(finished)} of {len(notifications)} notifications are closed/merged"
+        + (f"  {DIM}({len(unknown)} issue/PR states unavailable, left alone){RESET}" if unknown else "")
+    )
+
+    if not finished:
+        return
+    if not confirmed:
+        print(f"{DIM}Dry run — pass --yes to mark them done.{RESET}")
+        return
+
+    failed = mark_all_done([notification for notification, _ in finished])
+    print(f"{GREEN}Marked {len(finished) - len(failed)} done.{RESET}")
+    if failed:
+        print(f"{RED}{len(failed)} failed:{RESET}", file=sys.stderr)
+        for notification in failed:
+            print(f"  {notification['repository']['full_name']}  {notification['subject']['title']}", file=sys.stderr)
+        sys.exit(1)
+
+
+main()
