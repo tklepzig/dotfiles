@@ -1,0 +1,27 @@
+#!/bin/sh
+# Fuzzy-pick any pane across all sessions via fzf, with a live preview, and jump to it.
+# Intended to be run inside a tmux popup (display-popup -E).
+
+current_pane=$(tmux display-message -p '#{pane_id}')
+path_or_name="$(dirname "$0")/pathOrName.zsh"
+tab=$(printf '\t')
+# A non-whitespace separator, so read keeps empty fields such as an unset window name
+separator=$(printf '\037')
+
+# The hidden first column is the pane id, which stays unambiguous and shell-safe as a target
+selected=$(
+    tmux list-panes -a -F "#{pane_id}${separator}#{session_name}:#{window_index}.#{pane_index}${separator}#{pane_current_path}${separator}#{window_name}${separator}#{@sshTarget}${separator}#{pane_current_command}" \
+        | grep -v "^${current_pane}${separator}" \
+        | while IFS="$separator" read -r pane_id target path name ssh_target command; do
+            printf '%s\t%s\t%s\t%s\n' "$pane_id" "$target" "$("$path_or_name" "$path" "$name" full "$ssh_target")" "$command"
+        done \
+        | column -t -s "$tab" \
+        | fzf --prompt='Pane> ' --reverse --no-info --no-mouse \
+            --with-nth=2.. \
+            --preview='tmux capture-pane -ep -t {1}' \
+            --preview-window=down,60%
+)
+
+pane=${selected%% *}
+
+[ -n "$pane" ] && tmux switch-client -t "$pane" \; select-window -t "$pane" \; select-pane -t "$pane"
