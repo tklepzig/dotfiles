@@ -138,20 +138,25 @@ def current_prompt
   "#{parts.join(' ')}> "
 end
 
-def build_pr_graphql_query(pr_notifications)
+SUBJECT_FIELDS = {
+  'pulls' => 'pullRequest(number: %<number>s) { isDraft state author { login } }',
+  'issues' => 'issue(number: %<number>s) { state author { login } }'
+}.freeze
+
+def build_subject_graphql_query(subject_notifications)
   query_parts = []
   id_by_alias = {}
-  pr_notifications.each_with_index do |notification, index|
+  subject_notifications.each_with_index do |notification, index|
     path = api_path(notification['subject']['url'])
-    match = path&.match(%r{^repos/([^/]+)/([^/]+)/pulls/(\d+)$})
+    match = path&.match(%r{^repos/([^/]+)/([^/]+)/(pulls|issues)/(\d+)$})
     next unless match
 
-    owner, repository_name, number = match.captures
-    alias_key = "pr#{index}"
+    owner, repository_name, kind, number = match.captures
+    alias_key = "subject#{index}"
     id_by_alias[alias_key] = notification['id']
     query_parts << "#{alias_key}: repository(owner: #{JSON.generate(owner)}, " \
                    "name: #{JSON.generate(repository_name)}) " \
-                   "{ pullRequest(number: #{number}) { isDraft state author { login } } }"
+                   "{ subject: #{format(SUBJECT_FIELDS[kind], number:)} }"
   end
   [query_parts, id_by_alias]
 end
@@ -169,10 +174,10 @@ end
 # Returns [statuses, degraded]. A failed query is not fatal, but it silently
 # disables the draft/closed filters and blanks the author column, so the caller
 # has to be able to say so.
-def fetch_pull_request_statuses(pr_notifications)
-  return [{}, false] if pr_notifications.empty?
+def fetch_subject_statuses(subject_notifications)
+  return [{}, false] if subject_notifications.empty?
 
-  query_parts, id_by_alias = build_pr_graphql_query(pr_notifications)
+  query_parts, id_by_alias = build_subject_graphql_query(subject_notifications)
   return [{}, false] if query_parts.empty?
 
   parsed = execute_graphql_query("query { #{query_parts.join(' ')} }")
@@ -180,25 +185,25 @@ def fetch_pull_request_statuses(pr_notifications)
 
   data = parsed['data'] || {}
   statuses = id_by_alias.each_with_object({}) do |(alias_key, notification_id), collected|
-    pull_request = data.dig(alias_key, 'pullRequest')
-    next unless pull_request
+    subject = data.dig(alias_key, 'subject')
+    next unless subject
 
     collected[notification_id] = {
-      is_draft: pull_request['isDraft'] == true,
-      state: pull_request['state'],
-      author: pull_request.dig('author', 'login')
+      is_draft: subject['isDraft'] == true,
+      state: subject['state'],
+      author: subject.dig('author', 'login')
     }
   end
   [statuses, false]
 end
 
-def hide_pr?(status, show_drafts:, show_closed:)
+def hide_subject?(status, show_drafts:, show_closed:)
   hide_for_draft  = !show_drafts && status[:is_draft]
   hide_for_closed = !show_closed && status[:state] && status[:state] != 'OPEN'
   hide_for_draft || hide_for_closed
 end
 
-def filter_pull_requests(notifications, statuses, show_drafts:, show_closed:)
+def filter_by_subject_status(notifications, statuses, show_drafts:, show_closed:)
   return notifications if show_drafts && show_closed
   return notifications if statuses.empty?
 
@@ -206,7 +211,7 @@ def filter_pull_requests(notifications, statuses, show_drafts:, show_closed:)
     next false if notification['reason'] == 'mention'
 
     status = statuses[notification['id']]
-    status && hide_pr?(status, show_drafts:, show_closed:)
+    status && hide_subject?(status, show_drafts:, show_closed:)
   end
 end
 
@@ -268,14 +273,14 @@ end
 
 # The first line becomes fzf's --header-lines=1; the two leading fields are the
 # ones --with-nth=3.. hides, and '_' keeps it inert if it ever gets selected.
-def status_line(pr_details_missing)
+def status_line(details_missing)
   parts = [rate_limit_text]
-  parts << "#{YELLOW}⚠ PR details unavailable — draft/closed filters and authors off#{RESET}" if pr_details_missing
+  parts << "#{YELLOW}⚠ PR/issue details unavailable — draft/closed filters and authors off#{RESET}" if details_missing
   "_  _  #{parts.join('  ')}"
 end
 
-def row_for(notification, pr_statuses)
-  author_login = pr_statuses.dig(notification['id'], :author)
+def row_for(notification, subject_statuses)
+  author_login = subject_statuses.dig(notification['id'], :author)
   {
     id: notification['id'],
     path: api_path(notification['subject']['url']) || '_',
@@ -322,10 +327,10 @@ def column_widths(data)
   }
 end
 
-def build_rows(notifications, pr_statuses = {})
+def build_rows(notifications, subject_statuses = {})
   data = notifications
          .reject { |notification| notification['subject']['type'] == 'CheckSuite' }
-         .map { |notification| row_for(notification, pr_statuses) }
+         .map { |notification| row_for(notification, subject_statuses) }
 
   widths = column_widths(data)
   data.map { |row| format_row(row, widths) }
@@ -501,19 +506,19 @@ if ARGV[0] == 'tile'
   exit 0
 end
 
-pr_notifications = notifications.select { |notification| notification['subject']['type'] == 'PullRequest' }
-pr_statuses, pr_details_missing = fetch_pull_request_statuses(pr_notifications)
+subject_notifications = notifications.select { |notification| %w[PullRequest Issue].include?(notification['subject']['type']) }
+subject_statuses, details_missing = fetch_subject_statuses(subject_notifications)
 
-notifications = filter_pull_requests(notifications, pr_statuses, show_drafts:, show_closed:)
+notifications = filter_by_subject_status(notifications, subject_statuses, show_drafts:, show_closed:)
 
 if ARGV.include?('--rows')
-  puts status_line(pr_details_missing)
-  build_rows(notifications, pr_statuses).each { |row| puts row[:line] }
+  puts status_line(details_missing)
+  build_rows(notifications, subject_statuses).each { |row| puts row[:line] }
   exit 0
 end
 
-rows = build_rows(notifications, pr_statuses)
-selected = fzf_pick(rows, status_line(pr_details_missing))
+rows = build_rows(notifications, subject_statuses)
+selected = fzf_pick(rows, status_line(details_missing))
 
 def open_notification(path)
   html_url, = Open3.capture3('gh', 'api', *CACHE.split, path, '--jq', '.html_url')
