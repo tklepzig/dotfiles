@@ -254,9 +254,6 @@ autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx
 let g:vim_markdown_toc_autofit = 1
 let g:vim_markdown_folding_disabled = 1
 
-" Open search mode when opening markdown navigator
-let g:MarkdownNavigatorSearchOnOpen = 1
-
 
 let g:vimtex_syntax_conceal_disable = 1
 
