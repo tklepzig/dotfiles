@@ -1,4 +1,3 @@
-tap "jstkdng/programs"
 tap "nikitabobko/tap"
 
 brew "bat"
@@ -22,7 +21,6 @@ brew "watch"
 brew "websocat"
 brew "wemux"
 brew "wget"
-brew "jstkdng/programs/ueberzugpp"
 brew 'gpg'
 brew 'gpg2'
 brew 'cmus'

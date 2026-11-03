@@ -539,9 +539,15 @@ def configure_kitty():
 def configure_ranger():
     if not program_installed("ranger"):
         return
+    rc_path = f"{HOME}/.config/ranger/rc.conf"
+    # rc.conf only sets up ueberzug image previews, which don't work on macOS.
+    if is_mac():
+        if Path(rc_path).is_symlink():
+            Path(rc_path).unlink()
+        return
     Logger.log("Configuring ranger")
     os.makedirs(f"{HOME}/.config/ranger", exist_ok=True)
-    force_symlink(f"{DF_PATH}/ranger/rc.conf", f"{HOME}/.config/ranger/rc.conf")
+    force_symlink(f"{DF_PATH}/ranger/rc.conf", rc_path)
 
 
 def configure_mpv():
