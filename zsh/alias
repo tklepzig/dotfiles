@@ -100,17 +100,25 @@ k() {
     prune|tmux)
       $dotfilesDir/toolbox/scripts/git-worktree-list "$@"
       ;;
-    add)
-      local target
-      target=$($dotfilesDir/toolbox/scripts/git-worktree-list "$@")
-      [[ -n "$target" ]] && cd "$target"
+    -)
+      [[ -z "$_k_previous" ]] && { echo "k: no previous worktree" >&2; return 1 }
+      [[ ! -d "$_k_previous" ]] && { echo "k: $_k_previous is gone" >&2; return 1 }
+      _k_cd "$_k_previous"
       ;;
     *)
       local target
       target=$($dotfilesDir/toolbox/scripts/git-worktree-list "$@")
-      [[ -n "$target" ]] && cd "$target"
+      [[ -n "$target" ]] && _k_cd "$target"
       ;;
   esac
+}
+
+# Remembers the worktree root being left, so `k -` can swap back to it
+_k_cd() {
+  local current_root
+  current_root=$(git rev-parse --show-toplevel 2>/dev/null)
+  cd "$1" || return
+  [[ -n "$current_root" && "$current_root" != "$(git rev-parse --show-toplevel 2>/dev/null)" ]] && _k_previous=$current_root
 }
 
 ws() { $dotfilesDir/toolbox/scripts/workspaces "$@" }

@@ -132,8 +132,9 @@ add:    create a new worktree (defaults to ../<repo>-worktrees/<branch>)
                   implied when <ref> is a tag or commit rather than a branch
 rm:      fzf multi-picker to remove one or more worktrees (with confirmation, auto-prunes after)
 rm-self: remove the current worktree directly (no fzf, with confirmation, auto-prunes after)
-tmux:    open all worktrees in a tmux session (named after the repo, one window per worktree)'''
-completion = ["add", "rm", "rm-self", "tmux"]
+tmux:    open all worktrees in a tmux session (named after the repo, one window per worktree)
+-:       switch to the previously visited worktree root (`k` only, remembered per shell)'''
+completion = ["add", "rm", "rm-self", "tmux", "-"]
 [[git-worktree-list.args]]
 name = "subcommand"
 optional = true
